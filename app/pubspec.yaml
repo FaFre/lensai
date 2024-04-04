@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  receive_sharing_intent: ^1.6.8
 
 dev_dependencies:
   lint: ^2.3.0
