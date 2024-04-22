@@ -21,8 +21,8 @@ linter:
     - collection_methods_unrelated_type
 
 analyzer:
-  # plugins:
-  #   - custom_lint
+  plugins:
+    - custom_lint
   exclude:
     - "**.g.dart"
     - "**.swagger.dart"

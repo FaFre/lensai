@@ -1,0 +1,55 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    style="@style/Widget.KagiWidget.AppWidget.Container"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:theme="@style/Theme.KagiWidget.AppWidgetContainer">
+
+    <Button
+        android:id="@+id/search_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/search_text_field"
+        android:text="Search on Kagi..."
+        android:textColor="#848388"
+        android:drawablePadding="8dp"
+        android:padding="12dp"
+        android:drawableStart="@drawable/mdi_icon_search_web"
+        android:drawableTint="#848388"
+        android:gravity="start|center_vertical" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:paddingTop="12dp">
+
+        <Button
+            android:layout_marginEnd="8dp"
+            android:id="@+id/assistant_button"
+            android:padding="16dp"
+            android:backgroundTint="#333237"
+            android:background="@drawable/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTint="@color/white"
+            android:drawableStart="@drawable/mdi_icon_brain"
+            android:drawablePadding="8dp"
+            android:text="Assistant" />
+
+        <Button
+            android:layout_marginStart="8dp"
+            android:id="@+id/summarizer_button"
+            android:padding="16dp"
+            android:backgroundTint="#333237"
+            android:background="@drawable/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTint="@color/white"
+            android:drawableStart="@drawable/mdi_icon_text"
+            android:drawablePadding="8dp"
+            android:text="Summarizer" />
+    </LinearLayout>
+</LinearLayout>

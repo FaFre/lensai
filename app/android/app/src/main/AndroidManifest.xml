@@ -26,17 +26,28 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
             <intent-filter>
+                <action android:name="me.movenext.kagi_bang_bang.action.LAUNCH" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:mimeType="text/*" />
+            </intent-filter>
+            <intent-filter>
                <action android:name="android.intent.action.VIEW" />
-
                <category android:name="android.intent.category.DEFAULT" />
                <category android:name="android.intent.category.BROWSABLE" />
-               
-                <!-- This data tag matches all HTTP and HTTPS URLs -->
-                <data android:scheme="http" />
-                <data android:scheme="https" />
-                <data android:host="*" />
             </intent-filter>
         </activity>
+        <receiver android:name="KagiWidgetProvider" android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+
+            </intent-filter>
+                <meta-data android:name="android.appwidget.provider"
+                    android:resource="@xml/kagi_widget_info" />
+        </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data
@@ -48,10 +59,11 @@
          https://developer.android.com/reference/android/content/Intent#ACTION_PROCESS_TEXT.
 
          In particular, this is used by the Flutter engine in io.flutter.plugin.text.ProcessTextPlugin. -->
-    <queries>
+    <!-- This will show a lot of app actions in context menu when selecting text
+     <queries>
         <intent>
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
-    </queries>
+    </queries> -->
 </manifest>

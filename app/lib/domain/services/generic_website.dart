@@ -1,0 +1,73 @@
+import 'package:exceptions/exceptions.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:html/dom.dart';
+import 'package:html/parser.dart' as html_parser;
+import 'package:http/http.dart' as http;
+import 'package:kagi_bang_bang/core/http_error_handler.dart';
+import 'package:kagi_bang_bang/domain/entities/web_page_info.dart';
+import 'package:kagi_bang_bang/features/web_view/utils/favicon_helper.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'generic_website.g.dart';
+
+@Riverpod(keepAlive: true)
+class GenericWebsiteService extends _$GenericWebsiteService {
+  late http.Client _client;
+
+  @override
+  void build() {
+    _client = http.Client();
+  }
+
+  static Iterable<Favicon> _extractFavicons(Uri url, Document document) sync* {
+    final links = document.querySelectorAll(
+      'link[rel="icon"], link[rel="shortcut icon"], link[rel="apple-touch-icon"]',
+    );
+
+    for (final link in links) {
+      final href = link.attributes['href'];
+      if (href != null) {
+        // Attempt to parse height and width if available
+        int? height;
+        int? width;
+        if (link.attributes['sizes'] case final String sizes) {
+          final dimensions = sizes.split('x');
+          if (dimensions.length == 2) {
+            height = int.tryParse(dimensions[0]);
+            width = int.tryParse(dimensions[1]);
+          }
+        }
+
+        yield Favicon(
+          url: WebUri.uri(url.resolve(href)),
+          rel: link.attributes['rel'],
+          width: width,
+          height: height,
+        );
+      }
+    }
+  }
+
+  Future<Result<WebPageInfo>> getInfo(Uri url) async {
+    return Result.fromAsync(
+      () async {
+        final response = await _client.get(url);
+        return await compute(
+          (args) {
+            final document = html_parser.parse(args[0]);
+            final url = Uri.parse(args[1]);
+
+            final title = document.querySelector('title')?.text;
+            final favicon = choseFavicon(_extractFavicons(url, document));
+
+            return WebPageInfo(url: url, title: title, favicon: favicon)
+                .toJson();
+          },
+          [response.body, url.toString()],
+        ).then(WebPageInfo.fromJson);
+      },
+      exceptionHandler: handleHttpError,
+    );
+  }
+}
