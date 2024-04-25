@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
-import 'package:kagi_bang_bang/domain/entities/web_page_info.dart';
-import 'package:kagi_bang_bang/extensions/web_uri_favicon.dart';
+import 'package:bang_navigator/domain/entities/web_page_info.dart';
+import 'package:bang_navigator/extensions/web_uri_favicon.dart';
 
 class FaviconImage extends StatelessWidget {
   final double size;

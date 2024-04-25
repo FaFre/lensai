@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 }
 
 android {
-    namespace = "me.movenext.kagi_bang_bang"
+    namespace = "me.movenext.bang_navigator"
     compileSdk = 34
     ndkVersion = flutter.ndkVersion
 
@@ -39,7 +39,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "me.movenext.kagi_bang_bang"
+        applicationId = "me.movenext.bang_navigator"
         // https://api.flutter.dev/flutter/widgets/AndroidView-class.html
         //https://inappwebview.dev/docs/intro/#setup-android
         minSdk = 23

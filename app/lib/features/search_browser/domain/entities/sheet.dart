@@ -1,4 +1,4 @@
-import 'package:kagi_bang_bang/features/search_browser/domain/entities/modes.dart';
+import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 
 sealed class Sheet {}
 

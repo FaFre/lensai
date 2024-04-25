@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:exceptions/exceptions.dart';
 import 'package:http/http.dart' as http;
-import 'package:kagi_bang_bang/core/http_error_handler.dart';
+import 'package:bang_navigator/core/http_error_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'autosuggest.g.dart';

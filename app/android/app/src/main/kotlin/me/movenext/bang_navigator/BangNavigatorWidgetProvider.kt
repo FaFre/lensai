@@ -1,4 +1,4 @@
-package me.movenext.kagi_bang_bang
+package me.movenext.bang_navigator
 
 import android.appwidget.AppWidgetManager
 import android.content.Context
@@ -11,10 +11,10 @@ import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 
-class KagiWidgetProvider : HomeWidgetProvider() {
+class BangNavigatorWidgetProvider : HomeWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, widgetData: SharedPreferences) {
         appWidgetIds.forEach { widgetId ->
-            val views = RemoteViews(context.packageName, R.layout.kagi_widget).apply {
+            val views = RemoteViews(context.packageName, R.layout.bang_navigator_widget).apply {
                 val searchIntent = HomeWidgetLaunchIntent.getActivity(
                         context,
                         MainActivity::class.java,

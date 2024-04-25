@@ -1,3 +1,3 @@
-# kagi_bang_bang
+# bang_navigator
 
 A new Flutter project.

@@ -1,7 +1,7 @@
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:kagi_bang_bang/features/web_view/domain/entities/web_view_page.dart';
-import 'package:kagi_bang_bang/features/web_view/domain/repositories/web_view.dart';
-import 'package:kagi_bang_bang/features/web_view/presentation/widgets/web_view.dart';
+import 'package:bang_navigator/features/web_view/domain/entities/web_view_page.dart';
+import 'package:bang_navigator/features/web_view/domain/repositories/web_view.dart';
+import 'package:bang_navigator/features/web_view/presentation/widgets/web_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'switch_new_tab.g.dart';

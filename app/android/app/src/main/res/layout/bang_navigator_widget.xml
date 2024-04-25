@@ -1,10 +1,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    style="@style/Widget.KagiWidget.AppWidget.Container"
+    style="@style/Widget.BangNavigatorWidget.AppWidget.Container"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
     android:padding="16dp"
-    android:theme="@style/Theme.KagiWidget.AppWidgetContainer">
+    android:theme="@style/Theme.BangNavigatorWidget.AppWidgetContainer">
 
     <Button
         android:id="@+id/search_button"

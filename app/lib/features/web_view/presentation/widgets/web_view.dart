@@ -5,19 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:kagi_bang_bang/core/logger.dart';
-import 'package:kagi_bang_bang/features/search_browser/domain/entities/modes.dart';
-import 'package:kagi_bang_bang/features/search_browser/domain/entities/sheet.dart';
-import 'package:kagi_bang_bang/features/search_browser/domain/providers.dart';
-import 'package:kagi_bang_bang/features/search_browser/utils/url_builder.dart'
+import 'package:bang_navigator/core/logger.dart';
+import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
+import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
+import 'package:bang_navigator/features/search_browser/domain/providers.dart';
+import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
     as uri_builder;
-import 'package:kagi_bang_bang/features/settings/data/repositories/settings_repository.dart';
-import 'package:kagi_bang_bang/features/web_view/domain/entities/web_view_page.dart';
-import 'package:kagi_bang_bang/features/web_view/presentation/controllers/switch_new_tab.dart';
-import 'package:kagi_bang_bang/features/web_view/presentation/widgets/web_page_dialog.dart';
-import 'package:kagi_bang_bang/features/web_view/utils/favicon_helper.dart';
-import 'package:kagi_bang_bang/utils/platform_util.dart' as platform_util;
-import 'package:kagi_bang_bang/utils/ui_helper.dart' as ui_helper;
+import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
+import 'package:bang_navigator/features/web_view/domain/entities/web_view_page.dart';
+import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
+import 'package:bang_navigator/features/web_view/presentation/widgets/web_page_dialog.dart';
+import 'package:bang_navigator/features/web_view/utils/favicon_helper.dart';
+import 'package:bang_navigator/utils/platform_util.dart' as platform_util;
+import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
 import 'package:url_launcher/url_launcher.dart';
 
 const _webViewSupportedSchemes = [

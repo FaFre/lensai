@@ -1,4 +1,4 @@
-import 'package:kagi_bang_bang/features/settings/data/repositories/settings_repository.dart';
+import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'save_settings.g.dart';

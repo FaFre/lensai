@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "me.movenext" "\0"
-            VALUE "FileDescription", "kagi_bang_bang" "\0"
+            VALUE "FileDescription", "bang_navigator" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "kagi_bang_bang" "\0"
+            VALUE "InternalName", "bang_navigator" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 me.movenext. All rights reserved." "\0"
-            VALUE "OriginalFilename", "kagi_bang_bang.exe" "\0"
-            VALUE "ProductName", "kagi_bang_bang" "\0"
+            VALUE "OriginalFilename", "bang_navigator.exe" "\0"
+            VALUE "ProductName", "bang_navigator" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END

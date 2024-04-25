@@ -4,15 +4,15 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:kagi_bang_bang/domain/entities/web_page_info.dart';
-import 'package:kagi_bang_bang/features/search_browser/domain/entities/modes.dart';
-import 'package:kagi_bang_bang/features/search_browser/utils/url_builder.dart'
+import 'package:bang_navigator/domain/entities/web_page_info.dart';
+import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
+import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
     as uri_builder;
-import 'package:kagi_bang_bang/features/share_intent/domain/entities/shared_content.dart';
-import 'package:kagi_bang_bang/features/web_view/presentation/controllers/switch_new_tab.dart';
-import 'package:kagi_bang_bang/features/web_view/presentation/widgets/favicon.dart';
-import 'package:kagi_bang_bang/presentation/controllers/website_title.dart';
-import 'package:kagi_bang_bang/utils/ui_helper.dart' as ui_helper;
+import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
+import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
+import 'package:bang_navigator/features/web_view/presentation/widgets/favicon.dart';
+import 'package:bang_navigator/presentation/controllers/website_title.dart';
+import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
 import 'package:share_plus/share_plus.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher.dart';

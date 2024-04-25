@@ -1,5 +1,5 @@
-import 'package:kagi_bang_bang/domain/entities/web_page_info.dart';
-import 'package:kagi_bang_bang/domain/services/generic_website.dart';
+import 'package:bang_navigator/domain/entities/web_page_info.dart';
+import 'package:bang_navigator/domain/services/generic_website.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'website_title.g.dart';

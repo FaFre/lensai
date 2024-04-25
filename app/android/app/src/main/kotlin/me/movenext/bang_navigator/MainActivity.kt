@@ -1,4 +1,4 @@
-package me.movenext.kagi_bang_bang
+package me.movenext.bang_navigator
 
 import io.flutter.embedding.android.FlutterActivity
 

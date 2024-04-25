@@ -1,6 +1,6 @@
 {
-    "name": "kagi_bang_bang",
-    "short_name": "kagi_bang_bang",
+    "name": "bang_navigator",
+    "short_name": "bang_navigator",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

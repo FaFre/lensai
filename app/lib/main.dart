@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:kagi_bang_bang/core/logger.dart';
-import 'package:kagi_bang_bang/core/providers.dart';
-import 'package:kagi_bang_bang/features/search_browser/domain/services/session.dart';
-import 'package:kagi_bang_bang/features/settings/data/repositories/settings_repository.dart';
-import 'package:kagi_bang_bang/presentation/hooks/on_initialization.dart';
+import 'package:bang_navigator/core/logger.dart';
+import 'package:bang_navigator/core/providers.dart';
+import 'package:bang_navigator/features/search_browser/domain/services/session.dart';
+import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
+import 'package:bang_navigator/presentation/hooks/on_initialization.dart';
 
 class _ErrorObserver extends ProviderObserver {
   const _ErrorObserver();
@@ -24,7 +24,7 @@ class _ErrorObserver extends ProviderObserver {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await HomeWidget.setAppGroupId('BANG_BANG');
+  await HomeWidget.setAppGroupId('bang_navigator');
 
   // if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
   //   await InAppWebViewController.setWebContentsDebuggingEnabled(kDebugMode);

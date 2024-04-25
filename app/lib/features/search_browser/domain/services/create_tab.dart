@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:collection/collection.dart';
-import 'package:kagi_bang_bang/domain/entities/received_parameter.dart';
-import 'package:kagi_bang_bang/features/app_widget/domain/services/home_widget.dart';
-import 'package:kagi_bang_bang/features/search_browser/domain/entities/modes.dart';
-import 'package:kagi_bang_bang/features/search_browser/domain/entities/sheet.dart';
-import 'package:kagi_bang_bang/features/share_intent/domain/services/sharing_intent.dart';
+import 'package:bang_navigator/domain/entities/received_parameter.dart';
+import 'package:bang_navigator/features/app_widget/domain/services/home_widget.dart';
+import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
+import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
+import 'package:bang_navigator/features/share_intent/domain/services/sharing_intent.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 

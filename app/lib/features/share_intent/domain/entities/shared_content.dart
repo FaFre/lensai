@@ -1,4 +1,4 @@
-import 'package:kagi_bang_bang/utils/uri_parser.dart' as uri_parser;
+import 'package:bang_navigator/utils/uri_parser.dart' as uri_parser;
 
 sealed class SharedContent {
   const SharedContent();
