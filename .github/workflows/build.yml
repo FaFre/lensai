@@ -16,6 +16,8 @@ jobs:
     defaults:
       run:
         working-directory: app
+    permissions:
+      contents: write
     steps:
       - uses: actions/checkout@v2 # cd to current dir
       - uses: actions/setup-java@v2
