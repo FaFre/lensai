@@ -1,0 +1,44 @@
+name: Flutter CICD # action name
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build: # job's name
+    runs-on: ubuntu-latest # container os
+    env: # ADD environment variables
+      # KEY_JKS: ${{!secrets!}}
+      # KEY_PATH: ${{!github!}}/key.jks
+      # KEY_PASSWORD: ${{!secrets!}}
+      # ALIAS_PASSWORD: ${{!secrets!}}
+    defaults:
+      run:
+        working-directory: app
+    steps:
+      - uses: actions/checkout@v2 # cd to current dir
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt' # See 'Supported distributions' for available options
+          java-version: '11'
+      # - name: Create key file
+      #   run: echo $KEY_JKS | base64 -di > key.jks
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: beta
+      - run: flutter pub get
+      - run: flutter test
+      - run: flutter build apk --release --split-per-abi
+      - run: flutter build appbundle
+      - name: Create github artifact release # disable this to save storage
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/app/outputs/apk/release/*.apk,build/app/outputs/bundle/release/app-release.aab"
+          token: ${{!secrets!}} # this is automatically provided by github
+          commit: ${{!github!}}
+      - name: Upload app bundle artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: appbundle
+          path: build/app/outputs/bundle/release/app-release.aab
