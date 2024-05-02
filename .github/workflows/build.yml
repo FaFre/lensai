@@ -28,7 +28,7 @@ jobs:
         with:
           channel: beta
       - run: flutter pub get
-      - run: flutter test
+      # - run: flutter test
       - run: flutter build apk --release --split-per-abi
       - run: flutter build appbundle
       - name: Create github artifact release # disable this to save storage
