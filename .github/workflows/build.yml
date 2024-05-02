@@ -8,7 +8,7 @@ on:
 jobs:
   build: # job's name
     runs-on: ubuntu-latest # container os
-    env: # ADD environment variables
+    #env: # ADD environment variables
       # KEY_JKS: ${{!secrets!}}
       # KEY_PATH: ${{!github!}}/key.jks
       # KEY_PASSWORD: ${{!secrets!}}
