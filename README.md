@@ -1,3 +1,7 @@
+<p align="center">
+  <img width="250" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/app/assets/icon/icon.png" alt="Bang Navigator Logo">
+</p>
+
 # Bang Navigator - A Privacy-Focused Browser for Kagi
 
 Welcome to the GitHub repository of Bang Navigator, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure. Built with Flutter, Bang Navigator offers a seamless and intuitive interface across both Android and iOS devices, integrating the powerful tools of Kagi Search Engine.
