@@ -1,9 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
 import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
@@ -11,6 +7,10 @@ import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
 import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
 import 'package:bang_navigator/presentation/widgets/website_title_tile.dart';
 import 'package:bang_navigator/utils/uri_parser.dart' as uri_parser;
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SummarizeTab extends HookConsumerWidget {
   final SharedContent? sharedContent;

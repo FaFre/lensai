@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:bang_navigator/features/web_view/domain/repositories/web_view.dart';
 import 'package:bang_navigator/features/web_view/presentation/widgets/favicon.dart';
 import 'package:bang_navigator/features/web_view/presentation/widgets/web_view.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class WebViewTab extends HookConsumerWidget {
   final WebView webView;

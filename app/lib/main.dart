@@ -1,11 +1,11 @@
-import 'package:flutter/material.dart';
-import 'package:home_widget/home_widget.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:bang_navigator/core/logger.dart';
 import 'package:bang_navigator/core/providers.dart';
 import 'package:bang_navigator/features/search_browser/domain/services/session.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/presentation/hooks/on_initialization.dart';
+import 'package:flutter/material.dart';
+import 'package:home_widget/home_widget.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class _ErrorObserver extends ProviderObserver {
   const _ErrorObserver();

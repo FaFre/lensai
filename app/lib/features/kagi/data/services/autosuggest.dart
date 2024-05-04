@@ -1,8 +1,8 @@
 import 'dart:convert';
 
+import 'package:bang_navigator/core/http_error_handler.dart';
 import 'package:exceptions/exceptions.dart';
 import 'package:http/http.dart' as http;
-import 'package:bang_navigator/core/http_error_handler.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'autosuggest.g.dart';

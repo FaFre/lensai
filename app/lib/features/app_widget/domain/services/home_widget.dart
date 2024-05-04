@@ -1,5 +1,5 @@
-import 'package:home_widget/home_widget.dart';
 import 'package:bang_navigator/domain/entities/received_parameter.dart';
+import 'package:home_widget/home_widget.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 

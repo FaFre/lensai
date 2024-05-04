@@ -1,10 +1,4 @@
 import 'package:animations/animations.dart';
-import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
-import 'package:go_router/go_router.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:bang_navigator/core/routing/routes.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
@@ -23,6 +17,12 @@ import 'package:bang_navigator/presentation/hooks/listenable_callback.dart';
 import 'package:bang_navigator/presentation/hooks/overlay_portal_controller.dart';
 import 'package:bang_navigator/presentation/widgets/animated_indexed_stack.dart';
 import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
+import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
+import 'package:go_router/go_router.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
