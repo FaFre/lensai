@@ -4,7 +4,7 @@
 
 # Bang Navigator - A Privacy-Focused Browser for Kagi
 
-Welcome to the GitHub repository of Bang Navigator, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure. Built with Flutter, Bang Navigator offers a seamless and intuitive interface across both Android and iOS devices, integrating the powerful tools of Kagi Search Engine.
+Welcome to the GitHub repository of Bang Navigator, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure during research. Built with Flutter, Bang Navigator offers a seamless and intuitive interface across both Android and iOS devices, integrating the powerful tools of Kagi Search Engine.
 
 ## Features
 
@@ -23,11 +23,11 @@ Bang Navigator is packed with a variety of features aimed at improving usability
 
 ## Getting Started
 
-To get started with Bang Navigator, simply grab the latest [release](https://github.com/FaFre/bang_navigator/releases).
+To get started with Bang Navigator, simply grab the latest [release](https://github.com/FaFre/bang_navigator/releases) matching your device architecture (most probably ARM 64), which is either armeabi-v7a (ARM 32-bit), arm64-v8a (ARM 64-bit), or x86-64 (x86 64-bit).
 
 For now, there are only Android builds provided.
 
-Then obtain your Session Link (see [Kagi's Docs](https://help.kagi.com/kagi/privacy/private-browser-sessions.html#obtaining-a-session-link) for details), and paste the link into the field on the settings page.
+Install the app, then obtain your Session Link (see [Kagi's Docs](https://help.kagi.com/kagi/privacy/private-browser-sessions.html#obtaining-a-session-link) for details), and paste the link into the field on the settings page.
 
 <img height="500" alt="Settings Page" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/assets/screenshots/settings.png">
 
