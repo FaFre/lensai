@@ -406,6 +406,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.1.7447"
+  flutter_pdf_text:
+    dependency: "direct main"
+    description:
+      name: flutter_pdf_text
+      sha256: "97a49ecba6cf711a607642785758bf74fe0aaa3a2223524fa0c142e3966c56a0"
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.6.0"
   flutter_riverpod:
     dependency: transitive
     description:
@@ -660,7 +668,7 @@ packages:
     source: hosted
     version: "1.12.0"
   mime:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: mime
       sha256: "2e123074287cc9fd6c09de8336dae606d1ddb88d9ac47358826db698c176a1f2"
@@ -1064,6 +1072,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.2.2"
+  uri_to_file:
+    dependency: "direct main"
+    description:
+      name: uri_to_file
+      sha256: cbbb38f975d22311efacc9a53cdcb806708606666d8092314b81c5cb7983b700
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   url_launcher:
     dependency: "direct main"
     description:
