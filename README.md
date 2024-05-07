@@ -20,6 +20,7 @@ Bang Navigator is packed with a variety of features aimed at improving usability
 - **Enhanced Text Interaction**: Custom context menu allows for easy passage of marked text to Kagi's search or assistant tools.
 - **Home Widget**: Includes a home screen widget for quick actions, enhancing productivity.
 - **Speech Input**: Supports voice commands for hands-free operation and accessibility.
+- **PDF processing**: Open and directly summarize/prompt PDF documents.
 
 ## Getting Started
 
