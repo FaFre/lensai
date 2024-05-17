@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest # container os
     env: # ADD environment variables
       KEY_JKS: ${{ secrets.KEY_JKS }}
-      KEY_PATH: ${{ github.workspace }}/key.jks
+      KEY_PATH: $GITHUB_WORKSPACE/key.jks
       KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
     defaults:
@@ -25,7 +25,7 @@ jobs:
           distribution: 'adopt' # See 'Supported distributions' for available options
           java-version: '17'
       - name: Create key file
-        run: echo $KEY_JKS | base64 -di > key.jks
+        run: echo $KEY_JKS | base64 -di > $KEY_PATH
       - uses: subosito/flutter-action@v1
         with:
           channel: beta
