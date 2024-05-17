@@ -215,6 +215,14 @@ class KagiScreen extends HookConsumerWidget {
                 leadingIcon: const Icon(MdiIcons.text),
                 child: const Text('Summarizer'),
               ),
+              const Divider(),
+              MenuItemButton(
+                onPressed: () async {
+                  await context.push(AboutRoute().location);
+                },
+                leadingIcon: const Icon(Icons.info),
+                child: const Text('About'),
+              ),
             ],
           ),
         ],

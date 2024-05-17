@@ -1,5 +1,6 @@
 import 'package:bang_navigator/core/logger.dart';
 import 'package:bang_navigator/core/providers.dart';
+import 'package:bang_navigator/features/about/data/repositories/package_info_repository.dart';
 import 'package:bang_navigator/features/search_browser/domain/services/session.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/presentation/hooks/on_initialization.dart';
@@ -37,6 +38,8 @@ void main() async {
         builder: (context, ref, child) {
           useOnInitialization(
             () async {
+              await ref.read(packageInfoProvider.future);
+
               final settings =
                   await ref.read(settingsRepositoryProvider.future);
 
