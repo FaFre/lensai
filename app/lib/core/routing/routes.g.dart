@@ -8,7 +8,6 @@ part of 'routes.dart';
 
 List<RouteBase> get $appRoutes => [
       $kagiRoute,
-      $settingsRoute,
     ];
 
 RouteBase get $kagiRoute => GoRouteData.$route(
@@ -18,6 +17,10 @@ RouteBase get $kagiRoute => GoRouteData.$route(
         GoRouteData.$route(
           path: 'about',
           factory: $AboutRouteExtension._fromState,
+        ),
+        GoRouteData.$route(
+          path: 'settings',
+          factory: $SettingsRouteExtension._fromState,
         ),
       ],
     );
@@ -55,11 +58,6 @@ extension $AboutRouteExtension on AboutRoute {
 
   void replace(BuildContext context) => context.replace(location);
 }
-
-RouteBase get $settingsRoute => GoRouteData.$route(
-      path: '/settings',
-      factory: $SettingsRouteExtension._fromState,
-    );
 
 extension $SettingsRouteExtension on SettingsRoute {
   static SettingsRoute _fromState(GoRouterState state) => SettingsRoute();

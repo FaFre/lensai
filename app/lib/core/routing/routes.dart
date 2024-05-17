@@ -15,6 +15,9 @@ part 'routes.g.dart';
     TypedGoRoute<AboutRoute>(
       path: 'about',
     ),
+    TypedGoRoute<SettingsRoute>(
+      path: 'settings',
+    ),
   ],
 )
 class KagiRoute extends GoRouteData {
@@ -39,9 +42,6 @@ class KagiRoute extends GoRouteData {
   }
 }
 
-@TypedGoRoute<SettingsRoute>(
-  path: '/settings',
-)
 class SettingsRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
