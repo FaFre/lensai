@@ -8,11 +8,11 @@ on:
 jobs:
   build: # job's name
     runs-on: ubuntu-latest # container os
-    #env: # ADD environment variables
-      # KEY_JKS: ${{!secrets!}}
-      # KEY_PATH: ${{!github!}}/key.jks
-      # KEY_PASSWORD: ${{!secrets!}}
-      # ALIAS_PASSWORD: ${{!secrets!}}
+    env: # ADD environment variables
+      KEY_JKS: ${{!secrets!}}
+      KEY_PATH: ${{!github!}}/key.jks
+      KEY_PASSWORD: ${{!secrets!}}
+      ALIAS_PASSWORD: ${{!secrets!}}
     defaults:
       run:
         working-directory: app
@@ -24,8 +24,8 @@ jobs:
         with:
           distribution: 'adopt' # See 'Supported distributions' for available options
           java-version: '17'
-      # - name: Create key file
-      #   run: echo $KEY_JKS | base64 -di > key.jks
+      - name: Create key file
+        run: echo $KEY_JKS | base64 -di > key.jks
       - uses: subosito/flutter-action@v1
         with:
           channel: beta

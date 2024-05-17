@@ -54,11 +54,20 @@ android {
         implementation 'com.google.android.material:material:1.11.0'
     }
 
+    signingConfigs {
+        release {
+            keyAlias System.getenv("ALIAS_PASSWORD")
+            keyPassword System.getenv("KEY_PASSWORD")
+            storeFile System.getenv("KEY_PATH") ? file(System.getenv("KEY_PATH")) : null
+            storePassword System.getenv("KEY_PASSWORD")
+        }
+    }
+
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            signingConfig = signingConfigs.release
         }
     }
 }
