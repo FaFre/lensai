@@ -12,7 +12,7 @@ jobs:
       KEY_JKS: ${{ secrets.KEY_JKS }}
       KEY_PATH: ${{ github.workspace }}/key.jks
       KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
-      ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
     defaults:
       run:
         working-directory: app

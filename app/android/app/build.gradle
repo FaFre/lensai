@@ -56,7 +56,7 @@ android {
 
     signingConfigs {
         release {
-            keyAlias System.getenv("ALIAS_PASSWORD")
+            keyAlias System.getenv("KEY_ALIAS")
             keyPassword System.getenv("KEY_PASSWORD")
             storeFile System.getenv("KEY_PATH") ? file(System.getenv("KEY_PATH")) : null
             storePassword System.getenv("KEY_PASSWORD")
