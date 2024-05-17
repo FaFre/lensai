@@ -9,10 +9,10 @@ jobs:
   build: # job's name
     runs-on: ubuntu-latest # container os
     env: # ADD environment variables
-      KEY_JKS: ${{!secrets!}}
-      KEY_PATH: ${{!github!}}/key.jks
-      KEY_PASSWORD: ${{!secrets!}}
-      ALIAS_PASSWORD: ${{!secrets!}}
+      KEY_JKS: ${{ secrets.KEY_JKS }}
+      KEY_PATH: ${{ github.workspace }}/key.jks
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      ALIAS_PASSWORD: ${{ secrets.ALIAS_PASSWORD }}
     defaults:
       run:
         working-directory: app
