@@ -24,6 +24,7 @@ enum ChatModel {
   gpt35Turbo('GPT 3.5 Turbo', 1),
   gpt4('GPT 4', 2),
   gpt4Turbo('GPT 4 Turbo', 7),
+  gpt4o('GPT 4o', 15),
   claude3Haiku('Claude 3 Haiku', 13),
   claude3Sonnet('Claude 3 Sonnet', 14),
   claude3Opus('Claude 3 Opus', 12),

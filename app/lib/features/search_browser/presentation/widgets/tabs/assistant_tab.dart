@@ -35,7 +35,7 @@ class AssistantTab extends HookConsumerWidget {
     useSyncPageWithTab(tabController, pageController);
 
     final researchVariant = useState(ResearchVariant.expert);
-    final chatModel = useState(ChatModel.gpt4Turbo);
+    final chatModel = useState(ChatModel.gpt4o);
 
     return Form(
       key: formKey,
