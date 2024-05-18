@@ -1,21 +1,21 @@
 <p align="center">
-  <img width="250" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/app/assets/icon/icon.png" alt="Bang Navigator Logo">
+  <img width="250" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/app/assets/icon/icon.png" alt="BangNavigator Logo">
 </p>
 
-# Bang Navigator - A Privacy-Focused Browser for Kagi
+# BangNavigator - A Privacy-Focused Browser for Kagi
 
-Welcome to the GitHub repository of Bang Navigator, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure during research. Built with Flutter, Bang Navigator offers a seamless and intuitive interface across both Android and iOS devices, integrating the powerful tools of Kagi Search Engine.
+Welcome to the GitHub repository of BangNavigator, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure during research. Built with Flutter, BangNavigator offers a seamless and intuitive interface across both Android and iOS devices, integrating the powerful tools of Kagi Search Engine.
 
 ## Features
 
-Bang Navigator is packed with a variety of features aimed at improving usability and maintaining privacy:
+BangNavigator is packed with a variety of features aimed at improving usability and maintaining privacy:
 
 - **Cross-Platform Support**: Developed using Flutter, ensuring a consistent and smooth experience on both Android and iOS.
 - **Native Browser Engine**: Utilizes the native browser engine of the device for optimal performance and compatibility.
 - **Privacy by Default**: Incognito mode is enabled by default to keep your searches and browsing history private.
 - **Full Browser Functionality**: Includes all the essential features of a basic browser to browse the web efficiently.
 - **Kagi Integration**: Seamlessly integrates Kagi's search, assistant, and summarizer tools within a user-friendly interface.
-- **Easy Sharing**: Share URLs or text from any app directly into Bang Navigator without the need to copy and paste, for direct use with summarizer/assistant.
+- **Easy Sharing**: Share URLs or text from any app directly into BangNavigator without the need to copy and paste, for direct use with summarizer/assistant.
 - **Quick Summarization**: Long press any link on a website to get a summary via Kagi's summarizer.
 - **Enhanced Text Interaction**: Custom context menu allows for easy passage of marked text to Kagi's search or assistant tools.
 - **Home Widget**: Includes a home screen widget for quick actions, enhancing productivity.
@@ -55,7 +55,7 @@ Thank you for your support!
 
 ## Getting Started
 
-To get started with Bang Navigator, simply grab the latest [release](https://github.com/FaFre/bang_navigator/releases) matching your device architecture (most probably ARM 64), which is either armeabi-v7a (ARM 32-bit), arm64-v8a (ARM 64-bit), or x86-64 (x86 64-bit).
+To get started with BangNavigator, simply grab the latest [release](https://github.com/FaFre/bang_navigator/releases) matching your device architecture (most probably ARM 64), which is either armeabi-v7a (ARM 32-bit), arm64-v8a (ARM 64-bit), or x86-64 (x86 64-bit).
 
 For now, there are only Android builds provided.
 
@@ -81,7 +81,7 @@ The Home Widget provides quick access to key features right from your home scree
 
 <img height="500" alt="Highlight Actions" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/assets/screenshots/highlight_actions.png">
 
-Easily highlight text within Bang Navigator to instantly search or generate prompts. This feature simplifies the process of querying or interacting with text-based content on the web.
+Easily highlight text within BangNavigator to instantly search or generate prompts. This feature simplifies the process of querying or interacting with text-based content on the web.
 
 ### Tabs
 
