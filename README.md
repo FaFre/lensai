@@ -22,6 +22,37 @@ Bang Navigator is packed with a variety of features aimed at improving usability
 - **Speech Input**: Supports voice commands for hands-free operation and accessibility.
 - **PDF processing**: Open and directly summarize/prompt PDF documents.
 
+## Notice: Seeking Test Users for App Launch on Google Play
+
+Hello everyone,
+
+I am excited to announce that I am in the final stages of developing my new app and am preparing to launch it on Google Play. However, to meet the new testing requirements introduced by Google for personal developer accounts created after November 13, 2023, I need your help!
+
+### Why I Need Testers
+
+Google's new policy requires that developers run a closed test with at least 20 testers who have been opted-in for at least 14 days continuously before the app can be published to the production track on Google Play. This testing phase is crucial to ensure the app's quality, functionality, and user experience.
+
+### How You Can Help
+
+If you are interested in being a part of this testing phase, please follow these steps:
+
+1. **Send Your Google Account Email**: Email the Google account email address you use for Google Play to oss@movenext.me so I can add you to the testing group.
+2. **Opt-in to the Closed Test**: Once added, you will receive an invitation to join the closed testing group.
+3. **Use the App**: Download and use the app regularly for at least 14 days.
+4. **Provide Feedback**: Share any issues, bugs, or suggestions for improvement.
+
+### Benefits of Being a Tester
+
+- **Early Access**: Be among the first to use the app and explore its features.
+- **Influence Development**: Your feedback will directly impact the final version of the app.
+- **Exclusive Updates**: Receive updates and new features before they are released to the public.
+
+### How to Join
+
+Please send the email address of your Google account to oss@movenext.me to express your interest in joining the closed testing group. Your participation is greatly appreciated and will help ensure a successful launch on Google Play.
+
+Thank you for your support!
+
 ## Getting Started
 
 To get started with Bang Navigator, simply grab the latest [release](https://github.com/FaFre/bang_navigator/releases) matching your device architecture (most probably ARM 64), which is either armeabi-v7a (ARM 32-bit), arm64-v8a (ARM 64-bit), or x86-64 (x86 64-bit).
