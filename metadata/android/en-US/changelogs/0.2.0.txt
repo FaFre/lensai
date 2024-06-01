@@ -1,0 +1,3 @@
+* Added "About"-Dialog
+* Added new GPT 4o model as default
+* Prepare Google Play release

@@ -1,0 +1,1 @@
+* Added the ability to open and directly summarize/prompt PDF documents.
