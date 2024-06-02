@@ -6,6 +6,7 @@ import 'package:bang_navigator/features/search_browser/domain/providers.dart';
 import 'package:bang_navigator/features/search_browser/domain/services/create_tab.dart';
 import 'package:bang_navigator/features/search_browser/domain/services/session.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/app_bar_title.dart';
+import 'package:bang_navigator/features/search_browser/presentation/widgets/landing/content.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/view_tabs_sheet.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/tabs_action_button.dart';
@@ -306,10 +307,11 @@ class KagiScreen extends HookConsumerWidget {
                   ),
                   index: (activeWebView != null)
                       ? webViews.keys
-                          .toList()
-                          .indexOf(activeWebView.page.value.key)
-                      : null,
-                  children: webViews.values.toList(),
+                              .toList()
+                              .indexOf(activeWebView.page.value.key) +
+                          1
+                      : 0,
+                  children: [const LandingContent(), ...webViews.values],
                 ),
               );
             },
