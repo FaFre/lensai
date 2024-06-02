@@ -2,6 +2,7 @@
 
 * Added landing page
 * Adjusted routing for back navigation and landing page
+* Added link to Kagi Acoount in Settings
 
 ## 0.2.0
 

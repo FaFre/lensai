@@ -5,7 +5,9 @@ import 'package:bang_navigator/features/settings/utils/session_link_extractor.da
 import 'package:bang_navigator/presentation/hooks/listenable_callback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends HookConsumerWidget {
   const SettingsScreen({super.key});
@@ -83,8 +85,22 @@ class SettingsScreen extends HookConsumerWidget {
                     label: const Text('Kagi Session Token'),
                     hintText: 'https://kagi.com/search?token=...',
                     helperMaxLines: 2,
-                    helperText:
-                        'You can visit your Kagi Account settings to get your Session Link.',
+                    helper: Markdown(
+                      shrinkWrap: true,
+                      padding: EdgeInsets.zero,
+                      data:
+                          'You can visit your [Kagi Account Settings](user_details) to get your Session Link.',
+                      onTapLink: (text, href, title) async {
+                        if (href == 'user_details') {
+                          await launchUrl(
+                            Uri.parse(
+                              'https://kagi.com/settings?p=user_details',
+                            ),
+                            mode: LaunchMode.externalApplication,
+                          );
+                        }
+                      },
+                    ),
                     suffixIcon: IconButton(
                       onPressed: () {
                         hideSessionText.value = !hideSessionText.value;
