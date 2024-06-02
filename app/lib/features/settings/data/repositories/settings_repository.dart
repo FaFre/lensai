@@ -29,7 +29,9 @@ class SettingsRepository extends _$SettingsRepository {
       if (oldSettings.kagiSession != newSettings.kagiSession) {
         await _flutterSecureStorage.write(
           key: _sessionStorageKey,
-          value: newSettings.kagiSession,
+          value: (newSettings.kagiSession?.isNotEmpty ?? false)
+              ? newSettings.kagiSession
+              : null,
         );
       }
 

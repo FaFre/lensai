@@ -48,9 +48,11 @@ void main() async {
               }
 
               if (settings.kagiSession case final String session) {
-                await ref
-                    .read(sessionServiceProvider.notifier)
-                    .setKagiSession(session);
+                if (session.isNotEmpty) {
+                  await ref
+                      .read(sessionServiceProvider.notifier)
+                      .setKagiSession(session);
+                }
               }
 
               ref.read(sessionServiceProvider.notifier).initializationDone();
