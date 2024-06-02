@@ -249,6 +249,8 @@ class KagiScreen extends HookConsumerWidget {
               return BackButtonListener(
                 onBackButtonPressed: () async {
                   if (activeWebView?.page.value.pageHistory.canGoBack == true) {
+                    lastBackButtonPress.value = null;
+
                     await activeWebView?.page.value.controller?.goBack();
                     return true;
                   }
@@ -258,14 +260,30 @@ class KagiScreen extends HookConsumerWidget {
                           const Duration(seconds: 2)) {
                     lastBackButtonPress.value = null;
 
-                    return false;
+                    if (activeWebView?.key != null && webViews.length > 1) {
+                      await ref
+                          .read(webViewRepositoryProvider.notifier)
+                          .closeTab(activeWebView!.key!);
+                      return true;
+                    } else {
+                      //Mark back as unhandled and navigator will pop
+                      return false;
+                    }
                   } else {
                     lastBackButtonPress.value = DateTime.now();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Please click BACK again to exit'),
-                      ),
-                    );
+                    ScaffoldMessenger.of(context)
+                      ..clearSnackBars()
+                      ..showSnackBar(
+                        SnackBar(
+                          content: (webViews.length > 1)
+                              ? const Text(
+                                  'Please click BACK again to close current tab',
+                                )
+                              : const Text(
+                                  'Please click BACK again to exit app',
+                                ),
+                        ),
+                      );
 
                     return true;
                   }
