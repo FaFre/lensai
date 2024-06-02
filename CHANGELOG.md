@@ -1,3 +1,8 @@
+## 0.2.1
+
+* Added landing page
+* Adjusted routing for back navigation and landing page
+
 ## 0.2.0
 
 * Added "About"-Dialog
@@ -7,7 +12,6 @@
 ## 0.1.1
 
 * Added the ability to open and directly summarize/prompt PDF documents.
-
 
 ## 0.1.0
 

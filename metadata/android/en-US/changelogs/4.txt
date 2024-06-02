@@ -1,0 +1,2 @@
+* Added landing page
+* Adjusted routing for back navigation and landing page
