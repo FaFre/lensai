@@ -129,6 +129,8 @@ class AssistantTab extends HookConsumerWidget {
             decoration: const InputDecoration(
               // border: OutlineInputBorder(),
               label: Text('Prompt'),
+              hintText: 'Enter your prompt...',
+              floatingLabelBehavior: FloatingLabelBehavior.always,
             ),
             maxLines: null,
             validator: (value) {

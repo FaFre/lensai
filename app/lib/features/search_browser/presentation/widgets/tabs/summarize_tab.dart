@@ -7,10 +7,39 @@ import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
 import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
 import 'package:bang_navigator/presentation/widgets/website_title_tile.dart';
 import 'package:bang_navigator/utils/uri_parser.dart' as uri_parser;
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
+import 'package:flutter_pdf_text/flutter_pdf_text.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+
+class _InputField extends StatelessWidget {
+  final TextEditingController? controller;
+
+  const _InputField({required this.controller, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: controller,
+      decoration: const InputDecoration(
+        label: Text('Document'),
+        hintText: 'Enter URL or text to summarize',
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+      ),
+      maxLines: null,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (value) {
+        if (value?.isEmpty ?? true) {
+          return '';
+        }
+
+        return null;
+      },
+    );
+  }
+}
 
 class SummarizeTab extends HookConsumerWidget {
   final SharedContent? sharedContent;
@@ -59,21 +88,7 @@ class SummarizeTab extends HookConsumerWidget {
           ),
           ...switch (sharedContent) {
             SharedUrl() => [
-                TextFormField(
-                  controller: textController,
-                  decoration: const InputDecoration(
-                    // border: OutlineInputBorder(),
-                    label: Text('Document'),
-                  ),
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return '';
-                    }
-
-                    return null;
-                  },
-                ),
+                _InputField(controller: textController),
                 HookBuilder(
                   builder: (context) {
                     final url =
@@ -108,22 +123,27 @@ class SummarizeTab extends HookConsumerWidget {
                 ),
               ],
             SharedText() || null => [
-                TextFormField(
-                  controller: textController,
-                  decoration: const InputDecoration(
-                    // border: OutlineInputBorder(),
-                    label: Text('Document'),
-                  ),
-                  maxLines: null,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
-                  validator: (value) {
-                    if (value?.isEmpty ?? true) {
-                      return '';
-                    }
+                SizedBox(
+                  width: double.infinity,
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      final pickResult = await FilePicker.platform.pickFiles(
+                        type: FileType.custom,
+                        allowedExtensions: ['pdf'],
+                      );
 
-                    return null;
-                  },
+                      if (pickResult?.files.first.path
+                          case final String filePath) {
+                        final content = await PDFDoc.fromPath(filePath)
+                            .then((doc) => doc.text);
+                        textController.text = content;
+                      }
+                    },
+                    icon: const Icon(MdiIcons.fileUpload),
+                    label: const Text('Read PDF document'),
+                  ),
                 ),
+                _InputField(controller: textController),
                 const SizedBox(
                   height: 12,
                 ),

@@ -157,6 +157,8 @@ class SearchTab extends HookConsumerWidget {
                     decoration: InputDecoration(
                       // border: OutlineInputBorder(),
                       label: const Text('Query'),
+                      hintText: 'Ask anything...',
+                      floatingLabelBehavior: FloatingLabelBehavior.always,
                       suffixIcon: IconButton(
                         onPressed: () async {
                           final isServiceAvailable =

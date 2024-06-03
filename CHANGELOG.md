@@ -3,6 +3,7 @@
 * Added landing page
 * Adjusted routing for back navigation and landing page
 * Added link to Kagi Acoount in Settings
+* Improved input usability for Kagi Tools
 
 ## 0.2.0
 
