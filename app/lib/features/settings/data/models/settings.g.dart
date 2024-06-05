@@ -9,6 +9,8 @@ part of 'settings.dart';
 abstract class _$SettingsCWProxy {
   Settings kagiSession(String? kagiSession);
 
+  Settings showEarlyAccessFeatures(bool showEarlyAccessFeatures);
+
   Settings incognitoMode(bool incognitoMode);
 
   Settings enableJavascript(bool enableJavascript);
@@ -23,6 +25,7 @@ abstract class _$SettingsCWProxy {
   /// ````
   Settings call({
     String? kagiSession,
+    bool? showEarlyAccessFeatures,
     bool? incognitoMode,
     bool? enableJavascript,
     bool? launchUrlExternal,
@@ -37,6 +40,10 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
 
   @override
   Settings kagiSession(String? kagiSession) => this(kagiSession: kagiSession);
+
+  @override
+  Settings showEarlyAccessFeatures(bool showEarlyAccessFeatures) =>
+      this(showEarlyAccessFeatures: showEarlyAccessFeatures);
 
   @override
   Settings incognitoMode(bool incognitoMode) =>
@@ -60,6 +67,7 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
   /// ````
   Settings call({
     Object? kagiSession = const $CopyWithPlaceholder(),
+    Object? showEarlyAccessFeatures = const $CopyWithPlaceholder(),
     Object? incognitoMode = const $CopyWithPlaceholder(),
     Object? enableJavascript = const $CopyWithPlaceholder(),
     Object? launchUrlExternal = const $CopyWithPlaceholder(),
@@ -69,6 +77,12 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
           ? _value.kagiSession
           // ignore: cast_nullable_to_non_nullable
           : kagiSession as String?,
+      showEarlyAccessFeatures:
+          showEarlyAccessFeatures == const $CopyWithPlaceholder() ||
+                  showEarlyAccessFeatures == null
+              ? _value.showEarlyAccessFeatures
+              // ignore: cast_nullable_to_non_nullable
+              : showEarlyAccessFeatures as bool,
       incognitoMode:
           incognitoMode == const $CopyWithPlaceholder() || incognitoMode == null
               ? _value.incognitoMode

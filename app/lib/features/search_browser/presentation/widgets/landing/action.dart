@@ -21,6 +21,12 @@ class LandingAction extends HookConsumerWidget {
       ),
     );
 
+    final showEarlyAccessFeatures = ref.watch(
+      settingsRepositoryProvider.select(
+        (value) => value.valueOrNull?.showEarlyAccessFeatures ?? true,
+      ),
+    );
+
     return Visibility(
       visible: sessionTokenAvailable,
       replacement: Container(
@@ -71,21 +77,22 @@ class LandingAction extends HookConsumerWidget {
           OutlinedButton.icon(
             onPressed: () {
               ref.read(createTabStreamProvider.notifier).createTab(
-                    CreateTab(preferredTool: KagiTool.assistant),
-                  );
-            },
-            icon: const Icon(MdiIcons.brain),
-            label: const Text('Assistant'),
-          ),
-          OutlinedButton.icon(
-            onPressed: () {
-              ref.read(createTabStreamProvider.notifier).createTab(
                     CreateTab(preferredTool: KagiTool.summarizer),
                   );
             },
             icon: const Icon(MdiIcons.text),
             label: const Text('Summarizer'),
           ),
+          if (showEarlyAccessFeatures)
+            OutlinedButton.icon(
+              onPressed: () {
+                ref.read(createTabStreamProvider.notifier).createTab(
+                      CreateTab(preferredTool: KagiTool.assistant),
+                    );
+              },
+              icon: const Icon(MdiIcons.brain),
+              label: const Text('Assistant'),
+            ),
         ],
       ),
     );

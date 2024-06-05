@@ -34,6 +34,12 @@ class KagiScreen extends HookConsumerWidget {
     final displayedSheet = ref.watch(bottomSheetProvider);
     final displayedOverlayDialog = ref.watch(overlayDialogProvider);
 
+    final showEarlyAccessFeatures = ref.watch(
+      settingsRepositoryProvider.select(
+        (value) => value.valueOrNull?.showEarlyAccessFeatures ?? true,
+      ),
+    );
+
     final lastBackButtonPress = useRef<DateTime?>(null);
     final webViewController = useRef<InAppWebViewController?>(null);
 
@@ -191,30 +197,32 @@ class KagiScreen extends HookConsumerWidget {
               MenuItemButton(
                 onPressed: () {
                   ref.read(createTabStreamProvider.notifier).createTab(
-                        CreateTab(preferredTool: KagiTool.assistant),
-                      );
-                },
-                leadingIcon: const Icon(MdiIcons.brain),
-                child: const Text('Assistant'),
-              ),
-              MenuItemButton(
-                onPressed: () {
-                  ref.read(createTabStreamProvider.notifier).createTab(
                         CreateTab(preferredTool: KagiTool.summarizer),
                       );
                 },
                 leadingIcon: const Icon(MdiIcons.text),
                 child: const Text('Summarizer'),
               ),
+              if (showEarlyAccessFeatures)
+                MenuItemButton(
+                  onPressed: () {
+                    ref.read(createTabStreamProvider.notifier).createTab(
+                          CreateTab(preferredTool: KagiTool.assistant),
+                        );
+                  },
+                  leadingIcon: const Icon(MdiIcons.brain),
+                  child: const Text('Assistant'),
+                ),
               const Divider(),
-              MenuItemButton(
-                onPressed: () async {
-                  await context.push(ChatArchiveListRoute().location);
-                },
-                leadingIcon: const Icon(MdiIcons.archive),
-                child: const Text('Chat Archive'),
-              ),
-              const Divider(),
+              if (showEarlyAccessFeatures)
+                MenuItemButton(
+                  onPressed: () async {
+                    await context.push(ChatArchiveListRoute().location);
+                  },
+                  leadingIcon: const Icon(MdiIcons.archive),
+                  child: const Text('Chat Archive'),
+                ),
+              if (showEarlyAccessFeatures) const Divider(),
               MenuItemButton(
                 onPressed: () async {
                   await context.push(AboutRoute().location);

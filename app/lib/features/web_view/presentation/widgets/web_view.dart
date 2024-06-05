@@ -88,6 +88,12 @@ class _WebViewState extends ConsumerState<WebView> {
 
   @override
   Widget build(BuildContext context) {
+    final showEarlyAccessFeatures = ref.watch(
+      settingsRepositoryProvider.select(
+        (value) => value.valueOrNull?.showEarlyAccessFeatures ?? true,
+      ),
+    );
+
     final initialSettings = useMemoized(
       () => InAppWebViewSettings(
         // isInspectable: kDebugMode,
@@ -162,23 +168,24 @@ class _WebViewState extends ConsumerState<WebView> {
                   }
                 },
               ),
-              ContextMenuItem(
-                id: 2,
-                title: "Assistant",
-                action: () async {
-                  final selectedText =
-                      await widget.page.value.controller?.getSelectedText();
+              if (showEarlyAccessFeatures)
+                ContextMenuItem(
+                  id: 2,
+                  title: "Assistant",
+                  action: () async {
+                    final selectedText =
+                        await widget.page.value.controller?.getSelectedText();
 
-                  if (selectedText != null && selectedText.isNotEmpty) {
-                    ref.read(bottomSheetProvider.notifier).show(
-                          CreateTab(
-                            content: selectedText,
-                            preferredTool: KagiTool.assistant,
-                          ),
-                        );
-                  }
-                },
-              ),
+                    if (selectedText != null && selectedText.isNotEmpty) {
+                      ref.read(bottomSheetProvider.notifier).show(
+                            CreateTab(
+                              content: selectedText,
+                              preferredTool: KagiTool.assistant,
+                            ),
+                          );
+                    }
+                  },
+                ),
             ],
           ),
           onWebViewCreated: (controller) async {

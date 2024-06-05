@@ -1,4 +1,9 @@
-enum KagiTool { search, assistant, summarizer }
+enum KagiTool {
+  search,
+  summarizer,
+  //Sort early access features last
+  assistant,
+}
 
 enum AssistantMode {
   research(7),

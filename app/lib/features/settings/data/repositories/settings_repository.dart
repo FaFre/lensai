@@ -10,6 +10,7 @@ typedef UpdateSettingsFunc = Settings Function(Settings currentSettings);
 @Riverpod(keepAlive: true)
 class SettingsRepository extends _$SettingsRepository {
   static const _sessionStorageKey = 'b4ng_kagi_session';
+  static const _showEarlyAccessFeaturesKey = 'b4ng_show_early_access';
   static const _incognitoStorageKey = 'b4ng_settings_incognito';
   static const _javascriptStorageKey = 'b4ng_settings_js';
   static const _launchExternalStorageKey = 'b4ng_settings_launch_external';
@@ -32,6 +33,16 @@ class SettingsRepository extends _$SettingsRepository {
           value: (newSettings.kagiSession?.isNotEmpty ?? false)
               ? newSettings.kagiSession
               : null,
+        );
+      }
+
+      if (newSettings.showEarlyAccessFeatures !=
+          oldSettings.showEarlyAccessFeatures) {
+        await _sharedPreferences.then(
+          (s) => s.setBool(
+            _showEarlyAccessFeaturesKey,
+            newSettings.showEarlyAccessFeatures,
+          ),
         );
       }
 
@@ -66,6 +77,8 @@ class SettingsRepository extends _$SettingsRepository {
 
     return Settings.withDefaults(
       kagiSession: await _flutterSecureStorage.read(key: _sessionStorageKey),
+      showEarlyAccessFeatures:
+          sharedPreferences.getBool(_showEarlyAccessFeaturesKey),
       incognitoMode: sharedPreferences.getBool(_incognitoStorageKey),
       enableJavascript: sharedPreferences.getBool(_javascriptStorageKey),
       launchUrlExternal: sharedPreferences.getBool(_launchExternalStorageKey),

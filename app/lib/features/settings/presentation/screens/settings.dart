@@ -22,9 +22,11 @@ class SettingsScreen extends HookConsumerWidget {
     );
     final hideSessionText = useState(true);
 
-    // final isSavingSettings = ref.watch(
-    //   saveSettingsControllerProvider.select((value) => value.isLoading),
-    // );
+    final showEarlyAccessFeatures = ref.watch(
+      settingsRepositoryProvider.select(
+        (value) => value.valueOrNull?.showEarlyAccessFeatures ?? true,
+      ),
+    );
 
     final incognitoEnabled = ref.watch(
       settingsRepositoryProvider
@@ -113,6 +115,19 @@ class SettingsScreen extends HookConsumerWidget {
                     ),
                   ),
                 ),
+              ),
+              SwitchListTile.adaptive(
+                title: const Text('Show Early Access Features'),
+                subtitle: const Text(
+                  "Displays Kagi's early access features in the UI. As an Ultimate subscriber, you will likely want to have this enabled.",
+                ),
+                value: showEarlyAccessFeatures,
+                onChanged: (value) async {
+                  await ref.read(saveSettingsControllerProvider.notifier).save(
+                        (currentSettings) => currentSettings.copyWith
+                            .showEarlyAccessFeatures(value),
+                      );
+                },
               ),
               SwitchListTile.adaptive(
                 title: const Text('Incognito Mode'),

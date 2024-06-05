@@ -6,12 +6,14 @@ part 'settings.g.dart';
 @CopyWith()
 class Settings with FastEquatable {
   final String? kagiSession;
+  final bool showEarlyAccessFeatures;
   final bool incognitoMode;
   final bool enableJavascript;
   final bool launchUrlExternal;
 
   Settings({
     required this.kagiSession,
+    required this.showEarlyAccessFeatures,
     required this.incognitoMode,
     required this.enableJavascript,
     required this.launchUrlExternal,
@@ -19,10 +21,12 @@ class Settings with FastEquatable {
 
   Settings.withDefaults({
     required this.kagiSession,
+    bool? showEarlyAccessFeatures,
     bool? incognitoMode,
     bool? enableJavascript,
     bool? launchUrlExternal,
-  })  : incognitoMode = incognitoMode ?? true,
+  })  : showEarlyAccessFeatures = showEarlyAccessFeatures ?? true,
+        incognitoMode = incognitoMode ?? true,
         enableJavascript = enableJavascript ?? true,
         launchUrlExternal = launchUrlExternal ?? false;
 
@@ -32,6 +36,7 @@ class Settings with FastEquatable {
   @override
   List<Object?> get hashParameters => [
         kagiSession,
+        showEarlyAccessFeatures,
         incognitoMode,
         enableJavascript,
         launchUrlExternal,
