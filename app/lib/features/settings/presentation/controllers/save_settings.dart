@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'save_settings.g.dart';
 
-@riverpod
+@Riverpod()
 class SaveSettingsController extends _$SaveSettingsController {
   @override
   FutureOr<void> build() {}

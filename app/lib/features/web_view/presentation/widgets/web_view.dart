@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:bang_navigator/core/logger.dart';
+import 'package:bang_navigator/features/chat_archive/domain/entities/chat_entity.dart';
+import 'package:bang_navigator/features/chat_archive/domain/repositories/chat_archive.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
 import 'package:bang_navigator/features/search_browser/domain/providers.dart';
@@ -10,6 +12,7 @@ import 'package:bang_navigator/features/settings/data/repositories/settings_repo
 import 'package:bang_navigator/features/web_view/domain/entities/web_view_page.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:bang_navigator/features/web_view/presentation/widgets/web_page_dialog.dart';
+import 'package:bang_navigator/features/web_view/utils/download_helper.dart';
 import 'package:bang_navigator/features/web_view/utils/favicon_helper.dart';
 import 'package:bang_navigator/utils/platform_util.dart' as platform_util;
 import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
@@ -328,18 +331,40 @@ class _WebViewState extends ConsumerState<WebView> {
           onTitleChanged: (controller, title) {
             widget.updatePage((page) => page.copyWith.title(title));
           },
+          onDownloadStartRequest: (controller, downloadStartRequest) async {
+            final fileName = getDispositionFileName(
+              downloadStartRequest.contentDisposition!,
+            );
 
-          // onDownloadStartRequest: (controller, downloadStartRequest) {
-          // final regex = RegExp(
-          //   r"filename\*=UTF-8''([\w%\-\.]+)(?:; ?|$)",
-          //   caseSensitive: false,
-          // );
+            if (fileName != null) {
+              final entity = ChatEntity.fromFileName(fileName);
+              if (entity.name != null) {
+                final fileWrite = await ref
+                    .read(chatArchiveRepositoryProvider.notifier)
+                    .archiveChat(fileName, downloadStartRequest.url);
 
-          // final math =
-          //     regex.firstMatch(downloadStartRequest.contentDisposition!);
-
-          // print(math);
-          // },
+                fileWrite.map(
+                  onSuccess: (_) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        backgroundColor: Colors.green,
+                        content: Text(
+                          'Conversation "$entity" saved successfully!',
+                          style: const TextStyle(color: Colors.white),
+                        ),
+                      ),
+                    );
+                  },
+                  onFailure: (errorMessage) {
+                    ui_helper.showErrorMessage(
+                      context,
+                      errorMessage.toString(),
+                    );
+                  },
+                );
+              }
+            }
+          },
         ),
         HookBuilder(
           builder: (context) {

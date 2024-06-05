@@ -1,27 +1,26 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'settings_repository.dart';
+part of 'chat.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$settingsRepositoryHash() =>
-    r'2b715f29915e541cec5c7c0993c8099944989f48';
+String _$kagiChatServiceHash() => r'80ead208a1d7ca0da98bd20f11c99efd0d682c8f';
 
-/// See also [SettingsRepository].
-@ProviderFor(SettingsRepository)
-final settingsRepositoryProvider =
-    AsyncNotifierProvider<SettingsRepository, Settings>.internal(
-  SettingsRepository.new,
-  name: r'settingsRepositoryProvider',
+/// See also [KagiChatService].
+@ProviderFor(KagiChatService)
+final kagiChatServiceProvider =
+    NotifierProvider<KagiChatService, void>.internal(
+  KagiChatService.new,
+  name: r'kagiChatServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$settingsRepositoryHash,
+      : _$kagiChatServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$SettingsRepository = AsyncNotifier<Settings>;
+typedef _$KagiChatService = Notifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

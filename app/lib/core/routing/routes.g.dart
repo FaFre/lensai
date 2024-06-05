@@ -8,6 +8,8 @@ part of 'routes.dart';
 
 List<RouteBase> get $appRoutes => [
       $kagiRoute,
+      $settingsRoute,
+      $chatArchiveListRoute,
     ];
 
 RouteBase get $kagiRoute => GoRouteData.$route(
@@ -19,11 +21,6 @@ RouteBase get $kagiRoute => GoRouteData.$route(
           path: 'about',
           name: 'AboutRoute',
           factory: $AboutRouteExtension._fromState,
-        ),
-        GoRouteData.$route(
-          path: 'settings',
-          name: 'SettingsRoute',
-          factory: $SettingsRouteExtension._fromState,
         ),
       ],
     );
@@ -62,11 +59,68 @@ extension $AboutRouteExtension on AboutRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+RouteBase get $settingsRoute => GoRouteData.$route(
+      path: '/settings',
+      name: 'SettingsRoute',
+      factory: $SettingsRouteExtension._fromState,
+    );
+
 extension $SettingsRouteExtension on SettingsRoute {
   static SettingsRoute _fromState(GoRouterState state) => SettingsRoute();
 
   String get location => GoRouteData.$location(
         '/settings',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+RouteBase get $chatArchiveListRoute => GoRouteData.$route(
+      path: '/chat_archive',
+      name: 'ChatArchiveListRoute',
+      factory: $ChatArchiveListRouteExtension._fromState,
+      routes: [
+        GoRouteData.$route(
+          path: 'detail/:fileName',
+          name: 'ChatArchiveDetailRoute',
+          factory: $ChatArchiveDetailRouteExtension._fromState,
+        ),
+      ],
+    );
+
+extension $ChatArchiveListRouteExtension on ChatArchiveListRoute {
+  static ChatArchiveListRoute _fromState(GoRouterState state) =>
+      ChatArchiveListRoute();
+
+  String get location => GoRouteData.$location(
+        '/chat_archive',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $ChatArchiveDetailRouteExtension on ChatArchiveDetailRoute {
+  static ChatArchiveDetailRoute _fromState(GoRouterState state) =>
+      ChatArchiveDetailRoute(
+        fileName: state.pathParameters['fileName']!,
+      );
+
+  String get location => GoRouteData.$location(
+        '/chat_archive/detail/${Uri.encodeComponent(fileName)}',
       );
 
   void go(BuildContext context) => context.go(location);

@@ -25,7 +25,6 @@ import 'package:flutter_material_design_icons/flutter_material_design_icons.dart
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class KagiScreen extends HookConsumerWidget {
   const KagiScreen({super.key});
@@ -206,6 +205,14 @@ class KagiScreen extends HookConsumerWidget {
                 },
                 leadingIcon: const Icon(MdiIcons.text),
                 child: const Text('Summarizer'),
+              ),
+              const Divider(),
+              MenuItemButton(
+                onPressed: () async {
+                  await context.push(ChatArchiveListRoute().location);
+                },
+                leadingIcon: const Icon(MdiIcons.archive),
+                child: const Text('Chat Archive'),
               ),
               const Divider(),
               MenuItemButton(
