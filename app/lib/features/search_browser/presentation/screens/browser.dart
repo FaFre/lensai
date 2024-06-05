@@ -249,6 +249,16 @@ class KagiScreen extends HookConsumerWidget {
 
               return BackButtonListener(
                 onBackButtonPressed: () async {
+                  //Don't do anything if a child route is active
+                  if (GoRouterState.of(context).topRoute?.name != 'KagiRoute') {
+                    return false;
+                  }
+
+                  if (displayedSheet != null) {
+                    ref.read(bottomSheetProvider.notifier).dismiss();
+                    return true;
+                  }
+
                   if (activeWebView?.page.value.pageHistory.canGoBack == true) {
                     lastBackButtonPress.value = null;
 
@@ -257,7 +267,7 @@ class KagiScreen extends HookConsumerWidget {
                   }
 
                   if (lastBackButtonPress.value != null &&
-                      lastBackButtonPress.value!.difference(DateTime.now()) <
+                      DateTime.now().difference(lastBackButtonPress.value!) <
                           const Duration(seconds: 2)) {
                     lastBackButtonPress.value = null;
 

@@ -8,12 +8,15 @@ import 'package:go_router/go_router.dart';
 part 'routes.g.dart';
 
 @TypedGoRoute<KagiRoute>(
+  name: 'KagiRoute',
   path: '/',
   routes: [
     TypedGoRoute<AboutRoute>(
+      name: 'AboutRoute',
       path: 'about',
     ),
     TypedGoRoute<SettingsRoute>(
+      name: 'SettingsRoute',
       path: 'settings',
     ),
   ],

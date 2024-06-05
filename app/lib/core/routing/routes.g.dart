@@ -12,14 +12,17 @@ List<RouteBase> get $appRoutes => [
 
 RouteBase get $kagiRoute => GoRouteData.$route(
       path: '/',
+      name: 'KagiRoute',
       factory: $KagiRouteExtension._fromState,
       routes: [
         GoRouteData.$route(
           path: 'about',
+          name: 'AboutRoute',
           factory: $AboutRouteExtension._fromState,
         ),
         GoRouteData.$route(
           path: 'settings',
+          name: 'SettingsRoute',
           factory: $SettingsRouteExtension._fromState,
         ),
       ],
