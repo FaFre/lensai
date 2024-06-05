@@ -15,7 +15,6 @@ import 'package:flutter_material_design_icons/flutter_material_design_icons.dart
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class LoadingWebPageDialog extends HookConsumerWidget {
   final Uri url;
@@ -139,17 +138,7 @@ class WebPageDialog extends HookConsumerWidget {
             ),
             ListTile(
               onTap: () async {
-                if (!await launchUrl(
-                  page.url,
-                  mode: LaunchMode.externalApplication,
-                )) {
-                  if (context.mounted) {
-                    ui_helper.showErrorMessage(
-                      context,
-                      'Could not launch URL (${page.url})',
-                    );
-                  }
-                }
+                await ui_helper.launchUrlFeedback(context, page.url);
               },
               leading: const Icon(Icons.open_in_browser),
               title: const Text('Launch External'),

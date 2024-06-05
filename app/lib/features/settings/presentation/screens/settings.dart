@@ -3,11 +3,11 @@ import 'package:bang_navigator/features/settings/data/repositories/settings_repo
 import 'package:bang_navigator/features/settings/presentation/controllers/save_settings.dart';
 import 'package:bang_navigator/features/settings/utils/session_link_extractor.dart';
 import 'package:bang_navigator/presentation/hooks/listenable_callback.dart';
+import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:url_launcher/url_launcher.dart';
 
 class SettingsScreen extends HookConsumerWidget {
   const SettingsScreen({super.key});
@@ -92,11 +92,11 @@ class SettingsScreen extends HookConsumerWidget {
                           'You can visit your [Kagi Account Settings](user_details) to get your Session Link.',
                       onTapLink: (text, href, title) async {
                         if (href == 'user_details') {
-                          await launchUrl(
+                          await ui_helper.launchUrlFeedback(
+                            context,
                             Uri.parse(
                               'https://kagi.com/settings?p=user_details',
                             ),
-                            mode: LaunchMode.externalApplication,
                           );
                         }
                       },

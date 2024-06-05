@@ -172,17 +172,8 @@ class KagiScreen extends HookConsumerWidget {
                 onPressed: () async {
                   final url = await webViewController.value?.getUrl();
                   if (url != null) {
-                    if (!await launchUrl(
-                      url,
-                      mode: LaunchMode.externalApplication,
-                    )) {
-                      if (context.mounted) {
-                        ui_helper.showErrorMessage(
-                          context,
-                          'Could not launch URL ($url)',
-                        );
-                      }
-                    }
+                    // ignore: use_build_context_synchronously
+                    await ui_helper.launchUrlFeedback(context, url);
                   }
                 },
                 leadingIcon: const Icon(Icons.open_in_browser),
