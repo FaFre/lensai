@@ -21,8 +21,11 @@ BangNavigator is packed with a variety of features aimed at improving usability 
 - **Home Widget**: Includes a home screen widget for quick actions, enhancing productivity.
 - **Speech Input**: Supports voice commands for hands-free operation and accessibility.
 - **PDF processing**: Open and directly summarize/prompt PDF documents.
+- **Chat Archive**: Easily archive conversations with the Kagi assistant on your device
 
 ## Notice: Seeking Test Users for App Launch on Google Play
+
+*June, 2024*
 
 Hello everyone,
 
@@ -65,6 +68,8 @@ Install the app, then obtain your Session Link (see [Kagi's Docs](https://help.k
 
 ## Quickstart guide
 
+<img height="500" alt="Settings Page" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/assets/screenshots/landing.png">
+
 ### Kagi Tools
 
 <img height="500" alt="Kagi Tools" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/assets/screenshots/kagi_tools.png">
@@ -94,3 +99,13 @@ Manage multiple browsing sessions effortlessly with the tabbed browsing feature.
 <img height="500" alt="Link Actions" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/assets/screenshots/title_actions.png">
 
 Interact with links through long-press or by tapping on the title to open a context-specific actions menu. This feature enhances navigation efficiency and provides quick access to a range of options like direct summarization or sharing.
+
+### Chat Archive
+
+<img height="500" alt="Link Actions" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/assets/screenshots/archived_chat.png">
+
+Save any conversation with the assistant on your local device with just one click. Unlike the online Kagi conversations that expire after 7 days, archived chats are saved forever on your local device. 
+
+To archive a conversation, just press the download button and that's it!
+
+<img height="500" alt="Link Actions" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/assets/screenshots/archive_conversation.png">
