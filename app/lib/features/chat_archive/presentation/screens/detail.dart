@@ -94,6 +94,7 @@ class ChatArchiveDetailScreen extends HookConsumerWidget {
       ),
       body: Skeletonizer(
         enabled: chatAsync.isLoading,
+        justifyMultiLineText: false,
         child: chatAsync.when(
           data: (data) => Markdown(
             data: data,
@@ -129,7 +130,7 @@ class ChatArchiveDetailScreen extends HookConsumerWidget {
             );
           },
           loading: () => const Bone.multiText(
-            lines: 10,
+            lines: 15,
           ),
         ),
       ),
