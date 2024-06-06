@@ -1,3 +1,10 @@
+## 0.3.0
+
+* Added Chat Archive for conversations with Assistant
+* Moved the browser app bar to the bottom of the screen for easier operation
+* Fixed back button navigation
+* Added setting to disable early access Kagi tools
+
 ## 0.2.1
 
 * Added landing page
