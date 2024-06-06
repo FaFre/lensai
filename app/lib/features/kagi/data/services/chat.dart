@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bang_navigator/core/http_error_handler.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:exceptions/exceptions.dart';
@@ -24,7 +26,7 @@ class KagiChatService extends _$KagiChatService {
         final response = await _client
             .get(url.replace(queryParameters: {'token': kagiSession}));
 
-        return response.body;
+        return utf8.decode(response.bodyBytes);
       },
       exceptionHandler: handleHttpError,
     );
