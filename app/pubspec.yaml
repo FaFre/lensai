@@ -51,7 +51,7 @@ dev_dependencies:
   build_runner: ^2.4.9
   copy_with_extension_gen: ^5.0.4
   custom_lint: ^0.6.4
-  dependency_validator: ^3.2.3
+  dependency_validator: ^4.1.0
   fast_equatable_lint: ^0.3.0
   flutter_launcher_icons: ^0.13.1
   go_router_builder: ^2.4.1
