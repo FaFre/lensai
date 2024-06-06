@@ -40,6 +40,8 @@ class KagiScreen extends HookConsumerWidget {
       ),
     );
 
+    final menuController = useMemoized(() => MenuController());
+
     final lastBackButtonPress = useRef<DateTime?>(null);
     final webViewController = useRef<InAppWebViewController?>(null);
 
@@ -67,172 +69,180 @@ class KagiScreen extends HookConsumerWidget {
     );
 
     return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        title: AppBarTitle(
-          onTap: () {
-            final page = ref.read(webViewTabControllerProvider)?.page.value;
-
-            if (page != null) {
-              ref.watch(overlayDialogProvider.notifier).show(
-                    WebPageDialog(
-                      page: page,
-                      webViewController: webViewController.value,
-                      onDismiss:
-                          ref.watch(overlayDialogProvider.notifier).dismiss,
-                    ),
-                  );
-            }
-          },
-        ),
-        actions: [
-          TabsActionButton(
+      bottomNavigationBar: BottomAppBar(
+        height: AppBar().preferredSize.height,
+        padding: EdgeInsets.zero,
+        child: AppBar(
+          automaticallyImplyLeading: false,
+          title: AppBarTitle(
             onTap: () {
-              if (displayedSheet case ViewTabs()) {
-                ref.read(bottomSheetProvider.notifier).dismiss();
-              } else {
-                ref.read(bottomSheetProvider.notifier).show(ViewTabs());
+              final page = ref.read(webViewTabControllerProvider)?.page.value;
+
+              if (page != null) {
+                ref.watch(overlayDialogProvider.notifier).show(
+                      WebPageDialog(
+                        page: page,
+                        webViewController: webViewController.value,
+                        onDismiss:
+                            ref.watch(overlayDialogProvider.notifier).dismiss,
+                      ),
+                    );
               }
             },
           ),
-          MenuAnchor(
-            builder: (context, controller, child) {
-              return IconButton(
-                onPressed: () {
-                  if (controller.isOpen) {
-                    controller.close();
-                  } else {
-                    controller.open();
-                  }
-                },
-                icon: const Icon(Icons.more_vert),
-              );
-            },
-            menuChildren: [
-              HookConsumer(
-                builder: (context, ref, child) {
-                  final activeWebView = ref.watch(webViewTabControllerProvider);
-                  final history = useListenableSelector(
-                    activeWebView?.page,
-                    () =>
-                        activeWebView?.page.value.pageHistory ??
-                        (canGoBack: false, canGoForward: false),
-                  );
-
-                  return Row(
-                    children: [
-                      Expanded(
-                        child: IconButton(
-                          onPressed: (history.canGoBack)
-                              ? () async {
-                                  await webViewController.value?.goBack();
-                                }
-                              : null,
-                          icon: const Icon(Icons.arrow_back),
-                        ),
-                      ),
-                      const SizedBox(height: 48, child: VerticalDivider()),
-                      Expanded(
-                        child: IconButton(
-                          onPressed: (history.canGoForward)
-                              ? () async {
-                                  await webViewController.value?.goForward();
-                                }
-                              : null,
-                          icon: const Icon(Icons.arrow_forward),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-              const Divider(),
-              MenuItemButton(
-                onPressed: () async {
-                  await webViewController.value?.reload();
-                },
-                leadingIcon: const Icon(Icons.refresh),
-                child: const Text('Reload'),
-              ),
-              const Divider(),
-              MenuItemButton(
-                onPressed: () async {
-                  await context.push(SettingsRoute().location);
-                },
-                leadingIcon: const Icon(Icons.settings),
-                child: const Text('Settings'),
-              ),
-              const Divider(),
-              MenuItemButton(
-                onPressed: () async {
-                  final url = await webViewController.value?.getUrl();
-                  if (url != null) {
-                    await Share.shareUri(url);
-                  }
-                },
-                leadingIcon: const Icon(Icons.share),
-                child: const Text('Share'),
-              ),
-              MenuItemButton(
-                onPressed: () async {
-                  final url = await webViewController.value?.getUrl();
-                  if (url != null) {
-                    // ignore: use_build_context_synchronously
-                    await ui_helper.launchUrlFeedback(context, url);
-                  }
-                },
-                leadingIcon: const Icon(Icons.open_in_browser),
-                child: const Text('Launch External'),
-              ),
-              const Divider(),
-              MenuItemButton(
-                onPressed: () {
-                  ref.read(createTabStreamProvider.notifier).createTab(
-                        CreateTab(preferredTool: KagiTool.search),
-                      );
-                },
-                leadingIcon: const Icon(MdiIcons.searchWeb),
-                child: const Text('Search'),
-              ),
-              MenuItemButton(
-                onPressed: () {
-                  ref.read(createTabStreamProvider.notifier).createTab(
-                        CreateTab(preferredTool: KagiTool.summarizer),
-                      );
-                },
-                leadingIcon: const Icon(MdiIcons.text),
-                child: const Text('Summarizer'),
-              ),
-              if (showEarlyAccessFeatures)
+          actions: [
+            TabsActionButton(
+              onTap: () {
+                if (displayedSheet case ViewTabs()) {
+                  ref.read(bottomSheetProvider.notifier).dismiss();
+                } else {
+                  ref.read(bottomSheetProvider.notifier).show(ViewTabs());
+                }
+              },
+            ),
+            MenuAnchor(
+              controller: menuController,
+              builder: (context, controller, child) {
+                return IconButton(
+                  onPressed: () {
+                    if (controller.isOpen) {
+                      controller.close();
+                    } else {
+                      controller.open();
+                    }
+                  },
+                  icon: const Icon(Icons.more_vert),
+                );
+              },
+              menuChildren: [
+                MenuItemButton(
+                  onPressed: () async {
+                    await context.push(AboutRoute().location);
+                  },
+                  leadingIcon: const Icon(Icons.info),
+                  child: const Text('About'),
+                ),
+                const Divider(),
+                MenuItemButton(
+                  onPressed: () async {
+                    await context.push(SettingsRoute().location);
+                  },
+                  leadingIcon: const Icon(Icons.settings),
+                  child: const Text('Settings'),
+                ),
+                if (showEarlyAccessFeatures) const Divider(),
+                if (showEarlyAccessFeatures)
+                  MenuItemButton(
+                    onPressed: () async {
+                      await context.push(ChatArchiveListRoute().location);
+                    },
+                    leadingIcon: const Icon(MdiIcons.archive),
+                    child: const Text('Chat Archive'),
+                  ),
+                const Divider(),
+                if (showEarlyAccessFeatures)
+                  MenuItemButton(
+                    onPressed: () {
+                      ref.read(createTabStreamProvider.notifier).createTab(
+                            CreateTab(preferredTool: KagiTool.assistant),
+                          );
+                    },
+                    leadingIcon: const Icon(MdiIcons.brain),
+                    child: const Text('Assistant'),
+                  ),
                 MenuItemButton(
                   onPressed: () {
                     ref.read(createTabStreamProvider.notifier).createTab(
-                          CreateTab(preferredTool: KagiTool.assistant),
+                          CreateTab(preferredTool: KagiTool.summarizer),
                         );
                   },
-                  leadingIcon: const Icon(MdiIcons.brain),
-                  child: const Text('Assistant'),
+                  leadingIcon: const Icon(MdiIcons.text),
+                  child: const Text('Summarizer'),
                 ),
-              const Divider(),
-              if (showEarlyAccessFeatures)
+                MenuItemButton(
+                  onPressed: () {
+                    ref.read(createTabStreamProvider.notifier).createTab(
+                          CreateTab(preferredTool: KagiTool.search),
+                        );
+                  },
+                  leadingIcon: const Icon(MdiIcons.searchWeb),
+                  child: const Text('Search'),
+                ),
+                const Divider(),
                 MenuItemButton(
                   onPressed: () async {
-                    await context.push(ChatArchiveListRoute().location);
+                    final url = await webViewController.value?.getUrl();
+                    if (url != null) {
+                      // ignore: use_build_context_synchronously
+                      await ui_helper.launchUrlFeedback(context, url);
+                    }
                   },
-                  leadingIcon: const Icon(MdiIcons.archive),
-                  child: const Text('Chat Archive'),
+                  leadingIcon: const Icon(Icons.open_in_browser),
+                  child: const Text('Launch External'),
                 ),
-              if (showEarlyAccessFeatures) const Divider(),
-              MenuItemButton(
-                onPressed: () async {
-                  await context.push(AboutRoute().location);
-                },
-                leadingIcon: const Icon(Icons.info),
-                child: const Text('About'),
-              ),
-            ],
-          ),
-        ],
+                MenuItemButton(
+                  onPressed: () async {
+                    final url = await webViewController.value?.getUrl();
+                    if (url != null) {
+                      await Share.shareUri(url);
+                    }
+                  },
+                  leadingIcon: const Icon(Icons.share),
+                  child: const Text('Share'),
+                ),
+                const Divider(),
+                MenuItemButton(
+                  onPressed: () async {
+                    await webViewController.value?.reload();
+                  },
+                  leadingIcon: const Icon(Icons.refresh),
+                  child: const Text('Reload'),
+                ),
+                const Divider(),
+                HookConsumer(
+                  builder: (context, ref, child) {
+                    final activeWebView =
+                        ref.watch(webViewTabControllerProvider);
+                    final history = useListenableSelector(
+                      activeWebView?.page,
+                      () =>
+                          activeWebView?.page.value.pageHistory ??
+                          (canGoBack: false, canGoForward: false),
+                    );
+
+                    return Row(
+                      children: [
+                        Expanded(
+                          child: IconButton(
+                            onPressed: (history.canGoBack)
+                                ? () async {
+                                    await webViewController.value?.goBack();
+                                    menuController.close();
+                                  }
+                                : null,
+                            icon: const Icon(Icons.arrow_back),
+                          ),
+                        ),
+                        const SizedBox(height: 48, child: VerticalDivider()),
+                        Expanded(
+                          child: IconButton(
+                            onPressed: (history.canGoForward)
+                                ? () async {
+                                    await webViewController.value?.goForward();
+                                    menuController.close();
+                                  }
+                                : null,
+                            icon: const Icon(Icons.arrow_forward),
+                          ),
+                        ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ],
+        ),
       ),
       body: OverlayPortal(
         controller: overlayController,
@@ -305,29 +315,31 @@ class KagiScreen extends HookConsumerWidget {
                     return true;
                   }
                 },
-                child: AnimatedIndexedStack(
-                  duration: const Duration(milliseconds: 250),
-                  transitionBuilder: (child, animation, secondaryAnimation) =>
-                      SharedAxisTransition(
-                    animation: animation,
-                    secondaryAnimation: secondaryAnimation,
-                    transitionType: SharedAxisTransitionType.horizontal,
-                    child: child,
-                  ),
-                  key: ValueKey(
-                    (activeWebView != null)
-                        ? webViews.keys
-                            .toList()
-                            .indexOf(activeWebView.page.value.key)
-                        : null,
-                  ),
-                  index: (activeWebView != null)
-                      ? webViews.keys
+                child: SafeArea(
+                  child: AnimatedIndexedStack(
+                    duration: const Duration(milliseconds: 250),
+                    transitionBuilder: (child, animation, secondaryAnimation) =>
+                        SharedAxisTransition(
+                      animation: animation,
+                      secondaryAnimation: secondaryAnimation,
+                      transitionType: SharedAxisTransitionType.horizontal,
+                      child: child,
+                    ),
+                    key: ValueKey(
+                      (activeWebView != null)
+                          ? webViews.keys
                               .toList()
-                              .indexOf(activeWebView.page.value.key) +
-                          1
-                      : 0,
-                  children: [const LandingContent(), ...webViews.values],
+                              .indexOf(activeWebView.page.value.key)
+                          : null,
+                    ),
+                    index: (activeWebView != null)
+                        ? webViews.keys
+                                .toList()
+                                .indexOf(activeWebView.page.value.key) +
+                            1
+                        : 0,
+                    children: [const LandingContent(), ...webViews.values],
+                  ),
                 ),
               );
             },

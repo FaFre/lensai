@@ -373,17 +373,22 @@ class _WebViewState extends ConsumerState<WebView> {
             }
           },
         ),
-        HookBuilder(
-          builder: (context) {
-            final value = useValueListenable(webViewProgress);
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: HookBuilder(
+            builder: (context) {
+              final value = useValueListenable(webViewProgress);
 
-            return Visibility(
-              visible: value < 100,
-              child: LinearProgressIndicator(
-                value: value / 100,
-              ),
-            );
-          },
+              return Visibility(
+                visible: value < 100,
+                child: LinearProgressIndicator(
+                  value: value / 100,
+                ),
+              );
+            },
+          ),
         ),
       ],
     );
