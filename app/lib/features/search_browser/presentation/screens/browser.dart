@@ -29,6 +29,11 @@ import 'package:share_plus/share_plus.dart';
 class KagiScreen extends HookConsumerWidget {
   const KagiScreen({super.key});
 
+  double _realtiveSafeArea(BuildContext context) {
+    final mediaQuery = MediaQuery.of(context);
+    return 1.0 - (mediaQuery.padding.top / mediaQuery.size.height);
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final displayedSheet = ref.watch(bottomSheetProvider);
@@ -360,6 +365,7 @@ class KagiScreen extends HookConsumerWidget {
                 ViewTabs() => DraggableScrollableSheet(
                     expand: false,
                     minChildSize: 0.1,
+                    maxChildSize: _realtiveSafeArea(context),
                     builder: (context, scrollController) {
                       return SingleChildScrollView(
                         controller: scrollController,
@@ -375,6 +381,7 @@ class KagiScreen extends HookConsumerWidget {
                     expand: false,
                     initialChildSize: 0.8,
                     minChildSize: 0.1,
+                    maxChildSize: _realtiveSafeArea(context),
                     builder: (context, scrollController) {
                       return SingleChildScrollView(
                         controller: scrollController,
