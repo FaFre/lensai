@@ -357,6 +357,10 @@ class KagiScreen extends HookConsumerWidget {
                 if (notification.extent <= 0.1) {
                   ref.read(bottomSheetProvider.notifier).dismiss();
                   return true;
+                } else {
+                  ref
+                      .read(bottomSheetExtendProvider.notifier)
+                      .add(notification.extent);
                 }
 
                 return false;

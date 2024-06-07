@@ -1,4 +1,5 @@
 import 'package:bang_navigator/features/kagi/domain/repositories/autosuggest.dart';
+import 'package:bang_navigator/features/search_browser/domain/providers.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/speech_to_text_button.dart';
 import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
@@ -87,6 +88,8 @@ class _AutocompleteOptions<T extends Object> extends StatelessWidget {
 }
 
 class SearchTab extends HookConsumerWidget {
+  static const _maxOptionsHeight = 158.0;
+
   final SharedContent? sharedContent;
   final OnSubmitUri onSubmit;
 
@@ -118,12 +121,24 @@ class SearchTab extends HookConsumerWidget {
           Consumer(
             builder: (context, ref, child) {
               final optionsStream = ref.watch(autosuggestRepositoryProvider);
+              final openDirection = ref.watch(
+                bottomSheetExtendProvider.select((value) {
+                  final extend = value.valueOrNull;
+                  if (extend == null ||
+                      (MediaQuery.of(context).size.height * (1 - extend)) >
+                          _maxOptionsHeight) {
+                    return OptionsViewOpenDirection.up;
+                  } else {
+                    return OptionsViewOpenDirection.down;
+                  }
+                }),
+              );
 
               return ExternalResultsAutocomplete<String>(
                 textEditingController: textController,
                 optionsStream: optionsStream,
                 focusNode: focusNode,
-                optionsViewOpenDirection: OptionsViewOpenDirection.up,
+                optionsViewOpenDirection: openDirection,
                 displayStringForOption:
                     // ignore: avoid_redundant_argument_values
                     RawAutocomplete.defaultStringForOption,
@@ -135,8 +150,8 @@ class SearchTab extends HookConsumerWidget {
                     onSelected: onSelected,
                     options: options,
                     //Must match RawAutocomplete parent
-                    openDirection: OptionsViewOpenDirection.up,
-                    maxOptionsHeight: 200.0,
+                    openDirection: openDirection,
+                    maxOptionsHeight: _maxOptionsHeight,
                   );
                 },
                 onTextChanged: (textEditingValue) {
