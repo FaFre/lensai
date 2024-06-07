@@ -24,7 +24,7 @@ class KagiAutosuggestService extends _$KagiAutosuggestService {
         final response =
             await _client.get(_baseUrl.replace(queryParameters: {'q': query}));
 
-        final results = jsonDecode(response.body) as List;
+        final results = jsonDecode(utf8.decode(response.bodyBytes)) as List;
         return switch (results.last) {
           final String result => [result],
           final List resultList => resultList.cast(),
