@@ -1,5 +1,6 @@
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
+import 'package:bang_navigator/features/search_browser/presentation/widgets/speech_to_text_button.dart';
 import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
     as uri_builder;
 import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
@@ -126,11 +127,15 @@ class AssistantTab extends HookConsumerWidget {
           ),
           TextFormField(
             controller: textController,
-            decoration: const InputDecoration(
-              // border: OutlineInputBorder(),
-              label: Text('Prompt'),
+            decoration: InputDecoration(
+              label: const Text('Prompt'),
               hintText: 'Enter your prompt...',
               floatingLabelBehavior: FloatingLabelBehavior.always,
+              suffixIcon: SpeechToTextButton(
+                onTextReceived: (data) {
+                  textController.text = data.toString();
+                },
+              ),
             ),
             maxLines: null,
             validator: (value) {

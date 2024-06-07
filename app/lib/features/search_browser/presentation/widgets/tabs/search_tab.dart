@@ -1,15 +1,14 @@
 import 'package:bang_navigator/features/kagi/domain/repositories/autosuggest.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
+import 'package:bang_navigator/features/search_browser/presentation/widgets/speech_to_text_button.dart';
 import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
     as uri_builder;
 import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
 import 'package:bang_navigator/presentation/widgets/autocomplete.dart';
-import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:speech_to_text_google_dialog/speech_to_text_google_dialog.dart';
 
 // The default Material-style Autocomplete options.
 class _AutocompleteOptions<T extends Object> extends StatelessWidget {
@@ -159,27 +158,10 @@ class SearchTab extends HookConsumerWidget {
                       label: const Text('Query'),
                       hintText: 'Ask anything...',
                       floatingLabelBehavior: FloatingLabelBehavior.always,
-                      suffixIcon: IconButton(
-                        onPressed: () async {
-                          final isServiceAvailable =
-                              await SpeechToTextGoogleDialog.getInstance()
-                                  .showGoogleDialog(
-                            onTextReceived: (data) {
-                              textEditingController.text = data.toString();
-                            },
-                            // locale: "en-US",
-                          );
-
-                          if (!isServiceAvailable) {
-                            if (context.mounted) {
-                              ui_helper.showErrorMessage(
-                                context,
-                                'Service is not available',
-                              );
-                            }
-                          }
+                      suffixIcon: SpeechToTextButton(
+                        onTextReceived: (data) {
+                          textEditingController.text = data.toString();
                         },
-                        icon: const Icon(Icons.mic),
                       ),
                     ),
                     autovalidateMode: AutovalidateMode.onUserInteraction,
