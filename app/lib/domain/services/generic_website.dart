@@ -1,5 +1,6 @@
 import 'package:bang_navigator/core/http_error_handler.dart';
 import 'package:bang_navigator/domain/entities/web_page_info.dart';
+import 'package:bang_navigator/extensions/web_uri_favicon.dart';
 import 'package:bang_navigator/features/web_view/utils/favicon_helper.dart';
 import 'package:exceptions/exceptions.dart';
 import 'package:flutter/foundation.dart';
@@ -59,7 +60,12 @@ class GenericWebsiteService extends _$GenericWebsiteService {
             final url = Uri.parse(args[1]);
 
             final title = document.querySelector('title')?.text;
-            final favicon = choseFavicon(_extractFavicons(url, document));
+            final favicon = choseFavicon(_extractFavicons(url, document)) ??
+                //In case the icon can not get extracted, we use the resolver
+                //of duckduckgo
+                Favicon(
+                  url: WebUri.uri(url.genericFavicon()),
+                );
 
             return WebPageInfo(url: url, title: title, favicon: favicon)
                 .toJson();
@@ -68,6 +74,23 @@ class GenericWebsiteService extends _$GenericWebsiteService {
         ).then(WebPageInfo.fromJson);
       },
       exceptionHandler: handleHttpError,
+    );
+  }
+
+  Future<Result<Uint8List?>> getFaviconBytes(Uri url) {
+    return getInfo(url).then(
+      (result) => result.flatMapAsync(
+        (info) async {
+          if (info.favicon != null) {
+            return _client
+                .get(info.favicon!.url)
+                .then((response) => response.bodyBytes);
+          }
+
+          return null;
+        },
+        exceptionHandler: handleHttpError,
+      ),
     );
   }
 }

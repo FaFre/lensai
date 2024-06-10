@@ -1,6 +1,4 @@
-extension WebUriFavicon on Uri {
-  Uri guessFavicon() => removeFragment().replace(
-        path: 'favicon.ico',
-        queryParameters: {},
-      );
+extension UriFavicon on Uri {
+  Uri genericFavicon() =>
+      Uri.parse('https://icons.duckduckgo.com/ip3/$host.ico');
 }

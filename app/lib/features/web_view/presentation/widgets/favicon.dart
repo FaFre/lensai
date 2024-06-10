@@ -23,7 +23,7 @@ class FaviconImage extends StatelessWidget {
     if (webPageInfo.favicon != null) {
       return FadeInImage(
         placeholder: NetworkImage(
-          webPageInfo.url.guessFavicon().toString(),
+          webPageInfo.url.genericFavicon().toString(),
         ),
         image: NetworkImage(webPageInfo.favicon!.url.toString()),
         placeholderErrorBuilder: (_, __, ___) => _iconPlaceholder,
@@ -33,7 +33,7 @@ class FaviconImage extends StatelessWidget {
       );
     } else {
       return Image.network(
-        webPageInfo.url.guessFavicon().toString(),
+        webPageInfo.url.genericFavicon().toString(),
         errorBuilder: (_, __, ___) => _iconPlaceholder,
         height: size,
         width: size,
