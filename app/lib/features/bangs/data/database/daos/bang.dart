@@ -53,12 +53,12 @@ class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
       BangFrequencyCompanion.insert(
         trigger: trigger,
         frequency: 1,
-        lastUsed: DateTime.now().toUtc(),
+        lastUsed: DateTime.now(),
       ),
       onConflict: DoUpdate(
         (old) => BangFrequencyCompanion.custom(
           frequency: old.frequency + const Constant(1),
-          lastUsed: Variable(DateTime.now().toUtc()),
+          lastUsed: Variable(DateTime.now()),
         ),
       ),
     );
@@ -77,7 +77,7 @@ class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
       BangIconCompanion.insert(
         trigger: trigger,
         iconData: iconData,
-        fetchDate: DateTime.now().toUtc(),
+        fetchDate: DateTime.now(),
       ),
       mode: InsertMode.insertOrReplace,
     );
