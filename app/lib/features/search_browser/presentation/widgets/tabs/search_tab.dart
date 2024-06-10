@@ -1,9 +1,11 @@
+import 'package:bang_navigator/features/bangs/domain/providers.dart';
+import 'package:bang_navigator/features/bangs/domain/repositories/bang.dart';
+import 'package:bang_navigator/features/bangs/presentation/widgets/bang_icon.dart';
 import 'package:bang_navigator/features/kagi/domain/repositories/autosuggest.dart';
 import 'package:bang_navigator/features/search_browser/domain/providers.dart';
+import 'package:bang_navigator/features/search_browser/presentation/widgets/bang_chips.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/speech_to_text_button.dart';
-import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
-    as uri_builder;
 import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
 import 'package:bang_navigator/presentation/widgets/autocomplete.dart';
 import 'package:flutter/material.dart';
@@ -105,8 +107,16 @@ class SearchTab extends HookConsumerWidget {
 
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final focusNode = useFocusNode();
+
+    final selectedBangAsync = ref.watch(selectedBangDataProvider);
+    final defaultSearchBangAsync = ref.watch(kagiSearchBangProvider);
+
+    final activeBang =
+        selectedBangAsync.valueOrNull ?? defaultSearchBangAsync.valueOrNull;
+
     final textController =
         useTextEditingController(text: sharedContent?.toString());
+
     final quickAnswer = useListenableSelector(
       textController,
       () => textController.text.endsWith('?'),
@@ -118,6 +128,28 @@ class SearchTab extends HookConsumerWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           const SizedBox(height: 4),
+          selectedBangAsync.when(
+            skipLoadingOnReload: true,
+            data: (selectedBang) {
+              return BangChips(
+                selectedBang: selectedBang,
+                onSelected: (trigger) {
+                  ref
+                      .read(selectedBangTriggerProvider.notifier)
+                      .setTrigger(trigger);
+                },
+                onDeleted: (trigger) {
+                  if (ref.read(selectedBangTriggerProvider) == trigger) {
+                    ref
+                        .read(selectedBangTriggerProvider.notifier)
+                        .clearTrigger();
+                  }
+                },
+              );
+            },
+            error: (error, stackTrace) => SizedBox.shrink(),
+            loading: () => SizedBox.shrink(),
+          ),
           Consumer(
             builder: (context, ref, child) {
               final optionsStream = ref.watch(autosuggestRepositoryProvider);
@@ -169,7 +201,12 @@ class SearchTab extends HookConsumerWidget {
                     controller: textEditingController,
                     focusNode: focusNode,
                     decoration: InputDecoration(
-                      // border: OutlineInputBorder(),
+                      prefixIcon: (activeBang != null)
+                          ? Padding(
+                              padding: const EdgeInsetsDirectional.all(12.0),
+                              child: BangIcon(activeBang, iconSize: 24.0),
+                            )
+                          : null,
                       label: const Text('Query'),
                       hintText: 'Ask anything...',
                       floatingLabelBehavior: FloatingLabelBehavior.always,
@@ -190,16 +227,15 @@ class SearchTab extends HookConsumerWidget {
                     onTapOutside: (event) {
                       focusNode.unfocus();
                     },
-                    onFieldSubmitted: (value) {
-                      if (formKey.currentState?.validate() ?? false) {
-                        onSubmit(
-                          uri_builder.searchUri(
-                            searchQuery: textController.text,
-                          ),
-                        );
-                      }
+                    onFieldSubmitted: (_) async {
+                      if (activeBang != null &&
+                          (formKey.currentState?.validate() == true)) {
+                        await ref
+                            .read(bangRepositoryProvider.notifier)
+                            .increaseFrequency(activeBang.trigger);
 
-                      // onFieldSubmitted();
+                        onSubmit(activeBang.getUrl(textController.text));
+                      }
                     },
                   );
                 },
@@ -226,13 +262,14 @@ class SearchTab extends HookConsumerWidget {
           SizedBox(
             width: double.infinity,
             child: FilledButton.icon(
-              onPressed: () {
-                if (formKey.currentState?.validate() ?? false) {
-                  onSubmit(
-                    uri_builder.searchUri(
-                      searchQuery: textController.text,
-                    ),
-                  );
+              onPressed: () async {
+                if (activeBang != null &&
+                    (formKey.currentState?.validate() == true)) {
+                  await ref
+                      .read(bangRepositoryProvider.notifier)
+                      .increaseFrequency(activeBang.trigger);
+
+                  onSubmit(activeBang.getUrl(textController.text));
                 }
               },
               label: const Text('Search'),

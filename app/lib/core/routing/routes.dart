@@ -1,5 +1,7 @@
 import 'package:bang_navigator/core/routing/dialog_page.dart';
 import 'package:bang_navigator/features/about/presentation/screens/about.dart';
+import 'package:bang_navigator/features/bangs/presentation/screens/bang.dart';
+import 'package:bang_navigator/features/bangs/presentation/screens/search.dart';
 import 'package:bang_navigator/features/chat_archive/presentation/screens/detail.dart';
 import 'package:bang_navigator/features/chat_archive/presentation/screens/list.dart';
 import 'package:bang_navigator/features/search_browser/presentation/screens/browser.dart';
@@ -17,11 +19,19 @@ part 'routes.g.dart';
       name: 'AboutRoute',
       path: 'about',
     ),
+    TypedGoRoute<BangRoute>(
+      name: 'BangRoute',
+      path: 'bangs',
+      routes: [
+        TypedGoRoute<BangSearchRoute>(
+          name: 'BangSearchRoute',
+          path: 'search',
+        ),
+      ],
+    ),
   ],
 )
 class KagiRoute extends GoRouteData {
-  KagiRoute();
-
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const KagiScreen();
@@ -32,6 +42,20 @@ class AboutRoute extends GoRouteData {
   @override
   Page<void> buildPage(BuildContext context, GoRouterState state) {
     return DialogPage(builder: (_) => const AboutDialogScreen());
+  }
+}
+
+class BangRoute extends GoRouteData {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const BangScreen();
+  }
+}
+
+class BangSearchRoute extends GoRouteData {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const BangSearchScreen();
   }
 }
 

@@ -36,6 +36,7 @@ Uri summarizerUri({
     _baseUrl.replace(
       pathSegments: [
         'summarizer',
+        //TODO: check if really necessary
         'index.html',
       ],
       queryParameters: {
@@ -46,9 +47,4 @@ Uri summarizerUri({
         SharedText(text: final text) => text,
         _ => null,
       },
-    );
-
-Uri searchUri({required String searchQuery}) => _baseUrl.replace(
-      pathSegments: ['search'],
-      queryParameters: {'q': searchQuery},
     );

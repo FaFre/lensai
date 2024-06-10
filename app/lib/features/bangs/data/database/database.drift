@@ -1,0 +1,88 @@
+import 'package:bang_navigator/features/bangs/data/database/drift/converters/bang_format.dart';
+import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
+import 'package:bang_navigator/features/bangs/data/models/bang.dart';
+
+CREATE TABLE bang (
+  "trigger" TEXT PRIMARY KEY NOT NULL,
+  "group" ENUM(BangGroup),
+  website_name TEXT NOT NULL,
+  domain TEXT NOT NULL,
+  url_template TEXT NOT NULL,
+  category TEXT,
+  sub_category TEXT,
+  format TEXT MAPPED BY `const BangFormatConverter()`
+) WITH Bang;
+
+CREATE TABLE bang_frequency (
+  "trigger" TEXT PRIMARY KEY NOT NULL REFERENCES bang ("trigger") ON DELETE CASCADE,
+  frequency INTEGER NOT NULL,
+  last_used DATETIME NOT NULL
+);
+
+CREATE TABLE bang_icon (
+  "trigger" TEXT PRIMARY KEY NOT NULL REFERENCES bang ("trigger") ON DELETE CASCADE,
+  icon_data BLOB NOT NULL,
+  fetch_date DATETIME NOT NULL
+);
+
+CREATE VIRTUAL TABLE bang_fts 
+	USING fts5(
+    trigger,
+    website_name,
+    content=bang,
+    prefix='2 3'
+  );
+
+CREATE VIEW bang_data_view WITH BangData AS
+  SELECT
+    b.*,
+    bf.frequency,
+    bf.last_used,
+    bi.icon_data
+  FROM
+    bang b
+  LEFT JOIN
+    bang_frequency bf ON b."trigger" = bf."trigger"
+  LEFT JOIN
+    bang_icon bi ON b."trigger" = bi."trigger";
+
+-- Triggers to keep the FTS index up to date.
+CREATE TRIGGER bang_after_insert AFTER INSERT ON bang BEGIN
+  INSERT INTO 
+    bang_fts(rowid, "trigger", website_name) 
+    VALUES (new.rowid, new."trigger", new.website_name);
+END;
+CREATE TRIGGER bang_after_delete AFTER DELETE ON bang BEGIN
+  INSERT INTO 
+    bang_fts(bang_fts, rowid, "trigger", website_name) 
+    VALUES('delete', old.rowid, old."trigger", old.website_name);
+END;
+CREATE TRIGGER bang_after_update AFTER UPDATE ON bang BEGIN
+  INSERT INTO 
+    bang_fts(bang_fts, rowid, "trigger", website_name) 
+    VALUES('delete', old.rowid, old."trigger", old.website_name);
+  INSERT INTO 
+    bang_fts(rowid, "trigger", website_name) 
+    VALUES (new.rowid, new."trigger", new.website_name);
+END;
+
+optimizeFtsIndex:
+  INSERT INTO bang_fts(bang_fts) VALUES ('optimize');
+
+bangQuery WITH BangData:
+  SELECT
+    b.*,
+    bf.frequency,
+    bf.last_used,
+    bi.icon_data
+  FROM
+    bang_fts(:query) fts
+  INNER JOIN
+    bang b ON b.rowid = fts.rowid
+  LEFT JOIN
+    bang_frequency bf ON b."trigger" = bf."trigger"
+  LEFT JOIN
+    bang_icon bi ON b."trigger" = bi."trigger"
+  ORDER BY
+    RANK,
+    bf.frequency NULLS LAST;

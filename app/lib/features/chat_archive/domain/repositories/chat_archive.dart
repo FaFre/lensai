@@ -64,7 +64,9 @@ class ChatArchiveRepository extends _$ChatArchiveRepository {
 
 @Riverpod()
 Future<String> readArchivedChat(
-    ReadArchivedChatRef ref, String fileName) async {
+  ReadArchivedChatRef ref,
+  String fileName,
+) async {
   final result =
       await ref.read(chatArchiveRepositoryProvider.notifier).readChat(fileName);
 

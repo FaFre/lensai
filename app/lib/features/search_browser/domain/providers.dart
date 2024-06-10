@@ -2,6 +2,8 @@
 
 import 'dart:async';
 
+import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
+import 'package:bang_navigator/features/bangs/domain/repositories/bang.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
 import 'package:bang_navigator/features/search_browser/domain/services/create_tab.dart';
 import 'package:flutter/widgets.dart';
@@ -64,4 +66,27 @@ class BottomSheetExtend extends _$BottomSheetExtend {
     return _extentStreamController.stream
         .sampleTime(const Duration(milliseconds: 50));
   }
+}
+
+@Riverpod(keepAlive: true)
+class SelectedBangTrigger extends _$SelectedBangTrigger {
+  void setTrigger(String trigger) {
+    state = trigger;
+  }
+
+  void clearTrigger() {
+    state = null;
+  }
+
+  @override
+  String? build() {
+    return null;
+  }
+}
+
+@Riverpod()
+Stream<BangData?> selectedBangData(SelectedBangDataRef ref) {
+  final repository = ref.watch(bangRepositoryProvider.notifier);
+  final selectedBangTrigger = ref.watch(selectedBangTriggerProvider);
+  return repository.watchBang(selectedBangTrigger);
 }

@@ -1,0 +1,16 @@
+targets:
+  $default:
+    builders:
+      drift_dev:
+        # These options change how drift generates code
+        options:
+          skip_verification_code: true
+          data_class_to_companions: false
+          named_parameters: true
+          sql:
+            dialect: sqlite
+            options:
+              version: "3.45"
+              modules:
+                - json1
+                - fts5

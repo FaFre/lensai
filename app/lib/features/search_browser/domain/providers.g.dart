@@ -6,6 +6,21 @@ part of 'providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$selectedBangDataHash() => r'6d99a08f4a02027cc007ee1df30e5ac7923ca5f5';
+
+/// See also [selectedBangData].
+@ProviderFor(selectedBangData)
+final selectedBangDataProvider = AutoDisposeStreamProvider<BangData?>.internal(
+  selectedBangData,
+  name: r'selectedBangDataProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedBangDataHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef SelectedBangDataRef = AutoDisposeStreamProviderRef<BangData?>;
 String _$overlayDialogHash() => r'7a0376fff0ba12c70a257a47391e7c049dabd36d';
 
 /// See also [OverlayDialog].
@@ -53,5 +68,22 @@ final bottomSheetExtendProvider =
 );
 
 typedef _$BottomSheetExtend = StreamNotifier<double>;
+String _$selectedBangTriggerHash() =>
+    r'd110e4f8bd9d362e0cc54ee56a4f247d0870c760';
+
+/// See also [SelectedBangTrigger].
+@ProviderFor(SelectedBangTrigger)
+final selectedBangTriggerProvider =
+    NotifierProvider<SelectedBangTrigger, String?>.internal(
+  SelectedBangTrigger.new,
+  name: r'selectedBangTriggerProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$selectedBangTriggerHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$SelectedBangTrigger = Notifier<String?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

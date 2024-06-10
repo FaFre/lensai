@@ -1,13 +1,12 @@
 import 'dart:async';
 
 import 'package:bang_navigator/core/logger.dart';
+import 'package:bang_navigator/features/bangs/domain/providers.dart';
 import 'package:bang_navigator/features/chat_archive/domain/entities/chat_entity.dart';
 import 'package:bang_navigator/features/chat_archive/domain/repositories/chat_archive.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
 import 'package:bang_navigator/features/search_browser/domain/providers.dart';
-import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
-    as uri_builder;
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/web_view/domain/entities/web_view_page.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
@@ -158,13 +157,12 @@ class _WebViewState extends ConsumerState<WebView> {
                       await widget.page.value.controller?.getSelectedText();
 
                   if (selectedText != null && selectedText.isNotEmpty) {
-                    final url = uri_builder.searchUri(
-                      searchQuery: selectedText,
-                    );
+                    final searchBang =
+                        await ref.read(kagiSearchBangProvider.future);
 
                     await ref
                         .read(switchNewTabControllerProvider.notifier)
-                        .add(url);
+                        .add(searchBang!.getUrl(selectedText));
                   }
                 },
               ),

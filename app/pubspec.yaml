@@ -10,6 +10,7 @@ dependencies:
   animations: ^2.0.11
   collection: ^1.18.0
   copy_with_extension: ^5.0.4
+  drift: ^2.18.0
   exceptions: ^0.6.0
   expandable_page_view: ^1.0.17
   fast_equatable: ^1.1.0
@@ -28,6 +29,7 @@ dependencies:
   hooks_riverpod: ^2.5.1
   html: ^0.15.4
   http: ^1.2.1
+  json_annotation: ^4.9.0
   logger: ^2.2.0
   markdown: ^7.2.2
   mime: ^1.0.5
@@ -41,6 +43,8 @@ dependencies:
   shared_preferences: ^2.2.3
   skeletonizer: ^1.1.1
   speech_to_text_google_dialog: ^0.0.6
+  sqlite3: ^2.4.3
+  sqlite3_flutter_libs: ^0.5.23
   text_scroll: ^0.2.0
   universal_io: ^2.2.2
   uri_to_file: ^1.0.0
@@ -52,9 +56,11 @@ dev_dependencies:
   copy_with_extension_gen: ^5.0.4
   custom_lint: ^0.6.4
   dependency_validator: ^4.1.0
+  drift_dev: ^2.18.0
   fast_equatable_lint: ^0.3.0
   flutter_launcher_icons: ^0.13.1
   go_router_builder: ^2.4.1
+  json_serializable: ^6.8.0
   lint: ^2.3.0
   riverpod_generator: ^2.4.0
   riverpod_lint: ^2.3.10
