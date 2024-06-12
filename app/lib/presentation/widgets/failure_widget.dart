@@ -10,7 +10,7 @@ class FailureWidget extends StatelessWidget {
   });
 
   final String? title;
-  final Object? exception;
+  final dynamic exception;
   final VoidCallback? onRetry;
   final bool compact;
 
@@ -23,7 +23,10 @@ class FailureWidget extends StatelessWidget {
           ListTile(
             title: Text(title ?? 'Something went wrong'),
             subtitle: exception != null
-                ? Text(exception.runtimeType.toString())
+                ? switch (exception) {
+                    final String string => Text(string),
+                    _ => Text(exception.runtimeType.toString())
+                  }
                 : null,
             trailing: compact && onRetry != null
                 ? IconButton.outlined(
