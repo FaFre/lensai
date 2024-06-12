@@ -78,7 +78,7 @@ class BangChips extends HookConsumerWidget {
               ),
               IconButton(
                 onPressed: () async {
-                  await context.push(BangRoute().location);
+                  await context.push(BangSearchRoute().location);
                 },
                 icon: const Icon(Icons.chevron_right),
               ),
