@@ -25,6 +25,7 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   flutter_sharing_intent: ^1.1.1
   go_router: ^14.1.1
+  google_fonts: ^6.2.1
   home_widget: ^0.6.0
   hooks_riverpod: ^2.5.1
   html: ^0.15.4
@@ -70,6 +71,7 @@ flutter:
   assets:
     - assets/icon/icon.png
     - assets/landing/
+    - assets/fonts/
 
 flutter_launcher_icons:
   android: "launcher_icon"

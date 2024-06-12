@@ -1,19 +1,40 @@
+import 'package:bang_navigator/core/extension/date_time.dart';
+import 'package:bang_navigator/features/bangs/data/models/bang.dart';
+import 'package:bang_navigator/features/bangs/domain/providers.dart';
+import 'package:bang_navigator/features/bangs/domain/repositories/bang_data.dart';
+import 'package:bang_navigator/features/bangs/domain/repositories/sync.dart';
 import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/settings/presentation/controllers/save_settings.dart';
+import 'package:bang_navigator/features/settings/presentation/widgets/button_list_tile.dart';
 import 'package:bang_navigator/features/settings/utils/session_link_extractor.dart';
 import 'package:bang_navigator/presentation/hooks/listenable_callback.dart';
 import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SettingsScreen extends HookConsumerWidget {
   const SettingsScreen({super.key});
 
+  Widget _buildSection(ThemeData theme, String name) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(name, style: theme.textTheme.titleLarge),
+            const Divider(),
+          ],
+        ),
+      );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
     final kagiSessionTextController = useTextEditingController(
       text: ref.read(
         settingsRepositoryProvider
@@ -74,11 +95,12 @@ class SettingsScreen extends HookConsumerWidget {
           padding: const EdgeInsets.all(8.0),
           child: ListView(
             children: [
+              _buildSection(theme, 'Kagi'),
               Padding(
                 padding: const EdgeInsets.only(
                   left: 16,
                   right: 16,
-                  bottom: 16,
+                  bottom: 8,
                 ),
                 child: TextField(
                   controller: kagiSessionTextController,
@@ -129,6 +151,10 @@ class SettingsScreen extends HookConsumerWidget {
                       );
                 },
               ),
+              const SizedBox(
+                height: 16,
+              ),
+              _buildSection(theme, 'General'),
               SwitchListTile.adaptive(
                 title: const Text('Incognito Mode'),
                 subtitle: const Text(
@@ -166,6 +192,198 @@ class SettingsScreen extends HookConsumerWidget {
                         (currentSettings) =>
                             currentSettings.copyWith.launchUrlExternal(value),
                       );
+                },
+              ),
+              const SizedBox(
+                height: 16,
+              ),
+              _buildSection(theme, 'Bangs'),
+              ButtonListTile(
+                title: 'Icon Cache',
+                subtitle: 'Stores favicons for Bangs',
+                button: FilledButton.icon(
+                  onPressed: () async {
+                    await ref
+                        .read(bangDataRepositoryProvider.notifier)
+                        .clearIconData();
+                  },
+                  icon: const Icon(Icons.delete),
+                  label: const Text('Clear'),
+                ),
+              ),
+              ButtonListTile(
+                title: 'Bang Frequencies',
+                subtitle: 'Tracks Bang usage for recommendation history',
+                button: FilledButton.icon(
+                  onPressed: () async {
+                    await ref
+                        .read(bangDataRepositoryProvider.notifier)
+                        .clearFrequency();
+                  },
+                  icon: const Icon(Icons.delete),
+                  label: const Text('Clear'),
+                ),
+              ),
+              Consumer(
+                builder: (context, ref, child) {
+                  final lastSync = ref.watch(
+                    lastSyncOfGroupProvider(BangGroup.general).select(
+                      (value) => value.valueOrNull,
+                    ),
+                  );
+
+                  final count = ref.watch(
+                    bangCountOfGroupProvider(BangGroup.general).select(
+                      (value) => value.valueOrNull,
+                    ),
+                  );
+
+                  return ButtonListTile(
+                    title: 'General Bangs',
+                    subtitle: 'Automatically syncs every 7 days',
+                    content: Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: DefaultTextStyle(
+                        style: GoogleFonts.robotoMono(),
+                        child: Table(
+                          children: [
+                            TableRow(
+                              children: [
+                                const Text('Entries'),
+                                Text(count?.toString() ?? 'N/A'),
+                              ],
+                            ),
+                            TableRow(
+                              children: [
+                                const Text('Last Sync'),
+                                Text(
+                                  lastSync?.formatWithMinutePrecision() ??
+                                      'N/A',
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    button: FilledButton.icon(
+                      onPressed: () async {
+                        await ref
+                            .read(bangSyncRepositoryProvider.notifier)
+                            .syncGeneralBangs();
+                      },
+                      icon: const Icon(Icons.sync),
+                      label: const Text('Sync'),
+                    ),
+                  );
+                },
+              ),
+              Consumer(
+                builder: (context, ref, child) {
+                  final lastSync = ref.watch(
+                    lastSyncOfGroupProvider(BangGroup.assistant).select(
+                      (value) => value.valueOrNull,
+                    ),
+                  );
+
+                  final count = ref.watch(
+                    bangCountOfGroupProvider(BangGroup.assistant).select(
+                      (value) => value.valueOrNull,
+                    ),
+                  );
+
+                  return ButtonListTile(
+                    title: 'Assistant Bangs',
+                    subtitle: 'Automatically syncs every 7 days',
+                    content: Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: DefaultTextStyle(
+                        style: GoogleFonts.robotoMono(),
+                        child: Table(
+                          children: [
+                            TableRow(
+                              children: [
+                                const Text('Entries'),
+                                Text(count?.toString() ?? 'N/A'),
+                              ],
+                            ),
+                            TableRow(
+                              children: [
+                                const Text('Last Sync'),
+                                Text(
+                                  lastSync?.formatWithMinutePrecision() ??
+                                      'N/A',
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    button: FilledButton.icon(
+                      onPressed: () async {
+                        await ref
+                            .read(bangSyncRepositoryProvider.notifier)
+                            .syncAssistantBangs();
+                      },
+                      icon: const Icon(Icons.sync),
+                      label: const Text('Sync'),
+                    ),
+                  );
+                },
+              ),
+              Consumer(
+                builder: (context, ref, child) {
+                  final lastSync = ref.watch(
+                    lastSyncOfGroupProvider(BangGroup.kagi).select(
+                      (value) => value.valueOrNull,
+                    ),
+                  );
+
+                  final count = ref.watch(
+                    bangCountOfGroupProvider(BangGroup.kagi).select(
+                      (value) => value.valueOrNull,
+                    ),
+                  );
+
+                  return ButtonListTile(
+                    title: 'Kagi Bangs',
+                    subtitle: 'Automatically syncs every 7 days',
+                    content: Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: DefaultTextStyle(
+                        style: GoogleFonts.robotoMono(),
+                        child: Table(
+                          children: [
+                            TableRow(
+                              children: [
+                                const Text('Entries'),
+                                Text(count?.toString() ?? 'N/A'),
+                              ],
+                            ),
+                            TableRow(
+                              children: [
+                                const Text('Last Sync'),
+                                Text(
+                                  lastSync?.formatWithMinutePrecision() ??
+                                      'N/A',
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    button: FilledButton.icon(
+                      onPressed: () async {
+                        await ref
+                            .read(bangSyncRepositoryProvider.notifier)
+                            .syncKagiBangs();
+                      },
+                      icon: const Icon(Icons.sync),
+                      label: const Text('Sync'),
+                    ),
+                  );
                 },
               ),
             ],
