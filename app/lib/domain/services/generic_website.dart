@@ -82,9 +82,13 @@ class GenericWebsiteService extends _$GenericWebsiteService {
       (result) => result.flatMapAsync(
         (info) async {
           if (info.favicon != null) {
-            return _client
-                .get(info.favicon!.url)
-                .then((response) => response.bodyBytes);
+            return _client.get(info.favicon!.url).then((response) {
+              if (response.statusCode == 200) {
+                return response.bodyBytes;
+              } else {
+                return null;
+              }
+            });
           }
 
           return null;
