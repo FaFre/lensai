@@ -103,6 +103,8 @@ class SettingsScreen extends HookConsumerWidget {
                   bottom: 8,
                 ),
                 child: TextField(
+                  enableIMEPersonalizedLearning: false,
+                  autocorrect: false,
                   controller: kagiSessionTextController,
                   obscureText: hideSessionText.value,
                   decoration: InputDecoration(
