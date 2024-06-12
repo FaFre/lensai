@@ -135,7 +135,14 @@ class KagiScreen extends HookConsumerWidget {
                   leadingIcon: const Icon(Icons.settings),
                   child: const Text('Settings'),
                 ),
-                if (showEarlyAccessFeatures) const Divider(),
+                const Divider(),
+                MenuItemButton(
+                  onPressed: () async {
+                    await context.push(BangRoute().location);
+                  },
+                  leadingIcon: const Icon(MdiIcons.exclamationThick),
+                  child: const Text('Bangs'),
+                ),
                 if (showEarlyAccessFeatures)
                   MenuItemButton(
                     onPressed: () async {
