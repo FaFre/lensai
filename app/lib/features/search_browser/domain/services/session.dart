@@ -44,10 +44,6 @@ class SessionService extends _$SessionService {
     await webViewLoaded.future.whenComplete(() => headlessWebView..dispose());
   }
 
-  void initializationDone() {
-    state = true;
-  }
-
   @override
-  bool build() => false;
+  void build() {}
 }

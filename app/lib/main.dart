@@ -1,11 +1,10 @@
 import 'package:bang_navigator/core/logger.dart';
 import 'package:bang_navigator/core/providers.dart';
-import 'package:bang_navigator/features/about/data/repositories/package_info_repository.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/sync.dart';
-import 'package:bang_navigator/features/search_browser/domain/services/session.dart';
-import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
+import 'package:bang_navigator/domain/services/app_initialization.dart';
 import 'package:bang_navigator/presentation/hooks/on_initialization.dart';
+import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
@@ -39,28 +38,9 @@ void main() async {
         builder: (context, ref, child) {
           useOnInitialization(
             () async {
-              await ref.read(packageInfoProvider.future);
-
               await ref
-                  .read(bangSyncRepositoryProvider.notifier)
-                  .syncAllBangGroups(syncInterval: const Duration(days: 7));
-
-              final settings =
-                  await ref.read(settingsRepositoryProvider.future);
-
-              if (settings.incognitoMode) {
-                await ref.read(sessionServiceProvider.notifier).clearAllData();
-              }
-
-              if (settings.kagiSession case final String session) {
-                if (session.isNotEmpty) {
-                  await ref
-                      .read(sessionServiceProvider.notifier)
-                      .setKagiSession(session);
-                }
-              }
-
-              ref.read(sessionServiceProvider.notifier).initializationDone();
+                  .read(appInitializationServiceProvider.notifier)
+                  .initialize();
             },
           );
 
@@ -76,18 +56,11 @@ class MainApp extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isInitialized = ref.watch(sessionServiceProvider);
+    final initializationResult = ref.watch(appInitializationServiceProvider);
     final router = ref.watch(routerProvider);
 
-    if (!isInitialized) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
+    final themeData = useMemoized(
+      () => ThemeData(
         useMaterial3: true,
         brightness: Brightness.dark,
         // colorScheme: ColorScheme.fromSeed(
@@ -95,7 +68,44 @@ class MainApp extends HookConsumerWidget {
         //   brightness: Brightness.dark,
         // ),
       ),
-      routerConfig: router,
+    );
+
+    return initializationResult.fold(
+      (initializationState) {
+        if (!initializationState.initialized) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          theme: themeData,
+          routerConfig: router,
+        );
+      },
+      onFailure: (errorMessage) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: themeData,
+          home: Scaffold(
+            appBar: AppBar(
+              title: const Text('Initiallization Error'),
+            ),
+            body: Center(
+              child: FailureWidget(
+                title: 'Could not initialize App',
+                exception: errorMessage.toString(),
+                onRetry: () async {
+                  await ref
+                      .read(appInitializationServiceProvider.notifier)
+                      .reinitialize();
+                },
+              ),
+            ),
+          ),
+        );
+      },
     );
   }
 }
