@@ -4,6 +4,7 @@ import 'package:bang_navigator/features/search_browser/domain/entities/modes.dar
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
 import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
     as uri_builder;
+import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
 import 'package:bang_navigator/presentation/widgets/website_title_tile.dart';
 import 'package:bang_navigator/utils/uri_parser.dart' as uri_parser;
@@ -14,15 +15,21 @@ import 'package:flutter_material_design_icons/flutter_material_design_icons.dart
 import 'package:flutter_pdf_text/flutter_pdf_text.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-class _InputField extends StatelessWidget {
+class _InputField extends ConsumerWidget {
   final TextEditingController? controller;
 
   const _InputField({required this.controller, super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final incognitoEnabled = ref.watch(
+      settingsRepositoryProvider
+          .select((value) => value.valueOrNull?.incognitoMode ?? false),
+    );
+
     return TextFormField(
       controller: controller,
+      enableIMEPersonalizedLearning: !incognitoEnabled,
       decoration: const InputDecoration(
         label: Text('Document'),
         hintText: 'Enter URL or text to summarize',

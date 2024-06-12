@@ -6,6 +6,7 @@ import 'package:bang_navigator/features/bangs/presentation/widgets/bang_details.
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
 import 'package:bang_navigator/features/search_browser/domain/providers.dart';
+import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/presentation/hooks/listenable_callback.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -18,6 +19,10 @@ class BangSearchScreen extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final resultsAsync = ref.watch(bangSearchProvider);
+    final incognitoEnabled = ref.watch(
+      settingsRepositoryProvider
+          .select((value) => value.valueOrNull?.incognitoMode ?? false),
+    );
 
     final textEditingController = useTextEditingController();
 
@@ -32,6 +37,7 @@ class BangSearchScreen extends HookConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: TextField(
+          enableIMEPersonalizedLearning: !incognitoEnabled,
           controller: textEditingController,
           autofocus: true,
           autocorrect: false,

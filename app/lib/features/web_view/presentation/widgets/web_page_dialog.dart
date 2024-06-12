@@ -2,6 +2,7 @@ import 'package:bang_navigator/domain/entities/web_page_info.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
     as uri_builder;
+import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:bang_navigator/features/web_view/presentation/widgets/favicon.dart';
@@ -53,6 +54,11 @@ class WebPageDialog extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final incognitoEnabled = ref.watch(
+      settingsRepositoryProvider
+          .select((value) => value.valueOrNull?.incognitoMode ?? false),
+    );
+
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final urlTextController =
         useTextEditingController(text: page.url.toString());
@@ -89,6 +95,7 @@ class WebPageDialog extends HookConsumerWidget {
                   key: formKey,
                   child: TextFormField(
                     controller: urlTextController,
+                    enableIMEPersonalizedLearning: !incognitoEnabled,
                     decoration: InputDecoration(
                       suffixIcon: (webViewController != null)
                           ? IconButton(

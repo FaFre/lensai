@@ -6,6 +6,7 @@ import 'package:bang_navigator/features/search_browser/domain/providers.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/bang_chips.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/speech_to_text_button.dart';
+import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
 import 'package:bang_navigator/presentation/widgets/autocomplete.dart';
 import 'package:flutter/material.dart';
@@ -103,6 +104,11 @@ class SearchTab extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final incognitoEnabled = ref.watch(
+      settingsRepositoryProvider
+          .select((value) => value.valueOrNull?.incognitoMode ?? false),
+    );
+
     useAutomaticKeepAlive();
 
     final formKey = useMemoized(() => GlobalKey<FormState>());
@@ -199,6 +205,7 @@ class SearchTab extends HookConsumerWidget {
                 ) {
                   return TextFormField(
                     controller: textEditingController,
+                    enableIMEPersonalizedLearning: !incognitoEnabled,
                     focusNode: focusNode,
                     decoration: InputDecoration(
                       prefixIcon: (activeBang != null)
