@@ -73,8 +73,24 @@ class MainApp extends HookConsumerWidget {
     return initializationResult.fold(
       (initializationState) {
         if (!initializationState.initialized) {
-          return const Center(
-            child: CircularProgressIndicator(),
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: themeData,
+            home: Scaffold(
+              body: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const CircularProgressIndicator(),
+                    if (initializationState.stage != null)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(initializationState.stage!),
+                      ),
+                  ],
+                ),
+              ),
+            ),
           );
         }
 

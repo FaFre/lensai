@@ -7,13 +7,18 @@ part of 'app_initialization.dart';
 // **************************************************************************
 
 String _$appInitializationServiceHash() =>
-    r'7b36828c2368c3b3a97b799dd8192854629c8379';
+    r'9d970ee0c347a1fc89bea6546956a51ba8d2d711';
 
 /// See also [AppInitializationService].
 @ProviderFor(AppInitializationService)
 final appInitializationServiceProvider = NotifierProvider<
     AppInitializationService,
-    Result<({bool initialized, List<ErrorMessage> errors})>>.internal(
+    Result<
+        ({
+          bool initialized,
+          String? stage,
+          List<ErrorMessage> errors
+        })>>.internal(
   AppInitializationService.new,
   name: r'appInitializationServiceProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -23,7 +28,7 @@ final appInitializationServiceProvider = NotifierProvider<
   allTransitiveDependencies: null,
 );
 
-typedef _$AppInitializationService
-    = Notifier<Result<({bool initialized, List<ErrorMessage> errors})>>;
+typedef _$AppInitializationService = Notifier<
+    Result<({bool initialized, String? stage, List<ErrorMessage> errors})>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

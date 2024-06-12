@@ -20,16 +20,36 @@ class AppInitializationService extends _$AppInitializationService {
       final errors = <ErrorMessage>[];
 
       //Ensure Package info is loaded
+      state = Result.success(
+        (
+          initialized: false,
+          stage: 'Loading Package Info...',
+          errors: List.empty()
+        ),
+      );
       await ref.read(packageInfoProvider.future);
 
+      state = Result.success(
+        (
+          initialized: false,
+          stage: 'Synchronizing Bangs...',
+          errors: List.empty()
+        ),
+      );
       final syncResults = await ref
           .read(bangSyncRepositoryProvider.notifier)
           .syncAllBangGroups(syncInterval: const Duration(days: 7));
-
       for (final MapEntry(value: result) in syncResults.entries) {
         result.onFailure(errors.add);
       }
 
+      state = Result.success(
+        (
+          initialized: false,
+          stage: 'Enforcing Privacy...',
+          errors: List.empty()
+        ),
+      );
       final settings = await ref.read(settingsRepositoryProvider.future);
       if (settings.incognitoMode) {
         await ref.read(sessionServiceProvider.notifier).clearAllData();
@@ -43,12 +63,15 @@ class AppInitializationService extends _$AppInitializationService {
         }
       }
 
-      return (initialized: true, errors: errors);
+      return (initialized: true, stage: null, errors: errors);
     });
   }
 
   @override
-  Result<({bool initialized, List<ErrorMessage> errors})> build() {
-    return Result.success((initialized: false, errors: List.empty()));
+  Result<({bool initialized, String? stage, List<ErrorMessage> errors})>
+      build() {
+    return Result.success(
+      (initialized: false, stage: null, errors: List.empty()),
+    );
   }
 }
