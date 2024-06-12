@@ -33,6 +33,8 @@ class BangSearchScreen extends HookConsumerWidget {
       appBar: AppBar(
         title: TextField(
           controller: textEditingController,
+          autofocus: true,
+          autocorrect: false,
           decoration: const InputDecoration.collapsed(hintText: 'Search'),
         ),
         actions: [
