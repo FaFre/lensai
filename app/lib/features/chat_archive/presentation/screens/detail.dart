@@ -125,7 +125,8 @@ class ChatArchiveDetailScreen extends HookConsumerWidget {
           ),
           error: (error, stackTrace) {
             return FailureWidget(
-              title: error.toString(),
+              title: 'Could not load chat',
+              exception: error,
               onRetry: () => ref.refresh(readArchivedChatProvider(fileName)),
             );
           },

@@ -1,3 +1,4 @@
+import 'package:bang_navigator/core/extension/date_time.dart';
 import 'package:bang_navigator/core/routing/routes.dart';
 import 'package:bang_navigator/features/chat_archive/domain/repositories/chat_archive.dart';
 import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
@@ -27,7 +28,7 @@ class ChatArchiveListScreen extends HookConsumerWidget {
                   return ListTile(
                     title: Text(chat.toString()),
                     subtitle: (chat.dateTime != null)
-                        ? Text(chat.dateTime.toString())
+                        ? Text(chat.dateTime!.formatWithMinutePrecision())
                         : null,
                     onTap: () async {
                       await context.push(
@@ -41,7 +42,8 @@ class ChatArchiveListScreen extends HookConsumerWidget {
             },
             error: (error, stackTrace) {
               return FailureWidget(
-                title: error.toString(),
+                title: 'Could not load archived chats',
+                exception: error,
                 onRetry: () => ref.refresh(chatArchiveRepositoryProvider),
               );
             },
