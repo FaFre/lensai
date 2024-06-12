@@ -1,5 +1,5 @@
 import 'package:bang_navigator/features/bangs/domain/providers.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/bang.dart';
+import 'package:bang_navigator/features/bangs/domain/repositories/bang_data.dart';
 import 'package:bang_navigator/features/bangs/presentation/widgets/bang_icon.dart';
 import 'package:bang_navigator/features/kagi/domain/repositories/autosuggest.dart';
 import 'package:bang_navigator/features/search_browser/domain/providers.dart';
@@ -109,7 +109,7 @@ class SearchTab extends HookConsumerWidget {
     final focusNode = useFocusNode();
 
     final selectedBangAsync = ref.watch(selectedBangDataProvider);
-    final defaultSearchBangAsync = ref.watch(kagiSearchBangProvider);
+    final defaultSearchBangAsync = ref.watch(kagiSearchBangDataProvider);
 
     final activeBang =
         selectedBangAsync.valueOrNull ?? defaultSearchBangAsync.valueOrNull;
@@ -231,7 +231,7 @@ class SearchTab extends HookConsumerWidget {
                       if (activeBang != null &&
                           (formKey.currentState?.validate() == true)) {
                         await ref
-                            .read(bangRepositoryProvider.notifier)
+                            .read(bangDataRepositoryProvider.notifier)
                             .increaseFrequency(activeBang.trigger);
 
                         onSubmit(activeBang.getUrl(textController.text));
@@ -266,7 +266,7 @@ class SearchTab extends HookConsumerWidget {
                 if (activeBang != null &&
                     (formKey.currentState?.validate() == true)) {
                   await ref
-                      .read(bangRepositoryProvider.notifier)
+                      .read(bangDataRepositoryProvider.notifier)
                       .increaseFrequency(activeBang.trigger);
 
                   onSubmit(activeBang.getUrl(textController.text));

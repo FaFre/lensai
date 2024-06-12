@@ -1,25 +1,27 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'bang.dart';
+part of 'sync.dart';
 
 // **************************************************************************
 // RiverpodGenerator
 // **************************************************************************
 
-String _$bangRepositoryHash() => r'd405550e2ad11c57f3644f18390348efb71bdf0f';
+String _$bangSyncRepositoryHash() =>
+    r'79b9c561638e96eb404ceeecb4b50dec31f0c610';
 
-/// See also [BangRepository].
-@ProviderFor(BangRepository)
-final bangRepositoryProvider = NotifierProvider<BangRepository, void>.internal(
-  BangRepository.new,
-  name: r'bangRepositoryProvider',
+/// See also [BangSyncRepository].
+@ProviderFor(BangSyncRepository)
+final bangSyncRepositoryProvider =
+    NotifierProvider<BangSyncRepository, void>.internal(
+  BangSyncRepository.new,
+  name: r'bangSyncRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$bangRepositoryHash,
+      : _$bangSyncRepositoryHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$BangRepository = Notifier<void>;
+typedef _$BangSyncRepository = Notifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

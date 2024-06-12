@@ -6,7 +6,7 @@ part of 'providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$bangHash() => r'e3d44af52e27831b568f292d38b447a443acec95';
+String _$bangDataHash() => r'd0e96885458be8893c6b19735b8792bdd1b9bcb8';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -29,27 +29,27 @@ class _SystemHash {
   }
 }
 
-/// See also [bang].
-@ProviderFor(bang)
-const bangProvider = BangFamily();
+/// See also [bangData].
+@ProviderFor(bangData)
+const bangDataProvider = BangDataFamily();
 
-/// See also [bang].
-class BangFamily extends Family<AsyncValue<BangData?>> {
-  /// See also [bang].
-  const BangFamily();
+/// See also [bangData].
+class BangDataFamily extends Family<AsyncValue<BangData?>> {
+  /// See also [bangData].
+  const BangDataFamily();
 
-  /// See also [bang].
-  BangProvider call(
+  /// See also [bangData].
+  BangDataProvider call(
     String? trigger,
   ) {
-    return BangProvider(
+    return BangDataProvider(
       trigger,
     );
   }
 
   @override
-  BangProvider getProviderOverride(
-    covariant BangProvider provider,
+  BangDataProvider getProviderOverride(
+    covariant BangDataProvider provider,
   ) {
     return call(
       provider.trigger,
@@ -68,29 +68,31 @@ class BangFamily extends Family<AsyncValue<BangData?>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'bangProvider';
+  String? get name => r'bangDataProvider';
 }
 
-/// See also [bang].
-class BangProvider extends AutoDisposeStreamProvider<BangData?> {
-  /// See also [bang].
-  BangProvider(
+/// See also [bangData].
+class BangDataProvider extends AutoDisposeStreamProvider<BangData?> {
+  /// See also [bangData].
+  BangDataProvider(
     String? trigger,
   ) : this._internal(
-          (ref) => bang(
-            ref as BangRef,
+          (ref) => bangData(
+            ref as BangDataRef,
             trigger,
           ),
-          from: bangProvider,
-          name: r'bangProvider',
+          from: bangDataProvider,
+          name: r'bangDataProvider',
           debugGetCreateSourceHash:
-              const bool.fromEnvironment('dart.vm.product') ? null : _$bangHash,
-          dependencies: BangFamily._dependencies,
-          allTransitiveDependencies: BangFamily._allTransitiveDependencies,
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$bangDataHash,
+          dependencies: BangDataFamily._dependencies,
+          allTransitiveDependencies: BangDataFamily._allTransitiveDependencies,
           trigger: trigger,
         );
 
-  BangProvider._internal(
+  BangDataProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -104,12 +106,12 @@ class BangProvider extends AutoDisposeStreamProvider<BangData?> {
 
   @override
   Override overrideWith(
-    Stream<BangData?> Function(BangRef provider) create,
+    Stream<BangData?> Function(BangDataRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: BangProvider._internal(
-        (ref) => create(ref as BangRef),
+      override: BangDataProvider._internal(
+        (ref) => create(ref as BangDataRef),
         from: from,
         name: null,
         dependencies: null,
@@ -122,12 +124,12 @@ class BangProvider extends AutoDisposeStreamProvider<BangData?> {
 
   @override
   AutoDisposeStreamProviderElement<BangData?> createElement() {
-    return _BangProviderElement(this);
+    return _BangDataProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is BangProvider && other.trigger == trigger;
+    return other is BangDataProvider && other.trigger == trigger;
   }
 
   @override
@@ -139,88 +141,90 @@ class BangProvider extends AutoDisposeStreamProvider<BangData?> {
   }
 }
 
-mixin BangRef on AutoDisposeStreamProviderRef<BangData?> {
+mixin BangDataRef on AutoDisposeStreamProviderRef<BangData?> {
   /// The parameter `trigger` of this provider.
   String? get trigger;
 }
 
-class _BangProviderElement extends AutoDisposeStreamProviderElement<BangData?>
-    with BangRef {
-  _BangProviderElement(super.provider);
+class _BangDataProviderElement
+    extends AutoDisposeStreamProviderElement<BangData?> with BangDataRef {
+  _BangDataProviderElement(super.provider);
 
   @override
-  String? get trigger => (origin as BangProvider).trigger;
+  String? get trigger => (origin as BangDataProvider).trigger;
 }
 
-String _$kagiSearchBangHash() => r'ec830f26cf1d23e1e75747e1523cb1868e77d40b';
+String _$kagiSearchBangDataHash() =>
+    r'4dbeaab0541d7c8214d097523d139eede2e3f975';
 
-/// See also [kagiSearchBang].
-@ProviderFor(kagiSearchBang)
-final kagiSearchBangProvider = StreamProvider<BangData?>.internal(
-  kagiSearchBang,
-  name: r'kagiSearchBangProvider',
+/// See also [kagiSearchBangData].
+@ProviderFor(kagiSearchBangData)
+final kagiSearchBangDataProvider = StreamProvider<BangData?>.internal(
+  kagiSearchBangData,
+  name: r'kagiSearchBangDataProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$kagiSearchBangHash,
+      : _$kagiSearchBangDataHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef KagiSearchBangRef = StreamProviderRef<BangData?>;
-String _$allBangsHash() => r'212201f81e21fd0c1b5fb192359fb6ff8269a2a6';
+typedef KagiSearchBangDataRef = StreamProviderRef<BangData?>;
+String _$bangDataListHash() => r'f5544ce7b3cc0f3e0fc3db25a99456c3cd080c1c';
 
-/// See also [allBangs].
-@ProviderFor(allBangs)
-final allBangsProvider = AutoDisposeStreamProvider<List<BangData>>.internal(
-  allBangs,
-  name: r'allBangsProvider',
+/// See also [bangDataList].
+@ProviderFor(bangDataList)
+final bangDataListProvider = AutoDisposeStreamProvider<List<BangData>>.internal(
+  bangDataList,
+  name: r'bangDataListProvider',
   debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$allBangsHash,
+      const bool.fromEnvironment('dart.vm.product') ? null : _$bangDataListHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef AllBangsRef = AutoDisposeStreamProviderRef<List<BangData>>;
-String _$frequentBangsHash() => r'12867819c6e2bbc5f2b6342aacc286f62d3a1803';
+typedef BangDataListRef = AutoDisposeStreamProviderRef<List<BangData>>;
+String _$frequentBangDataListHash() =>
+    r'adf8d0b72adfa8faffadd7f1a294ce3945e22fec';
 
-/// See also [frequentBangs].
-@ProviderFor(frequentBangs)
-final frequentBangsProvider =
+/// See also [frequentBangDataList].
+@ProviderFor(frequentBangDataList)
+final frequentBangDataListProvider =
     AutoDisposeStreamProvider<List<BangData>>.internal(
-  frequentBangs,
-  name: r'frequentBangsProvider',
+  frequentBangDataList,
+  name: r'frequentBangDataListProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$frequentBangsHash,
+      : _$frequentBangDataListHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef FrequentBangsRef = AutoDisposeStreamProviderRef<List<BangData>>;
-String _$ensureIconAvailableHash() =>
-    r'2e112c88da8cf9bf12bdc5e5d525d59fe97a9419';
+typedef FrequentBangDataListRef = AutoDisposeStreamProviderRef<List<BangData>>;
+String _$bangDataEnsureIconHash() =>
+    r'69b59b582a7b165b8076a1478d0d433ec0846ccb';
 
-/// See also [ensureIconAvailable].
-@ProviderFor(ensureIconAvailable)
-const ensureIconAvailableProvider = EnsureIconAvailableFamily();
+/// See also [bangDataEnsureIcon].
+@ProviderFor(bangDataEnsureIcon)
+const bangDataEnsureIconProvider = BangDataEnsureIconFamily();
 
-/// See also [ensureIconAvailable].
-class EnsureIconAvailableFamily extends Family<AsyncValue<BangData>> {
-  /// See also [ensureIconAvailable].
-  const EnsureIconAvailableFamily();
+/// See also [bangDataEnsureIcon].
+class BangDataEnsureIconFamily extends Family<AsyncValue<BangData>> {
+  /// See also [bangDataEnsureIcon].
+  const BangDataEnsureIconFamily();
 
-  /// See also [ensureIconAvailable].
-  EnsureIconAvailableProvider call(
+  /// See also [bangDataEnsureIcon].
+  BangDataEnsureIconProvider call(
     BangData bang,
   ) {
-    return EnsureIconAvailableProvider(
+    return BangDataEnsureIconProvider(
       bang,
     );
   }
 
   @override
-  EnsureIconAvailableProvider getProviderOverride(
-    covariant EnsureIconAvailableProvider provider,
+  BangDataEnsureIconProvider getProviderOverride(
+    covariant BangDataEnsureIconProvider provider,
   ) {
     return call(
       provider.bang,
@@ -239,32 +243,32 @@ class EnsureIconAvailableFamily extends Family<AsyncValue<BangData>> {
       _allTransitiveDependencies;
 
   @override
-  String? get name => r'ensureIconAvailableProvider';
+  String? get name => r'bangDataEnsureIconProvider';
 }
 
-/// See also [ensureIconAvailable].
-class EnsureIconAvailableProvider extends AutoDisposeFutureProvider<BangData> {
-  /// See also [ensureIconAvailable].
-  EnsureIconAvailableProvider(
+/// See also [bangDataEnsureIcon].
+class BangDataEnsureIconProvider extends AutoDisposeFutureProvider<BangData> {
+  /// See also [bangDataEnsureIcon].
+  BangDataEnsureIconProvider(
     BangData bang,
   ) : this._internal(
-          (ref) => ensureIconAvailable(
-            ref as EnsureIconAvailableRef,
+          (ref) => bangDataEnsureIcon(
+            ref as BangDataEnsureIconRef,
             bang,
           ),
-          from: ensureIconAvailableProvider,
-          name: r'ensureIconAvailableProvider',
+          from: bangDataEnsureIconProvider,
+          name: r'bangDataEnsureIconProvider',
           debugGetCreateSourceHash:
               const bool.fromEnvironment('dart.vm.product')
                   ? null
-                  : _$ensureIconAvailableHash,
-          dependencies: EnsureIconAvailableFamily._dependencies,
+                  : _$bangDataEnsureIconHash,
+          dependencies: BangDataEnsureIconFamily._dependencies,
           allTransitiveDependencies:
-              EnsureIconAvailableFamily._allTransitiveDependencies,
+              BangDataEnsureIconFamily._allTransitiveDependencies,
           bang: bang,
         );
 
-  EnsureIconAvailableProvider._internal(
+  BangDataEnsureIconProvider._internal(
     super._createNotifier, {
     required super.name,
     required super.dependencies,
@@ -278,12 +282,12 @@ class EnsureIconAvailableProvider extends AutoDisposeFutureProvider<BangData> {
 
   @override
   Override overrideWith(
-    FutureOr<BangData> Function(EnsureIconAvailableRef provider) create,
+    FutureOr<BangData> Function(BangDataEnsureIconRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
-      override: EnsureIconAvailableProvider._internal(
-        (ref) => create(ref as EnsureIconAvailableRef),
+      override: BangDataEnsureIconProvider._internal(
+        (ref) => create(ref as BangDataEnsureIconRef),
         from: from,
         name: null,
         dependencies: null,
@@ -296,12 +300,12 @@ class EnsureIconAvailableProvider extends AutoDisposeFutureProvider<BangData> {
 
   @override
   AutoDisposeFutureProviderElement<BangData> createElement() {
-    return _EnsureIconAvailableProviderElement(this);
+    return _BangDataEnsureIconProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is EnsureIconAvailableProvider && other.bang == bang;
+    return other is BangDataEnsureIconProvider && other.bang == bang;
   }
 
   @override
@@ -313,18 +317,275 @@ class EnsureIconAvailableProvider extends AutoDisposeFutureProvider<BangData> {
   }
 }
 
-mixin EnsureIconAvailableRef on AutoDisposeFutureProviderRef<BangData> {
+mixin BangDataEnsureIconRef on AutoDisposeFutureProviderRef<BangData> {
   /// The parameter `bang` of this provider.
   BangData get bang;
 }
 
-class _EnsureIconAvailableProviderElement
+class _BangDataEnsureIconProviderElement
     extends AutoDisposeFutureProviderElement<BangData>
-    with EnsureIconAvailableRef {
-  _EnsureIconAvailableProviderElement(super.provider);
+    with BangDataEnsureIconRef {
+  _BangDataEnsureIconProviderElement(super.provider);
 
   @override
-  BangData get bang => (origin as EnsureIconAvailableProvider).bang;
+  BangData get bang => (origin as BangDataEnsureIconProvider).bang;
+}
+
+String _$lastSyncOfGroupHash() => r'4906dc24970eccda89d94697f98cf70e241ea4ec';
+
+/// See also [lastSyncOfGroup].
+@ProviderFor(lastSyncOfGroup)
+const lastSyncOfGroupProvider = LastSyncOfGroupFamily();
+
+/// See also [lastSyncOfGroup].
+class LastSyncOfGroupFamily extends Family<AsyncValue<DateTime?>> {
+  /// See also [lastSyncOfGroup].
+  const LastSyncOfGroupFamily();
+
+  /// See also [lastSyncOfGroup].
+  LastSyncOfGroupProvider call(
+    BangGroup group,
+  ) {
+    return LastSyncOfGroupProvider(
+      group,
+    );
+  }
+
+  @override
+  LastSyncOfGroupProvider getProviderOverride(
+    covariant LastSyncOfGroupProvider provider,
+  ) {
+    return call(
+      provider.group,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'lastSyncOfGroupProvider';
+}
+
+/// See also [lastSyncOfGroup].
+class LastSyncOfGroupProvider extends AutoDisposeStreamProvider<DateTime?> {
+  /// See also [lastSyncOfGroup].
+  LastSyncOfGroupProvider(
+    BangGroup group,
+  ) : this._internal(
+          (ref) => lastSyncOfGroup(
+            ref as LastSyncOfGroupRef,
+            group,
+          ),
+          from: lastSyncOfGroupProvider,
+          name: r'lastSyncOfGroupProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$lastSyncOfGroupHash,
+          dependencies: LastSyncOfGroupFamily._dependencies,
+          allTransitiveDependencies:
+              LastSyncOfGroupFamily._allTransitiveDependencies,
+          group: group,
+        );
+
+  LastSyncOfGroupProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.group,
+  }) : super.internal();
+
+  final BangGroup group;
+
+  @override
+  Override overrideWith(
+    Stream<DateTime?> Function(LastSyncOfGroupRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: LastSyncOfGroupProvider._internal(
+        (ref) => create(ref as LastSyncOfGroupRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        group: group,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<DateTime?> createElement() {
+    return _LastSyncOfGroupProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is LastSyncOfGroupProvider && other.group == group;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, group.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin LastSyncOfGroupRef on AutoDisposeStreamProviderRef<DateTime?> {
+  /// The parameter `group` of this provider.
+  BangGroup get group;
+}
+
+class _LastSyncOfGroupProviderElement
+    extends AutoDisposeStreamProviderElement<DateTime?>
+    with LastSyncOfGroupRef {
+  _LastSyncOfGroupProviderElement(super.provider);
+
+  @override
+  BangGroup get group => (origin as LastSyncOfGroupProvider).group;
+}
+
+String _$bangCountOfGroupHash() => r'10b363679230c0abf6a6ba7d0be2d0367a7ed215';
+
+/// See also [bangCountOfGroup].
+@ProviderFor(bangCountOfGroup)
+const bangCountOfGroupProvider = BangCountOfGroupFamily();
+
+/// See also [bangCountOfGroup].
+class BangCountOfGroupFamily extends Family<AsyncValue<int>> {
+  /// See also [bangCountOfGroup].
+  const BangCountOfGroupFamily();
+
+  /// See also [bangCountOfGroup].
+  BangCountOfGroupProvider call(
+    BangGroup group,
+  ) {
+    return BangCountOfGroupProvider(
+      group,
+    );
+  }
+
+  @override
+  BangCountOfGroupProvider getProviderOverride(
+    covariant BangCountOfGroupProvider provider,
+  ) {
+    return call(
+      provider.group,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'bangCountOfGroupProvider';
+}
+
+/// See also [bangCountOfGroup].
+class BangCountOfGroupProvider extends AutoDisposeStreamProvider<int> {
+  /// See also [bangCountOfGroup].
+  BangCountOfGroupProvider(
+    BangGroup group,
+  ) : this._internal(
+          (ref) => bangCountOfGroup(
+            ref as BangCountOfGroupRef,
+            group,
+          ),
+          from: bangCountOfGroupProvider,
+          name: r'bangCountOfGroupProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$bangCountOfGroupHash,
+          dependencies: BangCountOfGroupFamily._dependencies,
+          allTransitiveDependencies:
+              BangCountOfGroupFamily._allTransitiveDependencies,
+          group: group,
+        );
+
+  BangCountOfGroupProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.group,
+  }) : super.internal();
+
+  final BangGroup group;
+
+  @override
+  Override overrideWith(
+    Stream<int> Function(BangCountOfGroupRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: BangCountOfGroupProvider._internal(
+        (ref) => create(ref as BangCountOfGroupRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        group: group,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<int> createElement() {
+    return _BangCountOfGroupProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is BangCountOfGroupProvider && other.group == group;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, group.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin BangCountOfGroupRef on AutoDisposeStreamProviderRef<int> {
+  /// The parameter `group` of this provider.
+  BangGroup get group;
+}
+
+class _BangCountOfGroupProviderElement
+    extends AutoDisposeStreamProviderElement<int> with BangCountOfGroupRef {
+  _BangCountOfGroupProviderElement(super.provider);
+
+  @override
+  BangGroup get group => (origin as BangCountOfGroupProvider).group;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

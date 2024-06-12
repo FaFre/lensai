@@ -1,7 +1,7 @@
 import 'package:bang_navigator/core/logger.dart';
 import 'package:bang_navigator/core/providers.dart';
 import 'package:bang_navigator/features/about/data/repositories/package_info_repository.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/bang.dart';
+import 'package:bang_navigator/features/bangs/domain/repositories/sync.dart';
 import 'package:bang_navigator/features/search_browser/domain/services/session.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/presentation/hooks/on_initialization.dart';
@@ -42,8 +42,8 @@ void main() async {
               await ref.read(packageInfoProvider.future);
 
               await ref
-                  .read(bangRepositoryProvider.notifier)
-                  .syncAllBangGroups();
+                  .read(bangSyncRepositoryProvider.notifier)
+                  .syncAllBangGroups(syncInterval: const Duration(days: 7));
 
               final settings =
                   await ref.read(settingsRepositoryProvider.future);

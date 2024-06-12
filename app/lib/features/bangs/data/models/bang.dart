@@ -8,6 +8,7 @@ import 'package:json_annotation/json_annotation.dart';
 part 'bang.g.dart';
 
 enum BangGroup {
+  general,
   assistant,
   kagi,
 }

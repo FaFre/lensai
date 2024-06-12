@@ -1,4 +1,5 @@
 import 'package:bang_navigator/features/bangs/data/database/daos/bang.dart';
+import 'package:bang_navigator/features/bangs/data/database/daos/sync.dart';
 import 'package:bang_navigator/features/bangs/data/database/drift/converters/bang_format.dart';
 import 'package:bang_navigator/features/bangs/data/models/bang.dart';
 import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
@@ -7,7 +8,10 @@ import 'package:drift/drift.dart';
 
 part 'database.g.dart';
 
-@DriftDatabase(include: {'database.drift'}, daos: [BangDao])
+@DriftDatabase(
+  include: {'database.drift'},
+  daos: [BangDao, SyncDao],
+)
 class BangDatabase extends _$BangDatabase with PrefixQueryBuilderMixin {
   @override
   final int schemaVersion = 1;

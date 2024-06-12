@@ -158,7 +158,7 @@ class _WebViewState extends ConsumerState<WebView> {
 
                   if (selectedText != null && selectedText.isNotEmpty) {
                     final searchBang =
-                        await ref.read(kagiSearchBangProvider.future);
+                        await ref.read(kagiSearchBangDataProvider.future);
 
                     await ref
                         .read(switchNewTabControllerProvider.notifier)

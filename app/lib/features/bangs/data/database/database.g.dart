@@ -13,12 +13,12 @@ class BangTable extends Table with TableInfo<BangTable, Bang> {
       type: DriftSqlType.string,
       requiredDuringInsert: true,
       $customConstraints: 'PRIMARY KEY NOT NULL');
-  late final GeneratedColumnWithTypeConverter<BangGroup?, int> group =
-      GeneratedColumn<int>('group', aliasedName, true,
+  late final GeneratedColumnWithTypeConverter<BangGroup, int> group =
+      GeneratedColumn<int>('group', aliasedName, false,
               type: DriftSqlType.int,
-              requiredDuringInsert: false,
-              $customConstraints: '')
-          .withConverter<BangGroup?>(BangTable.$convertergroupn);
+              requiredDuringInsert: true,
+              $customConstraints: 'NOT NULL')
+          .withConverter<BangGroup>(BangTable.$convertergroup);
   late final GeneratedColumn<String> websiteName = GeneratedColumn<String>(
       'website_name', aliasedName, false,
       type: DriftSqlType.string,
@@ -80,8 +80,8 @@ class BangTable extends Table with TableInfo<BangTable, Bang> {
           .read(DriftSqlType.string, data['${effectivePrefix}trigger'])!,
       urlTemplate: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}url_template'])!,
-      group: BangTable.$convertergroupn.fromSql(attachedDatabase.typeMapping
-          .read(DriftSqlType.int, data['${effectivePrefix}group'])),
+      group: BangTable.$convertergroup.fromSql(attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}group'])!),
       category: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}category']),
       subCategory: attachedDatabase.typeMapping
@@ -98,8 +98,6 @@ class BangTable extends Table with TableInfo<BangTable, Bang> {
 
   static JsonTypeConverter2<BangGroup, int, int> $convertergroup =
       const EnumIndexConverter<BangGroup>(BangGroup.values);
-  static JsonTypeConverter2<BangGroup?, int?, int?> $convertergroupn =
-      JsonTypeConverter2.asNullable($convertergroup);
   static TypeConverter<Set<BangFormat>?, String?> $converterformat =
       const BangFormatConverter();
   @override
@@ -108,7 +106,7 @@ class BangTable extends Table with TableInfo<BangTable, Bang> {
 
 class BangCompanion extends UpdateCompanion<Bang> {
   final Value<String> trigger;
-  final Value<BangGroup?> group;
+  final Value<BangGroup> group;
   final Value<String> websiteName;
   final Value<String> domain;
   final Value<String> urlTemplate;
@@ -129,7 +127,7 @@ class BangCompanion extends UpdateCompanion<Bang> {
   });
   BangCompanion.insert({
     required String trigger,
-    this.group = const Value.absent(),
+    required BangGroup group,
     required String websiteName,
     required String domain,
     required String urlTemplate,
@@ -138,6 +136,7 @@ class BangCompanion extends UpdateCompanion<Bang> {
     this.format = const Value.absent(),
     this.rowid = const Value.absent(),
   })  : trigger = Value(trigger),
+        group = Value(group),
         websiteName = Value(websiteName),
         domain = Value(domain),
         urlTemplate = Value(urlTemplate);
@@ -167,7 +166,7 @@ class BangCompanion extends UpdateCompanion<Bang> {
 
   BangCompanion copyWith(
       {Value<String>? trigger,
-      Value<BangGroup?>? group,
+      Value<BangGroup>? group,
       Value<String>? websiteName,
       Value<String>? domain,
       Value<String>? urlTemplate,
@@ -196,7 +195,7 @@ class BangCompanion extends UpdateCompanion<Bang> {
     }
     if (group.present) {
       map['group'] =
-          Variable<int>(BangTable.$convertergroupn.toSql(group.value));
+          Variable<int>(BangTable.$convertergroup.toSql(group.value));
     }
     if (websiteName.present) {
       map['website_name'] = Variable<String>(websiteName.value);
@@ -235,6 +234,159 @@ class BangCompanion extends UpdateCompanion<Bang> {
           ..write('subCategory: $subCategory, ')
           ..write('format: $format, ')
           ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class BangSync extends Table with TableInfo<BangSync, BangSyncData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  BangSync(this.attachedDatabase, [this._alias]);
+  late final GeneratedColumnWithTypeConverter<BangGroup, int> group =
+      GeneratedColumn<int>('group', aliasedName, false,
+              type: DriftSqlType.int,
+              requiredDuringInsert: false,
+              $customConstraints: 'PRIMARY KEY NOT NULL')
+          .withConverter<BangGroup>(BangSync.$convertergroup);
+  late final GeneratedColumn<DateTime> lastSync = GeneratedColumn<DateTime>(
+      'last_sync', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: true,
+      $customConstraints: 'NOT NULL');
+  @override
+  List<GeneratedColumn> get $columns => [group, lastSync];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'bang_sync';
+  @override
+  Set<GeneratedColumn> get $primaryKey => {group};
+  @override
+  BangSyncData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BangSyncData(
+      group: BangSync.$convertergroup.fromSql(attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}group'])!),
+      lastSync: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}last_sync'])!,
+    );
+  }
+
+  @override
+  BangSync createAlias(String alias) {
+    return BangSync(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<BangGroup, int, int> $convertergroup =
+      const EnumIndexConverter<BangGroup>(BangGroup.values);
+  @override
+  bool get dontWriteConstraints => true;
+}
+
+class BangSyncData extends DataClass implements Insertable<BangSyncData> {
+  final BangGroup group;
+  final DateTime lastSync;
+  const BangSyncData({required this.group, required this.lastSync});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    {
+      map['group'] = Variable<int>(BangSync.$convertergroup.toSql(group));
+    }
+    map['last_sync'] = Variable<DateTime>(lastSync);
+    return map;
+  }
+
+  factory BangSyncData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BangSyncData(
+      group: BangSync.$convertergroup
+          .fromJson(serializer.fromJson<int>(json['group'])),
+      lastSync: serializer.fromJson<DateTime>(json['last_sync']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'group': serializer.toJson<int>(BangSync.$convertergroup.toJson(group)),
+      'last_sync': serializer.toJson<DateTime>(lastSync),
+    };
+  }
+
+  BangSyncData copyWith({BangGroup? group, DateTime? lastSync}) => BangSyncData(
+        group: group ?? this.group,
+        lastSync: lastSync ?? this.lastSync,
+      );
+  @override
+  String toString() {
+    return (StringBuffer('BangSyncData(')
+          ..write('group: $group, ')
+          ..write('lastSync: $lastSync')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(group, lastSync);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BangSyncData &&
+          other.group == this.group &&
+          other.lastSync == this.lastSync);
+}
+
+class BangSyncCompanion extends UpdateCompanion<BangSyncData> {
+  final Value<BangGroup> group;
+  final Value<DateTime> lastSync;
+  const BangSyncCompanion({
+    this.group = const Value.absent(),
+    this.lastSync = const Value.absent(),
+  });
+  BangSyncCompanion.insert({
+    this.group = const Value.absent(),
+    required DateTime lastSync,
+  }) : lastSync = Value(lastSync);
+  static Insertable<BangSyncData> custom({
+    Expression<int>? group,
+    Expression<DateTime>? lastSync,
+  }) {
+    return RawValuesInsertable({
+      if (group != null) 'group': group,
+      if (lastSync != null) 'last_sync': lastSync,
+    });
+  }
+
+  BangSyncCompanion copyWith(
+      {Value<BangGroup>? group, Value<DateTime>? lastSync}) {
+    return BangSyncCompanion(
+      group: group ?? this.group,
+      lastSync: lastSync ?? this.lastSync,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (group.present) {
+      map['group'] = Variable<int>(BangSync.$convertergroup.toSql(group.value));
+    }
+    if (lastSync.present) {
+      map['last_sync'] = Variable<DateTime>(lastSync.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BangSyncCompanion(')
+          ..write('group: $group, ')
+          ..write('lastSync: $lastSync')
           ..write(')'))
         .toString();
   }
@@ -812,7 +964,7 @@ class BangDataView extends ViewInfo<BangDataView, BangData>
   @override
   Map<SqlDialect, String> get createViewStatements => {
         SqlDialect.sqlite:
-            'CREATE VIEW bang_data_view WITH BangData AS SELECT b.*, bf.frequency, bf.last_used, bi.icon_data FROM bang AS b LEFT JOIN bang_frequency AS bf ON b."trigger" = bf."trigger" LEFT JOIN bang_icon AS bi ON b."trigger" = bi."trigger"',
+            'CREATE VIEW bang_data_view AS SELECT b.*, bf.frequency, bf.last_used, bi.icon_data FROM bang AS b LEFT JOIN bang_frequency AS bf ON b."trigger" = bf."trigger" LEFT JOIN bang_icon AS bi ON b."trigger" = bi."trigger"',
       };
   @override
   BangDataView get asDslTable => this;
@@ -846,9 +998,9 @@ class BangDataView extends ViewInfo<BangDataView, BangData>
   late final GeneratedColumn<String> trigger = GeneratedColumn<String>(
       'trigger', aliasedName, false,
       type: DriftSqlType.string);
-  late final GeneratedColumnWithTypeConverter<BangGroup?, int> group =
-      GeneratedColumn<int>('group', aliasedName, true, type: DriftSqlType.int)
-          .withConverter<BangGroup?>(BangTable.$convertergroupn);
+  late final GeneratedColumnWithTypeConverter<BangGroup, int> group =
+      GeneratedColumn<int>('group', aliasedName, false, type: DriftSqlType.int)
+          .withConverter<BangGroup>(BangTable.$convertergroup);
   late final GeneratedColumn<String> websiteName = GeneratedColumn<String>(
       'website_name', aliasedName, false,
       type: DriftSqlType.string);
@@ -892,6 +1044,7 @@ abstract class _$BangDatabase extends GeneratedDatabase {
   _$BangDatabase(QueryExecutor e) : super(e);
   _$BangDatabaseManager get managers => _$BangDatabaseManager(this);
   late final BangTable bang = BangTable(this);
+  late final BangSync bangSync = BangSync(this);
   late final BangFrequency bangFrequency = BangFrequency(this);
   late final BangIcon bangIcon = BangIcon(this);
   late final BangFts bangFts = BangFts(this);
@@ -906,6 +1059,7 @@ abstract class _$BangDatabase extends GeneratedDatabase {
       'CREATE TRIGGER bang_after_update AFTER UPDATE ON bang BEGIN INSERT INTO bang_fts (bang_fts, "rowid", "trigger", website_name) VALUES (\'delete\', old."rowid", old."trigger", old.website_name);INSERT INTO bang_fts ("rowid", "trigger", website_name) VALUES (new."rowid", new."trigger", new.website_name);END',
       'bang_after_update');
   late final BangDao bangDao = BangDao(this as BangDatabase);
+  late final SyncDao syncDao = SyncDao(this as BangDatabase);
   Future<int> optimizeFtsIndex() {
     return customInsert(
       'INSERT INTO bang_fts (bang_fts) VALUES (\'optimize\')',
@@ -946,6 +1100,7 @@ abstract class _$BangDatabase extends GeneratedDatabase {
   @override
   List<DatabaseSchemaEntity> get allSchemaEntities => [
         bang,
+        bangSync,
         bangFrequency,
         bangIcon,
         bangFts,
@@ -994,6 +1149,91 @@ abstract class _$BangDatabase extends GeneratedDatabase {
           ),
         ],
       );
+}
+
+typedef $BangSyncInsertCompanionBuilder = BangSyncCompanion Function({
+  Value<BangGroup> group,
+  required DateTime lastSync,
+});
+typedef $BangSyncUpdateCompanionBuilder = BangSyncCompanion Function({
+  Value<BangGroup> group,
+  Value<DateTime> lastSync,
+});
+
+class $BangSyncTableManager extends RootTableManager<
+    _$BangDatabase,
+    BangSync,
+    BangSyncData,
+    $BangSyncFilterComposer,
+    $BangSyncOrderingComposer,
+    $BangSyncProcessedTableManager,
+    $BangSyncInsertCompanionBuilder,
+    $BangSyncUpdateCompanionBuilder> {
+  $BangSyncTableManager(_$BangDatabase db, BangSync table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $BangSyncFilterComposer(ComposerState(db, table)),
+          orderingComposer: $BangSyncOrderingComposer(ComposerState(db, table)),
+          getChildManagerBuilder: (p) => $BangSyncProcessedTableManager(p),
+          getUpdateCompanionBuilder: ({
+            Value<BangGroup> group = const Value.absent(),
+            Value<DateTime> lastSync = const Value.absent(),
+          }) =>
+              BangSyncCompanion(
+            group: group,
+            lastSync: lastSync,
+          ),
+          getInsertCompanionBuilder: ({
+            Value<BangGroup> group = const Value.absent(),
+            required DateTime lastSync,
+          }) =>
+              BangSyncCompanion.insert(
+            group: group,
+            lastSync: lastSync,
+          ),
+        ));
+}
+
+class $BangSyncProcessedTableManager extends ProcessedTableManager<
+    _$BangDatabase,
+    BangSync,
+    BangSyncData,
+    $BangSyncFilterComposer,
+    $BangSyncOrderingComposer,
+    $BangSyncProcessedTableManager,
+    $BangSyncInsertCompanionBuilder,
+    $BangSyncUpdateCompanionBuilder> {
+  $BangSyncProcessedTableManager(super.$state);
+}
+
+class $BangSyncFilterComposer extends FilterComposer<_$BangDatabase, BangSync> {
+  $BangSyncFilterComposer(super.$state);
+  ColumnWithTypeConverterFilters<BangGroup, BangGroup, int> get group =>
+      $state.composableBuilder(
+          column: $state.table.group,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnFilters<DateTime> get lastSync => $state.composableBuilder(
+      column: $state.table.lastSync,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+}
+
+class $BangSyncOrderingComposer
+    extends OrderingComposer<_$BangDatabase, BangSync> {
+  $BangSyncOrderingComposer(super.$state);
+  ColumnOrderings<int> get group => $state.composableBuilder(
+      column: $state.table.group,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<DateTime> get lastSync => $state.composableBuilder(
+      column: $state.table.lastSync,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
 typedef $BangFrequencyInsertCompanionBuilder = BangFrequencyCompanion Function({
@@ -1301,6 +1541,8 @@ class $BangFtsOrderingComposer
 class _$BangDatabaseManager {
   final _$BangDatabase _db;
   _$BangDatabaseManager(this._db);
+  $BangSyncTableManager get bangSync =>
+      $BangSyncTableManager(_db, _db.bangSync);
   $BangFrequencyTableManager get bangFrequency =>
       $BangFrequencyTableManager(_db, _db.bangFrequency);
   $BangIconTableManager get bangIcon =>

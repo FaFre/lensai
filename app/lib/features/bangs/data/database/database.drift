@@ -4,7 +4,7 @@ import 'package:bang_navigator/features/bangs/data/models/bang.dart';
 
 CREATE TABLE bang (
   "trigger" TEXT PRIMARY KEY NOT NULL,
-  "group" ENUM(BangGroup),
+  "group" ENUM(BangGroup) NOT NULL,
   website_name TEXT NOT NULL,
   domain TEXT NOT NULL,
   url_template TEXT NOT NULL,
@@ -12,6 +12,11 @@ CREATE TABLE bang (
   sub_category TEXT,
   format TEXT MAPPED BY `const BangFormatConverter()`
 ) WITH Bang;
+
+CREATE TABLE bang_sync (
+  "group" ENUM(BangGroup) PRIMARY KEY NOT NULL,
+  last_sync DATETIME NOT NULL
+);
 
 CREATE TABLE bang_frequency (
   "trigger" TEXT PRIMARY KEY NOT NULL REFERENCES bang ("trigger") ON DELETE CASCADE,

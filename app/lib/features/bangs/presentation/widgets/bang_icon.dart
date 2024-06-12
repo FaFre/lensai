@@ -13,7 +13,7 @@ class BangIcon extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bangAsync = ref.watch(ensureIconAvailableProvider(bangData));
+    final bangAsync = ref.watch(bangDataEnsureIconProvider(bangData));
     final bang = bangAsync.valueOrNull ?? bangData;
 
     return Skeletonizer(

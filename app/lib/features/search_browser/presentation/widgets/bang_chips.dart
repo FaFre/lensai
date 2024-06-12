@@ -22,7 +22,7 @@ class BangChips extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final frequentBangsAsync = ref.watch(frequentBangsProvider);
+    final frequentBangsAsync = ref.watch(frequentBangDataListProvider);
 
     return frequentBangsAsync.when(
       data: (bangs) {

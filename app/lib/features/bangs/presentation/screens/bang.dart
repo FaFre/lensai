@@ -12,7 +12,7 @@ class BangScreen extends HookConsumerWidget {
   const BangScreen({super.key});
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final bangsAsync = ref.watch(allBangsProvider);
+    final bangsAsync = ref.watch(bangDataListProvider);
 
     return Scaffold(
       appBar: AppBar(

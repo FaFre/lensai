@@ -9,7 +9,7 @@ part 'bang.g.dart';
 class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
   BangDao(super.db);
 
-  Selectable<Bang> getBangs({Iterable<BangGroup?>? groups}) {
+  Selectable<Bang> getBangList({Iterable<BangGroup>? groups}) {
     final selectable = select(db.bang);
     if (groups != null) {
       selectable.where((t) => t.group.isInValues(groups));
@@ -18,11 +18,17 @@ class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
     return selectable;
   }
 
+  SingleSelectable<int> getBangCount({Iterable<BangGroup>? groups}) {
+    return db.bang.count(
+      where: (groups != null) ? (t) => t.group.isInValues(groups) : null,
+    );
+  }
+
   SingleOrNullSelectable<BangData> getBangData(String trigger) {
     return select(db.bangDataView)..where((t) => t.trigger.equals(trigger));
   }
 
-  Selectable<BangData> getBangDataList({Iterable<BangGroup?>? groups}) {
+  Selectable<BangData> getBangDataList({Iterable<BangGroup>? groups}) {
     final selectable = select(db.bangDataView);
     if (groups != null) {
       selectable.where((t) => t.group.isInValues(groups));
@@ -33,9 +39,10 @@ class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
     return selectable;
   }
 
-  Selectable<BangData> getFrequentBangDataList({Iterable<BangGroup?>? groups}) {
+  Selectable<BangData> getFrequentBangDataList({Iterable<BangGroup>? groups}) {
     final selectable = select(db.bangDataView)
       ..where((t) => t.frequency.isBiggerThanValue(0));
+
     if (groups != null) {
       selectable.where((t) => t.group.isInValues(groups));
     }
@@ -48,7 +55,7 @@ class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
     return selectable;
   }
 
-  Future<int> increaseFrequency(String trigger) {
+  Future<int> increaseBangFrequency(String trigger) {
     return db.bangFrequency.insertOne(
       BangFrequencyCompanion.insert(
         trigger: trigger,
@@ -68,11 +75,7 @@ class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
     return db.bangQuery(query: db.buildQuery(searchString));
   }
 
-  Future<void> insertBangs(Iterable<Bang> bangs) {
-    return db.bang.insertAll(bangs);
-  }
-
-  Future<int> upsertIcon(String trigger, Uint8List iconData) {
+  Future<int> upsertBangIcon(String trigger, Uint8List iconData) {
     return db.bangIcon.insertOne(
       BangIconCompanion.insert(
         trigger: trigger,
@@ -81,18 +84,5 @@ class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
       ),
       mode: InsertMode.insertOrReplace,
     );
-  }
-
-  Future<void> replaceBangs(Iterable<Bang> bangs) {
-    return batch(
-      (batch) {
-        batch.replaceAll(db.bang, bangs);
-      },
-    );
-  }
-
-  Future<int> deleteBangs(Iterable<String> triggers) {
-    final statement = delete(db.bang)..where((t) => t.trigger.isIn(triggers));
-    return statement.go();
   }
 }
