@@ -27,7 +27,12 @@ class FaviconImage extends StatelessWidget {
         ),
         image: NetworkImage(webPageInfo.favicon!.url.toString()),
         placeholderErrorBuilder: (_, __, ___) => _iconPlaceholder,
-        imageErrorBuilder: (_, __, ___) => _iconPlaceholder,
+        imageErrorBuilder: (_, __, ___) => Image.network(
+          webPageInfo.url.genericFavicon().toString(),
+          errorBuilder: (_, __, ___) => _iconPlaceholder,
+          height: size,
+          width: size,
+        ),
         height: size,
         width: size,
       );

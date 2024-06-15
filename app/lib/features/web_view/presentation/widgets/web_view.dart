@@ -12,7 +12,6 @@ import 'package:bang_navigator/features/web_view/domain/entities/web_view_page.d
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:bang_navigator/features/web_view/presentation/widgets/web_page_dialog.dart';
 import 'package:bang_navigator/features/web_view/utils/download_helper.dart';
-import 'package:bang_navigator/features/web_view/utils/favicon_helper.dart';
 import 'package:bang_navigator/utils/platform_util.dart' as platform_util;
 import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
 import 'package:flutter/foundation.dart';
@@ -241,10 +240,10 @@ class _WebViewState extends ConsumerState<WebView> {
             _onLoadStopDebounce?.cancel();
             _onLoadStopDebounce =
                 Timer(const Duration(milliseconds: 150), () async {
-              final favicon = await widget.page.value.controller
-                  ?.getFavicons()
-                  .then((icons) => choseFavicon(icons));
-              widget.updatePage((page) => page.copyWith.favicon(favicon));
+              // final favicon = await widget.page.value.controller
+              //     ?.getFavicons()
+              //     .then((icons) => choseFavicon(icons));
+              // widget.updatePage((page) => page.copyWith.favicon(favicon));
 
               await _updateScreenshot().whenComplete(() {
                 _periodicScreenshotUpdate?.cancel();
