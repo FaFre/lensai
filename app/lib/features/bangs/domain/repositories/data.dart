@@ -10,7 +10,7 @@ import 'package:drift/drift.dart';
 import 'package:exceptions/exceptions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'bang_data.g.dart';
+part 'data.g.dart';
 
 @Riverpod(keepAlive: true)
 class BangDataRepository extends _$BangDataRepository {

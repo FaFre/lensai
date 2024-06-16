@@ -7,7 +7,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'bang_source.g.dart';
+part 'source.g.dart';
 
 @Riverpod()
 class BangSource extends _$BangSource {

@@ -1,6 +1,6 @@
 import 'package:bang_navigator/core/routing/routes.dart';
 import 'package:bang_navigator/features/bangs/domain/providers.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/bang_data.dart';
+import 'package:bang_navigator/features/bangs/domain/repositories/data.dart';
 import 'package:bang_navigator/features/bangs/presentation/widgets/bang_chips.dart';
 import 'package:bang_navigator/features/bangs/presentation/widgets/search_field.dart';
 import 'package:bang_navigator/features/search_browser/domain/providers.dart';

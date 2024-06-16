@@ -5,7 +5,7 @@ import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
 import 'package:bang_navigator/features/bangs/data/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-part 'bang_search.g.dart';
+part 'search.g.dart';
 
 @Riverpod()
 class BangSearch extends _$BangSearch {

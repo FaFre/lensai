@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'bang_data.dart';
+part of 'data.dart';
 
 // **************************************************************************
 // RiverpodGenerator

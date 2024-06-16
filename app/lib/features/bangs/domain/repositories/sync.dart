@@ -1,7 +1,7 @@
 import 'package:bang_navigator/features/bangs/data/database/database.dart';
 import 'package:bang_navigator/features/bangs/data/models/bang.dart';
 import 'package:bang_navigator/features/bangs/data/providers.dart';
-import 'package:bang_navigator/features/bangs/data/services/bang_source.dart';
+import 'package:bang_navigator/features/bangs/data/services/source.dart';
 import 'package:drift/isolate.dart';
 import 'package:exceptions/exceptions.dart';
 import 'package:riverpod/riverpod.dart';

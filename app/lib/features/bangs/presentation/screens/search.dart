@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:bang_navigator/core/routing/routes.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/bang_search.dart';
+import 'package:bang_navigator/features/bangs/domain/repositories/search.dart';
 import 'package:bang_navigator/features/bangs/presentation/widgets/bang_details.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
@@ -87,7 +87,7 @@ class BangSearchScreen extends HookConsumerWidget {
             exception: error,
           ),
         ),
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const SizedBox.shrink(),
       ),
     );
   }
