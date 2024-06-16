@@ -6,6 +6,7 @@ import 'package:bang_navigator/features/search_browser/domain/providers.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
+import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SiteSearch extends HookConsumerWidget {
@@ -19,7 +20,12 @@ class SiteSearch extends HookConsumerWidget {
 
     final availableBangsAsync = ref.watch(
       bangDataListProvider(
-        filter: (domain: domain, groups: null, categoryFilter: null),
+        filter: (
+          domain: domain,
+          groups: null,
+          categoryFilter: null,
+          orderMostFrequentFirst: true,
+        ),
       ),
     );
     final availableBangCount = availableBangsAsync.valueOrNull?.length ?? 0;
@@ -91,6 +97,17 @@ class SiteSearch extends HookConsumerWidget {
                 onFieldSubmitted: (_) async {
                   await submitSearch();
                 },
+              ),
+              const SizedBox(
+                height: 12,
+              ),
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton.icon(
+                  onPressed: submitSearch,
+                  label: const Text('Search on Site'),
+                  icon: const Icon(MdiIcons.invoiceTextSend),
+                ),
               ),
             ],
           ),

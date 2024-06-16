@@ -24,7 +24,8 @@ class BangListScreen extends HookConsumerWidget {
               ? (category: category!, subCategory: subCategory)
               : null,
           domain: null,
-          groups: null
+          groups: null,
+          orderMostFrequentFirst: null,
         ),
       ),
     );

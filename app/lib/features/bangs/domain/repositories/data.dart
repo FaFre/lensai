@@ -47,6 +47,7 @@ class BangDataRepository extends _$BangDataRepository {
     Iterable<BangGroup>? groups,
     String? domain,
     ({String category, String? subCategory})? categoryFilter,
+    bool? orderMostFrequentFirst,
   }) {
     return _db.bangDao
         .getBangDataList(
@@ -54,6 +55,7 @@ class BangDataRepository extends _$BangDataRepository {
           domain: domain,
           category: categoryFilter?.category,
           subCategory: categoryFilter?.subCategory,
+          orderMostFrequentFirst: orderMostFrequentFirst,
         )
         .watch();
   }

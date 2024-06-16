@@ -33,6 +33,7 @@ class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
     String? domain,
     String? category,
     String? subCategory,
+    bool? orderMostFrequentFirst,
   }) {
     final selectable = select(db.bangDataView);
     if (groups != null) {
@@ -49,7 +50,10 @@ class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
       }
     }
 
-    selectable.orderBy([(t) => OrderingTerm.asc(t.websiteName)]);
+    selectable.orderBy([
+      if (orderMostFrequentFirst == true) (t) => OrderingTerm.desc(t.frequency),
+      (t) => OrderingTerm.asc(t.websiteName),
+    ]);
 
     return selectable;
   }

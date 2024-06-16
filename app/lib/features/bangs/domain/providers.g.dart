@@ -187,7 +187,7 @@ final bangCategoriesProvider =
 
 typedef BangCategoriesRef
     = AutoDisposeStreamProviderRef<Map<String, List<String>>>;
-String _$bangDataListHash() => r'64c3a3c55c481bf97f291f3befd8f958007daac6';
+String _$bangDataListHash() => r'c4fbc1676be933b29ec88f503110c119fe8b6d86';
 
 /// See also [bangDataList].
 @ProviderFor(bangDataList)
@@ -203,7 +203,8 @@ class BangDataListFamily extends Family<AsyncValue<List<BangData>>> {
     ({
       ({String category, String? subCategory})? categoryFilter,
       String? domain,
-      Iterable<BangGroup>? groups
+      Iterable<BangGroup>? groups,
+      bool? orderMostFrequentFirst
     })? filter,
   }) {
     return BangDataListProvider(
@@ -242,7 +243,8 @@ class BangDataListProvider extends AutoDisposeStreamProvider<List<BangData>> {
     ({
       ({String category, String? subCategory})? categoryFilter,
       String? domain,
-      Iterable<BangGroup>? groups
+      Iterable<BangGroup>? groups,
+      bool? orderMostFrequentFirst
     })? filter,
   }) : this._internal(
           (ref) => bangDataList(
@@ -274,7 +276,8 @@ class BangDataListProvider extends AutoDisposeStreamProvider<List<BangData>> {
   final ({
     ({String category, String? subCategory})? categoryFilter,
     String? domain,
-    Iterable<BangGroup>? groups
+    Iterable<BangGroup>? groups,
+    bool? orderMostFrequentFirst
   })? filter;
 
   @override
@@ -319,7 +322,8 @@ mixin BangDataListRef on AutoDisposeStreamProviderRef<List<BangData>> {
   ({
     ({String category, String? subCategory})? categoryFilter,
     String? domain,
-    Iterable<BangGroup>? groups
+    Iterable<BangGroup>? groups,
+    bool? orderMostFrequentFirst
   })? get filter;
 }
 
@@ -332,7 +336,8 @@ class _BangDataListProviderElement
   ({
     ({String category, String? subCategory})? categoryFilter,
     String? domain,
-    Iterable<BangGroup>? groups
+    Iterable<BangGroup>? groups,
+    bool? orderMostFrequentFirst
   })? get filter => (origin as BangDataListProvider).filter;
 }
 

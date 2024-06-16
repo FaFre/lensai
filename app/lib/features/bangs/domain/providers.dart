@@ -31,6 +31,7 @@ Stream<List<BangData>> bangDataList(
     Iterable<BangGroup>? groups,
     String? domain,
     ({String category, String? subCategory})? categoryFilter,
+    bool? orderMostFrequentFirst,
   })? filter,
 }) {
   final repository = ref.watch(bangDataRepositoryProvider.notifier);
@@ -38,6 +39,7 @@ Stream<List<BangData>> bangDataList(
     groups: filter?.groups,
     domain: filter?.domain,
     categoryFilter: filter?.categoryFilter,
+    orderMostFrequentFirst: filter?.orderMostFrequentFirst,
   );
 }
 
