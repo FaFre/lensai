@@ -201,19 +201,6 @@ class SettingsScreen extends HookConsumerWidget {
               ),
               _buildSection(theme, 'Bangs'),
               ButtonListTile(
-                title: 'Icon Cache',
-                subtitle: 'Stored favicons for Bangs',
-                button: FilledButton.icon(
-                  onPressed: () async {
-                    await ref
-                        .read(bangDataRepositoryProvider.notifier)
-                        .clearIconData();
-                  },
-                  icon: const Icon(Icons.delete),
-                  label: const Text('Clear'),
-                ),
-              ),
-              ButtonListTile(
                 title: 'Bang Frequencies',
                 subtitle: 'Tracked usage for Bang recommendations',
                 button: FilledButton.icon(
@@ -225,6 +212,45 @@ class SettingsScreen extends HookConsumerWidget {
                   icon: const Icon(Icons.delete),
                   label: const Text('Clear'),
                 ),
+              ),
+              Consumer(
+                builder: (context, ref, child) {
+                  final size = ref.watch(
+                    bangIconCacheSizeMegabytesProvider.select(
+                      (value) => value.valueOrNull,
+                    ),
+                  );
+
+                  return ButtonListTile(
+                    title: 'Icon Cache',
+                    subtitle: 'Stored favicons for Bangs',
+                    content: Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: DefaultTextStyle(
+                        style: GoogleFonts.robotoMono(),
+                        child: Table(
+                          children: [
+                            TableRow(
+                              children: [
+                                const Text('Size'),
+                                Text('${size?.toStringAsFixed(2) ?? 0} MB'),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    button: FilledButton.icon(
+                      onPressed: () async {
+                        await ref
+                            .read(bangDataRepositoryProvider.notifier)
+                            .clearIconData();
+                      },
+                      icon: const Icon(Icons.delete),
+                      label: const Text('Clear'),
+                    ),
+                  );
+                },
               ),
               Consumer(
                 builder: (context, ref, child) {

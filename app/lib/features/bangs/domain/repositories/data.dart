@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:bang_navigator/domain/services/generic_website.dart';
+import 'package:bang_navigator/extensions/database_table_size.dart';
 import 'package:bang_navigator/features/bangs/data/database/database.dart';
 import 'package:bang_navigator/features/bangs/data/models/bang.dart';
 import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
@@ -84,6 +85,10 @@ class BangDataRepository extends _$BangDataRepository {
         return bang;
       },
     );
+  }
+
+  Stream<double> watchIconCacheSize() {
+    return _db.tableSize(_db.bangIcon).watchSingle();
   }
 
   Future<int> clearIconData() {

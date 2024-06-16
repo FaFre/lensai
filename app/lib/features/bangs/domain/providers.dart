@@ -75,3 +75,9 @@ Stream<int> bangCountOfGroup(
   final repository = ref.watch(bangDataRepositoryProvider.notifier);
   return repository.watchBangCount(group);
 }
+
+@Riverpod()
+Stream<double> bangIconCacheSizeMegabytes(BangIconCacheSizeMegabytesRef ref) {
+  final repository = ref.watch(bangDataRepositoryProvider.notifier);
+  return repository.watchIconCacheSize();
+}
