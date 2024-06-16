@@ -54,7 +54,7 @@ class AssistantTab extends HookConsumerWidget {
             tabs: const [
               Tab(
                 text: 'Research',
-                icon: Icon(MdiIcons.cloudSearch),
+                icon: Icon(MdiIcons.layersSearch),
               ),
               Tab(
                 text: 'Code',
