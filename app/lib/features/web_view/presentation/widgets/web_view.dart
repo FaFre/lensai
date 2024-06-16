@@ -325,8 +325,9 @@ class _WebViewState extends ConsumerState<WebView> {
                 ref.read(overlayDialogProvider.notifier).show(
                       LoadingWebPageDialog(
                         url!,
-                        onDismiss:
-                            ref.watch(overlayDialogProvider.notifier).dismiss,
+                        onDismiss: () {
+                          ref.read(overlayDialogProvider.notifier).dismiss();
+                        },
                       ),
                     );
               }

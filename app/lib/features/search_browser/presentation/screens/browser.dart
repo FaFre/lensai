@@ -84,12 +84,12 @@ class KagiScreen extends HookConsumerWidget {
               final page = ref.read(webViewTabControllerProvider)?.page.value;
 
               if (page != null) {
-                ref.watch(overlayDialogProvider.notifier).show(
+                ref.read(overlayDialogProvider.notifier).show(
                       WebPageDialog(
                         page: page,
                         webViewController: webViewController.value,
                         onDismiss:
-                            ref.watch(overlayDialogProvider.notifier).dismiss,
+                            ref.read(overlayDialogProvider.notifier).dismiss,
                       ),
                     );
               }

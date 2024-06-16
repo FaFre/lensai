@@ -50,7 +50,7 @@ class SiteSearch extends HookConsumerWidget {
             .read(switchNewTabControllerProvider.notifier)
             .add(activeBang.getUrl(textController.text));
 
-        ref.watch(overlayDialogProvider.notifier).dismiss();
+        ref.read(overlayDialogProvider.notifier).dismiss();
       }
     }
 
