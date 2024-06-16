@@ -138,7 +138,7 @@ class KagiScreen extends HookConsumerWidget {
                 const Divider(),
                 MenuItemButton(
                   onPressed: () async {
-                    await context.push(BangRoute().location);
+                    await context.push(BangCategoriesRoute().location);
                   },
                   leadingIcon: const Icon(MdiIcons.exclamationThick),
                   child: const Text('Bangs'),

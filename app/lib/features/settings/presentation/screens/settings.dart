@@ -202,7 +202,7 @@ class SettingsScreen extends HookConsumerWidget {
               _buildSection(theme, 'Bangs'),
               ButtonListTile(
                 title: 'Icon Cache',
-                subtitle: 'Stores favicons for Bangs',
+                subtitle: 'Stored favicons for Bangs',
                 button: FilledButton.icon(
                   onPressed: () async {
                     await ref
@@ -215,7 +215,7 @@ class SettingsScreen extends HookConsumerWidget {
               ),
               ButtonListTile(
                 title: 'Bang Frequencies',
-                subtitle: 'Tracks Bang usage for recommendation history',
+                subtitle: 'Tracked usage for Bang recommendations',
                 button: FilledButton.icon(
                   onPressed: () async {
                     await ref

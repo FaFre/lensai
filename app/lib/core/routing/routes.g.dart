@@ -25,14 +25,26 @@ RouteBase get $kagiRoute => GoRouteData.$route(
         GoRouteData.$route(
           path: 'bangs',
           name: 'BangRoute',
-          factory: $BangRouteExtension._fromState,
+          factory: $BangCategoriesRouteExtension._fromState,
           routes: [
             GoRouteData.$route(
-              path: 'search',
-              name: 'BangSearchRoute',
-              factory: $BangSearchRouteExtension._fromState,
+              path: ':category',
+              name: 'BangCategoryRoute',
+              factory: $BangCategoryRouteExtension._fromState,
+              routes: [
+                GoRouteData.$route(
+                  path: ':subCategory',
+                  name: 'BangSubCategoryRoute',
+                  factory: $BangSubCategoryRouteExtension._fromState,
+                ),
+              ],
             ),
           ],
+        ),
+        GoRouteData.$route(
+          path: 'bang_search',
+          name: 'BangSearchRoute',
+          factory: $BangSearchRouteExtension._fromState,
         ),
       ],
     );
@@ -71,11 +83,52 @@ extension $AboutRouteExtension on AboutRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $BangRouteExtension on BangRoute {
-  static BangRoute _fromState(GoRouterState state) => BangRoute();
+extension $BangCategoriesRouteExtension on BangCategoriesRoute {
+  static BangCategoriesRoute _fromState(GoRouterState state) =>
+      BangCategoriesRoute();
 
   String get location => GoRouteData.$location(
         '/bangs',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $BangCategoryRouteExtension on BangCategoryRoute {
+  static BangCategoryRoute _fromState(GoRouterState state) => BangCategoryRoute(
+        category: state.pathParameters['category']!,
+      );
+
+  String get location => GoRouteData.$location(
+        '/bangs/${Uri.encodeComponent(category)}',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $BangSubCategoryRouteExtension on BangSubCategoryRoute {
+  static BangSubCategoryRoute _fromState(GoRouterState state) =>
+      BangSubCategoryRoute(
+        category: state.pathParameters['category']!,
+        subCategory: state.pathParameters['subCategory']!,
+      );
+
+  String get location => GoRouteData.$location(
+        '/bangs/${Uri.encodeComponent(category)}/${Uri.encodeComponent(subCategory)}',
       );
 
   void go(BuildContext context) => context.go(location);
@@ -92,7 +145,7 @@ extension $BangSearchRouteExtension on BangSearchRoute {
   static BangSearchRoute _fromState(GoRouterState state) => BangSearchRoute();
 
   String get location => GoRouteData.$location(
-        '/bangs/search',
+        '/bang_search',
       );
 
   void go(BuildContext context) => context.go(location);

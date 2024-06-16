@@ -18,7 +18,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 class _InputField extends ConsumerWidget {
   final TextEditingController? controller;
 
-  const _InputField({required this.controller, super.key});
+  const _InputField({required this.controller});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

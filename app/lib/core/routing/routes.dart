@@ -1,6 +1,7 @@
 import 'package:bang_navigator/core/routing/dialog_page.dart';
 import 'package:bang_navigator/features/about/presentation/screens/about.dart';
-import 'package:bang_navigator/features/bangs/presentation/screens/bang.dart';
+import 'package:bang_navigator/features/bangs/presentation/screens/categories.dart';
+import 'package:bang_navigator/features/bangs/presentation/screens/list.dart';
 import 'package:bang_navigator/features/bangs/presentation/screens/search.dart';
 import 'package:bang_navigator/features/chat_archive/presentation/screens/detail.dart';
 import 'package:bang_navigator/features/chat_archive/presentation/screens/list.dart';
@@ -19,15 +20,25 @@ part 'routes.g.dart';
       name: 'AboutRoute',
       path: 'about',
     ),
-    TypedGoRoute<BangRoute>(
+    TypedGoRoute<BangCategoriesRoute>(
       name: 'BangRoute',
       path: 'bangs',
       routes: [
-        TypedGoRoute<BangSearchRoute>(
-          name: 'BangSearchRoute',
-          path: 'search',
+        TypedGoRoute<BangCategoryRoute>(
+          name: 'BangCategoryRoute',
+          path: ':category',
+          routes: [
+            TypedGoRoute<BangSubCategoryRoute>(
+              name: 'BangSubCategoryRoute',
+              path: ':subCategory',
+            ),
+          ],
         ),
       ],
+    ),
+    TypedGoRoute<BangSearchRoute>(
+      name: 'BangSearchRoute',
+      path: 'bang_search',
     ),
   ],
 )
@@ -45,10 +56,36 @@ class AboutRoute extends GoRouteData {
   }
 }
 
-class BangRoute extends GoRouteData {
+class BangCategoriesRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const BangScreen();
+    return const BangCategoriesScreen();
+  }
+}
+
+class BangCategoryRoute extends GoRouteData {
+  final String category;
+
+  const BangCategoryRoute({required this.category});
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return BangListScreen(category: category);
+  }
+}
+
+class BangSubCategoryRoute extends GoRouteData {
+  final String category;
+  final String subCategory;
+
+  const BangSubCategoryRoute({
+    required this.category,
+    required this.subCategory,
+  });
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return BangListScreen(category: category, subCategory: subCategory);
   }
 }
 

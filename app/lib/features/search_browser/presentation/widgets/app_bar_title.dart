@@ -37,7 +37,7 @@ class AppBarTitle extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final activeWebView = ref.watch(webViewTabControllerProvider);
     if (activeWebView == null) {
-      return SizedBox.shrink();
+      return const SizedBox.shrink();
     }
 
     final page = useValueListenable(activeWebView.page);
