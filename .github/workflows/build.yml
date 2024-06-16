@@ -28,7 +28,7 @@ jobs:
         run: echo $KEY_JKS | base64 -di > $KEY_PATH
       - uses: subosito/flutter-action@v1
         with:
-          flutter-version: 3.22.1
+          flutter-version: 3.22.2
       - run: flutter pub get
       # - run: flutter test
       - run: flutter build apk --release --split-per-abi
