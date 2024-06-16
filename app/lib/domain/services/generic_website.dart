@@ -53,7 +53,8 @@ class GenericWebsiteService extends _$GenericWebsiteService {
   Future<Result<WebPageInfo>> getInfo(Uri url) async {
     return Result.fromAsync(
       () async {
-        final response = await _client.get(url);
+        final response =
+            await _client.get(url).timeout(const Duration(seconds: 10));
         return await compute(
           (args) {
             final document = html_parser.parse(args[0]);
@@ -82,7 +83,10 @@ class GenericWebsiteService extends _$GenericWebsiteService {
       (result) => result.flatMapAsync(
         (info) async {
           if (info.favicon != null) {
-            return _client.get(info.favicon!.url).then((response) {
+            return _client
+                .get(info.favicon!.url)
+                .timeout(const Duration(seconds: 10))
+                .then((response) {
               if (response.statusCode == 200) {
                 return response.bodyBytes;
               } else {
