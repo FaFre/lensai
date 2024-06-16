@@ -25,44 +25,41 @@ class ChatArchiveListScreen extends HookConsumerWidget {
           ),
         ],
       ),
-      body: SafeArea(
-        child: Skeletonizer(
-          enabled: chatsAsync.isLoading,
-          child: chatsAsync.when(
-            data: (chats) {
-              return ListView.builder(
-                itemCount: chats.length,
-                itemBuilder: (context, index) {
-                  final chat = chats[index];
+      body: Skeletonizer(
+        enabled: chatsAsync.isLoading,
+        child: chatsAsync.when(
+          data: (chats) {
+            return ListView.builder(
+              itemCount: chats.length,
+              itemBuilder: (context, index) {
+                final chat = chats[index];
 
-                  return ListTile(
-                    title: Text(chat.toString()),
-                    subtitle: (chat.dateTime != null)
-                        ? Text(chat.dateTime!.formatWithMinutePrecision())
-                        : null,
-                    onTap: () async {
-                      await context.push(
-                        ChatArchiveDetailRoute(fileName: chat.fileName)
-                            .location,
-                      );
-                    },
-                  );
-                },
-              );
-            },
-            error: (error, stackTrace) {
-              return FailureWidget(
-                title: 'Could not load archived chats',
-                exception: error,
-                onRetry: () => ref.refresh(chatArchiveRepositoryProvider),
-              );
-            },
-            loading: () => ListView.builder(
-              itemCount: 3,
-              itemBuilder: (context, index) => const ListTile(
-                title: Bone.text(),
-                subtitle: Bone.text(),
-              ),
+                return ListTile(
+                  title: Text(chat.toString()),
+                  subtitle: (chat.dateTime != null)
+                      ? Text(chat.dateTime!.formatWithMinutePrecision())
+                      : null,
+                  onTap: () async {
+                    await context.push(
+                      ChatArchiveDetailRoute(fileName: chat.fileName).location,
+                    );
+                  },
+                );
+              },
+            );
+          },
+          error: (error, stackTrace) {
+            return FailureWidget(
+              title: 'Could not load archived chats',
+              exception: error,
+              onRetry: () => ref.refresh(chatArchiveRepositoryProvider),
+            );
+          },
+          loading: () => ListView.builder(
+            itemCount: 3,
+            itemBuilder: (context, index) => const ListTile(
+              title: Bone.text(),
+              subtitle: Bone.text(),
             ),
           ),
         ),
