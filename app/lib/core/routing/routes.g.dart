@@ -28,7 +28,12 @@ RouteBase get $kagiRoute => GoRouteData.$route(
           factory: $BangCategoriesRouteExtension._fromState,
           routes: [
             GoRouteData.$route(
-              path: ':category',
+              path: 'search',
+              name: 'BangSearchRoute',
+              factory: $BangSearchRouteExtension._fromState,
+            ),
+            GoRouteData.$route(
+              path: 'category/:category',
               name: 'BangCategoryRoute',
               factory: $BangCategoryRouteExtension._fromState,
               routes: [
@@ -40,11 +45,6 @@ RouteBase get $kagiRoute => GoRouteData.$route(
               ],
             ),
           ],
-        ),
-        GoRouteData.$route(
-          path: 'bang_search',
-          name: 'BangSearchRoute',
-          factory: $BangSearchRouteExtension._fromState,
         ),
       ],
     );
@@ -101,13 +101,30 @@ extension $BangCategoriesRouteExtension on BangCategoriesRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
+extension $BangSearchRouteExtension on BangSearchRoute {
+  static BangSearchRoute _fromState(GoRouterState state) => BangSearchRoute();
+
+  String get location => GoRouteData.$location(
+        '/bangs/search',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
 extension $BangCategoryRouteExtension on BangCategoryRoute {
   static BangCategoryRoute _fromState(GoRouterState state) => BangCategoryRoute(
         category: state.pathParameters['category']!,
       );
 
   String get location => GoRouteData.$location(
-        '/bangs/${Uri.encodeComponent(category)}',
+        '/bangs/category/${Uri.encodeComponent(category)}',
       );
 
   void go(BuildContext context) => context.go(location);
@@ -128,24 +145,7 @@ extension $BangSubCategoryRouteExtension on BangSubCategoryRoute {
       );
 
   String get location => GoRouteData.$location(
-        '/bangs/${Uri.encodeComponent(category)}/${Uri.encodeComponent(subCategory)}',
-      );
-
-  void go(BuildContext context) => context.go(location);
-
-  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
-
-  void pushReplacement(BuildContext context) =>
-      context.pushReplacement(location);
-
-  void replace(BuildContext context) => context.replace(location);
-}
-
-extension $BangSearchRouteExtension on BangSearchRoute {
-  static BangSearchRoute _fromState(GoRouterState state) => BangSearchRoute();
-
-  String get location => GoRouteData.$location(
-        '/bang_search',
+        '/bangs/category/${Uri.encodeComponent(category)}/${Uri.encodeComponent(subCategory)}',
       );
 
   void go(BuildContext context) => context.go(location);
@@ -187,6 +187,11 @@ RouteBase get $chatArchiveListRoute => GoRouteData.$route(
       factory: $ChatArchiveListRouteExtension._fromState,
       routes: [
         GoRouteData.$route(
+          path: 'search',
+          name: 'ChatArchiveSearchRoute',
+          factory: $ChatArchiveSearchRouteExtension._fromState,
+        ),
+        GoRouteData.$route(
           path: 'detail/:fileName',
           name: 'ChatArchiveDetailRoute',
           factory: $ChatArchiveDetailRouteExtension._fromState,
@@ -200,6 +205,24 @@ extension $ChatArchiveListRouteExtension on ChatArchiveListRoute {
 
   String get location => GoRouteData.$location(
         '/chat_archive',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $ChatArchiveSearchRouteExtension on ChatArchiveSearchRoute {
+  static ChatArchiveSearchRoute _fromState(GoRouterState state) =>
+      ChatArchiveSearchRoute();
+
+  String get location => GoRouteData.$location(
+        '/chat_archive/search',
       );
 
   void go(BuildContext context) => context.go(location);

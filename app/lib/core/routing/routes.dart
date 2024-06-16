@@ -5,6 +5,7 @@ import 'package:bang_navigator/features/bangs/presentation/screens/list.dart';
 import 'package:bang_navigator/features/bangs/presentation/screens/search.dart';
 import 'package:bang_navigator/features/chat_archive/presentation/screens/detail.dart';
 import 'package:bang_navigator/features/chat_archive/presentation/screens/list.dart';
+import 'package:bang_navigator/features/chat_archive/presentation/screens/search.dart';
 import 'package:bang_navigator/features/search_browser/presentation/screens/browser.dart';
 import 'package:bang_navigator/features/settings/presentation/screens/settings.dart';
 import 'package:flutter/material.dart';
@@ -24,9 +25,13 @@ part 'routes.g.dart';
       name: 'BangRoute',
       path: 'bangs',
       routes: [
+        TypedGoRoute<BangSearchRoute>(
+          name: 'BangSearchRoute',
+          path: 'search',
+        ),
         TypedGoRoute<BangCategoryRoute>(
           name: 'BangCategoryRoute',
-          path: ':category',
+          path: 'category/:category',
           routes: [
             TypedGoRoute<BangSubCategoryRoute>(
               name: 'BangSubCategoryRoute',
@@ -35,10 +40,6 @@ part 'routes.g.dart';
           ],
         ),
       ],
-    ),
-    TypedGoRoute<BangSearchRoute>(
-      name: 'BangSearchRoute',
-      path: 'bang_search',
     ),
   ],
 )
@@ -111,6 +112,10 @@ class SettingsRoute extends GoRouteData {
   name: 'ChatArchiveListRoute',
   path: '/chat_archive',
   routes: [
+    TypedGoRoute<ChatArchiveSearchRoute>(
+      name: 'ChatArchiveSearchRoute',
+      path: 'search',
+    ),
     TypedGoRoute<ChatArchiveDetailRoute>(
       name: 'ChatArchiveDetailRoute',
       path: 'detail/:fileName',
@@ -121,6 +126,13 @@ class ChatArchiveListRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const ChatArchiveListScreen();
+  }
+}
+
+class ChatArchiveSearchRoute extends GoRouteData {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const ChatArchiveSearchScreen();
   }
 }
 
