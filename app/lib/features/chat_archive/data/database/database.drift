@@ -1,0 +1,43 @@
+CREATE TABLE chat (
+  file_name TEXT PRIMARY KEY NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL
+);
+
+CREATE VIRTUAL TABLE chat_fts 
+  USING fts5(
+    title,
+    content,
+    content=chat,
+    tokenize="trigram"
+  );
+
+-- Triggers to keep the FTS index up to date.
+CREATE TRIGGER chat_after_insert AFTER INSERT ON chat BEGIN
+  INSERT INTO 
+    chat_fts(rowid, title, content) 
+    VALUES (new.rowid, new.title, new.content);
+END;
+CREATE TRIGGER chat_after_delete AFTER DELETE ON chat BEGIN
+  INSERT INTO 
+    chat_fts(chat_fts, rowid, title, content) 
+    VALUES('delete', old.rowid, old.title, old.content);
+END;
+CREATE TRIGGER chat_after_update AFTER UPDATE ON chat BEGIN
+  INSERT INTO 
+    chat_fts(chat_fts, rowid, title, content) 
+    VALUES('delete', old.rowid, old.title, old.content);
+  INSERT INTO 
+    chat_fts(chat_fts, title, content) 
+    VALUES (new.rowid, new.title, new.content);
+END;
+
+chatQuery:
+  SELECT 
+    c.file_name,
+    highlight(chat_fts, 0, :beforeMatch, :afterMatch) AS title,
+    snippet(chat_fts, 1, :beforeMatch, :afterMatch, :ellipsis, :snippetLength) AS content_snippet
+  FROM chat_fts(:query) fts
+  INNER JOIN
+    chat c ON c.rowid = fts.rowid
+  ORDER BY RANK;

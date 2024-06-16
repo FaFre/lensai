@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:bang_navigator/core/logger.dart';
 import 'package:bang_navigator/features/bangs/domain/providers.dart';
 import 'package:bang_navigator/features/chat_archive/domain/entities/chat_entity.dart';
-import 'package:bang_navigator/features/chat_archive/domain/repositories/chat_archive.dart';
+import 'package:bang_navigator/features/chat_archive/domain/repositories/archive.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
 import 'package:bang_navigator/features/search_browser/domain/providers.dart';

@@ -4,13 +4,13 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:universal_io/io.dart';
 import 'package:watcher/watcher.dart';
 
-part 'chat_archive_file.g.dart';
+part 'file.g.dart';
 
 @Riverpod()
-class ChatArchiveFileRepository extends _$ChatArchiveFileRepository {
+class ChatArchiveFileService extends _$ChatArchiveFileService {
   final Future<Directory> _archiveDirectoryFuture;
 
-  ChatArchiveFileRepository()
+  ChatArchiveFileService()
       : _archiveDirectoryFuture =
             path_provider.getApplicationDocumentsDirectory().then(
                   (documentDirectory) => Directory(
@@ -19,7 +19,12 @@ class ChatArchiveFileRepository extends _$ChatArchiveFileRepository {
                 );
 
   Future<List<FileSystemEntity>> list() {
-    return _archiveDirectoryFuture.then((value) => value.list().toList());
+    return _archiveDirectoryFuture.then(
+      (value) => value
+          .list()
+          .where((file) => path.extension(file.path) == '.md')
+          .toList(),
+    );
   }
 
   Future<void> write(String fileName, String contents) async {
@@ -49,13 +54,19 @@ class ChatArchiveFileRepository extends _$ChatArchiveFileRepository {
     }
   }
 
-  @override
-  Raw<Stream<WatchEvent>> build() async* {
+  Stream<WatchEvent> _directoryStream() async* {
     final watcher = DirectoryWatcher(
       await _archiveDirectoryFuture
           .then((archiveDirectory) => archiveDirectory.absolute.path),
     );
 
-    yield* watcher.events;
+    yield* watcher.events.where((event) => path.extension(event.path) == '.md');
+  }
+
+  @override
+  Raw<Stream<WatchEvent>> build() {
+    //We return a Raw stream here and yield* doesnt support broadcast.
+    //So it is required to use asBroadcastStream here
+    return _directoryStream().asBroadcastStream();
   }
 }

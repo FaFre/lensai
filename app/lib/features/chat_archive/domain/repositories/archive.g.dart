@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'chat_archive.dart';
+part of 'archive.dart';
 
 // **************************************************************************
 // RiverpodGenerator
@@ -156,7 +156,7 @@ class _ReadArchivedChatProviderElement
 }
 
 String _$chatArchiveRepositoryHash() =>
-    r'c53b0d2704953a205c12357642237e15e8ffd3b1';
+    r'1b84b6f26a7c5f6c27874904b893a979a76e1fec';
 
 /// See also [ChatArchiveRepository].
 @ProviderFor(ChatArchiveRepository)

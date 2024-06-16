@@ -1,7 +1,7 @@
 import 'package:bang_navigator/core/routing/routes.dart';
-import 'package:bang_navigator/features/chat_archive/data/repositories/chat_archive_file.dart';
+import 'package:bang_navigator/features/chat_archive/data/services/file.dart';
 import 'package:bang_navigator/features/chat_archive/domain/entities/chat_entity.dart';
-import 'package:bang_navigator/features/chat_archive/domain/repositories/chat_archive.dart';
+import 'package:bang_navigator/features/chat_archive/domain/repositories/archive.dart';
 import 'package:bang_navigator/features/chat_archive/utils/markdown_to_text.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
@@ -78,7 +78,7 @@ class ChatArchiveDetailScreen extends HookConsumerWidget {
               MenuItemButton(
                 onPressed: () async {
                   await ref
-                      .read(chatArchiveFileRepositoryProvider.notifier)
+                      .read(chatArchiveFileServiceProvider.notifier)
                       .delete(fileName);
 
                   if (context.mounted) {

@@ -1,6 +1,6 @@
 import 'package:bang_navigator/core/extension/date_time.dart';
 import 'package:bang_navigator/core/routing/routes.dart';
-import 'package:bang_navigator/features/chat_archive/domain/repositories/chat_archive.dart';
+import 'package:bang_navigator/features/chat_archive/domain/repositories/archive.dart';
 import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -14,7 +14,17 @@ class ChatArchiveListScreen extends HookConsumerWidget {
     final chatsAsync = ref.watch(chatArchiveRepositoryProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Chat Archive')),
+      appBar: AppBar(
+        title: const Text('Chat Archive'),
+        actions: [
+          IconButton(
+            onPressed: () async {
+              await context.push(ChatArchiveSearchRoute().location);
+            },
+            icon: const Icon(Icons.search),
+          ),
+        ],
+      ),
       body: SafeArea(
         child: Skeletonizer(
           enabled: chatsAsync.isLoading,

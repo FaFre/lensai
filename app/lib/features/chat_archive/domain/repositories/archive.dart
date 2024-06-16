@@ -1,4 +1,4 @@
-import 'package:bang_navigator/features/chat_archive/data/repositories/chat_archive_file.dart';
+import 'package:bang_navigator/features/chat_archive/data/services/file.dart';
 import 'package:bang_navigator/features/chat_archive/domain/entities/chat_entity.dart';
 import 'package:bang_navigator/features/kagi/data/services/chat.dart';
 import 'package:exceptions/exceptions.dart';
@@ -6,16 +6,15 @@ import 'package:path/path.dart' as path;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 
-part 'chat_archive.g.dart';
+part 'archive.g.dart';
 
 @Riverpod()
 class ChatArchiveRepository extends _$ChatArchiveRepository {
-  Future<List<ChatEntity>> _listArchivedChats() async {
+  Future<List<ChatEntity>> listArchivedChats() async {
     final files =
-        await ref.read(chatArchiveFileRepositoryProvider.notifier).list();
+        await ref.read(chatArchiveFileServiceProvider.notifier).list();
 
     return files
-        .where((file) => path.extension(file.path) == '.md')
         .map((file) => ChatEntity.fromFileName(path.basename(file.path)))
         .toList();
   }
@@ -26,14 +25,14 @@ class ChatArchiveRepository extends _$ChatArchiveRepository {
 
     return contentsResult.flatMapAsync(
       (contents) => ref
-          .read(chatArchiveFileRepositoryProvider.notifier)
+          .read(chatArchiveFileServiceProvider.notifier)
           .write(fileName, contents),
     );
   }
 
   Future<Result<String>> readChat(String fileName) async {
     final contentsResult = await Result.fromAsync(
-      () => ref.read(chatArchiveFileRepositoryProvider.notifier).read(fileName),
+      () => ref.read(chatArchiveFileServiceProvider.notifier).read(fileName),
     );
 
     return contentsResult.fold(
@@ -51,12 +50,12 @@ class ChatArchiveRepository extends _$ChatArchiveRepository {
 
   @override
   Stream<List<ChatEntity>> build() async* {
-    final fileRepository = ref.watch(chatArchiveFileRepositoryProvider);
+    final fileRepository = ref.watch(chatArchiveFileServiceProvider);
 
     yield* ConcatStream([
-      _listArchivedChats().asStream(),
+      listArchivedChats().asStream(),
       fileRepository.asyncMap(
-        (_) => _listArchivedChats(),
+        (_) => listArchivedChats(),
       ),
     ]);
   }
