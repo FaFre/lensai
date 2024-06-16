@@ -62,13 +62,17 @@ class BangListScreen extends HookConsumerWidget {
                 },
               );
             },
-            error: (error, stackTrace) => Center(
-              child: FailureWidget(
-                title: 'Failed to load Bangs',
-                exception: error,
+            error: (error, stackTrace) => SliverToBoxAdapter(
+              child: Center(
+                child: FailureWidget(
+                  title: 'Failed to load Bangs',
+                  exception: error,
+                ),
               ),
             ),
-            loading: () => const Center(child: CircularProgressIndicator()),
+            loading: () => const SliverToBoxAdapter(
+              child: Center(child: CircularProgressIndicator()),
+            ),
           ),
         ],
       ),

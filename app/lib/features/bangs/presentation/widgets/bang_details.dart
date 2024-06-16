@@ -91,9 +91,17 @@ class BangDetails extends HookConsumerWidget {
                     label: Text(bangData.domain),
                     icon: const Icon(Icons.open_in_new),
                   ),
-                  Text(
-                    '!${bangData.trigger}',
-                    style: theme.textTheme.titleSmall,
+                  const SizedBox(
+                    width: 8,
+                  ),
+                  Expanded(
+                    child: Text(
+                      '!${bangData.trigger}',
+                      style: theme.textTheme.titleSmall,
+                      textAlign: TextAlign.right,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 ],
               ),
