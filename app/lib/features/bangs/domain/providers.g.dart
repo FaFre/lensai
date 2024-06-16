@@ -170,20 +170,172 @@ final kagiSearchBangDataProvider = StreamProvider<BangData?>.internal(
 );
 
 typedef KagiSearchBangDataRef = StreamProviderRef<BangData?>;
-String _$bangDataListHash() => r'f5544ce7b3cc0f3e0fc3db25a99456c3cd080c1c';
+String _$bangCategoriesHash() => r'dbc63b78208be90c2aa3c3d61b08f98818f4b89d';
 
-/// See also [bangDataList].
-@ProviderFor(bangDataList)
-final bangDataListProvider = AutoDisposeStreamProvider<List<BangData>>.internal(
-  bangDataList,
-  name: r'bangDataListProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$bangDataListHash,
+/// See also [bangCategories].
+@ProviderFor(bangCategories)
+final bangCategoriesProvider =
+    AutoDisposeStreamProvider<Map<String, List<String>>>.internal(
+  bangCategories,
+  name: r'bangCategoriesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$bangCategoriesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef BangDataListRef = AutoDisposeStreamProviderRef<List<BangData>>;
+typedef BangCategoriesRef
+    = AutoDisposeStreamProviderRef<Map<String, List<String>>>;
+String _$bangDataListHash() => r'64c3a3c55c481bf97f291f3befd8f958007daac6';
+
+/// See also [bangDataList].
+@ProviderFor(bangDataList)
+const bangDataListProvider = BangDataListFamily();
+
+/// See also [bangDataList].
+class BangDataListFamily extends Family<AsyncValue<List<BangData>>> {
+  /// See also [bangDataList].
+  const BangDataListFamily();
+
+  /// See also [bangDataList].
+  BangDataListProvider call({
+    ({
+      ({String category, String? subCategory})? categoryFilter,
+      String? domain,
+      Iterable<BangGroup>? groups
+    })? filter,
+  }) {
+    return BangDataListProvider(
+      filter: filter,
+    );
+  }
+
+  @override
+  BangDataListProvider getProviderOverride(
+    covariant BangDataListProvider provider,
+  ) {
+    return call(
+      filter: provider.filter,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'bangDataListProvider';
+}
+
+/// See also [bangDataList].
+class BangDataListProvider extends AutoDisposeStreamProvider<List<BangData>> {
+  /// See also [bangDataList].
+  BangDataListProvider({
+    ({
+      ({String category, String? subCategory})? categoryFilter,
+      String? domain,
+      Iterable<BangGroup>? groups
+    })? filter,
+  }) : this._internal(
+          (ref) => bangDataList(
+            ref as BangDataListRef,
+            filter: filter,
+          ),
+          from: bangDataListProvider,
+          name: r'bangDataListProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$bangDataListHash,
+          dependencies: BangDataListFamily._dependencies,
+          allTransitiveDependencies:
+              BangDataListFamily._allTransitiveDependencies,
+          filter: filter,
+        );
+
+  BangDataListProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.filter,
+  }) : super.internal();
+
+  final ({
+    ({String category, String? subCategory})? categoryFilter,
+    String? domain,
+    Iterable<BangGroup>? groups
+  })? filter;
+
+  @override
+  Override overrideWith(
+    Stream<List<BangData>> Function(BangDataListRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: BangDataListProvider._internal(
+        (ref) => create(ref as BangDataListRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        filter: filter,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<BangData>> createElement() {
+    return _BangDataListProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is BangDataListProvider && other.filter == filter;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, filter.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin BangDataListRef on AutoDisposeStreamProviderRef<List<BangData>> {
+  /// The parameter `filter` of this provider.
+  ({
+    ({String category, String? subCategory})? categoryFilter,
+    String? domain,
+    Iterable<BangGroup>? groups
+  })? get filter;
+}
+
+class _BangDataListProviderElement
+    extends AutoDisposeStreamProviderElement<List<BangData>>
+    with BangDataListRef {
+  _BangDataListProviderElement(super.provider);
+
+  @override
+  ({
+    ({String category, String? subCategory})? categoryFilter,
+    String? domain,
+    Iterable<BangGroup>? groups
+  })? get filter => (origin as BangDataListProvider).filter;
+}
+
 String _$frequentBangDataListHash() =>
     r'adf8d0b72adfa8faffadd7f1a294ce3945e22fec';
 

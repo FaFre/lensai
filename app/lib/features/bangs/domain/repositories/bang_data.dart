@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:bang_navigator/domain/services/generic_website.dart';
 import 'package:bang_navigator/features/bangs/data/database/database.dart';
 import 'package:bang_navigator/features/bangs/data/models/bang.dart';
@@ -25,6 +27,15 @@ class BangDataRepository extends _$BangDataRepository {
     } else {
       return Stream.value(null);
     }
+  }
+
+  Stream<Map<String, List<String>>> watchCategories() {
+    return _db.categoriesJson().watchSingle().map((json) {
+      final decoded = jsonDecode(json) as Map<String, dynamic>;
+      return decoded.map(
+        (key, value) => MapEntry(key, (value as List<dynamic>).cast()),
+      );
+    });
   }
 
   Stream<int> watchBangCount(BangGroup group) {

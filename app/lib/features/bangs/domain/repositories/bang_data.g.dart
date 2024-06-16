@@ -7,7 +7,7 @@ part of 'bang_data.dart';
 // **************************************************************************
 
 String _$bangDataRepositoryHash() =>
-    r'6ac3a59546f6d7e22f3c37aacd43a3579978eb50';
+    r'a6e4017a54516571af553426b0e8e3597d19f779';
 
 /// See also [BangDataRepository].
 @ProviderFor(BangDataRepository)

@@ -1094,6 +1094,15 @@ abstract class _$BangDatabase extends GeneratedDatabase {
         ));
   }
 
+  Selectable<String> categoriesJson() {
+    return customSelect(
+        'WITH categories AS (SELECT b.category, json_group_array(DISTINCT b.sub_category ORDER BY b.sub_category)AS sub_categories FROM bang AS b WHERE b.category IS NOT NULL AND b.sub_category IS NOT NULL GROUP BY b.category ORDER BY b.category) SELECT json_group_object(c.category, json(c.sub_categories)) AS categories_json FROM categories AS c',
+        variables: [],
+        readsFrom: {
+          bang,
+        }).map((QueryRow row) => row.read<String>('categories_json'));
+  }
+
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
