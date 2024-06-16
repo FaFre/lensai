@@ -148,7 +148,7 @@ class SearchTab extends HookConsumerWidget {
             child: FilledButton.icon(
               onPressed: submitSearch,
               label: const Text('Search'),
-              icon: const Icon(MdiIcons.invoiceTextSend),
+              icon: const Icon(MdiIcons.cloudSearch),
             ),
           ),
         ],
