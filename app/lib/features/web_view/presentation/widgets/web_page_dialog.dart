@@ -1,4 +1,5 @@
 import 'package:bang_navigator/domain/entities/web_page_info.dart';
+import 'package:bang_navigator/features/bangs/presentation/widgets/site_search.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
     as uri_builder;
@@ -133,6 +134,14 @@ class WebPageDialog extends HookConsumerWidget {
                 ),
               ),
             ),
+            const Divider(),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: SiteSearch(
+                domain: page.url.host,
+              ),
+            ),
+            const Divider(),
             ListTile(
               leading: const Icon(MdiIcons.contentCopy),
               title: const Text('Copy address'),

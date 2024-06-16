@@ -31,8 +31,19 @@ class BangDataRepository extends _$BangDataRepository {
     return _db.bangDao.getBangCount(groups: [group]).watchSingle();
   }
 
-  Stream<List<BangData>> watchBangs({Iterable<BangGroup>? groups}) {
-    return _db.bangDao.getBangDataList(groups: groups).watch();
+  Stream<List<BangData>> watchBangs({
+    Iterable<BangGroup>? groups,
+    String? domain,
+    ({String category, String? subCategory})? categoryFilter,
+  }) {
+    return _db.bangDao
+        .getBangDataList(
+          groups: groups,
+          domain: domain,
+          category: categoryFilter?.category,
+          subCategory: categoryFilter?.subCategory,
+        )
+        .watch();
   }
 
   Stream<List<BangData>> watchFrequentBangs({Iterable<BangGroup>? groups}) {

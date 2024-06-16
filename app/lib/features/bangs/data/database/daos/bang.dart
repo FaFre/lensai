@@ -28,10 +28,25 @@ class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
     return select(db.bangDataView)..where((t) => t.trigger.equals(trigger));
   }
 
-  Selectable<BangData> getBangDataList({Iterable<BangGroup>? groups}) {
+  Selectable<BangData> getBangDataList({
+    Iterable<BangGroup>? groups,
+    String? domain,
+    String? category,
+    String? subCategory,
+  }) {
     final selectable = select(db.bangDataView);
     if (groups != null) {
       selectable.where((t) => t.group.isInValues(groups));
+    }
+    if (domain != null) {
+      selectable.where((t) => t.domain.equals(domain));
+    }
+    if (category != null) {
+      selectable.where((t) => t.category.equals(category));
+
+      if (subCategory != null) {
+        selectable.where((t) => t.subCategory.equals(subCategory));
+      }
     }
 
     selectable.orderBy([(t) => OrderingTerm.asc(t.websiteName)]);

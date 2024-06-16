@@ -19,9 +19,26 @@ Stream<BangData?> kagiSearchBangData(KagiSearchBangDataRef ref) {
 }
 
 @Riverpod()
-Stream<List<BangData>> bangDataList(BangDataListRef ref) {
+Stream<Map<String, List<String>>> bangCategories(BangCategoriesRef ref) {
   final repository = ref.watch(bangDataRepositoryProvider.notifier);
-  return repository.watchBangs();
+  return repository.watchCategories();
+}
+
+@Riverpod()
+Stream<List<BangData>> bangDataList(
+  BangDataListRef ref, {
+  ({
+    Iterable<BangGroup>? groups,
+    String? domain,
+    ({String category, String? subCategory})? categoryFilter,
+  })? filter,
+}) {
+  final repository = ref.watch(bangDataRepositoryProvider.notifier);
+  return repository.watchBangs(
+    groups: filter?.groups,
+    domain: filter?.domain,
+    categoryFilter: filter?.categoryFilter,
+  );
 }
 
 @Riverpod()

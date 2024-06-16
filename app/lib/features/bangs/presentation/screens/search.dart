@@ -8,6 +8,7 @@ import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dar
 import 'package:bang_navigator/features/search_browser/domain/providers.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/presentation/hooks/listenable_callback.dart';
+import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
@@ -66,14 +67,12 @@ class BangSearchScreen extends HookConsumerWidget {
               bang,
               onTap: () {
                 ref
-                    .read(selectedBangTriggerProvider.notifier)
+                    .read(selectedBangTriggerProvider().notifier)
                     .setTrigger(bang.trigger);
 
                 if (ref.read(bottomSheetProvider) is! CreateTab) {
                   ref.read(bottomSheetProvider.notifier).show(
-                        CreateTab(
-                          preferredTool: KagiTool.search,
-                        ),
+                        CreateTab(preferredTool: KagiTool.search),
                       );
                 }
 
@@ -82,8 +81,13 @@ class BangSearchScreen extends HookConsumerWidget {
             );
           },
         ),
-        error: (error, stackTrace) => SizedBox.shrink(),
-        loading: () => SizedBox.shrink(),
+        error: (error, stackTrace) => Center(
+          child: FailureWidget(
+            title: 'Bang Search failed',
+            exception: error,
+          ),
+        ),
+        loading: () => const Center(child: CircularProgressIndicator()),
       ),
     );
   }
