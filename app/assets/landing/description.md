@@ -3,11 +3,12 @@ Welcome to Bang Navigator, a privacy-centric search and research browser designe
 Bang Navigator is packed with a variety of features aimed at improving usability and maintaining privacy:
 
 - **Privacy by Default**: Incognito mode is enabled by default to keep your searches and browsing history private.
-- **Full Browser Functionality**: Includes all the essential features of a basic browser to browse the web efficiently.
-- **Kagi Integration**: Seamlessly integrates Kagi's search, assistant, and summarizer tools within a user-friendly interface.
-- **Easy Sharing**: Share URLs or text from any app directly into Bang Navigator without the need to copy and paste, for direct use with summarizer/assistant.
-- **Quick Summarization**: Long press any link on a website to get a summary via Kagi's summarizer.
-- **Enhanced Text Interaction**: Custom context menu allows for easy passage of marked text to Kagi's search or assistant tools.
-- **Home Widget**: Includes a home screen widget for quick actions, enhancing productivity.
-- **Speech Input**: Supports voice commands for hands-free operation and accessibility.
-- **PDF processing**: Open and directly summarize/prompt PDF documents.
+- **[Kagi Integration](https://github.com/FaFre/bang_navigator/wiki/Kagi-Tools)**: Seamlessly integrates Kagi's search, assistant, and summarizer tools within a user-friendly interface.
+- **[Easy Sharing](https://github.com/FaFre/bang_navigator/wiki/Kagi-Tools)**: Share URLs or text from any app directly into BangNavigator without the need to copy and paste, for direct use with summarizer/assistant.
+- **[Quick Summarization](https://github.com/FaFre/bang_navigator/wiki/Browser)**: Long press any link on a website to get a summary via Kagi's summarizer.
+- **[Enhanced Text Interaction](https://github.com/FaFre/bang_navigator/wiki/Browser)**: Custom context menu allows for easy passage of marked text to Kagi's search or assistant tools.
+- **[Home Widget](https://github.com/FaFre/bang_navigator/wiki/Home-Widget)**: Includes a home screen widget for quick actions, enhancing productivity.
+- **[Speech Input](https://github.com/FaFre/bang_navigator/wiki/Kagi-Tools)**: Supports voice commands for hands-free operation and accessibility.
+- **[PDF processing](https://github.com/FaFre/bang_navigator/wiki/Kagi-Tools)**: Open and directly summarize/prompt PDF documents.
+- **[Chat Archive](https://github.com/FaFre/bang_navigator/wiki/Chat-Archive)**: Easily archive conversations with the Kagi assistant on your device and search through them locally
+- **[Bang Repository](https://github.com/FaFre/bang_navigator/wiki/Bangs)**: Automatically synchronizes all official Kagi Bangs from the official Repository and makes them available through a convenient interface.
