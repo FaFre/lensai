@@ -1,3 +1,10 @@
+## 0.4.1
+
+* Implemented Material You dynamic color scheme
+* Fixed back button navigation for dialogs
+* Fixed bang search displayed without available bangs
+* Updated landing page
+
 ## 0.4.0
 
 * Added full-text search for archived Chats

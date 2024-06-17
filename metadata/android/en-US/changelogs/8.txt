@@ -1,0 +1,4 @@
+* Implemented Material You dynamic color scheme
+* Fixed back button navigation for dialogs
+* Fixed bang search displayed without available bangs
+* Updated landing page
