@@ -1,6 +1,6 @@
-Welcome to Bang Navigator, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure during research. Bang Navigator offers a seamless and intuitive interface, integrating the powerful tools of Kagi Search Engine.
+Welcome to BangNavigator, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure during research. BangNavigator offers a seamless and intuitive interface, integrating the powerful tools of Kagi Search Engine.
 
-Bang Navigator is packed with a variety of features aimed at improving usability and maintaining privacy:
+BangNavigator is packed with a variety of features aimed at improving usability and maintaining privacy:
 
 - **Privacy by Default**: Incognito mode is enabled by default to keep your searches and browsing history private.
 - **[Kagi Integration](https://github.com/FaFre/bang_navigator/wiki/Kagi-Tools)**: Seamlessly integrates Kagi's search, assistant, and summarizer tools within a user-friendly interface.
