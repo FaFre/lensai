@@ -1,4 +1,6 @@
 import 'package:bang_navigator/domain/entities/web_page_info.dart';
+import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
+import 'package:bang_navigator/features/bangs/domain/providers.dart';
 import 'package:bang_navigator/features/bangs/presentation/widgets/site_search.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
@@ -8,6 +10,7 @@ import 'package:bang_navigator/features/share_intent/domain/entities/shared_cont
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:bang_navigator/features/web_view/presentation/widgets/favicon.dart';
 import 'package:bang_navigator/presentation/controllers/website_title.dart';
+import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
 import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +19,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 
 class LoadingWebPageDialog extends HookConsumerWidget {
   final Uri url;
@@ -29,11 +31,14 @@ class LoadingWebPageDialog extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final pageInfoAsync = ref.watch(pageInfoProvider(url));
 
-    return Skeletonizer(
-      enabled: pageInfoAsync.isLoading,
-      child: WebPageDialog(
-        page: pageInfoAsync.valueOrNull ??
-            WebPageInfo(url: url, favicon: null, title: ''),
+    return pageInfoAsync.when(
+      data: (pageInfo) => WebPageDialog(
+        page: pageInfo,
+        onDismiss: onDismiss,
+      ),
+      error: (error, stackTrace) => SizedBox.shrink(),
+      loading: () => ModalBarrier(
+        color: Theme.of(context).dialogTheme.barrierColor ?? Colors.black54,
         onDismiss: onDismiss,
       ),
     );
@@ -59,6 +64,18 @@ class WebPageDialog extends HookConsumerWidget {
       settingsRepositoryProvider
           .select((value) => value.valueOrNull?.incognitoMode ?? false),
     );
+
+    final availableBangsAsync = ref.watch(
+      bangDataListProvider(
+        filter: (
+          domain: page.url.host,
+          groups: null,
+          categoryFilter: null,
+          orderMostFrequentFirst: true,
+        ),
+      ),
+    );
+    final availableBangCount = availableBangsAsync.valueOrNull?.length;
 
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final urlTextController =
@@ -98,6 +115,7 @@ class WebPageDialog extends HookConsumerWidget {
                     controller: urlTextController,
                     enableIMEPersonalizedLearning: !incognitoEnabled,
                     decoration: InputDecoration(
+                      labelText: 'URL',
                       suffixIcon: (webViewController != null)
                           ? IconButton(
                               onPressed: () async {
@@ -137,11 +155,38 @@ class WebPageDialog extends HookConsumerWidget {
             const Divider(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: SiteSearch(
-                domain: page.url.host,
+              child: availableBangsAsync.when(
+                data: (availableBangs) {
+                  if (availableBangs.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+
+                  return SiteSearch(
+                    domain: page.url.host,
+                    availableBangs: availableBangs,
+                  );
+                },
+                error: (error, stackTrace) => FailureWidget(
+                  title: 'Could not load bangs',
+                  exception: error,
+                ),
+                loading: () => SiteSearch(
+                  domain: page.url.host,
+                  availableBangs: [
+                    BangData(
+                      websiteName: 'websiteName',
+                      domain: 'domain',
+                      trigger: 'trigger',
+                      urlTemplate: 'urlTemplate',
+                    ),
+                  ],
+                ),
               ),
             ),
-            const Divider(),
+            if (availableBangsAsync.isLoading ||
+                availableBangCount == null ||
+                availableBangCount > 0)
+              const Divider(),
             ListTile(
               leading: const Icon(MdiIcons.contentCopy),
               title: const Text('Copy address'),

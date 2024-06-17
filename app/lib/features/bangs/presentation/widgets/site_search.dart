@@ -1,4 +1,4 @@
-import 'package:bang_navigator/features/bangs/domain/providers.dart';
+import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
 import 'package:bang_navigator/features/bangs/domain/repositories/data.dart';
 import 'package:bang_navigator/features/bangs/presentation/widgets/bang_chips.dart';
 import 'package:bang_navigator/features/bangs/presentation/widgets/search_field.dart';
@@ -11,32 +11,24 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 class SiteSearch extends HookConsumerWidget {
   final String domain;
+  final List<BangData> availableBangs;
 
-  const SiteSearch({required this.domain, super.key});
+  const SiteSearch({
+    required this.domain,
+    required this.availableBangs,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final formKey = useMemoized(() => GlobalKey<FormState>());
-
-    final availableBangsAsync = ref.watch(
-      bangDataListProvider(
-        filter: (
-          domain: domain,
-          groups: null,
-          categoryFilter: null,
-          orderMostFrequentFirst: true,
-        ),
-      ),
-    );
-    final availableBangCount = availableBangsAsync.valueOrNull?.length ?? 0;
 
     final selectedBang = ref.watch(
       selectedBangDataProvider(domain: domain)
           .select((value) => value.valueOrNull),
     );
 
-    final activeBang =
-        selectedBang ?? availableBangsAsync.valueOrNull?.firstOrNull;
+    final activeBang = selectedBang ?? availableBangs.firstOrNull;
 
     final textController = useTextEditingController();
 
@@ -54,67 +46,58 @@ class SiteSearch extends HookConsumerWidget {
       }
     }
 
-    return availableBangsAsync.when(
-      data: (availableBangs) {
-        return Form(
-          key: formKey,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (availableBangCount > 1)
-                SizedBox(
-                  height: 48,
-                  width: double.maxFinite,
-                  child: BangChips(
-                    availableBangs: availableBangs,
-                    selectedBang: selectedBang,
-                    onSelected: (trigger) {
-                      ref
-                          .read(
-                            selectedBangTriggerProvider(domain: domain)
-                                .notifier,
-                          )
-                          .setTrigger(trigger);
-                    },
-                    onDeleted: (trigger) {
-                      if (ref.read(
-                            selectedBangTriggerProvider(domain: domain),
-                          ) ==
-                          trigger) {
-                        ref
-                            .read(
-                              selectedBangTriggerProvider(domain: domain)
-                                  .notifier,
-                            )
-                            .clearTrigger();
-                      }
-                    },
-                  ),
-                ),
-              SearchField(
-                textController: textController,
-                activeBang: activeBang,
-                onFieldSubmitted: (_) async {
-                  await submitSearch();
-                },
-              ),
-              const SizedBox(
-                height: 12,
-              ),
-              SizedBox(
-                width: double.infinity,
-                child: FilledButton.icon(
-                  onPressed: submitSearch,
-                  label: const Text('Search on Site'),
-                  icon: const Icon(MdiIcons.cloudSearch),
-                ),
-              ),
-            ],
+    return Form(
+      key: formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            height: 48,
+            width: double.maxFinite,
+            child: BangChips(
+              availableBangs: availableBangs,
+              selectedBang: selectedBang,
+              onSelected: (trigger) {
+                ref
+                    .read(
+                      selectedBangTriggerProvider(domain: domain).notifier,
+                    )
+                    .setTrigger(trigger);
+              },
+              onDeleted: (trigger) {
+                if (ref.read(
+                      selectedBangTriggerProvider(domain: domain),
+                    ) ==
+                    trigger) {
+                  ref
+                      .read(
+                        selectedBangTriggerProvider(domain: domain).notifier,
+                      )
+                      .clearTrigger();
+                }
+              },
+            ),
           ),
-        );
-      },
-      error: (error, stackTrace) => const SizedBox.shrink(),
-      loading: () => const SizedBox(height: 48),
+          SearchField(
+            textController: textController,
+            activeBang: activeBang,
+            onFieldSubmitted: (_) async {
+              await submitSearch();
+            },
+          ),
+          const SizedBox(
+            height: 12,
+          ),
+          SizedBox(
+            width: double.infinity,
+            child: FilledButton.icon(
+              onPressed: submitSearch,
+              label: const Text('Search on Site'),
+              icon: const Icon(MdiIcons.cloudSearch),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
