@@ -287,6 +287,11 @@ class KagiScreen extends HookConsumerWidget {
                     return true;
                   }
 
+                  if (displayedOverlayDialog != null) {
+                    ref.read(overlayDialogProvider.notifier).dismiss();
+                    return true;
+                  }
+
                   if (activeWebView?.page.value.pageHistory.canGoBack == true) {
                     lastBackButtonPress.value = null;
 
