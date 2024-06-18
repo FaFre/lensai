@@ -10,7 +10,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 part 'source.g.dart';
 
 @Riverpod()
-class BangSource extends _$BangSource {
+class BangSourceService extends _$BangSourceService {
   late http.Client _client;
 
   @override

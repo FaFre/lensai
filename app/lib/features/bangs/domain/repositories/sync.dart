@@ -16,7 +16,7 @@ class BangSyncRepository extends _$BangSyncRepository {
   BangSyncRepository();
 
   static Future<Result<void>> _fetchAndSync({
-    required BangSource sourceRepository,
+    required BangSourceService sourceService,
     required BangDatabase db,
     required Uri url,
     required BangGroup group,
@@ -32,7 +32,7 @@ class BangSyncRepository extends _$BangSyncRepository {
       }
     }
 
-    final result = await sourceRepository.getBangs(url, group);
+    final result = await sourceService.getBangs(url, group);
     return result.flatMapAsync(
       (remoteBangs) async {
         await db.syncDao.syncBangs(
@@ -57,7 +57,7 @@ class BangSyncRepository extends _$BangSyncRepository {
           computation: (db) async {
             final ref = ProviderContainer();
             final result = await _fetchAndSync(
-              sourceRepository: ref.read(bangSourceProvider.notifier),
+              sourceService: ref.read(bangSourceServiceProvider.notifier),
               db: db,
               url: url,
               group: group,

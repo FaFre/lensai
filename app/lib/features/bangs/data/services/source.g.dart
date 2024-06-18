@@ -6,20 +6,21 @@ part of 'source.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$bangSourceHash() => r'6ca70e8be16a0ae104fa6b739e3c0f2c59eab565';
+String _$bangSourceServiceHash() => r'2f734d563fa20de306a72013526ef1f72f910fe1';
 
-/// See also [BangSource].
-@ProviderFor(BangSource)
-final bangSourceProvider =
-    AutoDisposeNotifierProvider<BangSource, void>.internal(
-  BangSource.new,
-  name: r'bangSourceProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$bangSourceHash,
+/// See also [BangSourceService].
+@ProviderFor(BangSourceService)
+final bangSourceServiceProvider =
+    AutoDisposeNotifierProvider<BangSourceService, void>.internal(
+  BangSourceService.new,
+  name: r'bangSourceServiceProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$bangSourceServiceHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$BangSource = AutoDisposeNotifier<void>;
+typedef _$BangSourceService = AutoDisposeNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -7,7 +7,7 @@ part of 'sync.dart';
 // **************************************************************************
 
 String _$bangSyncRepositoryHash() =>
-    r'79b9c561638e96eb404ceeecb4b50dec31f0c610';
+    r'865164c809e2f171a6b748d149780383d6e3483f';
 
 /// See also [BangSyncRepository].
 @ProviderFor(BangSyncRepository)
