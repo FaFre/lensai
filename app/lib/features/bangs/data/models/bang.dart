@@ -8,9 +8,19 @@ import 'package:json_annotation/json_annotation.dart';
 part 'bang.g.dart';
 
 enum BangGroup {
-  general,
-  assistant,
-  kagi,
+  general(
+    'https://raw.githubusercontent.com/kagisearch/bangs/main/data/bangs.json',
+  ),
+  assistant(
+    'https://raw.githubusercontent.com/kagisearch/bangs/main/data/assistant_bangs.json',
+  ),
+  kagi(
+    'https://raw.githubusercontent.com/kagisearch/bangs/main/data/kagi_bangs.json',
+  );
+
+  final String url;
+
+  const BangGroup(this.url);
 }
 
 enum BangFormat {

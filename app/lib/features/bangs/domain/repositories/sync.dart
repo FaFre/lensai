@@ -87,27 +87,21 @@ class BangSyncRepository extends _$BangSyncRepository {
   Future<Result<void>> syncGeneralBangs({Duration? syncInterval}) =>
       _syncBangGroup(
         BangGroup.general,
-        Uri.parse(
-          'https://raw.githubusercontent.com/kagisearch/bangs/main/data/bangs.json',
-        ),
+        Uri.parse(BangGroup.general.url),
         syncInterval,
       );
 
   Future<Result<void>> syncKagiBangs({Duration? syncInterval}) =>
       _syncBangGroup(
         BangGroup.kagi,
-        Uri.parse(
-          'https://raw.githubusercontent.com/kagisearch/bangs/main/data/kagi_bangs.json',
-        ),
+        Uri.parse(BangGroup.kagi.url),
         syncInterval,
       );
 
   Future<Result<void>> syncAssistantBangs({Duration? syncInterval}) =>
       _syncBangGroup(
         BangGroup.assistant,
-        Uri.parse(
-          'https://raw.githubusercontent.com/kagisearch/bangs/main/data/assistant_bangs.json',
-        ),
+        Uri.parse(BangGroup.assistant.url),
         syncInterval,
       );
 
