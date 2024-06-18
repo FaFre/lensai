@@ -33,6 +33,7 @@ enum ChatModel {
   claude3Haiku('Claude 3 Haiku', 13),
   claude3Sonnet('Claude 3 Sonnet', 14),
   claude3Opus('Claude 3 Opus', 12),
+  gemini15Pro('Gemini 1.5 Pro', 8),
   mistralSmall('Mistral Small', 10),
   mistralLarge('Mistral Large', 11);
 
