@@ -1,4 +1,6 @@
+import 'package:bang_navigator/features/content_block/data/models/host.dart';
 import 'package:bang_navigator/features/settings/data/models/settings.dart';
+import 'package:collection/collection.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +16,8 @@ class SettingsRepository extends _$SettingsRepository {
   static const _incognitoStorageKey = 'b4ng_settings_incognito';
   static const _javascriptStorageKey = 'b4ng_settings_js';
   static const _launchExternalStorageKey = 'b4ng_settings_launch_external';
+  static const _contentBlockingStorageKey = 'b4ng_settings_content_blocking';
+  static const _enableHostListStorageKey = 'b4ng_settings_host_lists';
 
   final FlutterSecureStorage _flutterSecureStorage;
   final Future<SharedPreferences> _sharedPreferences;
@@ -23,6 +27,7 @@ class SettingsRepository extends _$SettingsRepository {
         _sharedPreferences = SharedPreferences.getInstance();
 
   Future<void> updateSettings(UpdateSettingsFunc updateWithCurrent) async {
+    final sharedPreferences = await _sharedPreferences;
     final oldSettings = state.value!;
     final newSettings = updateWithCurrent(oldSettings);
 
@@ -38,32 +43,48 @@ class SettingsRepository extends _$SettingsRepository {
 
       if (newSettings.showEarlyAccessFeatures !=
           oldSettings.showEarlyAccessFeatures) {
-        await _sharedPreferences.then(
-          (s) => s.setBool(
-            _showEarlyAccessFeaturesKey,
-            newSettings.showEarlyAccessFeatures,
-          ),
+        await sharedPreferences.setBool(
+          _showEarlyAccessFeaturesKey,
+          newSettings.showEarlyAccessFeatures,
         );
       }
 
       if (newSettings.incognitoMode != oldSettings.incognitoMode) {
-        await _sharedPreferences.then(
-          (s) => s.setBool(_incognitoStorageKey, newSettings.incognitoMode),
+        await sharedPreferences.setBool(
+          _incognitoStorageKey,
+          newSettings.incognitoMode,
         );
       }
 
       if (newSettings.enableJavascript != oldSettings.enableJavascript) {
-        await _sharedPreferences.then(
-          (s) => s.setBool(_javascriptStorageKey, newSettings.enableJavascript),
+        await sharedPreferences.setBool(
+          _javascriptStorageKey,
+          newSettings.enableJavascript,
         );
       }
 
       if (newSettings.launchUrlExternal != oldSettings.launchUrlExternal) {
-        await _sharedPreferences.then(
-          (s) => s.setBool(
-            _launchExternalStorageKey,
-            newSettings.launchUrlExternal,
-          ),
+        await sharedPreferences.setBool(
+          _launchExternalStorageKey,
+          newSettings.launchUrlExternal,
+        );
+      }
+
+      if (newSettings.enableContentBlocking !=
+          oldSettings.enableContentBlocking) {
+        await sharedPreferences.setBool(
+          _contentBlockingStorageKey,
+          newSettings.enableContentBlocking,
+        );
+      }
+
+      if (!const DeepCollectionEquality.unordered().equals(
+        newSettings.enableHostList,
+        oldSettings.enableHostList,
+      )) {
+        await sharedPreferences.setStringList(
+          _enableHostListStorageKey,
+          newSettings.enableHostList.map((list) => list.name).toList(),
         );
       }
 
@@ -82,6 +103,16 @@ class SettingsRepository extends _$SettingsRepository {
       incognitoMode: sharedPreferences.getBool(_incognitoStorageKey),
       enableJavascript: sharedPreferences.getBool(_javascriptStorageKey),
       launchUrlExternal: sharedPreferences.getBool(_launchExternalStorageKey),
+      enableContentBlocking:
+          sharedPreferences.getBool(_contentBlockingStorageKey),
+      enableHostList: sharedPreferences
+          .getStringList(_enableHostListStorageKey)
+          ?.map(
+            (list) => HostSource.values
+                .firstWhereOrNull((source) => source.name == list),
+          )
+          .whereNotNull()
+          .toSet(),
     );
   }
 }

@@ -1,18 +1,23 @@
 import 'package:flutter/material.dart';
 
-class ButtonListTile extends StatelessWidget {
+class CustomListTile extends StatelessWidget {
+  final bool enabled;
+
   final String title;
   final String subtitle;
   final Widget? content;
 
-  final Widget button;
+  final Widget? prefix;
+  final Widget suffix;
 
-  const ButtonListTile({
+  const CustomListTile({
     super.key,
     required this.title,
     required this.subtitle,
     this.content,
-    required this.button,
+    this.prefix,
+    required this.suffix,
+    this.enabled = true,
   });
 
   @override
@@ -23,6 +28,7 @@ class ButtonListTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
       child: Row(
         children: [
+          if (prefix != null) prefix!,
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -30,17 +36,23 @@ class ButtonListTile extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: theme.textTheme.bodyLarge,
+                  style: enabled
+                      ? theme.textTheme.bodyLarge
+                      : theme.textTheme.bodyLarge
+                          ?.copyWith(color: theme.disabledColor),
                 ),
                 Text(
                   subtitle,
-                  style: theme.textTheme.bodyMedium,
+                  style: enabled
+                      ? theme.textTheme.bodyMedium
+                      : theme.textTheme.bodyMedium
+                          ?.copyWith(color: theme.disabledColor),
                 ),
                 if (content != null) content!,
               ],
             ),
           ),
-          button,
+          suffix,
         ],
       ),
     );

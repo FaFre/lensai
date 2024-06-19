@@ -48,6 +48,7 @@ dependencies:
   sqlite3: ^2.4.3
   sqlite3_flutter_libs: ^0.5.23
   text_scroll: ^0.2.0
+  timeago: ^3.6.1
   universal_io: ^2.2.2
   uri_to_file: ^1.0.0
   url_launcher: ^6.2.5

@@ -7,7 +7,7 @@ part of 'settings_repository.dart';
 // **************************************************************************
 
 String _$settingsRepositoryHash() =>
-    r'0beffd6449e5488e61beb181fefefd4aa24361b0';
+    r'9d0e8b8452f85ca33b8f13a4bbcb69212e7d29bd';
 
 /// See also [SettingsRepository].
 @ProviderFor(SettingsRepository)

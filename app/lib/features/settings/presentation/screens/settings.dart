@@ -1,12 +1,13 @@
-import 'package:bang_navigator/core/extension/date_time.dart';
 import 'package:bang_navigator/features/bangs/data/models/bang.dart';
 import 'package:bang_navigator/features/bangs/domain/providers.dart';
 import 'package:bang_navigator/features/bangs/domain/repositories/data.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/sync.dart';
+import 'package:bang_navigator/features/content_block/data/models/host.dart';
 import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/settings/presentation/controllers/save_settings.dart';
-import 'package:bang_navigator/features/settings/presentation/widgets/button_list_tile.dart';
+import 'package:bang_navigator/features/settings/presentation/widgets/bang_group_list_tile.dart';
+import 'package:bang_navigator/features/settings/presentation/widgets/custom_list_tile.dart';
+import 'package:bang_navigator/features/settings/presentation/widgets/host_list_tile.dart';
 import 'package:bang_navigator/features/settings/utils/session_link_extractor.dart';
 import 'package:bang_navigator/presentation/hooks/listenable_callback.dart';
 import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
@@ -31,38 +32,29 @@ class SettingsScreen extends HookConsumerWidget {
         ),
       );
 
+  Widget _buildSubSection(ThemeData theme, String name) => Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+        child: Text(
+          name,
+          style: theme.textTheme.titleLarge?.copyWith(fontSize: 18),
+        ),
+      );
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    final kagiSessionTextController = useTextEditingController(
-      text: ref.read(
-        settingsRepositoryProvider
-            .select((value) => value.valueOrNull?.kagiSession),
+    final settings = ref.watch(
+      settingsRepositoryProvider.select(
+        (value) =>
+            value.valueOrNull ?? Settings.withDefaults(kagiSession: null),
       ),
+    );
+
+    final kagiSessionTextController = useTextEditingController(
+      text: settings.kagiSession,
     );
     final hideSessionText = useState(true);
-
-    final showEarlyAccessFeatures = ref.watch(
-      settingsRepositoryProvider.select(
-        (value) => value.valueOrNull?.showEarlyAccessFeatures ?? true,
-      ),
-    );
-
-    final incognitoEnabled = ref.watch(
-      settingsRepositoryProvider
-          .select((value) => value.valueOrNull?.incognitoMode ?? false),
-    );
-
-    final javacsriptEnabled = ref.watch(
-      settingsRepositoryProvider
-          .select((value) => value.valueOrNull?.enableJavascript ?? false),
-    );
-
-    final launchUrlExternal = ref.watch(
-      settingsRepositoryProvider
-          .select((value) => value.valueOrNull?.launchUrlExternal ?? false),
-    );
 
     useListenableCallback(kagiSessionTextController, () async {
       var text = kagiSessionTextController.text;
@@ -142,7 +134,7 @@ class SettingsScreen extends HookConsumerWidget {
             subtitle: const Text(
               "Displays Kagi's early access features in the UI. As an Ultimate subscriber, you will likely want to have this enabled.",
             ),
-            value: showEarlyAccessFeatures,
+            value: settings.showEarlyAccessFeatures,
             onChanged: (value) async {
               await ref.read(saveSettingsControllerProvider.notifier).save(
                     (currentSettings) =>
@@ -159,7 +151,7 @@ class SettingsScreen extends HookConsumerWidget {
             subtitle: const Text(
               'Deletes all browsing data upon app restart for enhanced privacy.',
             ),
-            value: incognitoEnabled,
+            value: settings.incognitoMode,
             onChanged: (value) async {
               await ref.read(saveSettingsControllerProvider.notifier).save(
                     (currentSettings) =>
@@ -172,7 +164,7 @@ class SettingsScreen extends HookConsumerWidget {
             subtitle: const Text(
               'While turning off JavaScript boosts security, privacy, and speed, it may cause some sites to not work as intended.',
             ),
-            value: javacsriptEnabled,
+            value: settings.enableJavascript,
             onChanged: (value) async {
               await ref.read(saveSettingsControllerProvider.notifier).save(
                     (currentSettings) =>
@@ -185,7 +177,7 @@ class SettingsScreen extends HookConsumerWidget {
             subtitle: const Text(
               'Opens all links (except for kagi.com) in your default browser.',
             ),
-            value: launchUrlExternal,
+            value: settings.launchUrlExternal,
             onChanged: (value) async {
               await ref.read(saveSettingsControllerProvider.notifier).save(
                     (currentSettings) =>
@@ -196,11 +188,64 @@ class SettingsScreen extends HookConsumerWidget {
           const SizedBox(
             height: 16,
           ),
+          _buildSection(theme, 'Content Blocking'),
+          SwitchListTile.adaptive(
+            title: const Text('Enable Content Blocking'),
+            subtitle: const Text(
+              'Prevents access to unwanted websites and ads, as defined in the selected lists below.',
+            ),
+            value: settings.enableContentBlocking,
+            onChanged: (value) async {
+              await ref.read(saveSettingsControllerProvider.notifier).save(
+                    (currentSettings) =>
+                        currentSettings.copyWith.enableContentBlocking(value),
+                  );
+            },
+          ),
+          _buildSubSection(theme, 'Lists'),
+          HostListTile(
+            enableContentBlocking: settings.enableContentBlocking,
+            enableHostLists: settings.enableHostList,
+            source: HostSource.stevenBlackUnified,
+            title: 'StevenBlack: Unified',
+            subtitle: 'Blocks domains containing adware, malware and trackers.',
+          ),
+          HostListTile(
+            enableContentBlocking: settings.enableContentBlocking,
+            enableHostLists: settings.enableHostList,
+            source: HostSource.stevenBlackFakeNews,
+            title: 'StevenBlack: Fake News',
+            subtitle: 'Blocks domains known for spreading fake news.',
+          ),
+          HostListTile(
+            enableContentBlocking: settings.enableContentBlocking,
+            enableHostLists: settings.enableHostList,
+            source: HostSource.stevenBlackGambling,
+            title: 'StevenBlack: Gambling',
+            subtitle: 'Blocks domains related to gambling.',
+          ),
+          HostListTile(
+            enableContentBlocking: settings.enableContentBlocking,
+            enableHostLists: settings.enableHostList,
+            source: HostSource.stevenBlackPorn,
+            title: 'StevenBlack: Porn',
+            subtitle: 'Blocks adult content domains.',
+          ),
+          HostListTile(
+            enableContentBlocking: settings.enableContentBlocking,
+            enableHostLists: settings.enableHostList,
+            source: HostSource.stevenBlackSocial,
+            title: 'StevenBlack: Social',
+            subtitle: 'Blocks social media domains.',
+          ),
+          const SizedBox(
+            height: 16,
+          ),
           _buildSection(theme, 'Bangs'),
-          ButtonListTile(
+          CustomListTile(
             title: 'Bang Frequencies',
             subtitle: 'Tracked usage for Bang recommendations',
-            button: FilledButton.icon(
+            suffix: FilledButton.icon(
               onPressed: () async {
                 await ref
                     .read(bangDataRepositoryProvider.notifier)
@@ -218,7 +263,7 @@ class SettingsScreen extends HookConsumerWidget {
                 ),
               );
 
-              return ButtonListTile(
+              return CustomListTile(
                 title: 'Icon Cache',
                 subtitle: 'Stored favicons for Bangs',
                 content: Padding(
@@ -226,6 +271,7 @@ class SettingsScreen extends HookConsumerWidget {
                   child: DefaultTextStyle(
                     style: GoogleFonts.robotoMono(),
                     child: Table(
+                      columnWidths: const {0: FixedColumnWidth(100)},
                       children: [
                         TableRow(
                           children: [
@@ -237,7 +283,7 @@ class SettingsScreen extends HookConsumerWidget {
                     ),
                   ),
                 ),
-                button: FilledButton.icon(
+                suffix: FilledButton.icon(
                   onPressed: () async {
                     await ref
                         .read(bangDataRepositoryProvider.notifier)
@@ -249,164 +295,21 @@ class SettingsScreen extends HookConsumerWidget {
               );
             },
           ),
-          Consumer(
-            builder: (context, ref, child) {
-              final lastSync = ref.watch(
-                lastSyncOfGroupProvider(BangGroup.general).select(
-                  (value) => value.valueOrNull,
-                ),
-              );
-
-              final count = ref.watch(
-                bangCountOfGroupProvider(BangGroup.general).select(
-                  (value) => value.valueOrNull,
-                ),
-              );
-
-              return ButtonListTile(
-                title: 'General Bangs',
-                subtitle: 'Automatically syncs every 7 days',
-                content: Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: DefaultTextStyle(
-                    style: GoogleFonts.robotoMono(),
-                    child: Table(
-                      children: [
-                        TableRow(
-                          children: [
-                            const Text('Entries'),
-                            Text(count?.toString() ?? 'N/A'),
-                          ],
-                        ),
-                        TableRow(
-                          children: [
-                            const Text('Last Sync'),
-                            Text(
-                              lastSync?.formatWithMinutePrecision() ?? 'N/A',
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                button: FilledButton.icon(
-                  onPressed: () async {
-                    await ref
-                        .read(bangSyncRepositoryProvider.notifier)
-                        .syncGeneralBangs();
-                  },
-                  icon: const Icon(Icons.sync),
-                  label: const Text('Sync'),
-                ),
-              );
-            },
+          _buildSubSection(theme, 'Repositories'),
+          const BangGroupListTile(
+            group: BangGroup.general,
+            title: 'General Bangs',
+            subtitle: 'Automatically syncs every 7 days',
           ),
-          Consumer(
-            builder: (context, ref, child) {
-              final lastSync = ref.watch(
-                lastSyncOfGroupProvider(BangGroup.assistant).select(
-                  (value) => value.valueOrNull,
-                ),
-              );
-
-              final count = ref.watch(
-                bangCountOfGroupProvider(BangGroup.assistant).select(
-                  (value) => value.valueOrNull,
-                ),
-              );
-
-              return ButtonListTile(
-                title: 'Assistant Bangs',
-                subtitle: 'Automatically syncs every 7 days',
-                content: Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: DefaultTextStyle(
-                    style: GoogleFonts.robotoMono(),
-                    child: Table(
-                      children: [
-                        TableRow(
-                          children: [
-                            const Text('Entries'),
-                            Text(count?.toString() ?? 'N/A'),
-                          ],
-                        ),
-                        TableRow(
-                          children: [
-                            const Text('Last Sync'),
-                            Text(
-                              lastSync?.formatWithMinutePrecision() ?? 'N/A',
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                button: FilledButton.icon(
-                  onPressed: () async {
-                    await ref
-                        .read(bangSyncRepositoryProvider.notifier)
-                        .syncAssistantBangs();
-                  },
-                  icon: const Icon(Icons.sync),
-                  label: const Text('Sync'),
-                ),
-              );
-            },
+          const BangGroupListTile(
+            group: BangGroup.assistant,
+            title: 'Assistant Bangs',
+            subtitle: 'Automatically syncs every 7 days',
           ),
-          Consumer(
-            builder: (context, ref, child) {
-              final lastSync = ref.watch(
-                lastSyncOfGroupProvider(BangGroup.kagi).select(
-                  (value) => value.valueOrNull,
-                ),
-              );
-
-              final count = ref.watch(
-                bangCountOfGroupProvider(BangGroup.kagi).select(
-                  (value) => value.valueOrNull,
-                ),
-              );
-
-              return ButtonListTile(
-                title: 'Kagi Bangs',
-                subtitle: 'Automatically syncs every 7 days',
-                content: Padding(
-                  padding: const EdgeInsets.only(top: 8.0),
-                  child: DefaultTextStyle(
-                    style: GoogleFonts.robotoMono(),
-                    child: Table(
-                      children: [
-                        TableRow(
-                          children: [
-                            const Text('Entries'),
-                            Text(count?.toString() ?? 'N/A'),
-                          ],
-                        ),
-                        TableRow(
-                          children: [
-                            const Text('Last Sync'),
-                            Text(
-                              lastSync?.formatWithMinutePrecision() ?? 'N/A',
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                button: FilledButton.icon(
-                  onPressed: () async {
-                    await ref
-                        .read(bangSyncRepositoryProvider.notifier)
-                        .syncKagiBangs();
-                  },
-                  icon: const Icon(Icons.sync),
-                  label: const Text('Sync'),
-                ),
-              );
-            },
+          const BangGroupListTile(
+            group: BangGroup.kagi,
+            title: 'Kagi Bangs',
+            subtitle: 'Automatically syncs every 7 days',
           ),
         ],
       ),

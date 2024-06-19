@@ -17,6 +17,10 @@ abstract class _$SettingsCWProxy {
 
   Settings launchUrlExternal(bool launchUrlExternal);
 
+  Settings enableContentBlocking(bool enableContentBlocking);
+
+  Settings enableHostList(Set<HostSource> enableHostList);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Settings(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -29,6 +33,8 @@ abstract class _$SettingsCWProxy {
     bool? incognitoMode,
     bool? enableJavascript,
     bool? launchUrlExternal,
+    bool? enableContentBlocking,
+    Set<HostSource>? enableHostList,
   });
 }
 
@@ -58,6 +64,14 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
       this(launchUrlExternal: launchUrlExternal);
 
   @override
+  Settings enableContentBlocking(bool enableContentBlocking) =>
+      this(enableContentBlocking: enableContentBlocking);
+
+  @override
+  Settings enableHostList(Set<HostSource> enableHostList) =>
+      this(enableHostList: enableHostList);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Settings(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -71,6 +85,8 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
     Object? incognitoMode = const $CopyWithPlaceholder(),
     Object? enableJavascript = const $CopyWithPlaceholder(),
     Object? launchUrlExternal = const $CopyWithPlaceholder(),
+    Object? enableContentBlocking = const $CopyWithPlaceholder(),
+    Object? enableHostList = const $CopyWithPlaceholder(),
   }) {
     return Settings(
       kagiSession: kagiSession == const $CopyWithPlaceholder()
@@ -98,6 +114,17 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
           ? _value.launchUrlExternal
           // ignore: cast_nullable_to_non_nullable
           : launchUrlExternal as bool,
+      enableContentBlocking:
+          enableContentBlocking == const $CopyWithPlaceholder() ||
+                  enableContentBlocking == null
+              ? _value.enableContentBlocking
+              // ignore: cast_nullable_to_non_nullable
+              : enableContentBlocking as bool,
+      enableHostList: enableHostList == const $CopyWithPlaceholder() ||
+              enableHostList == null
+          ? _value.enableHostList
+          // ignore: cast_nullable_to_non_nullable
+          : enableHostList as Set<HostSource>,
     );
   }
 }
