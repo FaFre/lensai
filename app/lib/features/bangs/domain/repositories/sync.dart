@@ -45,9 +45,8 @@ class BangSyncRepository extends _$BangSyncRepository {
     );
   }
 
-  Future<Result<void>> _syncBangGroup(
+  Future<Result<void>> syncBangGroup(
     BangGroup group,
-    Uri url,
     Duration? syncInterval,
   ) async {
     try {
@@ -59,7 +58,7 @@ class BangSyncRepository extends _$BangSyncRepository {
             final result = await _fetchAndSync(
               sourceService: ref.read(bangSourceServiceProvider.notifier),
               db: db,
-              url: url,
+              url: Uri.parse(group.url),
               group: group,
               syncInterval: syncInterval,
             );
@@ -84,40 +83,20 @@ class BangSyncRepository extends _$BangSyncRepository {
     return _db.syncDao.lastSyncOfGroup(group).watchSingleOrNull();
   }
 
-  Future<Result<void>> syncGeneralBangs({Duration? syncInterval}) =>
-      _syncBangGroup(
-        BangGroup.general,
-        Uri.parse(BangGroup.general.url),
-        syncInterval,
-      );
-
-  Future<Result<void>> syncKagiBangs({Duration? syncInterval}) =>
-      _syncBangGroup(
-        BangGroup.kagi,
-        Uri.parse(BangGroup.kagi.url),
-        syncInterval,
-      );
-
-  Future<Result<void>> syncAssistantBangs({Duration? syncInterval}) =>
-      _syncBangGroup(
-        BangGroup.assistant,
-        Uri.parse(BangGroup.assistant.url),
-        syncInterval,
-      );
-
-  Future<Map<BangGroup, Result<void>>> syncAllBangGroups({
+  Future<Map<BangGroup, Result<void>>> syncBangGroups({
+    Set<BangGroup>? groups,
     Duration? syncInterval,
   }) async {
-    //Run isolated operations
-    final generalSync = syncGeneralBangs(syncInterval: syncInterval);
-    final assistantSync = syncAssistantBangs(syncInterval: syncInterval);
-    final kagiSync = syncKagiBangs(syncInterval: syncInterval);
+    //Default to all sources
+    groups ??= BangGroup.values.toSet();
 
-    return {
-      BangGroup.general: await generalSync,
-      BangGroup.assistant: await assistantSync,
-      BangGroup.kagi: await kagiSync,
-    };
+    //Run isolated operations
+    final futures = groups.map(
+      (source) => syncBangGroup(source, syncInterval)
+          .then((result) => MapEntry(source, result)),
+    );
+
+    return Map.fromEntries(await Future.wait(futures));
   }
 
   @override
