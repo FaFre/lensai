@@ -7,12 +7,12 @@ part of 'save_settings.dart';
 // **************************************************************************
 
 String _$saveSettingsControllerHash() =>
-    r'f03cbb1a3a04f974560f5b6f0312fcc54ec25c54';
+    r'c56038b35665dea2ab84f8f4e0d4cc3a767f5d6c';
 
 /// See also [SaveSettingsController].
 @ProviderFor(SaveSettingsController)
 final saveSettingsControllerProvider =
-    AutoDisposeAsyncNotifierProvider<SaveSettingsController, void>.internal(
+    AsyncNotifierProvider<SaveSettingsController, void>.internal(
   SaveSettingsController.new,
   name: r'saveSettingsControllerProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -22,6 +22,6 @@ final saveSettingsControllerProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$SaveSettingsController = AutoDisposeAsyncNotifier<void>;
+typedef _$SaveSettingsController = AsyncNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

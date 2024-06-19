@@ -3,7 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'save_settings.g.dart';
 
-@Riverpod()
+@Riverpod(keepAlive: true)
 class SaveSettingsController extends _$SaveSettingsController {
   @override
   FutureOr<void> build() {}
@@ -11,7 +11,7 @@ class SaveSettingsController extends _$SaveSettingsController {
   Future<void> save(UpdateSettingsFunc updateSettings) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
-      () => ref
+      () async => ref
           .read(settingsRepositoryProvider.notifier)
           .updateSettings(updateSettings),
     );
