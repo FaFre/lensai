@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:bang_navigator/core/logger.dart';
 import 'package:bang_navigator/features/bangs/domain/providers.dart';
@@ -9,6 +10,7 @@ import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dar
 import 'package:bang_navigator/features/search_browser/domain/providers.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/web_view/domain/entities/web_view_page.dart';
+import 'package:bang_navigator/features/web_view/domain/providers.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:bang_navigator/features/web_view/presentation/widgets/web_page_dialog.dart';
 import 'package:bang_navigator/features/web_view/utils/download_helper.dart';
@@ -86,12 +88,6 @@ class _WebViewState extends ConsumerState<WebView> {
 
   @override
   Widget build(BuildContext context) {
-    final showEarlyAccessFeatures = ref.watch(
-      settingsRepositoryProvider.select(
-        (value) => value.valueOrNull?.showEarlyAccessFeatures ?? true,
-      ),
-    );
-
     final initialSettings = useMemoized(
       () => InAppWebViewSettings(
         // isInspectable: kDebugMode,
@@ -107,6 +103,36 @@ class _WebViewState extends ConsumerState<WebView> {
         saveFormData: false,
         disabledActionModeMenuItems: ActionModeMenuItem.MENU_ITEM_WEB_SEARCH,
       ),
+    );
+
+    final showEarlyAccessFeatures = ref.watch(
+      settingsRepositoryProvider.select(
+        (value) => value.valueOrNull?.showEarlyAccessFeatures ?? true,
+      ),
+    );
+
+    // We keep listening to changes and cache them in this ref.
+    // This is important, since our WebView will not have the main scope anymore
+    // to react to updates from ref.watch
+    //
+    // With this solution we dont need to read on every interception request
+    // and can just obtain the value from here
+    final blockContentHosts = useRef<Set<String>?>(null);
+    ref.listen(
+      blockContentHostsProvider,
+      (previous, next) {
+        blockContentHosts.value = next.valueOrNull;
+      },
+    );
+
+    ref.listen(
+      settingsRepositoryProvider
+          .select((value) => value.valueOrNull?.enableJavascript),
+      (previous, next) async {
+        await widget.page.value.controller?.setSettings(
+          settings: initialSettings.copy()..javaScriptEnabled = next,
+        );
+      },
     );
 
     final webViewProgress = useValueNotifier(100);
@@ -130,16 +156,6 @@ class _WebViewState extends ConsumerState<WebView> {
         default:
       }
     });
-
-    ref.listen(
-      settingsRepositoryProvider
-          .select((value) => value.valueOrNull?.enableJavascript),
-      (previous, next) async {
-        await widget.page.value.controller?.setSettings(
-          settings: initialSettings.copy()..javaScriptEnabled = next,
-        );
-      },
-    );
 
     return Stack(
       children: [
@@ -217,6 +233,17 @@ class _WebViewState extends ConsumerState<WebView> {
             return ServerTrustAuthResponse(
               action: ServerTrustAuthResponseAction.PROCEED,
             );
+          },
+          shouldInterceptRequest: (controller, request) async {
+            if (blockContentHosts.value?.contains(request.url.host) == true) {
+              return WebResourceResponse(
+                contentType: "text/plain",
+                data: utf8.encode("Blocked"),
+                statusCode: 403,
+                reasonPhrase: "Forbidden",
+              );
+            }
+            return null;
           },
           onProgressChanged: (controller, progress) {
             webViewProgress.value = progress;
