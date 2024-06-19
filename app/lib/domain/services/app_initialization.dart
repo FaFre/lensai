@@ -1,6 +1,10 @@
 import 'package:bang_navigator/features/about/data/repositories/package_info_repository.dart';
+import 'package:bang_navigator/features/bangs/data/models/bang.dart';
 import 'package:bang_navigator/features/bangs/domain/repositories/sync.dart';
+import 'package:bang_navigator/features/content_block/data/models/host.dart';
+import 'package:bang_navigator/features/content_block/domain/repositories/sync.dart';
 import 'package:bang_navigator/features/search_browser/domain/services/session.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:exceptions/exceptions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -10,58 +14,95 @@ part 'app_initialization.g.dart';
 @Riverpod(keepAlive: true)
 class AppInitializationService extends _$AppInitializationService {
   /// Will de facto restart the app
-  Future<void> reinitialize() async {
+  Future<void> reinitialize() {
     ref.invalidateSelf();
     return initialize();
   }
 
+  Future<void> _initPackageInfo() {
+    //Ensure Package info is loaded
+    state = Result.success(
+      (
+        initialized: false,
+        stage: 'Loading Package Info...',
+        errors: List.empty(),
+      ),
+    );
+
+    return ref.read(packageInfoProvider.future);
+  }
+
+  Future<Map<BangGroup, Result<void>>> _initBangs() {
+    state = Result.success(
+      (
+        initialized: false,
+        stage: 'Synchronizing Bangs...',
+        errors: List.empty(),
+      ),
+    );
+
+    return ref
+        .read(bangSyncRepositoryProvider.notifier)
+        .syncBangGroups(syncInterval: const Duration(days: 7));
+  }
+
+  Future<Map<HostSource, Result<void>>> _initHosts(Settings settings) async {
+    if (settings.enableContentBlocking) {
+      state = Result.success(
+        (
+          initialized: false,
+          stage: 'Synchronizing Ad & Content Blocking Lists...',
+          errors: List.empty(),
+        ),
+      );
+
+      return ref.read(hostSyncRepositoryProvider.notifier).syncHostSources(
+            sources: settings.enableHostList,
+            syncInterval: const Duration(days: 7),
+          );
+    }
+
+    return {};
+  }
+
+  Future<void> _initIncognito(Settings settings) async {
+    state = Result.success(
+      (
+        initialized: false,
+        stage: 'Enforcing Privacy...',
+        errors: List.empty(),
+      ),
+    );
+
+    if (settings.incognitoMode) {
+      await ref.read(sessionServiceProvider.notifier).clearAllData();
+    }
+
+    if (settings.kagiSession case final String session) {
+      if (session.isNotEmpty) {
+        await ref.read(sessionServiceProvider.notifier).setKagiSession(session);
+      }
+    }
+  }
+
   Future<void> initialize() async {
     state = await Result.fromAsync(() async {
+      final settings = await ref.read(settingsRepositoryProvider.future);
       final errors = <ErrorMessage>[];
 
-      //Ensure Package info is loaded
-      state = Result.success(
-        (
-          initialized: false,
-          stage: 'Loading Package Info...',
-          errors: List.empty()
-        ),
-      );
-      await ref.read(packageInfoProvider.future);
+      await _initPackageInfo();
 
-      state = Result.success(
-        (
-          initialized: false,
-          stage: 'Synchronizing Bangs...',
-          errors: List.empty()
-        ),
-      );
-      final syncResults = await ref
-          .read(bangSyncRepositoryProvider.notifier)
-          .syncAllBangGroups(syncInterval: const Duration(days: 7));
-      for (final MapEntry(value: result) in syncResults.entries) {
+      final bangSyncResults = await _initBangs();
+      for (final MapEntry(value: result) in bangSyncResults.entries) {
         result.onFailure(errors.add);
       }
 
-      state = Result.success(
-        (
-          initialized: false,
-          stage: 'Enforcing Privacy...',
-          errors: List.empty()
-        ),
-      );
-      final settings = await ref.read(settingsRepositoryProvider.future);
-      if (settings.incognitoMode) {
-        await ref.read(sessionServiceProvider.notifier).clearAllData();
+      final hostSyncResults = await _initHosts(settings);
+      for (final MapEntry(value: result) in hostSyncResults.entries) {
+        result.onFailure(errors.add);
       }
 
-      if (settings.kagiSession case final String session) {
-        if (session.isNotEmpty) {
-          await ref
-              .read(sessionServiceProvider.notifier)
-              .setKagiSession(session);
-        }
-      }
+      await _initIncognito(settings);
 
       return (initialized: true, stage: null, errors: errors);
     });
