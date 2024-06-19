@@ -305,7 +305,7 @@ class KagiScreen extends HookConsumerWidget {
                     lastBackButtonPress.value = null;
 
                     if (activeWebView?.key != null && webViews.length > 1) {
-                      await ref
+                      ref
                           .read(webViewRepositoryProvider.notifier)
                           .closeTab(activeWebView!.key!);
                       return true;

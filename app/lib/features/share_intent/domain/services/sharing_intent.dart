@@ -53,7 +53,7 @@ Raw<Stream<ReceivedParameter>> sharingIntentStream(SharingIntentStreamRef ref) {
       // ignore: discarded_futures
       .getInitialSharing()
       // ignore: discarded_futures
-      .then((event) async {
+      .then((event) {
     FlutterSharingIntent.instance.reset();
     return event;
   }).asStream();

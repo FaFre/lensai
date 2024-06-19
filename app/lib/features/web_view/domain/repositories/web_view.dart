@@ -35,11 +35,11 @@ class WebViewRepository extends _$WebViewRepository {
     state = {...state, webView.page.value.key: webView};
   }
 
-  Future<void> closeTab(Key key) async {
+  void closeTab(Key key) {
     state = Map.of(state)..remove(key);
   }
 
-  Future<void> closeAllTabs() async {
+  void closeAllTabs() {
     state = {};
   }
 }

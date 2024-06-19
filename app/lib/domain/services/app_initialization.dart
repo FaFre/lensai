@@ -46,7 +46,7 @@ class AppInitializationService extends _$AppInitializationService {
         .syncBangGroups(syncInterval: const Duration(days: 7));
   }
 
-  Future<Map<HostSource, Result<void>>> _initHosts(Settings settings) async {
+  FutureOr<Map<HostSource, Result<void>>> _initHosts(Settings settings) {
     if (settings.enableContentBlocking) {
       state = Result.success(
         (

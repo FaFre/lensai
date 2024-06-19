@@ -11,7 +11,7 @@ class SaveSettingsController extends _$SaveSettingsController {
   Future<void> save(UpdateSettingsFunc updateSettings) async {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
-      () async => ref
+      () => ref
           .read(settingsRepositoryProvider.notifier)
           .updateSettings(updateSettings),
     );

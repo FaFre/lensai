@@ -60,8 +60,8 @@ class WebViewTab extends HookConsumerWidget {
                   IconButton(
                     visualDensity:
                         const VisualDensity(horizontal: -4.0, vertical: -4.0),
-                    onPressed: () async {
-                      await ref
+                    onPressed: () {
+                      ref
                           .read(webViewRepositoryProvider.notifier)
                           .closeTab(page.key);
                     },

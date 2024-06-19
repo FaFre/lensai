@@ -29,10 +29,8 @@ class ViewTabsSheet extends HookConsumerWidget {
               label: const Text('New Tab'),
             ),
             TextButton.icon(
-              onPressed: () async {
-                await ref
-                    .read(webViewRepositoryProvider.notifier)
-                    .closeAllTabs();
+              onPressed: () {
+                ref.read(webViewRepositoryProvider.notifier).closeAllTabs();
               },
               icon: const Icon(Icons.delete),
               label: const Text('Close All'),
