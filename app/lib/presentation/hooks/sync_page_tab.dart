@@ -3,8 +3,9 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 
 void useSyncPageWithTab(
   TabController tabController,
-  PageController pageController,
-) {
+  PageController pageController, {
+  void Function(int index)? onIndexChanged,
+}) {
   useEffect(
     () {
       Future<void> syncPage() async {
@@ -13,11 +14,15 @@ void useSyncPageWithTab(
           curve: Curves.linear,
           duration: const Duration(milliseconds: 300),
         );
+        onIndexChanged?.call(tabController.index);
       }
 
       void syncTab() {
         if (!tabController.indexIsChanging) {
-          tabController.animateTo(pageController.page!.round());
+          final index = pageController.page!.round();
+
+          tabController.animateTo(index);
+          onIndexChanged?.call(index);
         }
       }
 

@@ -345,5 +345,56 @@ class _SelectedBangTriggerProviderElement
   @override
   String? get domain => (origin as SelectedBangTriggerProvider).domain;
 }
+
+String _$lastUsedAssistantModeHash() =>
+    r'1255a2754a3ea5ea058d110fd9743897fe103a69';
+
+/// See also [LastUsedAssistantMode].
+@ProviderFor(LastUsedAssistantMode)
+final lastUsedAssistantModeProvider =
+    NotifierProvider<LastUsedAssistantMode, AssistantMode>.internal(
+  LastUsedAssistantMode.new,
+  name: r'lastUsedAssistantModeProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$lastUsedAssistantModeHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$LastUsedAssistantMode = Notifier<AssistantMode>;
+String _$activeResearchVariantHash() =>
+    r'8c65a3f5ead6cc4f9e2af85b607b7a49b0764ee3';
+
+/// See also [ActiveResearchVariant].
+@ProviderFor(ActiveResearchVariant)
+final activeResearchVariantProvider =
+    NotifierProvider<ActiveResearchVariant, ResearchVariant>.internal(
+  ActiveResearchVariant.new,
+  name: r'activeResearchVariantProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$activeResearchVariantHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$ActiveResearchVariant = Notifier<ResearchVariant>;
+String _$activeChatModelHash() => r'675f406af8b4aa92699d59e37b5805a81d03a799';
+
+/// See also [ActiveChatModel].
+@ProviderFor(ActiveChatModel)
+final activeChatModelProvider =
+    NotifierProvider<ActiveChatModel, ChatModel>.internal(
+  ActiveChatModel.new,
+  name: r'activeChatModelProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$activeChatModelHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$ActiveChatModel = Notifier<ChatModel>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

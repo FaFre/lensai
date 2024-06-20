@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
 import 'package:bang_navigator/features/bangs/domain/repositories/data.dart';
+import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
 import 'package:bang_navigator/features/search_browser/domain/services/create_tab.dart';
 import 'package:flutter/widgets.dart';
@@ -90,4 +91,40 @@ Stream<BangData?> selectedBangData(SelectedBangDataRef ref, {String? domain}) {
   final selectedBangTrigger =
       ref.watch(selectedBangTriggerProvider(domain: domain));
   return repository.watchBang(selectedBangTrigger);
+}
+
+@Riverpod(keepAlive: true)
+class LastUsedAssistantMode extends _$LastUsedAssistantMode {
+  void update(AssistantMode mode) {
+    state = mode;
+  }
+
+  @override
+  AssistantMode build() {
+    return AssistantMode.research;
+  }
+}
+
+@Riverpod(keepAlive: true)
+class ActiveResearchVariant extends _$ActiveResearchVariant {
+  void update(ResearchVariant mode) {
+    state = mode;
+  }
+
+  @override
+  ResearchVariant build() {
+    return ResearchVariant.expert;
+  }
+}
+
+@Riverpod(keepAlive: true)
+class ActiveChatModel extends _$ActiveChatModel {
+  void update(ChatModel model) {
+    state = model;
+  }
+
+  @override
+  ChatModel build() {
+    return ChatModel.gpt4o;
+  }
 }

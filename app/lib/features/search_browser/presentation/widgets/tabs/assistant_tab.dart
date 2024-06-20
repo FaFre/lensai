@@ -1,4 +1,5 @@
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
+import 'package:bang_navigator/features/search_browser/domain/providers.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/speech_to_text_button.dart';
 import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
@@ -29,20 +30,30 @@ class AssistantTab extends HookConsumerWidget {
           .select((value) => value.valueOrNull?.incognitoMode ?? false),
     );
 
+    final researchVariant = ref.watch(activeResearchVariantProvider);
+    final chatModel = ref.watch(activeChatModelProvider);
+
     useAutomaticKeepAlive();
 
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final textController =
         useTextEditingController(text: sharedContent?.toString());
 
-    final tabController =
-        useTabController(initialLength: AssistantMode.values.length);
+    final tabController = useTabController(
+      initialLength: AssistantMode.values.length,
+      initialIndex: ref.read(lastUsedAssistantModeProvider).index,
+    );
     final pageController = usePageController(initialPage: tabController.index);
 
-    useSyncPageWithTab(tabController, pageController);
-
-    final researchVariant = useState(ResearchVariant.expert);
-    final chatModel = useState(ChatModel.gpt4o);
+    useSyncPageWithTab(
+      tabController,
+      pageController,
+      onIndexChanged: (index) {
+        ref
+            .read(lastUsedAssistantModeProvider.notifier)
+            .update(AssistantMode.values[index]);
+      },
+    );
 
     return Form(
       key: formKey,
@@ -92,9 +103,11 @@ class AssistantTab extends HookConsumerWidget {
                         label: Text('Fast'),
                       ),
                     ],
-                    selected: {researchVariant.value},
+                    selected: {researchVariant},
                     onSelectionChanged: (value) {
-                      researchVariant.value = value.first;
+                      ref
+                          .read(activeResearchVariantProvider.notifier)
+                          .update(value.first);
                     },
                   ),
                 ],
@@ -107,7 +120,7 @@ class AssistantTab extends HookConsumerWidget {
                     height: 12,
                   ),
                   DropdownMenu<ChatModel>(
-                    initialSelection: chatModel.value,
+                    initialSelection: chatModel,
                     expandedInsets: EdgeInsets.zero,
                     label: const Text('Model'),
                     inputDecorationTheme: const InputDecorationTheme(),
@@ -120,7 +133,7 @@ class AssistantTab extends HookConsumerWidget {
                         )
                         .toList(),
                     onSelected: (value) {
-                      chatModel.value = value!;
+                      ref.read(activeChatModelProvider.notifier).update(value!);
                     },
                   ),
                 ],
@@ -165,8 +178,8 @@ class AssistantTab extends HookConsumerWidget {
                     uri_builder.assistantUri(
                       prompt: textController.text,
                       assistantMode: AssistantMode.values[tabController.index],
-                      researchVariant: researchVariant.value,
-                      chatModel: chatModel.value,
+                      researchVariant: researchVariant,
+                      chatModel: chatModel,
                     ),
                   );
                 }
