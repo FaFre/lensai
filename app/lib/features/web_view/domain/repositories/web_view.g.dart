@@ -23,7 +23,7 @@ final webViewTabControllerProvider =
 );
 
 typedef _$WebViewTabController = Notifier<WebView?>;
-String _$webViewRepositoryHash() => r'96c14f599df30f6828ecaae584a509225b10e2f1';
+String _$webViewRepositoryHash() => r'6732fd1b8a465073b599f64d6710a61cd605c779';
 
 /// See also [WebViewRepository].
 @ProviderFor(WebViewRepository)

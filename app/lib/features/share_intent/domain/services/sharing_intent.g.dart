@@ -7,7 +7,7 @@ part of 'sharing_intent.dart';
 // **************************************************************************
 
 String _$sharingIntentStreamHash() =>
-    r'4b285bac1537aa03007a6e932ddb50f24b2db873';
+    r'e396c15da84d6e726f9e77996ef9d2422f6269e1';
 
 /// See also [sharingIntentStream].
 @ProviderFor(sharingIntentStream)
