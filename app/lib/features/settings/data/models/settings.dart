@@ -25,7 +25,7 @@ class Settings with FastEquatable {
   });
 
   Settings.withDefaults({
-    required this.kagiSession,
+    this.kagiSession,
     bool? showEarlyAccessFeatures,
     bool? incognitoMode,
     bool? enableJavascript,

@@ -3,6 +3,7 @@ import 'package:bang_navigator/features/search_browser/domain/entities/modes.dar
 import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
 import 'package:bang_navigator/features/search_browser/domain/services/create_tab.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/error_container.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -22,7 +23,8 @@ class LandingAction extends HookConsumerWidget {
 
     final showEarlyAccessFeatures = ref.watch(
       settingsRepositoryProvider.select(
-        (value) => value.valueOrNull?.showEarlyAccessFeatures ?? true,
+        (value) => (value.valueOrNull ?? Settings.withDefaults())
+            .showEarlyAccessFeatures,
       ),
     );
 

@@ -4,6 +4,7 @@ import 'package:bang_navigator/core/extension/date_time.dart';
 import 'package:bang_navigator/core/routing/routes.dart';
 import 'package:bang_navigator/features/chat_archive/domain/entities/chat_entity.dart';
 import 'package:bang_navigator/features/chat_archive/domain/repositories/search.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/presentation/hooks/listenable_callback.dart';
 import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
@@ -20,8 +21,9 @@ class ChatArchiveSearchScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final resultsAsync = ref.watch(chatArchiveSearchRepositoryProvider);
     final incognitoEnabled = ref.watch(
-      settingsRepositoryProvider
-          .select((value) => value.valueOrNull?.incognitoMode ?? false),
+      settingsRepositoryProvider.select(
+        (value) => (value.valueOrNull ?? Settings.withDefaults()).incognitoMode,
+      ),
     );
 
     final textEditingController = useTextEditingController();

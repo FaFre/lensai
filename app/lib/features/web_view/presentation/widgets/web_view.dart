@@ -8,6 +8,7 @@ import 'package:bang_navigator/features/chat_archive/domain/repositories/archive
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
 import 'package:bang_navigator/features/search_browser/domain/providers.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/web_view/domain/entities/web_view_page.dart';
 import 'package:bang_navigator/features/web_view/domain/providers.dart';
@@ -95,11 +96,9 @@ class _WebViewState extends ConsumerState<WebView> {
         allowsLinkPreview: false,
         disableLongPressContextMenuOnLinks: true,
         useShouldOverrideUrlLoading: true,
-        javaScriptEnabled: ref
-                .read(settingsRepositoryProvider)
-                .valueOrNull
-                ?.enableJavascript ??
-            true,
+        javaScriptEnabled: (ref.read(settingsRepositoryProvider).valueOrNull ??
+                Settings.withDefaults())
+            .enableJavascript,
         saveFormData: false,
         disabledActionModeMenuItems: ActionModeMenuItem.MENU_ITEM_WEB_SEARCH,
       ),
@@ -107,7 +106,8 @@ class _WebViewState extends ConsumerState<WebView> {
 
     final showEarlyAccessFeatures = ref.watch(
       settingsRepositoryProvider.select(
-        (value) => value.valueOrNull?.showEarlyAccessFeatures ?? true,
+        (value) => (value.valueOrNull ?? Settings.withDefaults())
+            .showEarlyAccessFeatures,
       ),
     );
 
@@ -126,8 +126,10 @@ class _WebViewState extends ConsumerState<WebView> {
     );
 
     ref.listen(
-      settingsRepositoryProvider
-          .select((value) => value.valueOrNull?.enableJavascript),
+      settingsRepositoryProvider.select(
+        (value) =>
+            (value.valueOrNull ?? Settings.withDefaults()).enableJavascript,
+      ),
       (previous, next) async {
         await widget.page.value.controller?.setSettings(
           settings: initialSettings.copy()..javaScriptEnabled = next,
@@ -297,11 +299,12 @@ class _WebViewState extends ConsumerState<WebView> {
           shouldOverrideUrlLoading: (controller, navigationAction) async {
             final url = navigationAction.request.url;
             if (url != null) {
-              final launchExternal = ref
-                      .read(settingsRepositoryProvider)
-                      .valueOrNull
-                      ?.launchUrlExternal ??
-                  false;
+              final launchExternal = ref.read(
+                settingsRepositoryProvider.select(
+                  (value) => (value.valueOrNull ?? Settings.withDefaults())
+                      .launchUrlExternal,
+                ),
+              );
 
               final unhandledScheme =
                   !_webViewSupportedSchemes.contains(url.scheme);

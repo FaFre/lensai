@@ -1,6 +1,7 @@
 import 'package:bang_navigator/core/routing/routes.dart';
 import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
 import 'package:bang_navigator/features/bangs/presentation/widgets/bang_icon.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
@@ -70,11 +71,13 @@ class BangDetails extends HookConsumerWidget {
                     onPressed: () async {
                       final url = Uri.parse(bangData.getUrl('').origin);
 
-                      final launchExternal = ref
-                              .read(settingsRepositoryProvider)
-                              .valueOrNull
-                              ?.launchUrlExternal ??
-                          false;
+                      final launchExternal = ref.read(
+                        settingsRepositoryProvider.select(
+                          (value) =>
+                              (value.valueOrNull ?? Settings.withDefaults())
+                                  .launchUrlExternal,
+                        ),
+                      );
 
                       if (launchExternal) {
                         await ui_helper.launchUrlFeedback(context, url);

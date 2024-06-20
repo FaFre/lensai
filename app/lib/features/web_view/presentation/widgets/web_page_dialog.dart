@@ -5,6 +5,7 @@ import 'package:bang_navigator/features/bangs/presentation/widgets/site_search.d
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
     as uri_builder;
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
@@ -61,8 +62,9 @@ class WebPageDialog extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final incognitoEnabled = ref.watch(
-      settingsRepositoryProvider
-          .select((value) => value.valueOrNull?.incognitoMode ?? false),
+      settingsRepositoryProvider.select(
+        (value) => (value.valueOrNull ?? Settings.withDefaults()).incognitoMode,
+      ),
     );
 
     final availableBangsAsync = ref.watch(

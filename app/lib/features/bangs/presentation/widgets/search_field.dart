@@ -3,6 +3,7 @@ import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
 import 'package:bang_navigator/features/bangs/presentation/widgets/bang_icon.dart';
 import 'package:bang_navigator/features/kagi/domain/repositories/autosuggest.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/speech_to_text_button.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/presentation/widgets/autocomplete.dart';
 import 'package:flutter/material.dart';
@@ -30,8 +31,9 @@ class SearchField extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final incognitoEnabled = ref.watch(
-      settingsRepositoryProvider
-          .select((value) => value.valueOrNull?.incognitoMode ?? false),
+      settingsRepositoryProvider.select(
+        (value) => (value.valueOrNull ?? Settings.withDefaults()).incognitoMode,
+      ),
     );
 
     final optionsStream = ref.watch(autosuggestRepositoryProvider);

@@ -6,6 +6,7 @@ import 'package:bang_navigator/features/bangs/presentation/widgets/bang_details.
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
 import 'package:bang_navigator/features/search_browser/domain/providers.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/presentation/hooks/listenable_callback.dart';
 import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
@@ -21,8 +22,9 @@ class BangSearchScreen extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final resultsAsync = ref.watch(bangSearchProvider);
     final incognitoEnabled = ref.watch(
-      settingsRepositoryProvider
-          .select((value) => value.valueOrNull?.incognitoMode ?? false),
+      settingsRepositoryProvider.select(
+        (value) => (value.valueOrNull ?? Settings.withDefaults()).incognitoMode,
+      ),
     );
 
     final textEditingController = useTextEditingController();

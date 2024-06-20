@@ -10,6 +10,7 @@ import 'package:bang_navigator/features/search_browser/presentation/widgets/land
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/view_tabs_sheet.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/tabs_action_button.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/web_view/domain/repositories/web_view.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
@@ -41,7 +42,8 @@ class KagiScreen extends HookConsumerWidget {
 
     final showEarlyAccessFeatures = ref.watch(
       settingsRepositoryProvider.select(
-        (value) => value.valueOrNull?.showEarlyAccessFeatures ?? true,
+        (value) => (value.valueOrNull ?? Settings.withDefaults())
+            .showEarlyAccessFeatures,
       ),
     );
 

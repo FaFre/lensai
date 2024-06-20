@@ -4,6 +4,7 @@ import 'package:bang_navigator/features/search_browser/presentation/widgets/shee
 import 'package:bang_navigator/features/search_browser/presentation/widgets/speech_to_text_button.dart';
 import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
     as uri_builder;
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
 import 'package:bang_navigator/presentation/hooks/sync_page_tab.dart';
@@ -26,8 +27,9 @@ class AssistantTab extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final incognitoEnabled = ref.watch(
-      settingsRepositoryProvider
-          .select((value) => value.valueOrNull?.incognitoMode ?? false),
+      settingsRepositoryProvider.select(
+        (value) => (value.valueOrNull ?? Settings.withDefaults()).incognitoMode,
+      ),
     );
 
     final researchVariant = ref.watch(activeResearchVariantProvider);

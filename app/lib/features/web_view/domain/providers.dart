@@ -1,4 +1,5 @@
 import 'package:bang_navigator/features/content_block/domain/repositories/host.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -8,12 +9,15 @@ part 'providers.g.dart';
 Stream<Set<String>?> blockContentHosts(BlockContentHostsRef ref) {
   final hostRepository = ref.watch(hostRepositoryProvider.notifier);
   final enableContentBlocking = ref.watch(
-    settingsRepositoryProvider
-        .select((value) => value.valueOrNull?.enableContentBlocking ?? false),
+    settingsRepositoryProvider.select(
+      (value) =>
+          (value.valueOrNull ?? Settings.withDefaults()).enableContentBlocking,
+    ),
   );
   final enableHostList = ref.watch(
-    settingsRepositoryProvider
-        .select((value) => value.valueOrNull?.enableHostList ?? {}),
+    settingsRepositoryProvider.select(
+      (value) => (value.valueOrNull ?? Settings.withDefaults()).enableHostList,
+    ),
   );
 
   if (!enableContentBlocking || enableHostList.isEmpty) {

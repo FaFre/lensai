@@ -3,6 +3,7 @@ import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dar
 import 'package:bang_navigator/features/search_browser/presentation/widgets/tabs/assistant_tab.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/tabs/search_tab.dart';
 import 'package:bang_navigator/features/search_browser/presentation/widgets/tabs/summarize_tab.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
 import 'package:bang_navigator/presentation/hooks/sync_page_tab.dart';
@@ -27,7 +28,8 @@ class SharedContentSheet extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final showEarlyAccessFeatures = ref.watch(
       settingsRepositoryProvider.select(
-        (value) => value.valueOrNull?.showEarlyAccessFeatures ?? true,
+        (value) => (value.valueOrNull ?? Settings.withDefaults())
+            .showEarlyAccessFeatures,
       ),
     );
 

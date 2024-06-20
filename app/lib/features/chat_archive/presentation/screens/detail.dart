@@ -3,6 +3,7 @@ import 'package:bang_navigator/features/chat_archive/data/services/file.dart';
 import 'package:bang_navigator/features/chat_archive/domain/entities/chat_entity.dart';
 import 'package:bang_navigator/features/chat_archive/domain/repositories/archive.dart';
 import 'package:bang_navigator/features/chat_archive/utils/markdown_to_text.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
@@ -102,11 +103,12 @@ class ChatArchiveDetailScreen extends HookConsumerWidget {
             onTapLink: (text, href, title) async {
               if (href != null) {
                 if (Uri.parse(href) case final Uri url) {
-                  final launchExternal = ref
-                          .read(settingsRepositoryProvider)
-                          .valueOrNull
-                          ?.launchUrlExternal ??
-                      false;
+                  final launchExternal = ref.read(
+                    settingsRepositoryProvider.select(
+                      (value) => (value.valueOrNull ?? Settings.withDefaults())
+                          .launchUrlExternal,
+                    ),
+                  );
 
                   if (launchExternal) {
                     await ui_helper.launchUrlFeedback(context, Uri.parse(href));
