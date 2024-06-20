@@ -249,7 +249,7 @@ class SettingsScreen extends HookConsumerWidget {
               onPressed: () async {
                 await ref
                     .read(bangDataRepositoryProvider.notifier)
-                    .clearFrequency();
+                    .resetFrequencies();
               },
               icon: const Icon(Icons.delete),
               label: const Text('Clear'),

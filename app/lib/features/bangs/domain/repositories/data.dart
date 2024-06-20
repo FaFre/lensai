@@ -97,7 +97,11 @@ class BangDataRepository extends _$BangDataRepository {
     return _db.bangIcon.deleteAll();
   }
 
-  Future<int> clearFrequency() {
+  Future<int> resetFrequencies() {
     return _db.bangFrequency.deleteAll();
+  }
+
+  Future<int> resetFrequency(String trigger) {
+    return _db.bangFrequency.deleteWhere((t) => t.trigger.equals(trigger));
   }
 }

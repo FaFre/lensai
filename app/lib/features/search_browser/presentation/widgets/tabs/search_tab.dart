@@ -74,7 +74,7 @@ class SearchTab extends HookConsumerWidget {
                                   .read(selectedBangTriggerProvider().notifier)
                                   .setTrigger(trigger);
                             },
-                            onDeleted: (trigger) {
+                            onDeleted: (trigger) async {
                               if (ref.read(selectedBangTriggerProvider()) ==
                                   trigger) {
                                 ref
@@ -82,6 +82,36 @@ class SearchTab extends HookConsumerWidget {
                                       selectedBangTriggerProvider().notifier,
                                     )
                                     .clearTrigger();
+                              } else {
+                                final dialogResult = await showDialog<bool>(
+                                  context: context,
+                                  builder: (context) => AlertDialog(
+                                    title: Text(
+                                      'Reset usage frequency of !$trigger?',
+                                    ),
+                                    content: const Text(
+                                      'This will remove the Bang from quick select.',
+                                    ),
+                                    actions: <Widget>[
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: const Text('Cancel'),
+                                      ),
+                                      TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, true),
+                                        child: const Text('Reset'),
+                                      ),
+                                    ],
+                                  ),
+                                );
+
+                                if (dialogResult == true) {
+                                  await ref
+                                      .read(bangDataRepositoryProvider.notifier)
+                                      .resetFrequency(trigger);
+                                }
                               }
                             },
                           ),
