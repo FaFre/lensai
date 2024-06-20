@@ -1,3 +1,1 @@
-# bang_navigator
-
-A new Flutter project.
+../README.md
