@@ -1,6 +1,7 @@
 import 'package:bang_navigator/features/content_block/data/models/host.dart';
 import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:collection/collection.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -8,6 +9,22 @@ import 'package:shared_preferences/shared_preferences.dart';
 part 'settings_repository.g.dart';
 
 typedef UpdateSettingsFunc = Settings Function(Settings currentSettings);
+
+Set<HostSource>? _parseHostSources(List<String>? input) => input
+    ?.map(
+      (list) =>
+          HostSource.values.firstWhereOrNull((source) => source.name == list),
+    )
+    .whereNotNull()
+    .toSet();
+
+ThemeMode? _parseThemeMode(int? index) {
+  if (index != null && index < ThemeMode.values.length) {
+    return ThemeMode.values[index];
+  }
+
+  return null;
+}
 
 @Riverpod(keepAlive: true)
 class SettingsRepository extends _$SettingsRepository {
@@ -18,6 +35,7 @@ class SettingsRepository extends _$SettingsRepository {
   static const _launchExternalStorageKey = 'b4ng_settings_launch_external';
   static const _contentBlockingStorageKey = 'b4ng_settings_content_blocking';
   static const _enableHostListStorageKey = 'b4ng_settings_host_lists';
+  static const _themeModeStorageKey = 'b4ng_settings_theme_mode';
 
   final FlutterSecureStorage _flutterSecureStorage;
   final Future<SharedPreferences> _sharedPreferences;
@@ -88,6 +106,13 @@ class SettingsRepository extends _$SettingsRepository {
         );
       }
 
+      if (newSettings.themeMode != oldSettings.themeMode) {
+        await sharedPreferences.setInt(
+          _themeModeStorageKey,
+          newSettings.themeMode.index,
+        );
+      }
+
       ref.invalidateSelf();
     }
   }
@@ -105,14 +130,11 @@ class SettingsRepository extends _$SettingsRepository {
       launchUrlExternal: sharedPreferences.getBool(_launchExternalStorageKey),
       enableContentBlocking:
           sharedPreferences.getBool(_contentBlockingStorageKey),
-      enableHostList: sharedPreferences
-          .getStringList(_enableHostListStorageKey)
-          ?.map(
-            (list) => HostSource.values
-                .firstWhereOrNull((source) => source.name == list),
-          )
-          .whereNotNull()
-          .toSet(),
+      enableHostList: _parseHostSources(
+        sharedPreferences.getStringList(_enableHostListStorageKey),
+      ),
+      themeMode:
+          _parseThemeMode(sharedPreferences.getInt(_themeModeStorageKey)),
     );
   }
 }

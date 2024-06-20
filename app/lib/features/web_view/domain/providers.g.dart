@@ -6,7 +6,7 @@ part of 'providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$blockContentHostsHash() => r'5a6b90a2884342ddb068f2b66d18ed83e42e5108';
+String _$blockContentHostsHash() => r'41855093d8376152244ae37f98e66eea7c74aa32';
 
 /// See also [blockContentHosts].
 @ProviderFor(blockContentHosts)

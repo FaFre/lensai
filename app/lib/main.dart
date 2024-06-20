@@ -1,5 +1,7 @@
 import 'package:bang_navigator/core/error_observer.dart';
 import 'package:bang_navigator/domain/services/app_initialization.dart';
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
+import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/presentation/hooks/on_initialization.dart';
 import 'package:bang_navigator/presentation/widgets/main_app.dart';
 import 'package:dynamic_color/dynamic_color.dart';
@@ -21,6 +23,13 @@ void main() async {
       observers: const [ErrorObserver()],
       child: HookConsumer(
         builder: (context, ref, child) {
+          final themeMode = ref.watch(
+            settingsRepositoryProvider.select(
+              (value) =>
+                  (value.valueOrNull ?? Settings.withDefaults()).themeMode,
+            ),
+          );
+
           useOnInitialization(
             () async {
               await ref
@@ -40,7 +49,7 @@ void main() async {
                   useMaterial3: true,
                   colorScheme: darkDynamic?.harmonized(),
                 ),
-                themeMode: ThemeMode.dark,
+                themeMode: themeMode,
               );
             },
           );

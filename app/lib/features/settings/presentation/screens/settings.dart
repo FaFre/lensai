@@ -46,8 +46,7 @@ class SettingsScreen extends HookConsumerWidget {
 
     final settings = ref.watch(
       settingsRepositoryProvider.select(
-        (value) =>
-            value.valueOrNull ?? Settings.withDefaults(kagiSession: null),
+        (value) => value.valueOrNull ?? Settings.withDefaults(),
       ),
     );
 
@@ -146,6 +145,49 @@ class SettingsScreen extends HookConsumerWidget {
             height: 16,
           ),
           _buildSection(theme, 'General'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Theme',
+                  style: theme.textTheme.bodyLarge,
+                ),
+                Center(
+                  child: SegmentedButton<ThemeMode>(
+                    segments: const [
+                      ButtonSegment(
+                        value: ThemeMode.system,
+                        icon: Icon(Icons.brightness_auto),
+                        label: Text('System'),
+                      ),
+                      ButtonSegment(
+                        value: ThemeMode.light,
+                        icon: Icon(Icons.light_mode),
+                        label: Text('Light'),
+                      ),
+                      ButtonSegment(
+                        value: ThemeMode.dark,
+                        icon: Icon(Icons.dark_mode),
+                        label: Text('Dark'),
+                      ),
+                    ],
+                    selected: {settings.themeMode},
+                    onSelectionChanged: (value) async {
+                      await ref
+                          .read(saveSettingsControllerProvider.notifier)
+                          .save(
+                            (currentSettings) =>
+                                currentSettings.copyWith.themeMode(value.first),
+                          );
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
           SwitchListTile.adaptive(
             title: const Text('Incognito Mode'),
             subtitle: const Text(
@@ -269,7 +311,9 @@ class SettingsScreen extends HookConsumerWidget {
                 content: Padding(
                   padding: const EdgeInsets.only(top: 8.0),
                   child: DefaultTextStyle(
-                    style: GoogleFonts.robotoMono(),
+                    style: GoogleFonts.robotoMono(
+                      textStyle: DefaultTextStyle.of(context).style,
+                    ),
                     child: Table(
                       columnWidths: const {0: FixedColumnWidth(100)},
                       children: [

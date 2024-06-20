@@ -21,6 +21,8 @@ abstract class _$SettingsCWProxy {
 
   Settings enableHostList(Set<HostSource> enableHostList);
 
+  Settings themeMode(ThemeMode themeMode);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Settings(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -35,6 +37,7 @@ abstract class _$SettingsCWProxy {
     bool? launchUrlExternal,
     bool? enableContentBlocking,
     Set<HostSource>? enableHostList,
+    ThemeMode? themeMode,
   });
 }
 
@@ -72,6 +75,9 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
       this(enableHostList: enableHostList);
 
   @override
+  Settings themeMode(ThemeMode themeMode) => this(themeMode: themeMode);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Settings(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -87,6 +93,7 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
     Object? launchUrlExternal = const $CopyWithPlaceholder(),
     Object? enableContentBlocking = const $CopyWithPlaceholder(),
     Object? enableHostList = const $CopyWithPlaceholder(),
+    Object? themeMode = const $CopyWithPlaceholder(),
   }) {
     return Settings(
       kagiSession: kagiSession == const $CopyWithPlaceholder()
@@ -125,6 +132,10 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
           ? _value.enableHostList
           // ignore: cast_nullable_to_non_nullable
           : enableHostList as Set<HostSource>,
+      themeMode: themeMode == const $CopyWithPlaceholder() || themeMode == null
+          ? _value.themeMode
+          // ignore: cast_nullable_to_non_nullable
+          : themeMode as ThemeMode,
     );
   }
 }

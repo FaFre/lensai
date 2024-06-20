@@ -23,7 +23,10 @@ class TabsActionButton extends HookConsumerWidget {
         ),
         child: Container(
           decoration: BoxDecoration(
-            border: Border.all(width: 2.0, color: Colors.white),
+            border: Border.all(
+              width: 2.0,
+              color: DefaultTextStyle.of(context).style.color!,
+            ),
             borderRadius: BorderRadius.circular(5.0),
           ),
           constraints: const BoxConstraints(minWidth: 25.0),
@@ -31,7 +34,6 @@ class TabsActionButton extends HookConsumerWidget {
             child: Text(
               tabCount.toString(),
               style: const TextStyle(
-                color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 14.0,
               ),

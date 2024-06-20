@@ -11,7 +11,9 @@ class SyncDetailsTable extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTextStyle(
-      style: GoogleFonts.robotoMono(),
+      style: GoogleFonts.robotoMono(
+        textStyle: DefaultTextStyle.of(context).style,
+      ),
       child: Table(
         columnWidths: const {0: FixedColumnWidth(100)},
         children: [
