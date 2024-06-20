@@ -11,12 +11,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@drawable/search_text_field"
-        android:text="Search on Kagi..."
+        android:text="Search with Kagi..."
         android:textColor="#848388"
         android:drawablePadding="8dp"
         android:padding="12dp"
-        android:drawableStart="@drawable/mdi_icon_search_web"
-        android:drawableTint="#848388"
+        android:drawableStart="@drawable/icon_with_size"
+        android:drawableEnd="@drawable/mdi_icon_microphone_tint"
         android:gravity="start|center_vertical" />
 
     <LinearLayout
