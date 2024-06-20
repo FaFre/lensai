@@ -11,10 +11,10 @@ import es.antonborri.home_widget.HomeWidgetBackgroundIntent
 import es.antonborri.home_widget.HomeWidgetLaunchIntent
 import es.antonborri.home_widget.HomeWidgetProvider
 
-class BangNavigatorWidgetProvider : HomeWidgetProvider() {
+class CompactWidgetProvider : HomeWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray, widgetData: SharedPreferences) {
         appWidgetIds.forEach { widgetId ->
-            val views = RemoteViews(context.packageName, R.layout.bang_navigator_widget).apply {
+            val views = RemoteViews(context.packageName, R.layout.compact_widget).apply {
                 val searchIntent = HomeWidgetLaunchIntent.getActivity(
                         context,
                         MainActivity::class.java,

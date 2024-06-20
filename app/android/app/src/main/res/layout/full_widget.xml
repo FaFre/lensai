@@ -27,19 +27,6 @@
         android:paddingTop="12dp">
 
         <Button
-            android:layout_marginEnd="8dp"
-            android:id="@+id/assistant_button"
-            android:padding="16dp"
-            android:backgroundTint="#333237"
-            android:background="@drawable/button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:drawableTint="@color/white"
-            android:drawableStart="@drawable/mdi_icon_brain"
-            android:drawablePadding="8dp"
-            android:text="Assistant" />
-
-        <Button
             android:layout_marginStart="8dp"
             android:id="@+id/summarizer_button"
             android:padding="16dp"
@@ -51,5 +38,18 @@
             android:drawableStart="@drawable/mdi_icon_text"
             android:drawablePadding="8dp"
             android:text="Summarizer" />
+
+        <Button
+            android:layout_marginEnd="8dp"
+            android:id="@+id/assistant_button"
+            android:padding="16dp"
+            android:backgroundTint="#333237"
+            android:background="@drawable/button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawableTint="@color/white"
+            android:drawableStart="@drawable/mdi_icon_brain"
+            android:drawablePadding="8dp"
+            android:text="Assistant" />
     </LinearLayout>
 </LinearLayout>

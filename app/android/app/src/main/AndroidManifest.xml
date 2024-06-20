@@ -45,13 +45,29 @@
                 <data android:mimeType="application/pdf" />
             </intent-filter>
         </activity>
-        <receiver android:name="BangNavigatorWidgetProvider" android:exported="true">
+        <receiver android:name="FullWidgetProvider" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 
             </intent-filter>
-                <meta-data android:name="android.appwidget.provider"
-                    android:resource="@xml/bang_navigator_widget_info" />
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/full_widget_info"/>
+        </receiver>
+        <receiver android:name="CompactWidgetProvider" android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/compact_widget_info"/>
+        </receiver>
+        <receiver android:name="SearchBarWidgetProvider" android:exported="true">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider"
+                android:resource="@xml/search_bar_widget_info"/>
         </receiver>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->

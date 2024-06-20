@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
-    android:initialLayout="@layout/bang_navigator_widget"
+    android:initialLayout="@layout/full_widget"
     android:resizeMode="none"
-    android:previewLayout="@layout/bang_navigator_widget"
+    android:previewLayout="@layout/full_widget"
     android:targetCellWidth="5"
     android:targetCellHeight="2"
     android:widgetCategory="home_screen" />
