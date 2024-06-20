@@ -1,3 +1,12 @@
+## 0.5.1
+
+* Reworked home widgets, now available in three sizes
+* Implemented content blocker for unwanted websites and ads
+* Added possibilty to remove Bangs from quick select
+* Added setting to switch theme (system/light/dark)
+* Remember assistant UI state
+* Added Gemini 1.5 Pro
+
 ## 0.4.1
 
 * Implemented Material You dynamic color scheme
