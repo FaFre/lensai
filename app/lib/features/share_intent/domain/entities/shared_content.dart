@@ -4,7 +4,8 @@ sealed class SharedContent {
   const SharedContent();
 
   factory SharedContent.parse(String content) {
-    if (uri_parser.tryParseUrl(content) case final Uri uri) {
+    if (uri_parser.tryParseUrl(content, eagerParsing: true)
+        case final Uri uri) {
       return SharedUrl(uri);
     } else {
       return SharedText(content);

@@ -20,6 +20,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:bang_navigator/utils/uri_parser.dart' as uri_parser;
 
 class LoadingWebPageDialog extends HookConsumerWidget {
   final Uri url;
@@ -125,9 +126,10 @@ class WebPageDialog extends HookConsumerWidget {
                                   await webViewController!.loadUrl(
                                     urlRequest: URLRequest(
                                       url: WebUri.uri(
-                                        Uri.parse(
+                                        uri_parser.tryParseUrl(
                                           urlTextController.text,
-                                        ),
+                                          eagerParsing: true,
+                                        )!,
                                       ),
                                     ),
                                   );
@@ -140,12 +142,9 @@ class WebPageDialog extends HookConsumerWidget {
                           : null,
                     ),
                     validator: (value) {
-                      if (value != null) {
-                        if (Uri.tryParse(value) case final Uri url) {
-                          if (url.hasScheme && url.hasAuthority) {
-                            return null;
-                          }
-                        }
+                      if (uri_parser.tryParseUrl(value, eagerParsing: true) !=
+                          null) {
+                        return null;
                       }
 
                       return 'Invalid URL';
