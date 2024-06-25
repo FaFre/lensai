@@ -217,7 +217,7 @@ class SettingsScreen extends HookConsumerWidget {
           SwitchListTile.adaptive(
             title: const Text('Block HTTP Protocol'),
             subtitle: const Text(
-              'Prevents loading of HTTP (unsecure) content entirely. When enabled, only HTTPS (secure) is allowed.',
+              'Prevents the loading of unsecure HTTP content. When enabled, only secure HTTPS content is allowed.',
             ),
             value: settings.blockHttpProtocol,
             onChanged: (value) async {
