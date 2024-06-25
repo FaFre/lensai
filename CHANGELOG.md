@@ -1,5 +1,13 @@
 ## 0.5.1
 
+* Added automatic upgrade of HTTP URLs to HTTPS (when available)
+* Added support for using the HTTP protocol app-wide
+* Introduced a setting to block all HTTP (insecure) content
+* Enhanced user URL parsing for URLs without a specified scheme
+* Improved widget layout
+
+## 0.5.0
+
 * Reworked home widgets, now available in three sizes
 * Implemented content blocker for unwanted websites and ads
 * Added possibilty to remove Bangs from quick select

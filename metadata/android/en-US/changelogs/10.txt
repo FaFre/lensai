@@ -1,0 +1,5 @@
+* Added automatic upgrade of HTTP URLs to HTTPS (when available)
+* Added support for using the HTTP protocol app-wide
+* Introduced a setting to block all HTTP (insecure) content
+* Enhanced user URL parsing for URLs without a specified scheme
+* Improved widget layout
