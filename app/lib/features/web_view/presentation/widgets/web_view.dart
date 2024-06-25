@@ -426,6 +426,8 @@ class _WebViewState extends ConsumerState<WebView> {
                 );
               }
             }
+
+            webViewProgress.value = 100;
           },
         ),
         Positioned(
