@@ -9,12 +9,16 @@ import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:http/http.dart' as http;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:universal_io/io.dart';
 
 part 'generic_website.g.dart';
 
 @Riverpod(keepAlive: true)
 class GenericWebsiteService extends _$GenericWebsiteService {
   late http.Client _client;
+  final Map<String, bool> _httpsCache;
+
+  GenericWebsiteService() : _httpsCache = {};
 
   @override
   void build() {
@@ -100,5 +104,43 @@ class GenericWebsiteService extends _$GenericWebsiteService {
         exceptionHandler: handleHttpError,
       ),
     );
+  }
+
+  Future<Uri?> tryUpgradeToHttps(Uri httpUri) async {
+    if (httpUri.isScheme('https')) {
+      return httpUri;
+    } else if (httpUri.isScheme('http')) {
+      final cached = _httpsCache[httpUri.host];
+      if (cached != null) {
+        return cached ? httpUri.replace(scheme: 'https') : null;
+      }
+
+      var sslAvailable = false;
+
+      try {
+        final context = SecurityContext.defaultContext;
+
+        final socket = await SecureSocket.connect(
+          httpUri.host,
+          443,
+          context: context,
+          timeout: const Duration(seconds: 3),
+        );
+
+        await socket.close();
+
+        sslAvailable = true;
+      } catch (_) {
+        sslAvailable = false;
+      }
+
+      _httpsCache[httpUri.host] = sslAvailable;
+
+      if (sslAvailable) {
+        return httpUri.replace(scheme: 'https');
+      }
+    }
+
+    return null;
   }
 }

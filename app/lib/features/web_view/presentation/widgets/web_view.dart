@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:bang_navigator/core/logger.dart';
+import 'package:bang_navigator/domain/services/generic_website.dart';
 import 'package:bang_navigator/features/bangs/domain/providers.dart';
 import 'package:bang_navigator/features/chat_archive/domain/entities/chat_entity.dart';
 import 'package:bang_navigator/features/chat_archive/domain/repositories/archive.dart';
@@ -289,6 +290,28 @@ class _WebViewState extends ConsumerState<WebView> {
                 reasonPhrase: "Forbidden",
               );
             }
+
+            //Check if main page aka main frame is upgradeable
+            if (request.url.isScheme('http') &&
+                request.isForMainFrame == true) {
+              final upgradedUri = await ref
+                  .read(genericWebsiteServiceProvider.notifier)
+                  .tryUpgradeToHttps(request.url);
+
+              if (upgradedUri != null) {
+                unawaited(
+                  controller.loadUrl(
+                    urlRequest: URLRequest(url: WebUri.uri(upgradedUri)),
+                  ),
+                );
+
+                return WebResourceResponse(
+                  statusCode: 200,
+                  reasonPhrase: "Redirecting...",
+                );
+              }
+            }
+
             return null;
           },
           onProgressChanged: (controller, progress) {
