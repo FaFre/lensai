@@ -55,6 +55,50 @@ class _WebViewState extends ConsumerState<WebView> {
   Timer? _onLoadStopDebounce;
   Timer? _periodicScreenshotUpdate;
 
+  Future<bool> _downloadChat(
+    DownloadStartRequest downloadStartRequest,
+    BuildContext context,
+  ) async {
+    final fileName = getDispositionFileName(
+      downloadStartRequest.contentDisposition!,
+    );
+
+    if (fileName != null) {
+      final entity = ChatEntity.fromFileName(fileName);
+      if (entity.name != null) {
+        final fileWrite = await ref
+            .read(chatArchiveRepositoryProvider.notifier)
+            .archiveChat(fileName, downloadStartRequest.url);
+
+        return fileWrite.fold(
+          (_) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                backgroundColor: Colors.green,
+                content: Text(
+                  'Conversation "$entity" saved successfully!',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ),
+            );
+
+            return true;
+          },
+          onFailure: (errorMessage) {
+            ui_helper.showErrorMessage(
+              context,
+              errorMessage.toString(),
+            );
+
+            return false;
+          },
+        );
+      }
+    }
+
+    return false;
+  }
+
   Future<void> _updateScreenshot() async {
     final screenshot = await widget.page.value.controller
         ?.takeScreenshot(
@@ -367,35 +411,18 @@ class _WebViewState extends ConsumerState<WebView> {
             widget.updatePage((page) => page.copyWith.title(title));
           },
           onDownloadStartRequest: (controller, downloadStartRequest) async {
-            final fileName = getDispositionFileName(
-              downloadStartRequest.contentDisposition!,
-            );
+            final handled = switch (downloadStartRequest.mimeType) {
+              'text/markdown' =>
+                await _downloadChat(downloadStartRequest, context),
+              _ => false
+            };
 
-            if (fileName != null) {
-              final entity = ChatEntity.fromFileName(fileName);
-              if (entity.name != null) {
-                final fileWrite = await ref
-                    .read(chatArchiveRepositoryProvider.notifier)
-                    .archiveChat(fileName, downloadStartRequest.url);
-
-                fileWrite.map(
-                  onSuccess: (_) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        backgroundColor: Colors.green,
-                        content: Text(
-                          'Conversation "$entity" saved successfully!',
-                          style: const TextStyle(color: Colors.white),
-                        ),
-                      ),
-                    );
-                  },
-                  onFailure: (errorMessage) {
-                    ui_helper.showErrorMessage(
-                      context,
-                      errorMessage.toString(),
-                    );
-                  },
+            if (!handled) {
+              if (context.mounted) {
+                await ui_helper.launchUrlFeedback(
+                  context,
+                  downloadStartRequest.url,
+                  mode: LaunchMode.platformDefault,
                 );
               }
             }
