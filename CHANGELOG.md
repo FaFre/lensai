@@ -4,6 +4,7 @@
 * Added support for using the HTTP protocol app-wide
 * Introduced a setting to block all HTTP (insecure) content
 * Enhanced user URL parsing for URLs without a specified scheme
+* Added support for launching documents and downloads through third-party apps
 * Improved widget layout
 
 ## 0.5.0
