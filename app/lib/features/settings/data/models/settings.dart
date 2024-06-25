@@ -13,6 +13,7 @@ class Settings with FastEquatable {
   final bool enableJavascript;
   final bool launchUrlExternal;
   final bool enableContentBlocking;
+  final bool blockHttpProtocol;
   final Set<HostSource> enableHostList;
   final ThemeMode themeMode;
 
@@ -23,6 +24,7 @@ class Settings with FastEquatable {
     required this.enableJavascript,
     required this.launchUrlExternal,
     required this.enableContentBlocking,
+    required this.blockHttpProtocol,
     required this.enableHostList,
     required this.themeMode,
   });
@@ -34,6 +36,7 @@ class Settings with FastEquatable {
     bool? enableJavascript,
     bool? launchUrlExternal,
     bool? enableContentBlocking,
+    bool? blockHttpProtocol,
     Set<HostSource>? enableHostList,
     ThemeMode? themeMode,
   })  : showEarlyAccessFeatures = showEarlyAccessFeatures ?? true,
@@ -41,6 +44,7 @@ class Settings with FastEquatable {
         enableJavascript = enableJavascript ?? true,
         launchUrlExternal = launchUrlExternal ?? false,
         enableContentBlocking = enableContentBlocking ?? true,
+        blockHttpProtocol = blockHttpProtocol ?? false,
         enableHostList = enableHostList ?? {HostSource.stevenBlackUnified},
         themeMode = themeMode ?? ThemeMode.dark;
 
@@ -55,6 +59,7 @@ class Settings with FastEquatable {
         enableJavascript,
         launchUrlExternal,
         enableContentBlocking,
+        blockHttpProtocol,
         enableHostList,
         themeMode,
       ];

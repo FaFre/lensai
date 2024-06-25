@@ -215,6 +215,19 @@ class SettingsScreen extends HookConsumerWidget {
             },
           ),
           SwitchListTile.adaptive(
+            title: const Text('Block HTTP Protocol'),
+            subtitle: const Text(
+              'Prevents loading of HTTP (unsecure) content entirely. When enabled, only HTTPS (secure) is allowed.',
+            ),
+            value: settings.blockHttpProtocol,
+            onChanged: (value) async {
+              await ref.read(saveSettingsControllerProvider.notifier).save(
+                    (currentSettings) =>
+                        currentSettings.copyWith.blockHttpProtocol(value),
+                  );
+            },
+          ),
+          SwitchListTile.adaptive(
             title: const Text('Launch Links Externally'),
             subtitle: const Text(
               'Opens all links (except for kagi.com) in your default browser.',

@@ -312,6 +312,19 @@ class _WebViewState extends ConsumerState<WebView> {
               }
             }
 
+            if (request.url.isScheme('http')) {
+              if ((ref.read(settingsRepositoryProvider).valueOrNull ??
+                      Settings.withDefaults())
+                  .blockHttpProtocol) {
+                return WebResourceResponse(
+                  contentType: "text/plain",
+                  data: utf8.encode("HTTP protocol is blocked"),
+                  statusCode: 403,
+                  reasonPhrase: "Forbidden",
+                );
+              }
+            }
+
             return null;
           },
           onProgressChanged: (controller, progress) {

@@ -34,6 +34,7 @@ class SettingsRepository extends _$SettingsRepository {
   static const _javascriptStorageKey = 'b4ng_settings_js';
   static const _launchExternalStorageKey = 'b4ng_settings_launch_external';
   static const _contentBlockingStorageKey = 'b4ng_settings_content_blocking';
+  static const _blockHttpProtocolStorageKey = 'b4ng_settings_block_http';
   static const _enableHostListStorageKey = 'b4ng_settings_host_lists';
   static const _themeModeStorageKey = 'b4ng_settings_theme_mode';
 
@@ -96,6 +97,13 @@ class SettingsRepository extends _$SettingsRepository {
         );
       }
 
+      if (newSettings.blockHttpProtocol != oldSettings.blockHttpProtocol) {
+        await sharedPreferences.setBool(
+          _blockHttpProtocolStorageKey,
+          newSettings.blockHttpProtocol,
+        );
+      }
+
       if (!const DeepCollectionEquality.unordered().equals(
         newSettings.enableHostList,
         oldSettings.enableHostList,
@@ -130,6 +138,8 @@ class SettingsRepository extends _$SettingsRepository {
       launchUrlExternal: sharedPreferences.getBool(_launchExternalStorageKey),
       enableContentBlocking:
           sharedPreferences.getBool(_contentBlockingStorageKey),
+      blockHttpProtocol:
+          sharedPreferences.getBool(_blockHttpProtocolStorageKey),
       enableHostList: _parseHostSources(
         sharedPreferences.getStringList(_enableHostListStorageKey),
       ),

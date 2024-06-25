@@ -19,6 +19,8 @@ abstract class _$SettingsCWProxy {
 
   Settings enableContentBlocking(bool enableContentBlocking);
 
+  Settings blockHttpProtocol(bool blockHttpProtocol);
+
   Settings enableHostList(Set<HostSource> enableHostList);
 
   Settings themeMode(ThemeMode themeMode);
@@ -36,6 +38,7 @@ abstract class _$SettingsCWProxy {
     bool? enableJavascript,
     bool? launchUrlExternal,
     bool? enableContentBlocking,
+    bool? blockHttpProtocol,
     Set<HostSource>? enableHostList,
     ThemeMode? themeMode,
   });
@@ -71,6 +74,10 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
       this(enableContentBlocking: enableContentBlocking);
 
   @override
+  Settings blockHttpProtocol(bool blockHttpProtocol) =>
+      this(blockHttpProtocol: blockHttpProtocol);
+
+  @override
   Settings enableHostList(Set<HostSource> enableHostList) =>
       this(enableHostList: enableHostList);
 
@@ -92,6 +99,7 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
     Object? enableJavascript = const $CopyWithPlaceholder(),
     Object? launchUrlExternal = const $CopyWithPlaceholder(),
     Object? enableContentBlocking = const $CopyWithPlaceholder(),
+    Object? blockHttpProtocol = const $CopyWithPlaceholder(),
     Object? enableHostList = const $CopyWithPlaceholder(),
     Object? themeMode = const $CopyWithPlaceholder(),
   }) {
@@ -127,6 +135,11 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
               ? _value.enableContentBlocking
               // ignore: cast_nullable_to_non_nullable
               : enableContentBlocking as bool,
+      blockHttpProtocol: blockHttpProtocol == const $CopyWithPlaceholder() ||
+              blockHttpProtocol == null
+          ? _value.blockHttpProtocol
+          // ignore: cast_nullable_to_non_nullable
+          : blockHttpProtocol as bool,
       enableHostList: enableHostList == const $CopyWithPlaceholder() ||
               enableHostList == null
           ? _value.enableHostList
