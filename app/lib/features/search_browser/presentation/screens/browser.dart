@@ -334,31 +334,41 @@ class KagiScreen extends HookConsumerWidget {
                     return true;
                   }
                 },
-                child: SafeArea(
-                  child: AnimatedIndexedStack(
-                    duration: const Duration(milliseconds: 250),
-                    transitionBuilder: (child, animation, secondaryAnimation) =>
-                        SharedAxisTransition(
-                      animation: animation,
-                      secondaryAnimation: secondaryAnimation,
-                      transitionType: SharedAxisTransitionType.horizontal,
-                      child: child,
+                child: Stack(
+                  children: [
+                    SafeArea(
+                      child: AnimatedIndexedStack(
+                        duration: const Duration(milliseconds: 250),
+                        transitionBuilder:
+                            (child, animation, secondaryAnimation) =>
+                                SharedAxisTransition(
+                          animation: animation,
+                          secondaryAnimation: secondaryAnimation,
+                          transitionType: SharedAxisTransitionType.horizontal,
+                          child: child,
+                        ),
+                        key: ValueKey(
+                          (activeWebView != null)
+                              ? webViews.keys
+                                  .toList()
+                                  .indexOf(activeWebView.page.value.key)
+                              : null,
+                        ),
+                        index: (activeWebView != null)
+                            ? webViews.keys
+                                    .toList()
+                                    .indexOf(activeWebView.page.value.key) +
+                                1
+                            : 0,
+                        children: [const LandingContent(), ...webViews.values],
+                      ),
                     ),
-                    key: ValueKey(
-                      (activeWebView != null)
-                          ? webViews.keys
-                              .toList()
-                              .indexOf(activeWebView.page.value.key)
-                          : null,
-                    ),
-                    index: (activeWebView != null)
-                        ? webViews.keys
-                                .toList()
-                                .indexOf(activeWebView.page.value.key) +
-                            1
-                        : 0,
-                    children: [const LandingContent(), ...webViews.values],
-                  ),
+                    if (displayedSheet != null)
+                      ModalBarrier(
+                        color: Theme.of(context).dialogTheme.barrierColor ??
+                            Colors.black54,
+                      ),
+                  ],
                 ),
               );
             },
