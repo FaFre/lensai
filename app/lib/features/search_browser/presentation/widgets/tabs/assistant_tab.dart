@@ -112,9 +112,21 @@ class AssistantTab extends HookConsumerWidget {
                           .update(value.first);
                     },
                   ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  _PromptField(textController, incognitoEnabled),
                 ],
               ),
-              const SizedBox.shrink(),
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  _PromptField(textController, incognitoEnabled),
+                ],
+              ),
               Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -138,35 +150,22 @@ class AssistantTab extends HookConsumerWidget {
                       ref.read(activeChatModelProvider.notifier).update(value!);
                     },
                   ),
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  _PromptField(textController, incognitoEnabled),
                 ],
               ),
-              const SizedBox.shrink(),
-            ],
-          ),
-          const SizedBox(
-            height: 12,
-          ),
-          TextFormField(
-            controller: textController,
-            enableIMEPersonalizedLearning: !incognitoEnabled,
-            decoration: InputDecoration(
-              label: const Text('Prompt'),
-              hintText: 'Enter your prompt...',
-              floatingLabelBehavior: FloatingLabelBehavior.always,
-              suffixIcon: SpeechToTextButton(
-                onTextReceived: (data) {
-                  textController.text = data.toString();
-                },
+              Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(
+                    height: 12,
+                  ),
+                  _PromptField(textController, incognitoEnabled),
+                ],
               ),
-            ),
-            maxLines: null,
-            validator: (value) {
-              if (value?.isEmpty ?? true) {
-                return '';
-              }
-
-              return null;
-            },
+            ],
           ),
           const SizedBox(
             height: 12,
@@ -192,6 +191,39 @@ class AssistantTab extends HookConsumerWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class _PromptField extends StatelessWidget {
+  final TextEditingController textController;
+  final bool incognitoEnabled;
+
+  const _PromptField(this.textController, this.incognitoEnabled);
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: textController,
+      enableIMEPersonalizedLearning: !incognitoEnabled,
+      decoration: InputDecoration(
+        label: const Text('Prompt'),
+        hintText: 'Enter your prompt...',
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+        suffixIcon: SpeechToTextButton(
+          onTextReceived: (data) {
+            textController.text = data.toString();
+          },
+        ),
+      ),
+      maxLines: null,
+      validator: (value) {
+        if (value?.isEmpty ?? true) {
+          return '';
+        }
+
+        return null;
+      },
     );
   }
 }
