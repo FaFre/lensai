@@ -40,7 +40,7 @@ class ViewTabsSheet extends HookConsumerWidget {
         Consumer(
           builder: (context, ref, child) {
             final tabs = ref.watch(
-              webViewRepositoryProvider.select((tabs) => tabs.values),
+              webViewRepositoryProvider.select((tabs) => tabs.values.toList()),
             );
             final activeTab = ref.watch(
               webViewTabControllerProvider.select(
@@ -56,7 +56,7 @@ class ViewTabsSheet extends HookConsumerWidget {
               mainAxisSpacing: 8.0,
               crossAxisSpacing: 8.0,
               crossAxisCount: 2,
-              children: tabs
+              children: tabs.reversed
                   .map(
                     (webView) => WebViewTab(
                       webView: webView,
