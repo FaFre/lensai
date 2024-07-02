@@ -396,9 +396,13 @@ class KagiScreen extends HookConsumerWidget {
                     minChildSize: 0.1,
                     maxChildSize: _realtiveSafeArea(context),
                     builder: (context, scrollController) {
-                      return SingleChildScrollView(
-                        controller: scrollController,
+                      return ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(28),
+                          topRight: Radius.circular(28),
+                        ),
                         child: ViewTabsSheet(
+                          sheetScrollController: scrollController,
                           onClose: () {
                             ref.read(bottomSheetProvider.notifier).dismiss();
                           },
