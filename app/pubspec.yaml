@@ -1,7 +1,7 @@
 name: bang_navigator
 description: "A secure and privacy friendly search browser"
 publish_to: 'none'
-version: 0.5.1+10
+version: 0.5.2+11
 
 environment:
   sdk: '>=3.4.1 <4.0.0'

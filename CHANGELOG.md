@@ -1,3 +1,9 @@
+## 0.5.2
+
+* Enhanced bottom sheet behavior for better UI and UX
+* Browser tabs now sort with the most recently added first
+* Browser tab sheet automatically scrolls to the active tab
+
 ## 0.5.1
 
 * Added automatic upgrade of HTTP URLs to HTTPS (when available)
