@@ -14,7 +14,10 @@ class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return Material(
       child: Consumer(
         builder: (context, ref, child) {

@@ -13,6 +13,7 @@ import 'package:bang_navigator/features/web_view/presentation/widgets/favicon.da
 import 'package:bang_navigator/presentation/controllers/website_title.dart';
 import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
 import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
+import 'package:bang_navigator/utils/uri_parser.dart' as uri_parser;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -20,7 +21,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:bang_navigator/utils/uri_parser.dart' as uri_parser;
 
 class LoadingWebPageDialog extends HookConsumerWidget {
   final Uri url;
