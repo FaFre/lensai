@@ -79,10 +79,12 @@ class AppBarTitle extends HookConsumerWidget {
                     const SizedBox(
                       width: 4,
                     ),
-                    Text(
-                      page.url.authority,
-                      style: theme.textTheme.bodyMedium
-                          ?.copyWith(color: theme.colorScheme.onSurface),
+                    Expanded(
+                      child: Text(
+                        page.url.authority,
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(color: theme.colorScheme.onSurface),
+                      ),
                     ),
                   ],
                 ),
