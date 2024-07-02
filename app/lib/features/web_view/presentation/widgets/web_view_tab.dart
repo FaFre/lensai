@@ -39,6 +39,7 @@ class WebViewTab extends HookConsumerWidget {
           onTap: () {
             if (!isActive) {
               ref.read(webViewTabControllerProvider.notifier).showTab(page.key);
+              onClose();
             } else {
               onClose();
             }

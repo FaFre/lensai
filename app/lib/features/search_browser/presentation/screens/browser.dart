@@ -391,6 +391,7 @@ class KagiScreen extends HookConsumerWidget {
               },
               child: switch (displayedSheet) {
                 ViewTabs() => DraggableScrollableSheet(
+                    key: ObjectKey(displayedSheet),
                     expand: false,
                     minChildSize: 0.1,
                     maxChildSize: _realtiveSafeArea(context),
@@ -406,6 +407,7 @@ class KagiScreen extends HookConsumerWidget {
                     },
                   ),
                 final CreateTab parameter => DraggableScrollableSheet(
+                    key: ObjectKey(displayedSheet),
                     expand: false,
                     initialChildSize: 0.8,
                     minChildSize: 0.1,
