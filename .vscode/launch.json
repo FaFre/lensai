@@ -8,21 +8,24 @@
             "name": "app",
             "cwd": "app",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
+            "args": ["--device-user", "0"]
         },
         {
             "name": "app (profile mode)",
             "cwd": "app",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "profile"
+            "flutterMode": "profile",
+            "args": ["--device-user", "0"]
         },
         {
             "name": "app (release mode)",
             "cwd": "app",
             "request": "launch",
             "type": "dart",
-            "flutterMode": "release"
+            "flutterMode": "release",
+            "args": ["--device-user", "0"]
         }
     ]
 }
