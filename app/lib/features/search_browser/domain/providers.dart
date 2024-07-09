@@ -33,11 +33,8 @@ class OverlayDialog extends _$OverlayDialog {
 class BottomSheet extends _$BottomSheet {
   @override
   Sheet? build() {
-    return ref.watch(
-      createTabStreamProvider.select(
-        (value) => value.valueOrNull,
-      ),
-    );
+    //Don't use select here because it will only fire on new != previous
+    return ref.watch(createTabStreamProvider).valueOrNull;
   }
 
   void show(Sheet sheet) {

@@ -1,8 +1,15 @@
+import 'package:flutter/widgets.dart';
+import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
+
 enum KagiTool {
-  search,
-  summarizer,
+  search(MdiIcons.searchWeb),
+  summarizer(MdiIcons.text),
   //Sort early access features last
-  assistant,
+  assistant(MdiIcons.brain);
+
+  final IconData icon;
+
+  const KagiTool(this.icon);
 }
 
 enum AssistantMode {

@@ -1,7 +1,6 @@
-import 'package:bang_navigator/features/content_block/data/models/host.dart';
 import 'package:bang_navigator/features/settings/data/models/settings.dart';
+import 'package:bang_navigator/features/settings/utils/preference_parser.dart';
 import 'package:collection/collection.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -10,34 +9,26 @@ part 'settings_repository.g.dart';
 
 typedef UpdateSettingsFunc = Settings Function(Settings currentSettings);
 
-Set<HostSource>? _parseHostSources(List<String>? input) => input
-    ?.map(
-      (list) =>
-          HostSource.values.firstWhereOrNull((source) => source.name == list),
-    )
-    .whereNotNull()
-    .toSet();
+enum _StorageKeys {
+  kagiSession('kagi_session'),
+  showEarlyAccessFeatures('show_early_access_features'),
+  incognito('enabe_incognito'),
+  javascript('enable_js'),
+  launchExternal('enable_launch_external'),
+  contentBlocking('enable_content_blocking'),
+  blockHttpProtocol('block_http'),
+  enableHostList('enable_host_lists'),
+  themeMode('theme_mode'),
+  quickAction('enable_quick_action'),
+  quickActionVoiceInput('enable_quick_action_voice_input');
 
-ThemeMode? _parseThemeMode(int? index) {
-  if (index != null && index < ThemeMode.values.length) {
-    return ThemeMode.values[index];
-  }
+  final String key;
 
-  return null;
+  const _StorageKeys(this.key);
 }
 
 @Riverpod(keepAlive: true)
 class SettingsRepository extends _$SettingsRepository {
-  static const _sessionStorageKey = 'b4ng_kagi_session';
-  static const _showEarlyAccessFeaturesKey = 'b4ng_show_early_access';
-  static const _incognitoStorageKey = 'b4ng_settings_incognito';
-  static const _javascriptStorageKey = 'b4ng_settings_js';
-  static const _launchExternalStorageKey = 'b4ng_settings_launch_external';
-  static const _contentBlockingStorageKey = 'b4ng_settings_content_blocking';
-  static const _blockHttpProtocolStorageKey = 'b4ng_settings_block_http';
-  static const _enableHostListStorageKey = 'b4ng_settings_host_lists';
-  static const _themeModeStorageKey = 'b4ng_settings_theme_mode';
-
   final FlutterSecureStorage _flutterSecureStorage;
   final Future<SharedPreferences> _sharedPreferences;
 
@@ -53,7 +44,7 @@ class SettingsRepository extends _$SettingsRepository {
     if (oldSettings != newSettings) {
       if (oldSettings.kagiSession != newSettings.kagiSession) {
         await _flutterSecureStorage.write(
-          key: _sessionStorageKey,
+          key: _StorageKeys.kagiSession.key,
           value: (newSettings.kagiSession?.isNotEmpty ?? false)
               ? newSettings.kagiSession
               : null,
@@ -63,28 +54,28 @@ class SettingsRepository extends _$SettingsRepository {
       if (newSettings.showEarlyAccessFeatures !=
           oldSettings.showEarlyAccessFeatures) {
         await sharedPreferences.setBool(
-          _showEarlyAccessFeaturesKey,
+          _StorageKeys.showEarlyAccessFeatures.key,
           newSettings.showEarlyAccessFeatures,
         );
       }
 
       if (newSettings.incognitoMode != oldSettings.incognitoMode) {
         await sharedPreferences.setBool(
-          _incognitoStorageKey,
+          _StorageKeys.incognito.key,
           newSettings.incognitoMode,
         );
       }
 
       if (newSettings.enableJavascript != oldSettings.enableJavascript) {
         await sharedPreferences.setBool(
-          _javascriptStorageKey,
+          _StorageKeys.javascript.key,
           newSettings.enableJavascript,
         );
       }
 
       if (newSettings.launchUrlExternal != oldSettings.launchUrlExternal) {
         await sharedPreferences.setBool(
-          _launchExternalStorageKey,
+          _StorageKeys.launchExternal.key,
           newSettings.launchUrlExternal,
         );
       }
@@ -92,14 +83,14 @@ class SettingsRepository extends _$SettingsRepository {
       if (newSettings.enableContentBlocking !=
           oldSettings.enableContentBlocking) {
         await sharedPreferences.setBool(
-          _contentBlockingStorageKey,
+          _StorageKeys.contentBlocking.key,
           newSettings.enableContentBlocking,
         );
       }
 
       if (newSettings.blockHttpProtocol != oldSettings.blockHttpProtocol) {
         await sharedPreferences.setBool(
-          _blockHttpProtocolStorageKey,
+          _StorageKeys.blockHttpProtocol.key,
           newSettings.blockHttpProtocol,
         );
       }
@@ -109,15 +100,35 @@ class SettingsRepository extends _$SettingsRepository {
         oldSettings.enableHostList,
       )) {
         await sharedPreferences.setStringList(
-          _enableHostListStorageKey,
+          _StorageKeys.enableHostList.key,
           newSettings.enableHostList.map((list) => list.name).toList(),
         );
       }
 
       if (newSettings.themeMode != oldSettings.themeMode) {
         await sharedPreferences.setInt(
-          _themeModeStorageKey,
+          _StorageKeys.themeMode.key,
           newSettings.themeMode.index,
+        );
+      }
+
+      if (newSettings.quickAction != oldSettings.quickAction) {
+        final index = newSettings.quickAction?.index;
+        if (index != null) {
+          await sharedPreferences.setInt(
+            _StorageKeys.quickAction.key,
+            index,
+          );
+        } else {
+          await sharedPreferences.remove(_StorageKeys.quickAction.key);
+        }
+      }
+
+      if (newSettings.quickActionVoiceInput !=
+          oldSettings.quickActionVoiceInput) {
+        await sharedPreferences.setBool(
+          _StorageKeys.quickActionVoiceInput.key,
+          newSettings.quickActionVoiceInput,
         );
       }
 
@@ -130,21 +141,27 @@ class SettingsRepository extends _$SettingsRepository {
     final sharedPreferences = await _sharedPreferences;
 
     return Settings.withDefaults(
-      kagiSession: await _flutterSecureStorage.read(key: _sessionStorageKey),
+      kagiSession:
+          await _flutterSecureStorage.read(key: _StorageKeys.kagiSession.key),
       showEarlyAccessFeatures:
-          sharedPreferences.getBool(_showEarlyAccessFeaturesKey),
-      incognitoMode: sharedPreferences.getBool(_incognitoStorageKey),
-      enableJavascript: sharedPreferences.getBool(_javascriptStorageKey),
-      launchUrlExternal: sharedPreferences.getBool(_launchExternalStorageKey),
+          sharedPreferences.getBool(_StorageKeys.showEarlyAccessFeatures.key),
+      incognitoMode: sharedPreferences.getBool(_StorageKeys.incognito.key),
+      enableJavascript: sharedPreferences.getBool(_StorageKeys.javascript.key),
+      launchUrlExternal:
+          sharedPreferences.getBool(_StorageKeys.launchExternal.key),
       enableContentBlocking:
-          sharedPreferences.getBool(_contentBlockingStorageKey),
+          sharedPreferences.getBool(_StorageKeys.contentBlocking.key),
       blockHttpProtocol:
-          sharedPreferences.getBool(_blockHttpProtocolStorageKey),
-      enableHostList: _parseHostSources(
-        sharedPreferences.getStringList(_enableHostListStorageKey),
+          sharedPreferences.getBool(_StorageKeys.blockHttpProtocol.key),
+      enableHostList: parseHostSources(
+        sharedPreferences.getStringList(_StorageKeys.enableHostList.key),
       ),
       themeMode:
-          _parseThemeMode(sharedPreferences.getInt(_themeModeStorageKey)),
+          parseThemeMode(sharedPreferences.getInt(_StorageKeys.themeMode.key)),
+      quickAction:
+          parseKagiTool(sharedPreferences.getInt(_StorageKeys.quickAction.key)),
+      quickActionVoiceInput:
+          sharedPreferences.getBool(_StorageKeys.quickActionVoiceInput.key),
     );
   }
 }

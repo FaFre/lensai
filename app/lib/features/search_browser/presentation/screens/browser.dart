@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:animations/animations.dart';
 import 'package:bang_navigator/core/routing/routes.dart';
 import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
@@ -26,6 +28,7 @@ import 'package:flutter_material_design_icons/flutter_material_design_icons.dart
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:speech_to_text_google_dialog/speech_to_text_google_dialog.dart';
 
 class KagiScreen extends HookConsumerWidget {
   const KagiScreen({super.key});
@@ -47,12 +50,29 @@ class KagiScreen extends HookConsumerWidget {
       ),
     );
 
+    final quickAction = ref.watch(
+      settingsRepositoryProvider.select(
+        (value) => (value.valueOrNull ?? Settings.withDefaults()).quickAction,
+      ),
+    );
+
+    final quickActionVoice = ref.watch(
+      settingsRepositoryProvider.select(
+        (value) => (value.valueOrNull ?? Settings.withDefaults())
+            .quickActionVoiceInput,
+      ),
+    );
+
+    final activeWebView = ref.watch(webViewTabControllerProvider);
+
     final menuController = useMemoized(() => MenuController());
 
     final lastBackButtonPress = useRef<DateTime?>(null);
     final webViewController = useRef<InAppWebViewController?>(null);
 
     final overlayController = useOverlayPortalController();
+
+    final activeKagiTool = useValueNotifier<KagiTool?>(null, [displayedSheet]);
 
     ref.listen(
       overlayDialogProvider,
@@ -81,23 +101,130 @@ class KagiScreen extends HookConsumerWidget {
         padding: EdgeInsets.zero,
         child: AppBar(
           automaticallyImplyLeading: false,
-          title: AppBarTitle(
-            onTap: () {
-              final page = ref.read(webViewTabControllerProvider)?.page.value;
+          titleSpacing: 8.0,
+          title: (activeWebView != null)
+              ? AppBarTitle(
+                  activeWebView: activeWebView,
+                  onTap: () {
+                    final page = activeWebView.page.value;
 
-              if (page != null) {
-                ref.read(overlayDialogProvider.notifier).show(
-                      WebPageDialog(
-                        page: page,
-                        webViewController: webViewController.value,
-                        onDismiss:
-                            ref.read(overlayDialogProvider.notifier).dismiss,
-                      ),
+                    ref.read(overlayDialogProvider.notifier).show(
+                          WebPageDialog(
+                            page: page,
+                            webViewController: webViewController.value,
+                            onDismiss: ref
+                                .read(overlayDialogProvider.notifier)
+                                .dismiss,
+                          ),
+                        );
+                  },
+                )
+              : HookBuilder(
+                  builder: (context) {
+                    final activeTool = useListenableSelector(
+                      activeKagiTool,
+                      () {
+                        if (displayedSheet is SharedContentSheet) {
+                          return null;
+                        }
+
+                        return activeKagiTool.value;
+                      },
                     );
-              }
-            },
-          ),
+
+                    return Row(
+                      children: [
+                        IconButton(
+                          color: (activeTool == KagiTool.search)
+                              ? Theme.of(context).colorScheme.primary
+                              : null,
+                          onPressed: () {
+                            ref
+                                .read(createTabStreamProvider.notifier)
+                                .createTab(
+                                  CreateTab(preferredTool: KagiTool.search),
+                                );
+                          },
+                          icon: Icon(KagiTool.search.icon),
+                        ),
+                        IconButton(
+                          color: (activeTool == KagiTool.summarizer)
+                              ? Theme.of(context).colorScheme.primary
+                              : null,
+                          onPressed: () {
+                            ref
+                                .read(createTabStreamProvider.notifier)
+                                .createTab(
+                                  CreateTab(preferredTool: KagiTool.summarizer),
+                                );
+                          },
+                          icon: Icon(KagiTool.summarizer.icon),
+                        ),
+                        if (showEarlyAccessFeatures)
+                          IconButton(
+                            color: (activeTool == KagiTool.assistant)
+                                ? Theme.of(context).colorScheme.primary
+                                : null,
+                            onPressed: () {
+                              ref
+                                  .read(createTabStreamProvider.notifier)
+                                  .createTab(
+                                    CreateTab(
+                                      preferredTool: KagiTool.assistant,
+                                    ),
+                                  );
+                            },
+                            icon: Icon(KagiTool.assistant.icon),
+                          ),
+                      ],
+                    );
+                  },
+                ),
           actions: [
+            if (activeWebView != null && quickAction != null)
+              InkWell(
+                onTap: () async {
+                  var tab = CreateTab(
+                    preferredTool: quickAction,
+                  );
+
+                  if (quickActionVoice) {
+                    final completer = Completer<String>();
+
+                    final isServiceAvailable =
+                        await SpeechToTextGoogleDialog.getInstance()
+                            .showGoogleDialog(
+                      onTextReceived: (data) {
+                        completer.complete(data.toString());
+                      },
+                      // locale: "en-US",
+                    );
+
+                    if (!isServiceAvailable) {
+                      if (context.mounted) {
+                        ui_helper.showErrorMessage(
+                          context,
+                          'Service is not available',
+                        );
+                      }
+                    }
+
+                    tab = CreateTab(
+                      preferredTool: quickAction,
+                      content: await completer.future,
+                    );
+                  }
+
+                  ref.read(createTabStreamProvider.notifier).createTab(tab);
+                },
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 15.0,
+                    horizontal: 8.0,
+                  ),
+                  child: Icon(quickActionVoice ? Icons.mic : quickAction.icon),
+                ),
+              ),
             TabsActionButton(
               onTap: () {
                 if (displayedSheet case ViewTabs()) {
@@ -110,15 +237,22 @@ class KagiScreen extends HookConsumerWidget {
             MenuAnchor(
               controller: menuController,
               builder: (context, controller, child) {
-                return IconButton(
-                  onPressed: () {
-                    if (controller.isOpen) {
-                      controller.close();
-                    } else {
-                      controller.open();
-                    }
-                  },
-                  icon: const Icon(Icons.more_vert),
+                return Padding(
+                  padding: const EdgeInsets.only(right: 4.0),
+                  child: InkWell(
+                    onTap: () {
+                      if (controller.isOpen) {
+                        controller.close();
+                      } else {
+                        controller.open();
+                      }
+                    },
+                    child: const Padding(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 15.0, horizontal: 8.0),
+                      child: Icon(Icons.more_vert),
+                    ),
+                  ),
                 );
               },
               menuChildren: [
@@ -161,7 +295,7 @@ class KagiScreen extends HookConsumerWidget {
                             CreateTab(preferredTool: KagiTool.assistant),
                           );
                     },
-                    leadingIcon: const Icon(MdiIcons.brain),
+                    leadingIcon: Icon(KagiTool.assistant.icon),
                     child: const Text('Assistant'),
                   ),
                 MenuItemButton(
@@ -170,7 +304,7 @@ class KagiScreen extends HookConsumerWidget {
                           CreateTab(preferredTool: KagiTool.summarizer),
                         );
                   },
-                  leadingIcon: const Icon(MdiIcons.text),
+                  leadingIcon: Icon(KagiTool.summarizer.icon),
                   child: const Text('Summarizer'),
                 ),
                 MenuItemButton(
@@ -179,7 +313,7 @@ class KagiScreen extends HookConsumerWidget {
                           CreateTab(preferredTool: KagiTool.search),
                         );
                   },
-                  leadingIcon: const Icon(MdiIcons.searchWeb),
+                  leadingIcon: Icon(KagiTool.search.icon),
                   child: const Text('Search'),
                 ),
                 const Divider(),
@@ -213,10 +347,8 @@ class KagiScreen extends HookConsumerWidget {
                   child: const Text('Reload'),
                 ),
                 const Divider(),
-                HookConsumer(
-                  builder: (context, ref, child) {
-                    final activeWebView =
-                        ref.watch(webViewTabControllerProvider);
+                HookBuilder(
+                  builder: (context) {
                     final history = useListenableSelector(
                       activeWebView?.page,
                       () =>
@@ -272,7 +404,6 @@ class KagiScreen extends HookConsumerWidget {
           child: HookConsumer(
             builder: (context, ref, child) {
               final webViews = ref.watch(webViewRepositoryProvider);
-              final activeWebView = ref.watch(webViewTabControllerProvider);
               useListenableCallback(activeWebView?.page, () {
                 webViewController.value = activeWebView?.page.value.controller;
               });
@@ -391,7 +522,7 @@ class KagiScreen extends HookConsumerWidget {
               },
               child: switch (displayedSheet) {
                 ViewTabs() => DraggableScrollableSheet(
-                    key: ObjectKey(displayedSheet),
+                    key: ValueKey(displayedSheet),
                     expand: false,
                     minChildSize: 0.1,
                     maxChildSize: _realtiveSafeArea(context),
@@ -411,7 +542,7 @@ class KagiScreen extends HookConsumerWidget {
                     },
                   ),
                 final CreateTab parameter => DraggableScrollableSheet(
-                    key: ObjectKey(displayedSheet),
+                    key: ValueKey(displayedSheet),
                     expand: false,
                     initialChildSize: 0.8,
                     minChildSize: 0.1,
@@ -420,7 +551,7 @@ class KagiScreen extends HookConsumerWidget {
                       return SingleChildScrollView(
                         controller: scrollController,
                         child: SharedContentSheet(
-                          key: ObjectKey(parameter),
+                          key: ValueKey(parameter),
                           parameter: parameter,
                           onSubmit: (url) async {
                             await ref
@@ -428,6 +559,9 @@ class KagiScreen extends HookConsumerWidget {
                                 .add(url);
 
                             ref.read(bottomSheetProvider.notifier).dismiss();
+                          },
+                          onActiveToolChanged: (tool) {
+                            activeKagiTool.value = tool;
                           },
                         ),
                       );

@@ -25,6 +25,10 @@ abstract class _$SettingsCWProxy {
 
   Settings themeMode(ThemeMode themeMode);
 
+  Settings quickAction(KagiTool? quickAction);
+
+  Settings quickActionVoiceInput(bool quickActionVoiceInput);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Settings(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -41,6 +45,8 @@ abstract class _$SettingsCWProxy {
     bool? blockHttpProtocol,
     Set<HostSource>? enableHostList,
     ThemeMode? themeMode,
+    KagiTool? quickAction,
+    bool? quickActionVoiceInput,
   });
 }
 
@@ -85,6 +91,13 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
   Settings themeMode(ThemeMode themeMode) => this(themeMode: themeMode);
 
   @override
+  Settings quickAction(KagiTool? quickAction) => this(quickAction: quickAction);
+
+  @override
+  Settings quickActionVoiceInput(bool quickActionVoiceInput) =>
+      this(quickActionVoiceInput: quickActionVoiceInput);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Settings(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -102,6 +115,8 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
     Object? blockHttpProtocol = const $CopyWithPlaceholder(),
     Object? enableHostList = const $CopyWithPlaceholder(),
     Object? themeMode = const $CopyWithPlaceholder(),
+    Object? quickAction = const $CopyWithPlaceholder(),
+    Object? quickActionVoiceInput = const $CopyWithPlaceholder(),
   }) {
     return Settings(
       kagiSession: kagiSession == const $CopyWithPlaceholder()
@@ -149,6 +164,16 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
           ? _value.themeMode
           // ignore: cast_nullable_to_non_nullable
           : themeMode as ThemeMode,
+      quickAction: quickAction == const $CopyWithPlaceholder()
+          ? _value.quickAction
+          // ignore: cast_nullable_to_non_nullable
+          : quickAction as KagiTool?,
+      quickActionVoiceInput:
+          quickActionVoiceInput == const $CopyWithPlaceholder() ||
+                  quickActionVoiceInput == null
+              ? _value.quickActionVoiceInput
+              // ignore: cast_nullable_to_non_nullable
+              : quickActionVoiceInput as bool,
     );
   }
 }

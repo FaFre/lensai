@@ -10,7 +10,6 @@ import 'package:bang_navigator/presentation/hooks/sync_page_tab.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 
 typedef OnSubmitUri = void Function(Uri url);
@@ -18,10 +17,12 @@ typedef OnSubmitUri = void Function(Uri url);
 class SharedContentSheet extends HookConsumerWidget {
   final CreateTab parameter;
   final OnSubmitUri onSubmit;
+  final void Function(KagiTool tool)? onActiveToolChanged;
 
   const SharedContentSheet({
     required this.parameter,
     required this.onSubmit,
+    this.onActiveToolChanged,
     super.key,
   });
   @override
@@ -37,11 +38,12 @@ class SharedContentSheet extends HookConsumerWidget {
       () => (parameter.content != null)
           ? SharedContent.parse(parameter.content!)
           : null,
+      [parameter],
     );
 
-    final tabController = useTabController(
-      initialLength: KagiTool.values.length - (showEarlyAccessFeatures ? 0 : 1),
-      initialIndex: parameter.preferredTool?.index ??
+    final initialIndex = useMemoized(
+      () =>
+          parameter.preferredTool?.index ??
           switch (sharedContent) {
             SharedText(text: final text) =>
               (showEarlyAccessFeatures && text.length > 25)
@@ -52,10 +54,32 @@ class SharedContentSheet extends HookConsumerWidget {
                 ? KagiTool.assistant.index
                 : KagiTool.search.index,
           },
+      [sharedContent],
+    );
+
+    final tabController = useTabController(
+      initialLength: KagiTool.values.length - (showEarlyAccessFeatures ? 0 : 1),
+      initialIndex: initialIndex,
     );
     final pageController = usePageController(initialPage: tabController.index);
 
-    useSyncPageWithTab(tabController, pageController);
+    useSyncPageWithTab(
+      tabController,
+      pageController,
+      onIndexChanged: (index) {
+        onActiveToolChanged?.call(KagiTool.values[index]);
+      },
+    );
+
+    useEffect(
+      () {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          onActiveToolChanged?.call(KagiTool.values[initialIndex]);
+        });
+        return null;
+      },
+      [initialIndex],
+    );
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -63,17 +87,17 @@ class SharedContentSheet extends HookConsumerWidget {
         TabBar(
           controller: tabController,
           tabs: [
-            const Tab(
-              icon: Icon(MdiIcons.searchWeb),
+            Tab(
+              icon: Icon(KagiTool.search.icon),
               text: 'Search',
             ),
-            const Tab(
-              icon: Icon(MdiIcons.text),
+            Tab(
+              icon: Icon(KagiTool.summarizer.icon),
               text: 'Summarize',
             ),
             if (showEarlyAccessFeatures)
-              const Tab(
-                icon: Icon(MdiIcons.brain),
+              Tab(
+                icon: Icon(KagiTool.assistant.icon),
                 text: 'Assistant',
               ),
           ],

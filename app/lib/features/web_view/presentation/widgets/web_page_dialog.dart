@@ -227,7 +227,7 @@ class WebPageDialog extends HookConsumerWidget {
             ),
             const Divider(),
             ListTile(
-              leading: const Icon(MdiIcons.text),
+              leading: Icon(KagiTool.summarizer.icon),
               title: const Text('Summarize'),
               onTap: () async {
                 final url = uri_builder.summarizerUri(

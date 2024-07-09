@@ -8,7 +8,7 @@ class CustomListTile extends StatelessWidget {
   final Widget? content;
 
   final Widget? prefix;
-  final Widget suffix;
+  final Widget? suffix;
 
   const CustomListTile({
     super.key,
@@ -16,13 +16,15 @@ class CustomListTile extends StatelessWidget {
     required this.subtitle,
     this.content,
     this.prefix,
-    required this.suffix,
+    this.suffix,
     this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final subtitleTextTheme = theme.textTheme.bodyMedium!
+        .copyWith(color: theme.colorScheme.onSurfaceVariant);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
@@ -44,7 +46,7 @@ class CustomListTile extends StatelessWidget {
                 Text(
                   subtitle,
                   style: enabled
-                      ? theme.textTheme.bodyMedium
+                      ? subtitleTextTheme
                       : theme.textTheme.bodyMedium
                           ?.copyWith(color: theme.disabledColor),
                 ),
@@ -52,7 +54,7 @@ class CustomListTile extends StatelessWidget {
               ],
             ),
           ),
-          suffix,
+          if (suffix != null) suffix!,
         ],
       ),
     );

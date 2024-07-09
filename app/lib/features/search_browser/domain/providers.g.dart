@@ -172,7 +172,7 @@ final overlayDialogProvider =
 );
 
 typedef _$OverlayDialog = AutoDisposeNotifier<Widget?>;
-String _$bottomSheetHash() => r'31108d6d80d5b858024a8a8ae9ebb9c650eabe70';
+String _$bottomSheetHash() => r'4040ec50a488b4b12123bedceab6d8620e6abe3d';
 
 /// See also [BottomSheet].
 @ProviderFor(BottomSheet)

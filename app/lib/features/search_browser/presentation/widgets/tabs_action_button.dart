@@ -15,11 +15,9 @@ class TabsActionButton extends HookConsumerWidget {
     return InkWell(
       onTap: onTap,
       child: Padding(
-        padding: const EdgeInsets.only(
-          left: 10.0,
-          top: 15.0,
-          right: 10.0,
-          bottom: 15.0,
+        padding: const EdgeInsets.symmetric(
+          horizontal: 8.0,
+          vertical: 15.0,
         ),
         child: Container(
           decoration: BoxDecoration(

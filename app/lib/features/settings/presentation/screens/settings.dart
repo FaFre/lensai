@@ -2,6 +2,7 @@ import 'package:bang_navigator/features/bangs/data/models/bang.dart';
 import 'package:bang_navigator/features/bangs/domain/providers.dart';
 import 'package:bang_navigator/features/bangs/domain/repositories/data.dart';
 import 'package:bang_navigator/features/content_block/data/models/host.dart';
+import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/settings/presentation/controllers/save_settings.dart';
@@ -242,6 +243,76 @@ class SettingsScreen extends HookConsumerWidget {
           ),
           const SizedBox(
             height: 16,
+          ),
+          _buildSection(theme, 'Appearance'),
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const CustomListTile(
+                  title: 'Quick Action',
+                  subtitle:
+                      'Appears in the browser app bar between website title and tab count.',
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Center(
+                    child: SegmentedButton<KagiTool>(
+                      emptySelectionAllowed: true,
+                      segments: [
+                        ButtonSegment(
+                          value: KagiTool.search,
+                          icon: Icon(KagiTool.search.icon),
+                          label: const Text('Search'),
+                        ),
+                        ButtonSegment(
+                          value: KagiTool.summarizer,
+                          icon: Icon(KagiTool.summarizer.icon),
+                          label: const Text('Summarizer'),
+                        ),
+                        ButtonSegment(
+                          value: KagiTool.assistant,
+                          icon: Icon(KagiTool.assistant.icon),
+                          label: const Text('Assistant'),
+                        ),
+                      ],
+                      selected: {
+                        if (settings.quickAction != null) settings.quickAction!,
+                      },
+                      onSelectionChanged: (value) async {
+                        await ref
+                            .read(saveSettingsControllerProvider.notifier)
+                            .save(
+                              (currentSettings) =>
+                                  currentSettings.copyWith.quickAction(
+                                value.isNotEmpty ? value.first : null,
+                              ),
+                            );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          SwitchListTile.adaptive(
+            title: const Text('Quick Action - STT'),
+            subtitle: const Text(
+              'Quick option will open with speech-to-text input.',
+            ),
+            value: settings.quickActionVoiceInput,
+            onChanged: (settings.quickAction != null)
+                ? (value) async {
+                    await ref
+                        .read(saveSettingsControllerProvider.notifier)
+                        .save(
+                          (currentSettings) => currentSettings.copyWith
+                              .quickActionVoiceInput(value),
+                        );
+                  }
+                : null,
           ),
           _buildSection(theme, 'Content Blocking'),
           SwitchListTile.adaptive(
