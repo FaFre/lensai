@@ -21,5 +21,21 @@ final blockContentHostsProvider = StreamProvider<Set<String>?>.internal(
 );
 
 typedef BlockContentHostsRef = StreamProviderRef<Set<String>?>;
+String _$readerabilityScriptHash() =>
+    r'6fdd1aa920bc58c35ef9888158e572e25793870a';
+
+/// See also [readerabilityScript].
+@ProviderFor(readerabilityScript)
+final readerabilityScriptProvider = FutureProvider<String>.internal(
+  readerabilityScript,
+  name: r'readerabilityScriptProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$readerabilityScriptHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef ReaderabilityScriptRef = FutureProviderRef<String>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

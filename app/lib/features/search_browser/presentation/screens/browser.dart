@@ -15,15 +15,15 @@ import 'package:bang_navigator/features/search_browser/presentation/widgets/tabs
 import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/web_view/domain/repositories/web_view.dart';
+import 'package:bang_navigator/features/web_view/presentation/controllers/readerability.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:bang_navigator/features/web_view/presentation/widgets/web_page_dialog.dart';
-import 'package:bang_navigator/presentation/hooks/listenable_callback.dart';
 import 'package:bang_navigator/presentation/hooks/overlay_portal_controller.dart';
+import 'package:bang_navigator/presentation/widgets/animate_gradient_shader.dart';
 import 'package:bang_navigator/presentation/widgets/animated_indexed_stack.dart';
 import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -68,7 +68,6 @@ class KagiScreen extends HookConsumerWidget {
     final menuController = useMemoized(() => MenuController());
 
     final lastBackButtonPress = useRef<DateTime?>(null);
-    final webViewController = useRef<InAppWebViewController?>(null);
 
     final overlayController = useOverlayPortalController();
 
@@ -111,7 +110,7 @@ class KagiScreen extends HookConsumerWidget {
                     ref.read(overlayDialogProvider.notifier).show(
                           WebPageDialog(
                             page: page,
-                            webViewController: webViewController.value,
+                            webViewController: page.controller,
                             onDismiss: ref
                                 .read(overlayDialogProvider.notifier)
                                 .dismiss,
@@ -181,6 +180,92 @@ class KagiScreen extends HookConsumerWidget {
                   },
                 ),
           actions: [
+            if (activeWebView != null)
+              HookConsumer(
+                builder: (context, ref, child) {
+                  final colorScheme = Theme.of(context).colorScheme;
+
+                  final controller =
+                      useListenable(activeWebView.page).value.controller;
+                  final readerabilityState = ref.watch(
+                    readerabilityControllerProvider(controller),
+                  );
+
+                  final isReaderable = useValueListenable(
+                    activeWebView.isReaderable,
+                  );
+
+                  final readerableApplied = useValueListenable(
+                    activeWebView.readerableApplied,
+                  );
+
+                  final icon = useMemoized(
+                    () => readerableApplied
+                        ? Icon(
+                            MdiIcons.bookOpen,
+                            color: Theme.of(context).colorScheme.primary,
+                          )
+                        : const Icon(
+                            MdiIcons.bookOpenOutline,
+                            color: Colors.white,
+                          ),
+                    [readerableApplied],
+                  );
+
+                  return Visibility(
+                    visible: isReaderable == true || readerableApplied,
+                    child: InkWell(
+                      onTap: readerabilityState.isLoading
+                          ? null
+                          : () async {
+                              final controller =
+                                  activeWebView.currentController;
+
+                              if (controller != null) {
+                                final readabilityNotifier = ref.read(
+                                  readerabilityControllerProvider(
+                                    controller,
+                                  ).notifier,
+                                );
+
+                                if (readerableApplied) {
+                                  await activeWebView
+                                      .updateReaderableApplied(false);
+                                } else {
+                                  await readabilityNotifier.applyReaderable();
+                                  await activeWebView
+                                      .updateReaderableApplied(true);
+                                }
+                              }
+                            },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 15.0,
+                          horizontal: 8.0,
+                        ),
+                        child: readerabilityState.when(
+                          data: (_) => icon,
+                          error: (error, stackTrace) => SizedBox.shrink(),
+                          loading: () => AnimateGradientShader(
+                            duration: const Duration(milliseconds: 500),
+                            primaryEnd: Alignment.bottomLeft,
+                            secondaryEnd: Alignment.topRight,
+                            primaryColors: [
+                              colorScheme.primary,
+                              colorScheme.primaryContainer,
+                            ],
+                            secondaryColors: [
+                              colorScheme.secondary,
+                              colorScheme.secondaryContainer,
+                            ],
+                            child: icon,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
             if (activeWebView != null && quickAction != null)
               InkWell(
                 onTap: () async {
@@ -319,7 +404,8 @@ class KagiScreen extends HookConsumerWidget {
                 const Divider(),
                 MenuItemButton(
                   onPressed: () async {
-                    final url = await webViewController.value?.getUrl();
+                    final url =
+                        await activeWebView?.currentController?.getUrl();
                     if (url != null) {
                       // ignore: use_build_context_synchronously
                       await ui_helper.launchUrlFeedback(context, url);
@@ -330,7 +416,8 @@ class KagiScreen extends HookConsumerWidget {
                 ),
                 MenuItemButton(
                   onPressed: () async {
-                    final url = await webViewController.value?.getUrl();
+                    final url =
+                        await activeWebView?.currentController?.getUrl();
                     if (url != null) {
                       await Share.shareUri(url);
                     }
@@ -341,7 +428,7 @@ class KagiScreen extends HookConsumerWidget {
                 const Divider(),
                 MenuItemButton(
                   onPressed: () async {
-                    await webViewController.value?.reload();
+                    await activeWebView?.currentController?.reload();
                   },
                   leadingIcon: const Icon(Icons.refresh),
                   child: const Text('Reload'),
@@ -362,7 +449,8 @@ class KagiScreen extends HookConsumerWidget {
                           child: IconButton(
                             onPressed: (history.canGoBack)
                                 ? () async {
-                                    await webViewController.value?.goBack();
+                                    await activeWebView?.currentController
+                                        ?.goBack();
                                     menuController.close();
                                   }
                                 : null,
@@ -374,7 +462,8 @@ class KagiScreen extends HookConsumerWidget {
                           child: IconButton(
                             onPressed: (history.canGoForward)
                                 ? () async {
-                                    await webViewController.value?.goForward();
+                                    await activeWebView?.currentController
+                                        ?.goForward();
                                     menuController.close();
                                   }
                                 : null,
@@ -404,9 +493,6 @@ class KagiScreen extends HookConsumerWidget {
           child: HookConsumer(
             builder: (context, ref, child) {
               final webViews = ref.watch(webViewRepositoryProvider);
-              useListenableCallback(activeWebView?.page, () {
-                webViewController.value = activeWebView?.page.value.controller;
-              });
 
               return BackButtonListener(
                 onBackButtonPressed: () async {

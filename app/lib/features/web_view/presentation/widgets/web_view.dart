@@ -13,6 +13,7 @@ import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/web_view/domain/entities/web_view_page.dart';
 import 'package:bang_navigator/features/web_view/domain/providers.dart';
+import 'package:bang_navigator/features/web_view/presentation/controllers/readerability.dart';
 import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:bang_navigator/features/web_view/presentation/widgets/web_page_dialog.dart';
 import 'package:bang_navigator/features/web_view/utils/download_helper.dart';
@@ -36,16 +37,45 @@ const _webViewSupportedSchemes = [
 ];
 
 class WebView extends StatefulHookConsumerWidget {
-  final ValueNotifier<WebViewPage> _valueNotifier;
+  final ValueNotifier<WebViewPage> _pageNotifier;
 
-  ValueListenable<WebViewPage> get page => _valueNotifier;
+  final ValueNotifier<bool?> _isReaderable;
+  final ValueNotifier<bool> _readerableApplied;
+
+  ValueListenable<WebViewPage> get page => _pageNotifier;
+
+  /// Don't cache this value as it depends on current value of a ValueListenable
+  InAppWebViewController? get currentController =>
+      _pageNotifier.value.controller;
+
+  ValueListenable<bool?> get isReaderable => _isReaderable;
+  ValueListenable<bool> get readerableApplied => _readerableApplied;
 
   void updatePage(WebViewPage Function(WebViewPage page) update) {
-    _valueNotifier.value = update(_valueNotifier.value);
+    _pageNotifier.value = update(_pageNotifier.value);
+  }
+
+  void resetReaderable() {
+    _isReaderable.value = null;
+    _readerableApplied.value = false;
+  }
+
+  Future<void> updateReaderableApplied(bool value) async {
+    if (value == false) {
+      await _pageNotifier.value.controller?.reload();
+    }
+
+    _readerableApplied.value = value;
+  }
+
+  void updateIsReaderable(bool value) {
+    _isReaderable.value = value;
   }
 
   WebView({required WebViewPage tab})
-      : _valueNotifier = ValueNotifier(tab),
+      : _pageNotifier = ValueNotifier(tab),
+        _isReaderable = ValueNotifier(null),
+        _readerableApplied = ValueNotifier(false),
         super(key: tab.key);
 
   @override
@@ -128,7 +158,10 @@ class _WebViewState extends ConsumerState<WebView> {
     _onLoadStopDebounce?.cancel();
     _periodicScreenshotUpdate?.cancel();
 
-    widget._valueNotifier.dispose();
+    widget._pageNotifier.dispose();
+    widget._isReaderable.dispose();
+    widget._readerableApplied.dispose();
+
     logger.i('Disposed ${widget.key} (${widget.page.value.title})');
   }
 
@@ -340,8 +373,10 @@ class _WebViewState extends ConsumerState<WebView> {
                 ),
               );
             }
+
+            widget.resetReaderable();
           },
-          onLoadStop: (controller, url) {
+          onLoadStop: (controller, url) async {
             if (url != null) {
               widget.updatePage((page) => page.copyWith.url(url));
             }
@@ -365,6 +400,12 @@ class _WebViewState extends ConsumerState<WebView> {
                 });
               });
             });
+
+            final readabilityNotifier = ref.read(
+              readerabilityControllerProvider(controller).notifier,
+            );
+
+            widget.updateIsReaderable(await readabilityNotifier.isReaderable());
           },
           onUpdateVisitedHistory: (controller, url, isReload) async {
             if (isReload != true) {

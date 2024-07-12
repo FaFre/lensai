@@ -1,7 +1,12 @@
+import 'dart:convert';
+
 import 'package:bang_navigator/features/content_block/domain/repositories/host.dart';
 import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show rootBundle;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:universal_io/io.dart';
 
 part 'providers.g.dart';
 
@@ -27,4 +32,14 @@ Stream<Set<String>?> blockContentHosts(BlockContentHostsRef ref) {
   return hostRepository
       .watchHosts(sources: enableHostList)
       .map((hosts) => hosts.toSet());
+}
+
+@Riverpod(keepAlive: true)
+Future<String> readerabilityScript(ReaderabilityScriptRef ref) {
+  return rootBundle.load('assets/scripts/readability.min.js.gz').then(
+        (value) => compute(
+          (message) => utf8.decode(gzip.decode(message)),
+          value.buffer.asUint8List(),
+        ),
+      );
 }

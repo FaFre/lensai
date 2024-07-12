@@ -1,0 +1,1362 @@
+{
+  "hash": "8d23fa454595d8aa7895",
+  "version": "5.92.1",
+  "time": 1715,
+  "builtAt": 1720514525488,
+  "publicPath": "auto",
+  "outputPath": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/dist",
+  "assetsByChunkName": {
+    "main": [
+      "readability.min.js"
+    ]
+  },
+  "assets": [
+    {
+      "type": "asset",
+      "name": "readability.min.js",
+      "size": 55954,
+      "emitted": true,
+      "comparedForEmit": false,
+      "cached": false,
+      "info": {
+        "javascriptModule": false,
+        "minimized": true,
+        "related": {
+          "gzipped": "readability.min.js.gz"
+        },
+        "size": 55954
+      },
+      "chunkNames": [
+        "main"
+      ],
+      "chunkIdHints": [],
+      "auxiliaryChunkNames": [],
+      "auxiliaryChunkIdHints": [],
+      "filteredRelated": 0,
+      "related": [
+        {
+          "type": "gzipped",
+          "name": "readability.min.js.gz",
+          "size": 18947,
+          "emitted": true,
+          "comparedForEmit": false,
+          "cached": false,
+          "info": {
+            "compressed": true,
+            "size": 18947
+          },
+          "chunkNames": [],
+          "chunkIdHints": [],
+          "auxiliaryChunkNames": [],
+          "auxiliaryChunkIdHints": [],
+          "related": {},
+          "chunks": [],
+          "auxiliaryChunks": [],
+          "isOverSizeLimit": false
+        }
+      ],
+      "chunks": [
+        792
+      ],
+      "auxiliaryChunks": [],
+      "isOverSizeLimit": false
+    }
+  ],
+  "chunks": [
+    {
+      "rendered": true,
+      "initial": true,
+      "entry": true,
+      "recorded": false,
+      "size": 157907,
+      "sizes": {
+        "javascript": 156970,
+        "runtime": 937
+      },
+      "names": [
+        "main"
+      ],
+      "idHints": [],
+      "runtime": [
+        "main"
+      ],
+      "files": [
+        "readability.min.js"
+      ],
+      "auxiliaryFiles": [],
+      "hash": "55ea9d503085bb5260ad",
+      "childrenByOrder": {},
+      "id": 792,
+      "siblings": [],
+      "parents": [],
+      "children": [],
+      "modules": [
+        {
+          "type": "module",
+          "moduleType": "javascript/auto",
+          "layer": null,
+          "size": 4162,
+          "sizes": {
+            "javascript": 4162
+          },
+          "built": true,
+          "codeGenerated": true,
+          "buildTimeExecuted": false,
+          "cached": false,
+          "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability-readerable.js",
+          "name": "./node_modules/@mozilla/readability/Readability-readerable.js",
+          "nameForCondition": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability-readerable.js",
+          "index": 3,
+          "preOrderIndex": 3,
+          "index2": 1,
+          "postOrderIndex": 1,
+          "cacheable": true,
+          "optional": false,
+          "orphan": false,
+          "dependent": true,
+          "issuer": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "issuerName": "./node_modules/@mozilla/readability/index.js",
+          "issuerPath": [
+            {
+              "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "name": "./src/index.js",
+              "id": 954
+            },
+            {
+              "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+              "name": "./node_modules/@mozilla/readability/index.js",
+              "id": 396
+            }
+          ],
+          "failed": false,
+          "errors": 0,
+          "warnings": 0,
+          "id": 804,
+          "issuerId": 396,
+          "chunks": [
+            792
+          ],
+          "assets": [],
+          "reasons": [
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability-readerable.js",
+              "module": "./node_modules/@mozilla/readability/Readability-readerable.js",
+              "moduleName": "./node_modules/@mozilla/readability/Readability-readerable.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability-readerable.js",
+              "resolvedModule": "./node_modules/@mozilla/readability/Readability-readerable.js",
+              "type": "cjs self exports reference",
+              "active": true,
+              "explanation": "",
+              "userRequest": null,
+              "loc": "107:2-16",
+              "moduleId": 804,
+              "resolvedModuleId": 804
+            },
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+              "module": "./node_modules/@mozilla/readability/index.js",
+              "moduleName": "./node_modules/@mozilla/readability/index.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+              "resolvedModule": "./node_modules/@mozilla/readability/index.js",
+              "type": "cjs require",
+              "active": true,
+              "explanation": "",
+              "userRequest": "./Readability-readerable",
+              "loc": "3:27-62",
+              "moduleId": 396,
+              "resolvedModuleId": 396
+            }
+          ],
+          "usedExports": null,
+          "providedExports": null,
+          "optimizationBailout": [
+            "CommonJS bailout: module.exports is used directly at 107:2-16",
+            "Statement (VariableDeclaration) with side effects in source code at 22:0-27:2",
+            "ModuleConcatenation bailout: Module is not an ECMAScript module"
+          ],
+          "depth": 2
+        },
+        {
+          "type": "module",
+          "moduleType": "javascript/auto",
+          "layer": null,
+          "size": 84033,
+          "sizes": {
+            "javascript": 84033
+          },
+          "built": true,
+          "codeGenerated": true,
+          "buildTimeExecuted": false,
+          "cached": false,
+          "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability.js",
+          "name": "./node_modules/@mozilla/readability/Readability.js",
+          "nameForCondition": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability.js",
+          "index": 2,
+          "preOrderIndex": 2,
+          "index2": 0,
+          "postOrderIndex": 0,
+          "cacheable": true,
+          "optional": false,
+          "orphan": false,
+          "dependent": true,
+          "issuer": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "issuerName": "./node_modules/@mozilla/readability/index.js",
+          "issuerPath": [
+            {
+              "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "name": "./src/index.js",
+              "id": 954
+            },
+            {
+              "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+              "name": "./node_modules/@mozilla/readability/index.js",
+              "id": 396
+            }
+          ],
+          "failed": false,
+          "errors": 0,
+          "warnings": 0,
+          "id": 238,
+          "issuerId": 396,
+          "chunks": [
+            792
+          ],
+          "assets": [],
+          "reasons": [
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability.js",
+              "module": "./node_modules/@mozilla/readability/Readability.js",
+              "moduleName": "./node_modules/@mozilla/readability/Readability.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability.js",
+              "resolvedModule": "./node_modules/@mozilla/readability/Readability.js",
+              "type": "cjs self exports reference",
+              "active": true,
+              "explanation": "",
+              "userRequest": null,
+              "loc": "2313:2-16",
+              "moduleId": 238,
+              "resolvedModuleId": 238
+            },
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+              "module": "./node_modules/@mozilla/readability/index.js",
+              "moduleName": "./node_modules/@mozilla/readability/index.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+              "resolvedModule": "./node_modules/@mozilla/readability/index.js",
+              "type": "cjs require",
+              "active": true,
+              "explanation": "",
+              "userRequest": "./Readability",
+              "loc": "2:18-42",
+              "moduleId": 396,
+              "resolvedModuleId": 396
+            }
+          ],
+          "usedExports": null,
+          "providedExports": null,
+          "optimizationBailout": [
+            "CommonJS bailout: module.exports is used directly at 2313:2-16",
+            "Statement (ExpressionStatement) with side effects in source code at 98:0-2309:2",
+            "ModuleConcatenation bailout: Module is not an ECMAScript module"
+          ],
+          "depth": 2
+        },
+        {
+          "type": "module",
+          "moduleType": "javascript/auto",
+          "layer": null,
+          "size": 226,
+          "sizes": {
+            "javascript": 226
+          },
+          "built": true,
+          "codeGenerated": true,
+          "buildTimeExecuted": false,
+          "cached": false,
+          "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "name": "./node_modules/@mozilla/readability/index.js",
+          "nameForCondition": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "index": 1,
+          "preOrderIndex": 1,
+          "index2": 2,
+          "postOrderIndex": 2,
+          "cacheable": true,
+          "optional": false,
+          "orphan": false,
+          "dependent": true,
+          "issuer": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "issuerName": "./src/index.js",
+          "issuerPath": [
+            {
+              "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "name": "./src/index.js",
+              "id": 954
+            }
+          ],
+          "failed": false,
+          "errors": 0,
+          "warnings": 0,
+          "id": 396,
+          "issuerId": 954,
+          "chunks": [
+            792
+          ],
+          "assets": [],
+          "reasons": [
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+              "module": "./node_modules/@mozilla/readability/index.js",
+              "moduleName": "./node_modules/@mozilla/readability/index.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+              "resolvedModule": "./node_modules/@mozilla/readability/index.js",
+              "type": "cjs self exports reference",
+              "active": true,
+              "explanation": "",
+              "userRequest": null,
+              "loc": "5:0-14",
+              "moduleId": 396,
+              "resolvedModuleId": 396
+            },
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "module": "./src/index.js",
+              "moduleName": "./src/index.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "resolvedModule": "./src/index.js",
+              "type": "harmony side effect evaluation",
+              "active": true,
+              "explanation": "",
+              "userRequest": "@mozilla/readability",
+              "loc": "1:0-73",
+              "moduleId": 954,
+              "resolvedModuleId": 954
+            },
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "module": "./src/index.js",
+              "moduleName": "./src/index.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "resolvedModule": "./src/index.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "@mozilla/readability",
+              "loc": "4:9-29",
+              "moduleId": 954,
+              "resolvedModuleId": 954
+            },
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "module": "./src/index.js",
+              "moduleName": "./src/index.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "resolvedModule": "./src/index.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "@mozilla/readability",
+              "loc": "7:19-30",
+              "moduleId": 954,
+              "resolvedModuleId": 954
+            }
+          ],
+          "usedExports": null,
+          "providedExports": null,
+          "optimizationBailout": [
+            "CommonJS bailout: module.exports is used directly at 5:0-14",
+            "Statement (VariableDeclaration) with side effects in source code at 2:0-43",
+            "ModuleConcatenation bailout: Module is not an ECMAScript module"
+          ],
+          "depth": 1
+        },
+        {
+          "type": "module",
+          "moduleType": "javascript/auto",
+          "layer": null,
+          "size": 67137,
+          "sizes": {
+            "javascript": 67137
+          },
+          "built": true,
+          "codeGenerated": true,
+          "buildTimeExecuted": false,
+          "cached": false,
+          "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+          "name": "./node_modules/dompurify/dist/purify.js",
+          "nameForCondition": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+          "index": 4,
+          "preOrderIndex": 4,
+          "index2": 3,
+          "postOrderIndex": 3,
+          "cacheable": true,
+          "optional": false,
+          "orphan": false,
+          "dependent": true,
+          "issuer": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "issuerName": "./src/index.js",
+          "issuerPath": [
+            {
+              "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "name": "./src/index.js",
+              "id": 954
+            }
+          ],
+          "failed": false,
+          "errors": 0,
+          "warnings": 0,
+          "id": 838,
+          "issuerId": 954,
+          "chunks": [
+            792
+          ],
+          "assets": [],
+          "reasons": [
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "module": "./src/index.js",
+              "moduleName": "./src/index.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "resolvedModule": "./src/index.js",
+              "type": "harmony side effect evaluation",
+              "active": true,
+              "explanation": "",
+              "userRequest": "dompurify",
+              "loc": "2:0-34",
+              "moduleId": 954,
+              "resolvedModuleId": 954
+            },
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "module": "./src/index.js",
+              "moduleName": "./src/index.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+              "resolvedModule": "./src/index.js",
+              "type": "harmony import specifier",
+              "active": true,
+              "explanation": "",
+              "userRequest": "dompurify",
+              "loc": "14:15-33",
+              "moduleId": 954,
+              "resolvedModuleId": 954
+            },
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+              "module": "./node_modules/dompurify/dist/purify.js",
+              "moduleName": "./node_modules/dompurify/dist/purify.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+              "resolvedModule": "./node_modules/dompurify/dist/purify.js",
+              "type": "cjs self exports reference",
+              "active": true,
+              "explanation": "",
+              "userRequest": null,
+              "loc": "4:65-79",
+              "moduleId": 838,
+              "resolvedModuleId": 838
+            },
+            {
+              "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+              "module": "./node_modules/dompurify/dist/purify.js",
+              "moduleName": "./node_modules/dompurify/dist/purify.js",
+              "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+              "resolvedModule": "./node_modules/dompurify/dist/purify.js",
+              "type": "cjs self exports reference",
+              "active": true,
+              "explanation": "",
+              "userRequest": null,
+              "loc": "7:3-7",
+              "moduleId": 838,
+              "resolvedModuleId": 838
+            }
+          ],
+          "usedExports": null,
+          "providedExports": null,
+          "optimizationBailout": [
+            "CommonJS bailout: this is used directly at 7:3-7",
+            "CommonJS bailout: module.exports is used directly at 4:65-79",
+            "Statement (ExpressionStatement) with side effects in source code at 3:0-1561:4",
+            "ModuleConcatenation bailout: Module is not an ECMAScript module"
+          ],
+          "depth": 1
+        },
+        {
+          "type": "module",
+          "moduleType": "javascript/auto",
+          "layer": null,
+          "size": 1412,
+          "sizes": {
+            "javascript": 1412
+          },
+          "built": true,
+          "codeGenerated": true,
+          "buildTimeExecuted": false,
+          "cached": false,
+          "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "name": "./src/index.js",
+          "nameForCondition": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "index": 0,
+          "preOrderIndex": 0,
+          "index2": 4,
+          "postOrderIndex": 4,
+          "cacheable": true,
+          "optional": false,
+          "orphan": false,
+          "dependent": false,
+          "issuer": null,
+          "issuerName": null,
+          "issuerPath": null,
+          "failed": false,
+          "errors": 0,
+          "warnings": 0,
+          "id": 954,
+          "issuerId": null,
+          "chunks": [
+            792
+          ],
+          "assets": [],
+          "reasons": [
+            {
+              "moduleIdentifier": null,
+              "module": null,
+              "moduleName": null,
+              "resolvedModuleIdentifier": null,
+              "resolvedModule": null,
+              "type": "entry",
+              "active": true,
+              "explanation": "",
+              "userRequest": "./src/index.js",
+              "loc": "main",
+              "moduleId": null,
+              "resolvedModuleId": null
+            },
+            {
+              "moduleIdentifier": null,
+              "module": null,
+              "moduleName": null,
+              "resolvedModuleIdentifier": null,
+              "resolvedModule": null,
+              "type": null,
+              "active": true,
+              "explanation": "used as library export",
+              "userRequest": null,
+              "moduleId": null,
+              "resolvedModuleId": null
+            }
+          ],
+          "usedExports": true,
+          "providedExports": [
+            "applyReaderable",
+            "isReaderable"
+          ],
+          "optimizationBailout": [
+            "Statement (ExpressionStatement) with side effects in source code at 33:0-35",
+            "ModuleConcatenation bailout: Cannot concat with ./node_modules/@mozilla/readability/index.js: Module is not an ECMAScript module",
+            "ModuleConcatenation bailout: Cannot concat with ./node_modules/dompurify/dist/purify.js: Module is not an ECMAScript module"
+          ],
+          "depth": 0
+        },
+        {
+          "type": "module",
+          "moduleType": "runtime",
+          "layer": null,
+          "size": 267,
+          "sizes": {
+            "runtime": 267
+          },
+          "built": false,
+          "codeGenerated": true,
+          "buildTimeExecuted": false,
+          "cached": false,
+          "identifier": "webpack/runtime/compat get default export",
+          "name": "webpack/runtime/compat get default export",
+          "nameForCondition": null,
+          "index": null,
+          "preOrderIndex": null,
+          "index2": null,
+          "postOrderIndex": null,
+          "optional": false,
+          "orphan": false,
+          "dependent": false,
+          "failed": false,
+          "errors": 0,
+          "warnings": 0,
+          "id": "",
+          "chunks": [
+            792
+          ],
+          "assets": [],
+          "reasons": [],
+          "usedExports": null,
+          "providedExports": [],
+          "optimizationBailout": [],
+          "depth": null
+        },
+        {
+          "type": "module",
+          "moduleType": "runtime",
+          "layer": null,
+          "size": 308,
+          "sizes": {
+            "runtime": 308
+          },
+          "built": false,
+          "codeGenerated": true,
+          "buildTimeExecuted": false,
+          "cached": false,
+          "identifier": "webpack/runtime/define property getters",
+          "name": "webpack/runtime/define property getters",
+          "nameForCondition": null,
+          "index": null,
+          "preOrderIndex": null,
+          "index2": null,
+          "postOrderIndex": null,
+          "optional": false,
+          "orphan": false,
+          "dependent": false,
+          "failed": false,
+          "errors": 0,
+          "warnings": 0,
+          "id": "",
+          "chunks": [
+            792
+          ],
+          "assets": [],
+          "reasons": [],
+          "usedExports": null,
+          "providedExports": [],
+          "optimizationBailout": [],
+          "depth": null
+        },
+        {
+          "type": "module",
+          "moduleType": "runtime",
+          "layer": null,
+          "size": 88,
+          "sizes": {
+            "runtime": 88
+          },
+          "built": false,
+          "codeGenerated": true,
+          "buildTimeExecuted": false,
+          "cached": false,
+          "identifier": "webpack/runtime/hasOwnProperty shorthand",
+          "name": "webpack/runtime/hasOwnProperty shorthand",
+          "nameForCondition": null,
+          "index": null,
+          "preOrderIndex": null,
+          "index2": null,
+          "postOrderIndex": null,
+          "optional": false,
+          "orphan": false,
+          "dependent": false,
+          "failed": false,
+          "errors": 0,
+          "warnings": 0,
+          "id": "",
+          "chunks": [
+            792
+          ],
+          "assets": [],
+          "reasons": [],
+          "usedExports": null,
+          "providedExports": [],
+          "optimizationBailout": [],
+          "depth": null
+        },
+        {
+          "type": "module",
+          "moduleType": "runtime",
+          "layer": null,
+          "size": 274,
+          "sizes": {
+            "runtime": 274
+          },
+          "built": false,
+          "codeGenerated": true,
+          "buildTimeExecuted": false,
+          "cached": false,
+          "identifier": "webpack/runtime/make namespace object",
+          "name": "webpack/runtime/make namespace object",
+          "nameForCondition": null,
+          "index": null,
+          "preOrderIndex": null,
+          "index2": null,
+          "postOrderIndex": null,
+          "optional": false,
+          "orphan": false,
+          "dependent": false,
+          "failed": false,
+          "errors": 0,
+          "warnings": 0,
+          "id": "",
+          "chunks": [
+            792
+          ],
+          "assets": [],
+          "reasons": [],
+          "usedExports": null,
+          "providedExports": [],
+          "optimizationBailout": [],
+          "depth": null
+        }
+      ],
+      "origins": [
+        {
+          "module": "",
+          "moduleIdentifier": "",
+          "moduleName": "",
+          "loc": "main",
+          "request": "./src/index.js"
+        }
+      ]
+    }
+  ],
+  "modules": [
+    {
+      "type": "module",
+      "moduleType": "javascript/auto",
+      "layer": null,
+      "size": 1412,
+      "sizes": {
+        "javascript": 1412
+      },
+      "built": true,
+      "codeGenerated": true,
+      "buildTimeExecuted": false,
+      "cached": false,
+      "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+      "name": "./src/index.js",
+      "nameForCondition": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+      "index": 0,
+      "preOrderIndex": 0,
+      "index2": 4,
+      "postOrderIndex": 4,
+      "cacheable": true,
+      "optional": false,
+      "orphan": false,
+      "issuer": null,
+      "issuerName": null,
+      "issuerPath": null,
+      "failed": false,
+      "errors": 0,
+      "warnings": 0,
+      "id": 954,
+      "issuerId": null,
+      "chunks": [
+        792
+      ],
+      "assets": [],
+      "reasons": [
+        {
+          "moduleIdentifier": null,
+          "module": null,
+          "moduleName": null,
+          "resolvedModuleIdentifier": null,
+          "resolvedModule": null,
+          "type": "entry",
+          "active": true,
+          "explanation": "",
+          "userRequest": "./src/index.js",
+          "loc": "main",
+          "moduleId": null,
+          "resolvedModuleId": null
+        },
+        {
+          "moduleIdentifier": null,
+          "module": null,
+          "moduleName": null,
+          "resolvedModuleIdentifier": null,
+          "resolvedModule": null,
+          "type": null,
+          "active": true,
+          "explanation": "used as library export",
+          "userRequest": null,
+          "moduleId": null,
+          "resolvedModuleId": null
+        }
+      ],
+      "usedExports": true,
+      "providedExports": [
+        "applyReaderable",
+        "isReaderable"
+      ],
+      "optimizationBailout": [
+        "Statement (ExpressionStatement) with side effects in source code at 33:0-35",
+        "ModuleConcatenation bailout: Cannot concat with ./node_modules/@mozilla/readability/index.js: Module is not an ECMAScript module",
+        "ModuleConcatenation bailout: Cannot concat with ./node_modules/dompurify/dist/purify.js: Module is not an ECMAScript module"
+      ],
+      "depth": 0
+    },
+    {
+      "type": "module",
+      "moduleType": "javascript/auto",
+      "layer": null,
+      "size": 226,
+      "sizes": {
+        "javascript": 226
+      },
+      "built": true,
+      "codeGenerated": true,
+      "buildTimeExecuted": false,
+      "cached": false,
+      "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+      "name": "./node_modules/@mozilla/readability/index.js",
+      "nameForCondition": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+      "index": 1,
+      "preOrderIndex": 1,
+      "index2": 2,
+      "postOrderIndex": 2,
+      "cacheable": true,
+      "optional": false,
+      "orphan": false,
+      "issuer": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+      "issuerName": "./src/index.js",
+      "issuerPath": [
+        {
+          "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "name": "./src/index.js",
+          "id": 954
+        }
+      ],
+      "failed": false,
+      "errors": 0,
+      "warnings": 0,
+      "id": 396,
+      "issuerId": 954,
+      "chunks": [
+        792
+      ],
+      "assets": [],
+      "reasons": [
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "module": "./node_modules/@mozilla/readability/index.js",
+          "moduleName": "./node_modules/@mozilla/readability/index.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "resolvedModule": "./node_modules/@mozilla/readability/index.js",
+          "type": "cjs self exports reference",
+          "active": true,
+          "explanation": "",
+          "userRequest": null,
+          "loc": "5:0-14",
+          "moduleId": 396,
+          "resolvedModuleId": 396
+        },
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "module": "./src/index.js",
+          "moduleName": "./src/index.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "resolvedModule": "./src/index.js",
+          "type": "harmony side effect evaluation",
+          "active": true,
+          "explanation": "",
+          "userRequest": "@mozilla/readability",
+          "loc": "1:0-73",
+          "moduleId": 954,
+          "resolvedModuleId": 954
+        },
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "module": "./src/index.js",
+          "moduleName": "./src/index.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "resolvedModule": "./src/index.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "@mozilla/readability",
+          "loc": "4:9-29",
+          "moduleId": 954,
+          "resolvedModuleId": 954
+        },
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "module": "./src/index.js",
+          "moduleName": "./src/index.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "resolvedModule": "./src/index.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "@mozilla/readability",
+          "loc": "7:19-30",
+          "moduleId": 954,
+          "resolvedModuleId": 954
+        }
+      ],
+      "usedExports": null,
+      "providedExports": null,
+      "optimizationBailout": [
+        "CommonJS bailout: module.exports is used directly at 5:0-14",
+        "Statement (VariableDeclaration) with side effects in source code at 2:0-43",
+        "ModuleConcatenation bailout: Module is not an ECMAScript module"
+      ],
+      "depth": 1
+    },
+    {
+      "type": "module",
+      "moduleType": "javascript/auto",
+      "layer": null,
+      "size": 67137,
+      "sizes": {
+        "javascript": 67137
+      },
+      "built": true,
+      "codeGenerated": true,
+      "buildTimeExecuted": false,
+      "cached": false,
+      "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+      "name": "./node_modules/dompurify/dist/purify.js",
+      "nameForCondition": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+      "index": 4,
+      "preOrderIndex": 4,
+      "index2": 3,
+      "postOrderIndex": 3,
+      "cacheable": true,
+      "optional": false,
+      "orphan": false,
+      "issuer": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+      "issuerName": "./src/index.js",
+      "issuerPath": [
+        {
+          "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "name": "./src/index.js",
+          "id": 954
+        }
+      ],
+      "failed": false,
+      "errors": 0,
+      "warnings": 0,
+      "id": 838,
+      "issuerId": 954,
+      "chunks": [
+        792
+      ],
+      "assets": [],
+      "reasons": [
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "module": "./src/index.js",
+          "moduleName": "./src/index.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "resolvedModule": "./src/index.js",
+          "type": "harmony side effect evaluation",
+          "active": true,
+          "explanation": "",
+          "userRequest": "dompurify",
+          "loc": "2:0-34",
+          "moduleId": 954,
+          "resolvedModuleId": 954
+        },
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "module": "./src/index.js",
+          "moduleName": "./src/index.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "resolvedModule": "./src/index.js",
+          "type": "harmony import specifier",
+          "active": true,
+          "explanation": "",
+          "userRequest": "dompurify",
+          "loc": "14:15-33",
+          "moduleId": 954,
+          "resolvedModuleId": 954
+        },
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+          "module": "./node_modules/dompurify/dist/purify.js",
+          "moduleName": "./node_modules/dompurify/dist/purify.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+          "resolvedModule": "./node_modules/dompurify/dist/purify.js",
+          "type": "cjs self exports reference",
+          "active": true,
+          "explanation": "",
+          "userRequest": null,
+          "loc": "4:65-79",
+          "moduleId": 838,
+          "resolvedModuleId": 838
+        },
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+          "module": "./node_modules/dompurify/dist/purify.js",
+          "moduleName": "./node_modules/dompurify/dist/purify.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/dompurify/dist/purify.js",
+          "resolvedModule": "./node_modules/dompurify/dist/purify.js",
+          "type": "cjs self exports reference",
+          "active": true,
+          "explanation": "",
+          "userRequest": null,
+          "loc": "7:3-7",
+          "moduleId": 838,
+          "resolvedModuleId": 838
+        }
+      ],
+      "usedExports": null,
+      "providedExports": null,
+      "optimizationBailout": [
+        "CommonJS bailout: this is used directly at 7:3-7",
+        "CommonJS bailout: module.exports is used directly at 4:65-79",
+        "Statement (ExpressionStatement) with side effects in source code at 3:0-1561:4",
+        "ModuleConcatenation bailout: Module is not an ECMAScript module"
+      ],
+      "depth": 1
+    },
+    {
+      "type": "module",
+      "moduleType": "javascript/auto",
+      "layer": null,
+      "size": 84033,
+      "sizes": {
+        "javascript": 84033
+      },
+      "built": true,
+      "codeGenerated": true,
+      "buildTimeExecuted": false,
+      "cached": false,
+      "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability.js",
+      "name": "./node_modules/@mozilla/readability/Readability.js",
+      "nameForCondition": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability.js",
+      "index": 2,
+      "preOrderIndex": 2,
+      "index2": 0,
+      "postOrderIndex": 0,
+      "cacheable": true,
+      "optional": false,
+      "orphan": false,
+      "issuer": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+      "issuerName": "./node_modules/@mozilla/readability/index.js",
+      "issuerPath": [
+        {
+          "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "name": "./src/index.js",
+          "id": 954
+        },
+        {
+          "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "name": "./node_modules/@mozilla/readability/index.js",
+          "id": 396
+        }
+      ],
+      "failed": false,
+      "errors": 0,
+      "warnings": 0,
+      "id": 238,
+      "issuerId": 396,
+      "chunks": [
+        792
+      ],
+      "assets": [],
+      "reasons": [
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability.js",
+          "module": "./node_modules/@mozilla/readability/Readability.js",
+          "moduleName": "./node_modules/@mozilla/readability/Readability.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability.js",
+          "resolvedModule": "./node_modules/@mozilla/readability/Readability.js",
+          "type": "cjs self exports reference",
+          "active": true,
+          "explanation": "",
+          "userRequest": null,
+          "loc": "2313:2-16",
+          "moduleId": 238,
+          "resolvedModuleId": 238
+        },
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "module": "./node_modules/@mozilla/readability/index.js",
+          "moduleName": "./node_modules/@mozilla/readability/index.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "resolvedModule": "./node_modules/@mozilla/readability/index.js",
+          "type": "cjs require",
+          "active": true,
+          "explanation": "",
+          "userRequest": "./Readability",
+          "loc": "2:18-42",
+          "moduleId": 396,
+          "resolvedModuleId": 396
+        }
+      ],
+      "usedExports": null,
+      "providedExports": null,
+      "optimizationBailout": [
+        "CommonJS bailout: module.exports is used directly at 2313:2-16",
+        "Statement (ExpressionStatement) with side effects in source code at 98:0-2309:2",
+        "ModuleConcatenation bailout: Module is not an ECMAScript module"
+      ],
+      "depth": 2
+    },
+    {
+      "type": "module",
+      "moduleType": "javascript/auto",
+      "layer": null,
+      "size": 4162,
+      "sizes": {
+        "javascript": 4162
+      },
+      "built": true,
+      "codeGenerated": true,
+      "buildTimeExecuted": false,
+      "cached": false,
+      "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability-readerable.js",
+      "name": "./node_modules/@mozilla/readability/Readability-readerable.js",
+      "nameForCondition": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability-readerable.js",
+      "index": 3,
+      "preOrderIndex": 3,
+      "index2": 1,
+      "postOrderIndex": 1,
+      "cacheable": true,
+      "optional": false,
+      "orphan": false,
+      "issuer": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+      "issuerName": "./node_modules/@mozilla/readability/index.js",
+      "issuerPath": [
+        {
+          "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/babel-loader/lib/index.js??ruleSet[1].rules[0].use!/home/fafre/Repos/kagi_bang_bang/app/js/readability/src/index.js",
+          "name": "./src/index.js",
+          "id": 954
+        },
+        {
+          "identifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "name": "./node_modules/@mozilla/readability/index.js",
+          "id": 396
+        }
+      ],
+      "failed": false,
+      "errors": 0,
+      "warnings": 0,
+      "id": 804,
+      "issuerId": 396,
+      "chunks": [
+        792
+      ],
+      "assets": [],
+      "reasons": [
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability-readerable.js",
+          "module": "./node_modules/@mozilla/readability/Readability-readerable.js",
+          "moduleName": "./node_modules/@mozilla/readability/Readability-readerable.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/Readability-readerable.js",
+          "resolvedModule": "./node_modules/@mozilla/readability/Readability-readerable.js",
+          "type": "cjs self exports reference",
+          "active": true,
+          "explanation": "",
+          "userRequest": null,
+          "loc": "107:2-16",
+          "moduleId": 804,
+          "resolvedModuleId": 804
+        },
+        {
+          "moduleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "module": "./node_modules/@mozilla/readability/index.js",
+          "moduleName": "./node_modules/@mozilla/readability/index.js",
+          "resolvedModuleIdentifier": "/home/fafre/Repos/kagi_bang_bang/app/js/readability/node_modules/@mozilla/readability/index.js",
+          "resolvedModule": "./node_modules/@mozilla/readability/index.js",
+          "type": "cjs require",
+          "active": true,
+          "explanation": "",
+          "userRequest": "./Readability-readerable",
+          "loc": "3:27-62",
+          "moduleId": 396,
+          "resolvedModuleId": 396
+        }
+      ],
+      "usedExports": null,
+      "providedExports": null,
+      "optimizationBailout": [
+        "CommonJS bailout: module.exports is used directly at 107:2-16",
+        "Statement (VariableDeclaration) with side effects in source code at 22:0-27:2",
+        "ModuleConcatenation bailout: Module is not an ECMAScript module"
+      ],
+      "depth": 2
+    },
+    {
+      "type": "module",
+      "moduleType": "runtime",
+      "layer": null,
+      "size": 267,
+      "sizes": {
+        "runtime": 267
+      },
+      "built": false,
+      "codeGenerated": true,
+      "buildTimeExecuted": false,
+      "cached": false,
+      "identifier": "webpack/runtime/compat get default export",
+      "name": "webpack/runtime/compat get default export",
+      "nameForCondition": null,
+      "index": null,
+      "preOrderIndex": null,
+      "index2": null,
+      "postOrderIndex": null,
+      "optional": false,
+      "orphan": false,
+      "failed": false,
+      "errors": 0,
+      "warnings": 0,
+      "id": "",
+      "chunks": [
+        792
+      ],
+      "assets": [],
+      "reasons": [],
+      "usedExports": null,
+      "providedExports": [],
+      "optimizationBailout": [],
+      "depth": null
+    },
+    {
+      "type": "module",
+      "moduleType": "runtime",
+      "layer": null,
+      "size": 308,
+      "sizes": {
+        "runtime": 308
+      },
+      "built": false,
+      "codeGenerated": true,
+      "buildTimeExecuted": false,
+      "cached": false,
+      "identifier": "webpack/runtime/define property getters",
+      "name": "webpack/runtime/define property getters",
+      "nameForCondition": null,
+      "index": null,
+      "preOrderIndex": null,
+      "index2": null,
+      "postOrderIndex": null,
+      "optional": false,
+      "orphan": false,
+      "failed": false,
+      "errors": 0,
+      "warnings": 0,
+      "id": "",
+      "chunks": [
+        792
+      ],
+      "assets": [],
+      "reasons": [],
+      "usedExports": null,
+      "providedExports": [],
+      "optimizationBailout": [],
+      "depth": null
+    },
+    {
+      "type": "module",
+      "moduleType": "runtime",
+      "layer": null,
+      "size": 88,
+      "sizes": {
+        "runtime": 88
+      },
+      "built": false,
+      "codeGenerated": true,
+      "buildTimeExecuted": false,
+      "cached": false,
+      "identifier": "webpack/runtime/hasOwnProperty shorthand",
+      "name": "webpack/runtime/hasOwnProperty shorthand",
+      "nameForCondition": null,
+      "index": null,
+      "preOrderIndex": null,
+      "index2": null,
+      "postOrderIndex": null,
+      "optional": false,
+      "orphan": false,
+      "failed": false,
+      "errors": 0,
+      "warnings": 0,
+      "id": "",
+      "chunks": [
+        792
+      ],
+      "assets": [],
+      "reasons": [],
+      "usedExports": null,
+      "providedExports": [],
+      "optimizationBailout": [],
+      "depth": null
+    },
+    {
+      "type": "module",
+      "moduleType": "runtime",
+      "layer": null,
+      "size": 274,
+      "sizes": {
+        "runtime": 274
+      },
+      "built": false,
+      "codeGenerated": true,
+      "buildTimeExecuted": false,
+      "cached": false,
+      "identifier": "webpack/runtime/make namespace object",
+      "name": "webpack/runtime/make namespace object",
+      "nameForCondition": null,
+      "index": null,
+      "preOrderIndex": null,
+      "index2": null,
+      "postOrderIndex": null,
+      "optional": false,
+      "orphan": false,
+      "failed": false,
+      "errors": 0,
+      "warnings": 0,
+      "id": "",
+      "chunks": [
+        792
+      ],
+      "assets": [],
+      "reasons": [],
+      "usedExports": null,
+      "providedExports": [],
+      "optimizationBailout": [],
+      "depth": null
+    }
+  ],
+  "entrypoints": {
+    "main": {
+      "name": "main",
+      "chunks": [
+        792
+      ],
+      "assets": [
+        {
+          "name": "readability.min.js",
+          "size": 55954
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": 55954,
+      "auxiliaryAssets": [],
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {},
+      "isOverSizeLimit": false
+    }
+  },
+  "namedChunkGroups": {
+    "main": {
+      "name": "main",
+      "chunks": [
+        792
+      ],
+      "assets": [
+        {
+          "name": "readability.min.js",
+          "size": 55954
+        }
+      ],
+      "filteredAssets": 0,
+      "assetsSize": 55954,
+      "auxiliaryAssets": [],
+      "filteredAuxiliaryAssets": 0,
+      "auxiliaryAssetsSize": 0,
+      "children": {},
+      "childAssets": {},
+      "isOverSizeLimit": false
+    }
+  },
+  "errors": [],
+  "errorsCount": 0,
+  "warnings": [],
+  "warningsCount": 0,
+  "children": []
+}

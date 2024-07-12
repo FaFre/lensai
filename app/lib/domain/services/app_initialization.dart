@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:bang_navigator/features/about/data/repositories/package_info_repository.dart';
 import 'package:bang_navigator/features/bangs/data/models/bang.dart';
 import 'package:bang_navigator/features/bangs/domain/repositories/sync.dart';
@@ -6,6 +8,7 @@ import 'package:bang_navigator/features/content_block/domain/repositories/sync.d
 import 'package:bang_navigator/features/search_browser/domain/services/session.dart';
 import 'package:bang_navigator/features/settings/data/models/settings.dart';
 import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
+import 'package:bang_navigator/features/web_view/domain/providers.dart';
 import 'package:exceptions/exceptions.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -89,6 +92,8 @@ class AppInitializationService extends _$AppInitializationService {
     state = await Result.fromAsync(() async {
       final settings = await ref.read(settingsRepositoryProvider.future);
       final errors = <ErrorMessage>[];
+
+      unawaited(ref.read(readerabilityScriptProvider.future));
 
       await _initPackageInfo();
 
