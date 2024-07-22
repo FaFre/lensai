@@ -322,6 +322,13 @@ class BangSyncData extends DataClass implements Insertable<BangSyncData> {
         group: group ?? this.group,
         lastSync: lastSync ?? this.lastSync,
       );
+  BangSyncData copyWithCompanion(BangSyncCompanion data) {
+    return BangSyncData(
+      group: data.group.present ? data.group.value : this.group,
+      lastSync: data.lastSync.present ? data.lastSync.value : this.lastSync,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('BangSyncData(')
@@ -487,6 +494,14 @@ class BangFrequencyData extends DataClass
         frequency: frequency ?? this.frequency,
         lastUsed: lastUsed ?? this.lastUsed,
       );
+  BangFrequencyData copyWithCompanion(BangFrequencyCompanion data) {
+    return BangFrequencyData(
+      trigger: data.trigger.present ? data.trigger.value : this.trigger,
+      frequency: data.frequency.present ? data.frequency.value : this.frequency,
+      lastUsed: data.lastUsed.present ? data.lastUsed.value : this.lastUsed,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('BangFrequencyData(')
@@ -677,6 +692,14 @@ class BangIconData extends DataClass implements Insertable<BangIconData> {
         iconData: iconData ?? this.iconData,
         fetchDate: fetchDate ?? this.fetchDate,
       );
+  BangIconData copyWithCompanion(BangIconCompanion data) {
+    return BangIconData(
+      trigger: data.trigger.present ? data.trigger.value : this.trigger,
+      iconData: data.iconData.present ? data.iconData.value : this.iconData,
+      fetchDate: data.fetchDate.present ? data.fetchDate.value : this.fetchDate,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('BangIconData(')
@@ -856,6 +879,14 @@ class BangFt extends DataClass implements Insertable<BangFt> {
         trigger: trigger ?? this.trigger,
         websiteName: websiteName ?? this.websiteName,
       );
+  BangFt copyWithCompanion(BangFtsCompanion data) {
+    return BangFt(
+      trigger: data.trigger.present ? data.trigger.value : this.trigger,
+      websiteName:
+          data.websiteName.present ? data.websiteName.value : this.websiteName,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('BangFt(')
@@ -1042,7 +1073,7 @@ class BangDataView extends ViewInfo<BangDataView, BangData>
 
 abstract class _$BangDatabase extends GeneratedDatabase {
   _$BangDatabase(QueryExecutor e) : super(e);
-  _$BangDatabaseManager get managers => _$BangDatabaseManager(this);
+  $BangDatabaseManager get managers => $BangDatabaseManager(this);
   late final BangTable bang = BangTable(this);
   late final BangSync bangSync = BangSync(this);
   late final BangFrequency bangFrequency = BangFrequency(this);
@@ -1160,7 +1191,210 @@ abstract class _$BangDatabase extends GeneratedDatabase {
       );
 }
 
-typedef $BangSyncInsertCompanionBuilder = BangSyncCompanion Function({
+typedef $BangTableCreateCompanionBuilder = BangCompanion Function({
+  required String trigger,
+  required BangGroup group,
+  required String websiteName,
+  required String domain,
+  required String urlTemplate,
+  Value<String?> category,
+  Value<String?> subCategory,
+  Value<Set<BangFormat>?> format,
+  Value<int> rowid,
+});
+typedef $BangTableUpdateCompanionBuilder = BangCompanion Function({
+  Value<String> trigger,
+  Value<BangGroup> group,
+  Value<String> websiteName,
+  Value<String> domain,
+  Value<String> urlTemplate,
+  Value<String?> category,
+  Value<String?> subCategory,
+  Value<Set<BangFormat>?> format,
+  Value<int> rowid,
+});
+
+class $BangTableTableManager extends RootTableManager<
+    _$BangDatabase,
+    BangTable,
+    Bang,
+    $BangTableFilterComposer,
+    $BangTableOrderingComposer,
+    $BangTableCreateCompanionBuilder,
+    $BangTableUpdateCompanionBuilder> {
+  $BangTableTableManager(_$BangDatabase db, BangTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $BangTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $BangTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> trigger = const Value.absent(),
+            Value<BangGroup> group = const Value.absent(),
+            Value<String> websiteName = const Value.absent(),
+            Value<String> domain = const Value.absent(),
+            Value<String> urlTemplate = const Value.absent(),
+            Value<String?> category = const Value.absent(),
+            Value<String?> subCategory = const Value.absent(),
+            Value<Set<BangFormat>?> format = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BangCompanion(
+            trigger: trigger,
+            group: group,
+            websiteName: websiteName,
+            domain: domain,
+            urlTemplate: urlTemplate,
+            category: category,
+            subCategory: subCategory,
+            format: format,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String trigger,
+            required BangGroup group,
+            required String websiteName,
+            required String domain,
+            required String urlTemplate,
+            Value<String?> category = const Value.absent(),
+            Value<String?> subCategory = const Value.absent(),
+            Value<Set<BangFormat>?> format = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BangCompanion.insert(
+            trigger: trigger,
+            group: group,
+            websiteName: websiteName,
+            domain: domain,
+            urlTemplate: urlTemplate,
+            category: category,
+            subCategory: subCategory,
+            format: format,
+            rowid: rowid,
+          ),
+        ));
+}
+
+class $BangTableFilterComposer
+    extends FilterComposer<_$BangDatabase, BangTable> {
+  $BangTableFilterComposer(super.$state);
+  ColumnFilters<String> get trigger => $state.composableBuilder(
+      column: $state.table.trigger,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<BangGroup, BangGroup, int> get group =>
+      $state.composableBuilder(
+          column: $state.table.group,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get websiteName => $state.composableBuilder(
+      column: $state.table.websiteName,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get domain => $state.composableBuilder(
+      column: $state.table.domain,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get urlTemplate => $state.composableBuilder(
+      column: $state.table.urlTemplate,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get category => $state.composableBuilder(
+      column: $state.table.category,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnFilters<String> get subCategory => $state.composableBuilder(
+      column: $state.table.subCategory,
+      builder: (column, joinBuilders) =>
+          ColumnFilters(column, joinBuilders: joinBuilders));
+
+  ColumnWithTypeConverterFilters<Set<BangFormat>?, Set<BangFormat>, String>
+      get format => $state.composableBuilder(
+          column: $state.table.format,
+          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
+              column,
+              joinBuilders: joinBuilders));
+
+  ComposableFilter bangFrequencyRefs(
+      ComposableFilter Function($BangFrequencyFilterComposer f) f) {
+    final $BangFrequencyFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.trigger,
+        referencedTable: $state.db.bangFrequency,
+        getReferencedColumn: (t) => t.trigger,
+        builder: (joinBuilder, parentComposers) => $BangFrequencyFilterComposer(
+            ComposerState($state.db, $state.db.bangFrequency, joinBuilder,
+                parentComposers)));
+    return f(composer);
+  }
+
+  ComposableFilter bangIconRefs(
+      ComposableFilter Function($BangIconFilterComposer f) f) {
+    final $BangIconFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.trigger,
+        referencedTable: $state.db.bangIcon,
+        getReferencedColumn: (t) => t.trigger,
+        builder: (joinBuilder, parentComposers) => $BangIconFilterComposer(
+            ComposerState(
+                $state.db, $state.db.bangIcon, joinBuilder, parentComposers)));
+    return f(composer);
+  }
+}
+
+class $BangTableOrderingComposer
+    extends OrderingComposer<_$BangDatabase, BangTable> {
+  $BangTableOrderingComposer(super.$state);
+  ColumnOrderings<String> get trigger => $state.composableBuilder(
+      column: $state.table.trigger,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<int> get group => $state.composableBuilder(
+      column: $state.table.group,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get websiteName => $state.composableBuilder(
+      column: $state.table.websiteName,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get domain => $state.composableBuilder(
+      column: $state.table.domain,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get urlTemplate => $state.composableBuilder(
+      column: $state.table.urlTemplate,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get category => $state.composableBuilder(
+      column: $state.table.category,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get subCategory => $state.composableBuilder(
+      column: $state.table.subCategory,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  ColumnOrderings<String> get format => $state.composableBuilder(
+      column: $state.table.format,
+      builder: (column, joinBuilders) =>
+          ColumnOrderings(column, joinBuilders: joinBuilders));
+}
+
+typedef $BangSyncCreateCompanionBuilder = BangSyncCompanion Function({
   Value<BangGroup> group,
   required DateTime lastSync,
 });
@@ -1175,8 +1409,7 @@ class $BangSyncTableManager extends RootTableManager<
     BangSyncData,
     $BangSyncFilterComposer,
     $BangSyncOrderingComposer,
-    $BangSyncProcessedTableManager,
-    $BangSyncInsertCompanionBuilder,
+    $BangSyncCreateCompanionBuilder,
     $BangSyncUpdateCompanionBuilder> {
   $BangSyncTableManager(_$BangDatabase db, BangSync table)
       : super(TableManagerState(
@@ -1184,8 +1417,7 @@ class $BangSyncTableManager extends RootTableManager<
           table: table,
           filteringComposer: $BangSyncFilterComposer(ComposerState(db, table)),
           orderingComposer: $BangSyncOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $BangSyncProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<BangGroup> group = const Value.absent(),
             Value<DateTime> lastSync = const Value.absent(),
           }) =>
@@ -1193,7 +1425,7 @@ class $BangSyncTableManager extends RootTableManager<
             group: group,
             lastSync: lastSync,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             Value<BangGroup> group = const Value.absent(),
             required DateTime lastSync,
           }) =>
@@ -1202,18 +1434,6 @@ class $BangSyncTableManager extends RootTableManager<
             lastSync: lastSync,
           ),
         ));
-}
-
-class $BangSyncProcessedTableManager extends ProcessedTableManager<
-    _$BangDatabase,
-    BangSync,
-    BangSyncData,
-    $BangSyncFilterComposer,
-    $BangSyncOrderingComposer,
-    $BangSyncProcessedTableManager,
-    $BangSyncInsertCompanionBuilder,
-    $BangSyncUpdateCompanionBuilder> {
-  $BangSyncProcessedTableManager(super.$state);
 }
 
 class $BangSyncFilterComposer extends FilterComposer<_$BangDatabase, BangSync> {
@@ -1245,7 +1465,7 @@ class $BangSyncOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $BangFrequencyInsertCompanionBuilder = BangFrequencyCompanion Function({
+typedef $BangFrequencyCreateCompanionBuilder = BangFrequencyCompanion Function({
   required String trigger,
   required int frequency,
   required DateTime lastUsed,
@@ -1264,8 +1484,7 @@ class $BangFrequencyTableManager extends RootTableManager<
     BangFrequencyData,
     $BangFrequencyFilterComposer,
     $BangFrequencyOrderingComposer,
-    $BangFrequencyProcessedTableManager,
-    $BangFrequencyInsertCompanionBuilder,
+    $BangFrequencyCreateCompanionBuilder,
     $BangFrequencyUpdateCompanionBuilder> {
   $BangFrequencyTableManager(_$BangDatabase db, BangFrequency table)
       : super(TableManagerState(
@@ -1275,8 +1494,7 @@ class $BangFrequencyTableManager extends RootTableManager<
               $BangFrequencyFilterComposer(ComposerState(db, table)),
           orderingComposer:
               $BangFrequencyOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $BangFrequencyProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<String> trigger = const Value.absent(),
             Value<int> frequency = const Value.absent(),
             Value<DateTime> lastUsed = const Value.absent(),
@@ -1288,7 +1506,7 @@ class $BangFrequencyTableManager extends RootTableManager<
             lastUsed: lastUsed,
             rowid: rowid,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             required String trigger,
             required int frequency,
             required DateTime lastUsed,
@@ -1303,26 +1521,9 @@ class $BangFrequencyTableManager extends RootTableManager<
         ));
 }
 
-class $BangFrequencyProcessedTableManager extends ProcessedTableManager<
-    _$BangDatabase,
-    BangFrequency,
-    BangFrequencyData,
-    $BangFrequencyFilterComposer,
-    $BangFrequencyOrderingComposer,
-    $BangFrequencyProcessedTableManager,
-    $BangFrequencyInsertCompanionBuilder,
-    $BangFrequencyUpdateCompanionBuilder> {
-  $BangFrequencyProcessedTableManager(super.$state);
-}
-
 class $BangFrequencyFilterComposer
     extends FilterComposer<_$BangDatabase, BangFrequency> {
   $BangFrequencyFilterComposer(super.$state);
-  ColumnFilters<String> get trigger => $state.composableBuilder(
-      column: $state.table.trigger,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
   ColumnFilters<int> get frequency => $state.composableBuilder(
       column: $state.table.frequency,
       builder: (column, joinBuilders) =>
@@ -1332,16 +1533,23 @@ class $BangFrequencyFilterComposer
       column: $state.table.lastUsed,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  $BangTableFilterComposer get trigger {
+    final $BangTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.trigger,
+        referencedTable: $state.db.bang,
+        getReferencedColumn: (t) => t.trigger,
+        builder: (joinBuilder, parentComposers) => $BangTableFilterComposer(
+            ComposerState(
+                $state.db, $state.db.bang, joinBuilder, parentComposers)));
+    return composer;
+  }
 }
 
 class $BangFrequencyOrderingComposer
     extends OrderingComposer<_$BangDatabase, BangFrequency> {
   $BangFrequencyOrderingComposer(super.$state);
-  ColumnOrderings<String> get trigger => $state.composableBuilder(
-      column: $state.table.trigger,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
   ColumnOrderings<int> get frequency => $state.composableBuilder(
       column: $state.table.frequency,
       builder: (column, joinBuilders) =>
@@ -1351,9 +1559,21 @@ class $BangFrequencyOrderingComposer
       column: $state.table.lastUsed,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  $BangTableOrderingComposer get trigger {
+    final $BangTableOrderingComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.trigger,
+        referencedTable: $state.db.bang,
+        getReferencedColumn: (t) => t.trigger,
+        builder: (joinBuilder, parentComposers) => $BangTableOrderingComposer(
+            ComposerState(
+                $state.db, $state.db.bang, joinBuilder, parentComposers)));
+    return composer;
+  }
 }
 
-typedef $BangIconInsertCompanionBuilder = BangIconCompanion Function({
+typedef $BangIconCreateCompanionBuilder = BangIconCompanion Function({
   required String trigger,
   required Uint8List iconData,
   required DateTime fetchDate,
@@ -1372,8 +1592,7 @@ class $BangIconTableManager extends RootTableManager<
     BangIconData,
     $BangIconFilterComposer,
     $BangIconOrderingComposer,
-    $BangIconProcessedTableManager,
-    $BangIconInsertCompanionBuilder,
+    $BangIconCreateCompanionBuilder,
     $BangIconUpdateCompanionBuilder> {
   $BangIconTableManager(_$BangDatabase db, BangIcon table)
       : super(TableManagerState(
@@ -1381,8 +1600,7 @@ class $BangIconTableManager extends RootTableManager<
           table: table,
           filteringComposer: $BangIconFilterComposer(ComposerState(db, table)),
           orderingComposer: $BangIconOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $BangIconProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<String> trigger = const Value.absent(),
             Value<Uint8List> iconData = const Value.absent(),
             Value<DateTime> fetchDate = const Value.absent(),
@@ -1394,7 +1612,7 @@ class $BangIconTableManager extends RootTableManager<
             fetchDate: fetchDate,
             rowid: rowid,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             required String trigger,
             required Uint8List iconData,
             required DateTime fetchDate,
@@ -1409,25 +1627,8 @@ class $BangIconTableManager extends RootTableManager<
         ));
 }
 
-class $BangIconProcessedTableManager extends ProcessedTableManager<
-    _$BangDatabase,
-    BangIcon,
-    BangIconData,
-    $BangIconFilterComposer,
-    $BangIconOrderingComposer,
-    $BangIconProcessedTableManager,
-    $BangIconInsertCompanionBuilder,
-    $BangIconUpdateCompanionBuilder> {
-  $BangIconProcessedTableManager(super.$state);
-}
-
 class $BangIconFilterComposer extends FilterComposer<_$BangDatabase, BangIcon> {
   $BangIconFilterComposer(super.$state);
-  ColumnFilters<String> get trigger => $state.composableBuilder(
-      column: $state.table.trigger,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
-
   ColumnFilters<Uint8List> get iconData => $state.composableBuilder(
       column: $state.table.iconData,
       builder: (column, joinBuilders) =>
@@ -1437,16 +1638,23 @@ class $BangIconFilterComposer extends FilterComposer<_$BangDatabase, BangIcon> {
       column: $state.table.fetchDate,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
+
+  $BangTableFilterComposer get trigger {
+    final $BangTableFilterComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.trigger,
+        referencedTable: $state.db.bang,
+        getReferencedColumn: (t) => t.trigger,
+        builder: (joinBuilder, parentComposers) => $BangTableFilterComposer(
+            ComposerState(
+                $state.db, $state.db.bang, joinBuilder, parentComposers)));
+    return composer;
+  }
 }
 
 class $BangIconOrderingComposer
     extends OrderingComposer<_$BangDatabase, BangIcon> {
   $BangIconOrderingComposer(super.$state);
-  ColumnOrderings<String> get trigger => $state.composableBuilder(
-      column: $state.table.trigger,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
-
   ColumnOrderings<Uint8List> get iconData => $state.composableBuilder(
       column: $state.table.iconData,
       builder: (column, joinBuilders) =>
@@ -1456,9 +1664,21 @@ class $BangIconOrderingComposer
       column: $state.table.fetchDate,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
+
+  $BangTableOrderingComposer get trigger {
+    final $BangTableOrderingComposer composer = $state.composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.trigger,
+        referencedTable: $state.db.bang,
+        getReferencedColumn: (t) => t.trigger,
+        builder: (joinBuilder, parentComposers) => $BangTableOrderingComposer(
+            ComposerState(
+                $state.db, $state.db.bang, joinBuilder, parentComposers)));
+    return composer;
+  }
 }
 
-typedef $BangFtsInsertCompanionBuilder = BangFtsCompanion Function({
+typedef $BangFtsCreateCompanionBuilder = BangFtsCompanion Function({
   required String trigger,
   required String websiteName,
   Value<int> rowid,
@@ -1475,8 +1695,7 @@ class $BangFtsTableManager extends RootTableManager<
     BangFt,
     $BangFtsFilterComposer,
     $BangFtsOrderingComposer,
-    $BangFtsProcessedTableManager,
-    $BangFtsInsertCompanionBuilder,
+    $BangFtsCreateCompanionBuilder,
     $BangFtsUpdateCompanionBuilder> {
   $BangFtsTableManager(_$BangDatabase db, BangFts table)
       : super(TableManagerState(
@@ -1484,8 +1703,7 @@ class $BangFtsTableManager extends RootTableManager<
           table: table,
           filteringComposer: $BangFtsFilterComposer(ComposerState(db, table)),
           orderingComposer: $BangFtsOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $BangFtsProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<String> trigger = const Value.absent(),
             Value<String> websiteName = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -1495,7 +1713,7 @@ class $BangFtsTableManager extends RootTableManager<
             websiteName: websiteName,
             rowid: rowid,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             required String trigger,
             required String websiteName,
             Value<int> rowid = const Value.absent(),
@@ -1506,18 +1724,6 @@ class $BangFtsTableManager extends RootTableManager<
             rowid: rowid,
           ),
         ));
-}
-
-class $BangFtsProcessedTableManager extends ProcessedTableManager<
-    _$BangDatabase,
-    BangFts,
-    BangFt,
-    $BangFtsFilterComposer,
-    $BangFtsOrderingComposer,
-    $BangFtsProcessedTableManager,
-    $BangFtsInsertCompanionBuilder,
-    $BangFtsUpdateCompanionBuilder> {
-  $BangFtsProcessedTableManager(super.$state);
 }
 
 class $BangFtsFilterComposer extends FilterComposer<_$BangDatabase, BangFts> {
@@ -1547,9 +1753,10 @@ class $BangFtsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-class _$BangDatabaseManager {
+class $BangDatabaseManager {
   final _$BangDatabase _db;
-  _$BangDatabaseManager(this._db);
+  $BangDatabaseManager(this._db);
+  $BangTableTableManager get bang => $BangTableTableManager(_db, _db.bang);
   $BangSyncTableManager get bangSync =>
       $BangSyncTableManager(_db, _db.bangSync);
   $BangFrequencyTableManager get bangFrequency =>

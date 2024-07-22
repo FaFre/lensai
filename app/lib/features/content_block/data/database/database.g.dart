@@ -86,6 +86,13 @@ class HostData extends DataClass implements Insertable<HostData> {
         hostname: hostname ?? this.hostname,
         source: source ?? this.source,
       );
+  HostData copyWithCompanion(HostCompanion data) {
+    return HostData(
+      hostname: data.hostname.present ? data.hostname.value : this.hostname,
+      source: data.source.present ? data.source.value : this.source,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('HostData(')
@@ -252,6 +259,13 @@ class HostSyncData extends DataClass implements Insertable<HostSyncData> {
         source: source ?? this.source,
         lastSync: lastSync ?? this.lastSync,
       );
+  HostSyncData copyWithCompanion(HostSyncCompanion data) {
+    return HostSyncData(
+      source: data.source.present ? data.source.value : this.source,
+      lastSync: data.lastSync.present ? data.lastSync.value : this.lastSync,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('HostSyncData(')
@@ -325,7 +339,7 @@ class HostSyncCompanion extends UpdateCompanion<HostSyncData> {
 
 abstract class _$HostDatabase extends GeneratedDatabase {
   _$HostDatabase(QueryExecutor e) : super(e);
-  _$HostDatabaseManager get managers => _$HostDatabaseManager(this);
+  $HostDatabaseManager get managers => $HostDatabaseManager(this);
   late final Host host = Host(this);
   late final HostSync hostSync = HostSync(this);
   late final HostDao hostDao = HostDao(this as HostDatabase);
@@ -337,7 +351,7 @@ abstract class _$HostDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [host, hostSync];
 }
 
-typedef $HostInsertCompanionBuilder = HostCompanion Function({
+typedef $HostCreateCompanionBuilder = HostCompanion Function({
   required String hostname,
   required HostSource source,
   Value<int> rowid,
@@ -354,8 +368,7 @@ class $HostTableManager extends RootTableManager<
     HostData,
     $HostFilterComposer,
     $HostOrderingComposer,
-    $HostProcessedTableManager,
-    $HostInsertCompanionBuilder,
+    $HostCreateCompanionBuilder,
     $HostUpdateCompanionBuilder> {
   $HostTableManager(_$HostDatabase db, Host table)
       : super(TableManagerState(
@@ -363,8 +376,7 @@ class $HostTableManager extends RootTableManager<
           table: table,
           filteringComposer: $HostFilterComposer(ComposerState(db, table)),
           orderingComposer: $HostOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $HostProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<String> hostname = const Value.absent(),
             Value<HostSource> source = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -374,7 +386,7 @@ class $HostTableManager extends RootTableManager<
             source: source,
             rowid: rowid,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             required String hostname,
             required HostSource source,
             Value<int> rowid = const Value.absent(),
@@ -385,18 +397,6 @@ class $HostTableManager extends RootTableManager<
             rowid: rowid,
           ),
         ));
-}
-
-class $HostProcessedTableManager extends ProcessedTableManager<
-    _$HostDatabase,
-    Host,
-    HostData,
-    $HostFilterComposer,
-    $HostOrderingComposer,
-    $HostProcessedTableManager,
-    $HostInsertCompanionBuilder,
-    $HostUpdateCompanionBuilder> {
-  $HostProcessedTableManager(super.$state);
 }
 
 class $HostFilterComposer extends FilterComposer<_$HostDatabase, Host> {
@@ -427,7 +427,7 @@ class $HostOrderingComposer extends OrderingComposer<_$HostDatabase, Host> {
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $HostSyncInsertCompanionBuilder = HostSyncCompanion Function({
+typedef $HostSyncCreateCompanionBuilder = HostSyncCompanion Function({
   Value<HostSource> source,
   required DateTime lastSync,
 });
@@ -442,8 +442,7 @@ class $HostSyncTableManager extends RootTableManager<
     HostSyncData,
     $HostSyncFilterComposer,
     $HostSyncOrderingComposer,
-    $HostSyncProcessedTableManager,
-    $HostSyncInsertCompanionBuilder,
+    $HostSyncCreateCompanionBuilder,
     $HostSyncUpdateCompanionBuilder> {
   $HostSyncTableManager(_$HostDatabase db, HostSync table)
       : super(TableManagerState(
@@ -451,8 +450,7 @@ class $HostSyncTableManager extends RootTableManager<
           table: table,
           filteringComposer: $HostSyncFilterComposer(ComposerState(db, table)),
           orderingComposer: $HostSyncOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $HostSyncProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<HostSource> source = const Value.absent(),
             Value<DateTime> lastSync = const Value.absent(),
           }) =>
@@ -460,7 +458,7 @@ class $HostSyncTableManager extends RootTableManager<
             source: source,
             lastSync: lastSync,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             Value<HostSource> source = const Value.absent(),
             required DateTime lastSync,
           }) =>
@@ -469,18 +467,6 @@ class $HostSyncTableManager extends RootTableManager<
             lastSync: lastSync,
           ),
         ));
-}
-
-class $HostSyncProcessedTableManager extends ProcessedTableManager<
-    _$HostDatabase,
-    HostSync,
-    HostSyncData,
-    $HostSyncFilterComposer,
-    $HostSyncOrderingComposer,
-    $HostSyncProcessedTableManager,
-    $HostSyncInsertCompanionBuilder,
-    $HostSyncUpdateCompanionBuilder> {
-  $HostSyncProcessedTableManager(super.$state);
 }
 
 class $HostSyncFilterComposer extends FilterComposer<_$HostDatabase, HostSync> {
@@ -512,9 +498,9 @@ class $HostSyncOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-class _$HostDatabaseManager {
+class $HostDatabaseManager {
   final _$HostDatabase _db;
-  _$HostDatabaseManager(this._db);
+  $HostDatabaseManager(this._db);
   $HostTableManager get host => $HostTableManager(_db, _db.host);
   $HostSyncTableManager get hostSync =>
       $HostSyncTableManager(_db, _db.hostSync);

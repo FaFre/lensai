@@ -94,6 +94,14 @@ class ChatData extends DataClass implements Insertable<ChatData> {
         title: title ?? this.title,
         content: content ?? this.content,
       );
+  ChatData copyWithCompanion(ChatCompanion data) {
+    return ChatData(
+      fileName: data.fileName.present ? data.fileName.value : this.fileName,
+      title: data.title.present ? data.title.value : this.title,
+      content: data.content.present ? data.content.value : this.content,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('ChatData(')
@@ -272,6 +280,13 @@ class ChatFt extends DataClass implements Insertable<ChatFt> {
         title: title ?? this.title,
         content: content ?? this.content,
       );
+  ChatFt copyWithCompanion(ChatFtsCompanion data) {
+    return ChatFt(
+      title: data.title.present ? data.title.value : this.title,
+      content: data.content.present ? data.content.value : this.content,
+    );
+  }
+
   @override
   String toString() {
     return (StringBuffer('ChatFt(')
@@ -355,7 +370,7 @@ class ChatFtsCompanion extends UpdateCompanion<ChatFt> {
 
 abstract class _$ChatSearchDatabase extends GeneratedDatabase {
   _$ChatSearchDatabase(QueryExecutor e) : super(e);
-  _$ChatSearchDatabaseManager get managers => _$ChatSearchDatabaseManager(this);
+  $ChatSearchDatabaseManager get managers => $ChatSearchDatabaseManager(this);
   late final Chat chat = Chat(this);
   late final ChatFts chatFts = ChatFts(this);
   late final Trigger chatAfterInsert = Trigger(
@@ -427,7 +442,7 @@ abstract class _$ChatSearchDatabase extends GeneratedDatabase {
       );
 }
 
-typedef $ChatInsertCompanionBuilder = ChatCompanion Function({
+typedef $ChatCreateCompanionBuilder = ChatCompanion Function({
   required String fileName,
   required String title,
   required String content,
@@ -446,8 +461,7 @@ class $ChatTableManager extends RootTableManager<
     ChatData,
     $ChatFilterComposer,
     $ChatOrderingComposer,
-    $ChatProcessedTableManager,
-    $ChatInsertCompanionBuilder,
+    $ChatCreateCompanionBuilder,
     $ChatUpdateCompanionBuilder> {
   $ChatTableManager(_$ChatSearchDatabase db, Chat table)
       : super(TableManagerState(
@@ -455,8 +469,7 @@ class $ChatTableManager extends RootTableManager<
           table: table,
           filteringComposer: $ChatFilterComposer(ComposerState(db, table)),
           orderingComposer: $ChatOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $ChatProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<String> fileName = const Value.absent(),
             Value<String> title = const Value.absent(),
             Value<String> content = const Value.absent(),
@@ -468,7 +481,7 @@ class $ChatTableManager extends RootTableManager<
             content: content,
             rowid: rowid,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             required String fileName,
             required String title,
             required String content,
@@ -481,18 +494,6 @@ class $ChatTableManager extends RootTableManager<
             rowid: rowid,
           ),
         ));
-}
-
-class $ChatProcessedTableManager extends ProcessedTableManager<
-    _$ChatSearchDatabase,
-    Chat,
-    ChatData,
-    $ChatFilterComposer,
-    $ChatOrderingComposer,
-    $ChatProcessedTableManager,
-    $ChatInsertCompanionBuilder,
-    $ChatUpdateCompanionBuilder> {
-  $ChatProcessedTableManager(super.$state);
 }
 
 class $ChatFilterComposer extends FilterComposer<_$ChatSearchDatabase, Chat> {
@@ -532,7 +533,7 @@ class $ChatOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-typedef $ChatFtsInsertCompanionBuilder = ChatFtsCompanion Function({
+typedef $ChatFtsCreateCompanionBuilder = ChatFtsCompanion Function({
   required String title,
   required String content,
   Value<int> rowid,
@@ -549,8 +550,7 @@ class $ChatFtsTableManager extends RootTableManager<
     ChatFt,
     $ChatFtsFilterComposer,
     $ChatFtsOrderingComposer,
-    $ChatFtsProcessedTableManager,
-    $ChatFtsInsertCompanionBuilder,
+    $ChatFtsCreateCompanionBuilder,
     $ChatFtsUpdateCompanionBuilder> {
   $ChatFtsTableManager(_$ChatSearchDatabase db, ChatFts table)
       : super(TableManagerState(
@@ -558,8 +558,7 @@ class $ChatFtsTableManager extends RootTableManager<
           table: table,
           filteringComposer: $ChatFtsFilterComposer(ComposerState(db, table)),
           orderingComposer: $ChatFtsOrderingComposer(ComposerState(db, table)),
-          getChildManagerBuilder: (p) => $ChatFtsProcessedTableManager(p),
-          getUpdateCompanionBuilder: ({
+          updateCompanionCallback: ({
             Value<String> title = const Value.absent(),
             Value<String> content = const Value.absent(),
             Value<int> rowid = const Value.absent(),
@@ -569,7 +568,7 @@ class $ChatFtsTableManager extends RootTableManager<
             content: content,
             rowid: rowid,
           ),
-          getInsertCompanionBuilder: ({
+          createCompanionCallback: ({
             required String title,
             required String content,
             Value<int> rowid = const Value.absent(),
@@ -580,18 +579,6 @@ class $ChatFtsTableManager extends RootTableManager<
             rowid: rowid,
           ),
         ));
-}
-
-class $ChatFtsProcessedTableManager extends ProcessedTableManager<
-    _$ChatSearchDatabase,
-    ChatFts,
-    ChatFt,
-    $ChatFtsFilterComposer,
-    $ChatFtsOrderingComposer,
-    $ChatFtsProcessedTableManager,
-    $ChatFtsInsertCompanionBuilder,
-    $ChatFtsUpdateCompanionBuilder> {
-  $ChatFtsProcessedTableManager(super.$state);
 }
 
 class $ChatFtsFilterComposer
@@ -622,9 +609,9 @@ class $ChatFtsOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
-class _$ChatSearchDatabaseManager {
+class $ChatSearchDatabaseManager {
   final _$ChatSearchDatabase _db;
-  _$ChatSearchDatabaseManager(this._db);
+  $ChatSearchDatabaseManager(this._db);
   $ChatTableManager get chat => $ChatTableManager(_db, _db.chat);
   $ChatFtsTableManager get chatFts => $ChatFtsTableManager(_db, _db.chatFts);
 }
