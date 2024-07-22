@@ -29,6 +29,8 @@ abstract class _$SettingsCWProxy {
 
   Settings quickActionVoiceInput(bool quickActionVoiceInput);
 
+  Settings enableReadability(bool enableReadability);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Settings(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -47,6 +49,7 @@ abstract class _$SettingsCWProxy {
     ThemeMode? themeMode,
     KagiTool? quickAction,
     bool? quickActionVoiceInput,
+    bool? enableReadability,
   });
 }
 
@@ -98,6 +101,10 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
       this(quickActionVoiceInput: quickActionVoiceInput);
 
   @override
+  Settings enableReadability(bool enableReadability) =>
+      this(enableReadability: enableReadability);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `Settings(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -117,6 +124,7 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
     Object? themeMode = const $CopyWithPlaceholder(),
     Object? quickAction = const $CopyWithPlaceholder(),
     Object? quickActionVoiceInput = const $CopyWithPlaceholder(),
+    Object? enableReadability = const $CopyWithPlaceholder(),
   }) {
     return Settings(
       kagiSession: kagiSession == const $CopyWithPlaceholder()
@@ -174,6 +182,11 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
               ? _value.quickActionVoiceInput
               // ignore: cast_nullable_to_non_nullable
               : quickActionVoiceInput as bool,
+      enableReadability: enableReadability == const $CopyWithPlaceholder() ||
+              enableReadability == null
+          ? _value.enableReadability
+          // ignore: cast_nullable_to_non_nullable
+          : enableReadability as bool,
     );
   }
 }

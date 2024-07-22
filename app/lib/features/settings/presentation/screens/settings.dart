@@ -241,6 +241,19 @@ class SettingsScreen extends HookConsumerWidget {
                   );
             },
           ),
+          SwitchListTile.adaptive(
+            title: const Text('Enable Reader Mode'),
+            subtitle: const Text(
+              'Optional browser app bar tool that extracts and simplifies web pages for improved readability by removing ads, sidebars, and other non-essential elements.',
+            ),
+            value: settings.enableReadability,
+            onChanged: (value) async {
+              await ref.read(saveSettingsControllerProvider.notifier).save(
+                    (currentSettings) =>
+                        currentSettings.copyWith.enableReadability(value),
+                  );
+            },
+          ),
           const SizedBox(
             height: 16,
           ),

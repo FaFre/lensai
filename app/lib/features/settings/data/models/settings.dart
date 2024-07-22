@@ -19,6 +19,7 @@ class Settings with FastEquatable {
   final ThemeMode themeMode;
   final KagiTool? quickAction;
   final bool quickActionVoiceInput;
+  final bool enableReadability;
 
   Settings({
     required this.kagiSession,
@@ -32,6 +33,7 @@ class Settings with FastEquatable {
     required this.themeMode,
     required this.quickAction,
     required this.quickActionVoiceInput,
+    required this.enableReadability,
   });
 
   Settings.withDefaults({
@@ -46,6 +48,7 @@ class Settings with FastEquatable {
     ThemeMode? themeMode,
     this.quickAction,
     bool? quickActionVoiceInput,
+    bool? enableReadability,
   })  : showEarlyAccessFeatures = showEarlyAccessFeatures ?? true,
         incognitoMode = incognitoMode ?? true,
         enableJavascript = enableJavascript ?? true,
@@ -54,7 +57,8 @@ class Settings with FastEquatable {
         blockHttpProtocol = blockHttpProtocol ?? false,
         enableHostList = enableHostList ?? {HostSource.stevenBlackUnified},
         themeMode = themeMode ?? ThemeMode.dark,
-        quickActionVoiceInput = quickActionVoiceInput ?? false;
+        quickActionVoiceInput = quickActionVoiceInput ?? false,
+        enableReadability = enableReadability ?? true;
 
   @override
   bool get cacheHash => true;
@@ -72,5 +76,6 @@ class Settings with FastEquatable {
         themeMode,
         quickAction,
         quickActionVoiceInput,
+        enableReadability,
       ];
 }

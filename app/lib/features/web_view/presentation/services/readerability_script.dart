@@ -1,3 +1,5 @@
+import 'package:bang_navigator/features/settings/data/models/settings.dart';
+import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:bang_navigator/features/web_view/domain/providers.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -7,10 +9,17 @@ part 'readerability_script.g.dart';
 @Riverpod()
 class ReaderabilityScriptService extends _$ReaderabilityScriptService {
   late Future<String> _readerabilityScript;
+  late bool _enableReadability;
 
   @override
   Future<void> build(InAppWebViewController? controller) async {
     _readerabilityScript = ref.watch(readerabilityScriptProvider.future);
+    _enableReadability = ref.watch(
+      settingsRepositoryProvider.select(
+        (value) =>
+            (value.valueOrNull ?? Settings.withDefaults()).enableReadability,
+      ),
+    );
   }
 
   Future<void> _injectScript() async {
@@ -20,7 +29,7 @@ class ReaderabilityScriptService extends _$ReaderabilityScriptService {
     }
   }
 
-  Future<void> ensureScriptInjected() async {
+  Future<void> _ensureScriptInjected() async {
     if (controller != null) {
       final injected = await controller!.evaluateJavascript(
         source:
@@ -34,22 +43,26 @@ class ReaderabilityScriptService extends _$ReaderabilityScriptService {
   }
 
   Future<bool> isReaderable() async {
-    await ensureScriptInjected();
+    if (_enableReadability) {
+      await _ensureScriptInjected();
 
-    if (controller != null) {
-      return await controller!.evaluateJavascript(
-        source: 'isReaderable();',
-      ) as bool;
+      if (controller != null) {
+        return await controller!.evaluateJavascript(
+          source: 'isReaderable();',
+        ) as bool;
+      }
     }
 
     return false;
   }
 
   Future<void> applyReaderable() async {
-    await ensureScriptInjected();
+    if (_enableReadability) {
+      await _ensureScriptInjected();
 
-    if (controller != null) {
-      await controller!.evaluateJavascript(source: 'applyReaderable();');
+      if (controller != null) {
+        await controller!.evaluateJavascript(source: 'applyReaderable();');
+      }
     }
   }
 }

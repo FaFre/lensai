@@ -191,6 +191,13 @@ class KagiScreen extends HookConsumerWidget {
                     readerabilityControllerProvider(controller),
                   );
 
+                  final enableReadability = ref.watch(
+                    settingsRepositoryProvider.select(
+                      (value) => (value.valueOrNull ?? Settings.withDefaults())
+                          .enableReadability,
+                    ),
+                  );
+
                   final isReaderable = useValueListenable(
                     activeWebView.isReaderable,
                   );
@@ -213,7 +220,8 @@ class KagiScreen extends HookConsumerWidget {
                   );
 
                   return Visibility(
-                    visible: isReaderable == true || readerableApplied,
+                    visible: enableReadability &&
+                        (isReaderable == true || readerableApplied),
                     child: InkWell(
                       onTap: readerabilityState.isLoading
                           ? null

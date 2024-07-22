@@ -7,7 +7,7 @@ part of 'readerability_script.dart';
 // **************************************************************************
 
 String _$readerabilityScriptServiceHash() =>
-    r'780980e6771d8d860e261fb4bc41236a60e0aaab';
+    r'7a4fe65f683c31545b2f2bcb3ea199619be4bf4b';
 
 /// Copied from Dart SDK
 class _SystemHash {

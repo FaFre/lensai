@@ -20,7 +20,8 @@ enum _StorageKeys {
   enableHostList('enable_host_lists'),
   themeMode('theme_mode'),
   quickAction('enable_quick_action'),
-  quickActionVoiceInput('enable_quick_action_voice_input');
+  quickActionVoiceInput('enable_quick_action_voice_input'),
+  enableReadability('enable_readability');
 
   final String key;
 
@@ -132,6 +133,13 @@ class SettingsRepository extends _$SettingsRepository {
         );
       }
 
+      if (newSettings.enableReadability != oldSettings.enableReadability) {
+        await sharedPreferences.setBool(
+          _StorageKeys.enableReadability.key,
+          newSettings.enableReadability,
+        );
+      }
+
       ref.invalidateSelf();
     }
   }
@@ -162,6 +170,8 @@ class SettingsRepository extends _$SettingsRepository {
           parseKagiTool(sharedPreferences.getInt(_StorageKeys.quickAction.key)),
       quickActionVoiceInput:
           sharedPreferences.getBool(_StorageKeys.quickActionVoiceInput.key),
+      enableReadability:
+          sharedPreferences.getBool(_StorageKeys.enableReadability.key),
     );
   }
 }
