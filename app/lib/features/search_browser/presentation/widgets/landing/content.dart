@@ -26,7 +26,7 @@ class LandingContent extends HookConsumerWidget {
       child: Column(
         children: [
           Text(
-            'BangNavigator',
+            'Lensai',
             style: textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
             textAlign: TextAlign.center,
           ),

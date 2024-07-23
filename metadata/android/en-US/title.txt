@@ -1,1 +1,1 @@
-BangNavigator: A Kagi Browser
+Lensai: A Kagi Browser

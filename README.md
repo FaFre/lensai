@@ -1,18 +1,18 @@
 <p align="center">
-  <img width="250" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/app/assets/icon/icon.png" alt="BangNavigator Logo">
+  <img width="250" src="https://raw.githubusercontent.com/FaFre/bang_navigator/main/app/assets/icon/icon.png" alt="Lensai Logo">
 </p>
 
-# BangNavigator - A Privacy-Focused Browser for Kagi
+# Lensai - A Privacy-Focused Browser for Kagi
 
-Welcome to the GitHub repository of BangNavigator, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure during research. Built with Flutter, BangNavigator offers a seamless and intuitive interface across both Android and iOS devices, integrating the powerful tools of Kagi Search Engine.
+Welcome to the GitHub repository of Lensai, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure during research. Built with Flutter, Lensai offers a seamless and intuitive interface across both Android and iOS devices, integrating the powerful tools of Kagi Search Engine.
 
 ## Features
 
-BangNavigator is packed with a variety of features aimed at improving usability and maintaining privacy:
+Lensai is packed with a variety of features aimed at improving usability and maintaining privacy:
 
 - **Privacy by Default**: Incognito mode is enabled by default to keep your searches and browsing history private.
 - **[Kagi Integration](https://github.com/FaFre/bang_navigator/wiki/Kagi-Tools)**: Seamlessly integrates Kagi's search, assistant, and summarizer tools within a user-friendly interface.
-- **[Easy Sharing](https://github.com/FaFre/bang_navigator/wiki/Kagi-Tools)**: Share URLs or text from any app directly into BangNavigator without the need to copy and paste, for direct use with summarizer/assistant.
+- **[Easy Sharing](https://github.com/FaFre/bang_navigator/wiki/Kagi-Tools)**: Share URLs or text from any app directly into Lensai without the need to copy and paste, for direct use with summarizer/assistant.
 - **[Quick Summarization](https://github.com/FaFre/bang_navigator/wiki/Browser)**: Long press any link on a website to get a summary via Kagi's summarizer.
 - **[Content Blocking](https://github.com/FaFre/bang_navigator/wiki/Content-Blocking)**: A powerful content blocker is enabled by default to filter out ads, malware, and tracking sites.
 - **[Home Widgets](https://github.com/FaFre/bang_navigator/wiki/Home-Widget)**: Includes home screen widgets in three different sizes for quick actions, enhancing productivity.

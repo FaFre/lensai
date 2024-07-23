@@ -1,6 +1,6 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Theme.BangNavigatorWidget" parent="@style/Theme.Material3.DayNight.NoActionBar">
+    <style name="Theme.LensaiWidget" parent="@style/Theme.Material3.DayNight.NoActionBar">
         <!-- Primary brand color. -->
         <item name="colorPrimary">@color/purple_500</item>
         <item name="colorPrimaryVariant">@color/purple_700</item>
@@ -14,7 +14,7 @@
         <!-- Customize your theme here. -->
     </style>
 
-    <style name="Theme.BangNavigatorWidget.AppWidgetContainerParent" parent="@android:style/Theme.DeviceDefault">
+    <style name="Theme.LensaiWidget.AppWidgetContainerParent" parent="@android:style/Theme.DeviceDefault">
         <!-- Radius of the outer bound of widgets to make the rounded corners -->
         <item name="appWidgetRadius">16dp</item>
         <!--
@@ -24,7 +24,7 @@
         <item name="appWidgetInnerRadius">8dp</item>
     </style>
 
-    <style name="Theme.BangNavigatorWidget.AppWidgetContainer" parent="Theme.BangNavigatorWidget.AppWidgetContainerParent">
+    <style name="Theme.LensaiWidget.AppWidgetContainer" parent="Theme.LensaiWidget.AppWidgetContainerParent">
         <!-- Apply padding to avoid the content of the widget colliding with the rounded corners -->
         <item name="appWidgetPadding">16dp</item>
     </style>
