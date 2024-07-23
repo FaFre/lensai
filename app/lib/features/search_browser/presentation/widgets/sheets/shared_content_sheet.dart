@@ -1,16 +1,16 @@
-import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
-import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
-import 'package:bang_navigator/features/search_browser/presentation/widgets/tabs/assistant_tab.dart';
-import 'package:bang_navigator/features/search_browser/presentation/widgets/tabs/search_tab.dart';
-import 'package:bang_navigator/features/search_browser/presentation/widgets/tabs/summarize_tab.dart';
-import 'package:bang_navigator/features/settings/data/models/settings.dart';
-import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
-import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
-import 'package:bang_navigator/presentation/hooks/sync_page_tab.dart';
 import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/search_browser/domain/entities/sheet.dart';
+import 'package:lensai/features/search_browser/presentation/widgets/tabs/assistant_tab.dart';
+import 'package:lensai/features/search_browser/presentation/widgets/tabs/search_tab.dart';
+import 'package:lensai/features/search_browser/presentation/widgets/tabs/summarize_tab.dart';
+import 'package:lensai/features/settings/data/models/settings.dart';
+import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/features/share_intent/domain/entities/shared_content.dart';
+import 'package:lensai/presentation/hooks/sync_page_tab.dart';
 
 typedef OnSubmitUri = void Function(Uri url);
 

@@ -1,9 +1,9 @@
-import 'package:bang_navigator/domain/entities/web_page_info.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:fast_equatable/fast_equatable.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:lensai/domain/entities/web_page_info.dart';
 
 part 'web_view_page.g.dart';
 

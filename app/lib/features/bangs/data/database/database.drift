@@ -1,6 +1,6 @@
-import 'package:bang_navigator/features/bangs/data/database/drift/converters/bang_format.dart';
-import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
-import 'package:bang_navigator/features/bangs/data/models/bang.dart';
+import 'package:lensai/features/bangs/data/database/drift/converters/bang_format.dart';
+import 'package:lensai/features/bangs/data/models/bang_data.dart';
+import 'package:lensai/features/bangs/data/models/bang.dart';
 
 CREATE TABLE bang (
   "trigger" TEXT PRIMARY KEY NOT NULL,

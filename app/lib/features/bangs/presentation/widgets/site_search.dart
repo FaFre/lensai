@@ -1,13 +1,13 @@
-import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/data.dart';
-import 'package:bang_navigator/features/bangs/presentation/widgets/bang_chips.dart';
-import 'package:bang_navigator/features/bangs/presentation/widgets/search_field.dart';
-import 'package:bang_navigator/features/search_browser/domain/providers.dart';
-import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/bangs/data/models/bang_data.dart';
+import 'package:lensai/features/bangs/domain/repositories/data.dart';
+import 'package:lensai/features/bangs/presentation/widgets/bang_chips.dart';
+import 'package:lensai/features/bangs/presentation/widgets/search_field.dart';
+import 'package:lensai/features/search_browser/domain/providers.dart';
+import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
 
 class SiteSearch extends HookConsumerWidget {
   final String domain;

@@ -1,7 +1,7 @@
-import 'package:bang_navigator/features/bangs/data/database/database.dart';
-import 'package:bang_navigator/features/bangs/data/models/bang.dart';
-import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
 import 'package:drift/drift.dart';
+import 'package:lensai/features/bangs/data/database/database.dart';
+import 'package:lensai/features/bangs/data/models/bang.dart';
+import 'package:lensai/features/bangs/data/models/bang_data.dart';
 
 part 'bang.g.dart';
 

@@ -1,9 +1,9 @@
-import 'package:bang_navigator/features/web_view/domain/entities/web_view_page.dart';
-import 'package:bang_navigator/features/web_view/presentation/widgets/favicon.dart';
-import 'package:bang_navigator/features/web_view/presentation/widgets/web_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
+import 'package:lensai/features/web_view/domain/entities/web_view_page.dart';
+import 'package:lensai/features/web_view/presentation/widgets/favicon.dart';
+import 'package:lensai/features/web_view/presentation/widgets/web_view.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 class AppBarTitle extends HookWidget {

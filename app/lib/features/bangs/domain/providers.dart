@@ -1,7 +1,7 @@
-import 'package:bang_navigator/features/bangs/data/models/bang.dart';
-import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/data.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/sync.dart';
+import 'package:lensai/features/bangs/data/models/bang.dart';
+import 'package:lensai/features/bangs/data/models/bang_data.dart';
+import 'package:lensai/features/bangs/domain/repositories/data.dart';
+import 'package:lensai/features/bangs/domain/repositories/sync.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'providers.g.dart';

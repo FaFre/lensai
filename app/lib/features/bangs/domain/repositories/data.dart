@@ -1,14 +1,14 @@
 import 'dart:convert';
 
-import 'package:bang_navigator/domain/services/generic_website.dart';
-import 'package:bang_navigator/extensions/database_table_size.dart';
-import 'package:bang_navigator/features/bangs/data/database/database.dart';
-import 'package:bang_navigator/features/bangs/data/models/bang.dart';
-import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
-import 'package:bang_navigator/features/bangs/data/providers.dart';
-import 'package:bang_navigator/utils/image_helper.dart';
 import 'package:drift/drift.dart';
 import 'package:exceptions/exceptions.dart';
+import 'package:lensai/domain/services/generic_website.dart';
+import 'package:lensai/extensions/database_table_size.dart';
+import 'package:lensai/features/bangs/data/database/database.dart';
+import 'package:lensai/features/bangs/data/models/bang.dart';
+import 'package:lensai/features/bangs/data/models/bang_data.dart';
+import 'package:lensai/features/bangs/data/providers.dart';
+import 'package:lensai/utils/image_helper.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'data.g.dart';

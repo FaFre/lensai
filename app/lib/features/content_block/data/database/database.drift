@@ -1,4 +1,4 @@
-import 'package:bang_navigator/features/content_block/data/models/host.dart';
+import 'package:lensai/features/content_block/data/models/host.dart';
 
 CREATE TABLE host (
   hostname TEXT PRIMARY KEY NOT NULL,

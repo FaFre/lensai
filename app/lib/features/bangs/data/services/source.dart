@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:bang_navigator/core/http_error_handler.dart';
-import 'package:bang_navigator/features/bangs/data/models/bang.dart';
 import 'package:exceptions/exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
+import 'package:lensai/core/http_error_handler.dart';
+import 'package:lensai/features/bangs/data/models/bang.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'source.g.dart';

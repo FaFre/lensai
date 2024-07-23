@@ -1,12 +1,12 @@
-import 'package:bang_navigator/features/content_block/data/models/host.dart';
-import 'package:bang_navigator/features/content_block/domain/providers.dart';
-import 'package:bang_navigator/features/content_block/domain/repositories/sync.dart';
-import 'package:bang_navigator/features/settings/data/models/settings.dart';
-import 'package:bang_navigator/features/settings/presentation/controllers/save_settings.dart';
-import 'package:bang_navigator/features/settings/presentation/widgets/custom_list_tile.dart';
-import 'package:bang_navigator/features/settings/presentation/widgets/sync_details_table.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/content_block/data/models/host.dart';
+import 'package:lensai/features/content_block/domain/providers.dart';
+import 'package:lensai/features/content_block/domain/repositories/sync.dart';
+import 'package:lensai/features/settings/data/models/settings.dart';
+import 'package:lensai/features/settings/presentation/controllers/save_settings.dart';
+import 'package:lensai/features/settings/presentation/widgets/custom_list_tile.dart';
+import 'package:lensai/features/settings/presentation/widgets/sync_details_table.dart';
 
 class HostListTile extends HookConsumerWidget {
   final bool enabled;

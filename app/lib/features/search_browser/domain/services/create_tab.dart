@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:bang_navigator/domain/entities/received_parameter.dart';
-import 'package:bang_navigator/features/app_widget/domain/services/home_widget.dart';
-import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
-import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
-import 'package:bang_navigator/features/share_intent/domain/services/sharing_intent.dart';
 import 'package:collection/collection.dart';
+import 'package:lensai/domain/entities/received_parameter.dart';
+import 'package:lensai/features/app_widget/domain/services/home_widget.dart';
+import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/search_browser/domain/entities/sheet.dart';
+import 'package:lensai/features/share_intent/domain/services/sharing_intent.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 

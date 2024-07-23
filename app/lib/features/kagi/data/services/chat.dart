@@ -1,9 +1,9 @@
 import 'dart:convert';
 
-import 'package:bang_navigator/core/http_error_handler.dart';
-import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:exceptions/exceptions.dart';
 import 'package:http/http.dart' as http;
+import 'package:lensai/core/http_error_handler.dart';
+import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'chat.g.dart';

@@ -1,10 +1,10 @@
-import 'package:bang_navigator/core/extension/date_time.dart';
-import 'package:bang_navigator/core/routing/routes.dart';
-import 'package:bang_navigator/features/chat_archive/domain/repositories/archive.dart';
-import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/core/extension/date_time.dart';
+import 'package:lensai/core/routing/routes.dart';
+import 'package:lensai/features/chat_archive/domain/repositories/archive.dart';
+import 'package:lensai/presentation/widgets/failure_widget.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 
 class ChatArchiveListScreen extends HookConsumerWidget {

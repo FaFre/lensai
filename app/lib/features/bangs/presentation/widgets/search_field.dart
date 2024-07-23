@@ -1,15 +1,15 @@
 // The default Material-style Autocomplete options.
-import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
-import 'package:bang_navigator/features/bangs/presentation/widgets/bang_icon.dart';
-import 'package:bang_navigator/features/kagi/domain/repositories/autosuggest.dart';
-import 'package:bang_navigator/features/search_browser/presentation/widgets/speech_to_text_button.dart';
-import 'package:bang_navigator/features/settings/data/models/settings.dart';
-import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
-import 'package:bang_navigator/presentation/widgets/autocomplete.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/bangs/data/models/bang_data.dart';
+import 'package:lensai/features/bangs/presentation/widgets/bang_icon.dart';
+import 'package:lensai/features/kagi/domain/repositories/autosuggest.dart';
+import 'package:lensai/features/search_browser/presentation/widgets/speech_to_text_button.dart';
+import 'package:lensai/features/settings/data/models/settings.dart';
+import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/presentation/widgets/autocomplete.dart';
 
 class SearchField extends HookConsumerWidget {
   static const defaultMaxOptionsHeight = 158.0;

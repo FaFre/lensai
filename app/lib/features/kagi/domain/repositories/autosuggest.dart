@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'package:bang_navigator/features/kagi/data/services/autosuggest.dart';
-import 'package:bang_navigator/utils/lru_cache.dart';
+import 'package:lensai/features/kagi/data/services/autosuggest.dart';
+import 'package:lensai/utils/lru_cache.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 

@@ -1,6 +1,6 @@
-import 'package:bang_navigator/features/chat_archive/data/database/daos/search.dart';
-import 'package:bang_navigator/features/query/domain/tokenizer.dart';
 import 'package:drift/drift.dart';
+import 'package:lensai/features/chat_archive/data/database/daos/search.dart';
+import 'package:lensai/features/query/domain/tokenizer.dart';
 
 part 'database.g.dart';
 

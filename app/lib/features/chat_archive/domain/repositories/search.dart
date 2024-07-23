@@ -1,13 +1,13 @@
 import 'dart:async';
 
-import 'package:bang_navigator/core/logger.dart';
-import 'package:bang_navigator/features/chat_archive/data/database/database.dart';
-import 'package:bang_navigator/features/chat_archive/data/providers.dart';
-import 'package:bang_navigator/features/chat_archive/data/services/file.dart';
-import 'package:bang_navigator/features/chat_archive/domain/entities/chat_entity.dart';
-import 'package:bang_navigator/features/chat_archive/domain/repositories/archive.dart';
-import 'package:bang_navigator/features/chat_archive/utils/markdown_to_text.dart';
 import 'package:collection/collection.dart';
+import 'package:lensai/core/logger.dart';
+import 'package:lensai/features/chat_archive/data/database/database.dart';
+import 'package:lensai/features/chat_archive/data/providers.dart';
+import 'package:lensai/features/chat_archive/data/services/file.dart';
+import 'package:lensai/features/chat_archive/domain/entities/chat_entity.dart';
+import 'package:lensai/features/chat_archive/domain/repositories/archive.dart';
+import 'package:lensai/features/chat_archive/utils/markdown_to_text.dart';
 import 'package:path/path.dart' as path;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:watcher/watcher.dart';

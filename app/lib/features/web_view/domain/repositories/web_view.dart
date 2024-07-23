@@ -1,7 +1,7 @@
 import 'dart:collection';
 
-import 'package:bang_navigator/features/web_view/presentation/widgets/web_view.dart';
 import 'package:flutter/foundation.dart';
+import 'package:lensai/features/web_view/presentation/widgets/web_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'web_view.g.dart';

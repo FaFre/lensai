@@ -1,5 +1,5 @@
-import 'package:bang_navigator/domain/entities/web_page_info.dart';
-import 'package:bang_navigator/domain/services/generic_website.dart';
+import 'package:lensai/domain/entities/web_page_info.dart';
+import 'package:lensai/domain/services/generic_website.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'website_title.g.dart';

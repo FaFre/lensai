@@ -1,6 +1,6 @@
-import 'package:bang_navigator/features/content_block/data/database/database.dart';
-import 'package:bang_navigator/features/content_block/data/models/host.dart';
 import 'package:drift/drift.dart';
+import 'package:lensai/features/content_block/data/database/database.dart';
+import 'package:lensai/features/content_block/data/models/host.dart';
 
 part 'host.g.dart';
 

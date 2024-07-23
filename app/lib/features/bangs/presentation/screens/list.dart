@@ -1,13 +1,13 @@
-import 'package:bang_navigator/core/routing/routes.dart';
-import 'package:bang_navigator/features/bangs/domain/providers.dart';
-import 'package:bang_navigator/features/bangs/presentation/widgets/bang_details.dart';
-import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
-import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
-import 'package:bang_navigator/features/search_browser/domain/providers.dart';
-import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/core/routing/routes.dart';
+import 'package:lensai/features/bangs/domain/providers.dart';
+import 'package:lensai/features/bangs/presentation/widgets/bang_details.dart';
+import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/search_browser/domain/entities/sheet.dart';
+import 'package:lensai/features/search_browser/domain/providers.dart';
+import 'package:lensai/presentation/widgets/failure_widget.dart';
 
 class BangListScreen extends HookConsumerWidget {
   final String? category;

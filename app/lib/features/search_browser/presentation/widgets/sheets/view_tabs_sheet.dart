@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:bang_navigator/features/web_view/domain/repositories/web_view.dart';
-import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
-import 'package:bang_navigator/features/web_view/presentation/widgets/web_view_tab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
+import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
+import 'package:lensai/features/web_view/presentation/widgets/web_view_tab.dart';
 
 class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
   final VoidCallback onClose;

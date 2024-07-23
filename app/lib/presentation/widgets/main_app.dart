@@ -1,8 +1,8 @@
-import 'package:bang_navigator/core/providers.dart';
-import 'package:bang_navigator/domain/services/app_initialization.dart';
-import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/core/providers.dart';
+import 'package:lensai/domain/services/app_initialization.dart';
+import 'package:lensai/presentation/widgets/failure_widget.dart';
 
 class MainApp extends HookConsumerWidget {
   final ThemeData? theme;

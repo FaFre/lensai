@@ -1,4 +1,4 @@
-import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'save_settings.g.dart';

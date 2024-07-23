@@ -1,5 +1,5 @@
-import 'package:bang_navigator/features/web_view/presentation/services/readerability_script.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:lensai/features/web_view/presentation/services/readerability_script.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'readerability.g.dart';

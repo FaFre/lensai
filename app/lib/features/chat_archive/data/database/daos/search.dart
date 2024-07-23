@@ -1,5 +1,5 @@
-import 'package:bang_navigator/features/chat_archive/data/database/database.dart';
 import 'package:drift/drift.dart';
+import 'package:lensai/features/chat_archive/data/database/database.dart';
 
 part 'search.g.dart';
 

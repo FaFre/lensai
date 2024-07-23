@@ -1,4 +1,4 @@
-import 'package:bang_navigator/core/logger.dart';
+import 'package:lensai/core/logger.dart';
 import 'package:riverpod/riverpod.dart';
 
 class ErrorObserver extends ProviderObserver {

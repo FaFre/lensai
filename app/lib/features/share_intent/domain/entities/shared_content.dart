@@ -1,4 +1,4 @@
-import 'package:bang_navigator/utils/uri_parser.dart' as uri_parser;
+import 'package:lensai/utils/uri_parser.dart' as uri_parser;
 
 sealed class SharedContent {
   const SharedContent();

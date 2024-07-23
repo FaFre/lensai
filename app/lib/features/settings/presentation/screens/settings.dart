@@ -1,22 +1,22 @@
-import 'package:bang_navigator/features/bangs/data/models/bang.dart';
-import 'package:bang_navigator/features/bangs/domain/providers.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/data.dart';
-import 'package:bang_navigator/features/content_block/data/models/host.dart';
-import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
-import 'package:bang_navigator/features/settings/data/models/settings.dart';
-import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
-import 'package:bang_navigator/features/settings/presentation/controllers/save_settings.dart';
-import 'package:bang_navigator/features/settings/presentation/widgets/bang_group_list_tile.dart';
-import 'package:bang_navigator/features/settings/presentation/widgets/custom_list_tile.dart';
-import 'package:bang_navigator/features/settings/presentation/widgets/host_list_tile.dart';
-import 'package:bang_navigator/features/settings/utils/session_link_extractor.dart';
-import 'package:bang_navigator/presentation/hooks/listenable_callback.dart';
-import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/bangs/data/models/bang.dart';
+import 'package:lensai/features/bangs/domain/providers.dart';
+import 'package:lensai/features/bangs/domain/repositories/data.dart';
+import 'package:lensai/features/content_block/data/models/host.dart';
+import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/settings/data/models/settings.dart';
+import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/features/settings/presentation/controllers/save_settings.dart';
+import 'package:lensai/features/settings/presentation/widgets/bang_group_list_tile.dart';
+import 'package:lensai/features/settings/presentation/widgets/custom_list_tile.dart';
+import 'package:lensai/features/settings/presentation/widgets/host_list_tile.dart';
+import 'package:lensai/features/settings/utils/session_link_extractor.dart';
+import 'package:lensai/presentation/hooks/listenable_callback.dart';
+import 'package:lensai/utils/ui_helper.dart' as ui_helper;
 
 class SettingsScreen extends HookConsumerWidget {
   const SettingsScreen({super.key});

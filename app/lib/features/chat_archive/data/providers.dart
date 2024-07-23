@@ -1,6 +1,6 @@
-import 'package:bang_navigator/features/chat_archive/data/database/database.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:lensai/features/chat_archive/data/database/database.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:sqlite3/sqlite3.dart';

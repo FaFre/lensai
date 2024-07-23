@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:bang_navigator/core/logger.dart';
-import 'package:bang_navigator/domain/entities/received_parameter.dart';
-import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter_pdf_text/flutter_pdf_text.dart';
 import 'package:flutter_sharing_intent/flutter_sharing_intent.dart';
 import 'package:flutter_sharing_intent/model/sharing_file.dart';
+import 'package:lensai/core/logger.dart';
+import 'package:lensai/domain/entities/received_parameter.dart';
+import 'package:lensai/features/search_browser/domain/entities/modes.dart';
 import 'package:mime/mime.dart' as mime;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';

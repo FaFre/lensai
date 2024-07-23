@@ -1,7 +1,7 @@
-import 'package:bang_navigator/features/content_block/data/models/host.dart';
-import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
+import 'package:lensai/features/content_block/data/models/host.dart';
+import 'package:lensai/features/search_browser/domain/entities/modes.dart';
 
 Set<HostSource>? parseHostSources(List<String>? input) => input
     ?.map(

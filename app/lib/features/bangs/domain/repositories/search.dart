@@ -1,8 +1,8 @@
 import 'dart:async';
 
-import 'package:bang_navigator/features/bangs/data/database/database.dart';
-import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
-import 'package:bang_navigator/features/bangs/data/providers.dart';
+import 'package:lensai/features/bangs/data/database/database.dart';
+import 'package:lensai/features/bangs/data/models/bang_data.dart';
+import 'package:lensai/features/bangs/data/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'search.g.dart';

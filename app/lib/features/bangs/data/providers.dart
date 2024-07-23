@@ -1,6 +1,6 @@
-import 'package:bang_navigator/features/bangs/data/database/database.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
+import 'package:lensai/features/bangs/data/database/database.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart' as path_provider;
 import 'package:riverpod_annotation/riverpod_annotation.dart';

@@ -1,6 +1,6 @@
-import 'package:bang_navigator/features/web_view/domain/repositories/web_view.dart';
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 
 class TabsActionButton extends HookConsumerWidget {
   final VoidCallback onTap;

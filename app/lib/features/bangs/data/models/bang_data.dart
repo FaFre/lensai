@@ -1,6 +1,6 @@
-import 'package:bang_navigator/features/bangs/data/models/bang.dart';
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:drift/drift.dart';
+import 'package:lensai/features/bangs/data/models/bang.dart';
 
 part 'bang_data.g.dart';
 

@@ -1,20 +1,20 @@
 import 'dart:async';
 
-import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
-import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
-import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
-    as uri_builder;
-import 'package:bang_navigator/features/settings/data/models/settings.dart';
-import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
-import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
-import 'package:bang_navigator/presentation/widgets/website_title_tile.dart';
-import 'package:bang_navigator/utils/uri_parser.dart' as uri_parser;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:flutter_pdf_text/flutter_pdf_text.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
+import 'package:lensai/features/search_browser/utils/url_builder.dart'
+    as uri_builder;
+import 'package:lensai/features/settings/data/models/settings.dart';
+import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/features/share_intent/domain/entities/shared_content.dart';
+import 'package:lensai/presentation/widgets/website_title_tile.dart';
+import 'package:lensai/utils/uri_parser.dart' as uri_parser;
 
 class _InputField extends ConsumerWidget {
   final TextEditingController? controller;

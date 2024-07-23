@@ -1,10 +1,10 @@
 import 'dart:convert';
 
-import 'package:bang_navigator/features/content_block/domain/repositories/host.dart';
-import 'package:bang_navigator/features/settings/data/models/settings.dart';
-import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
+import 'package:lensai/features/content_block/domain/repositories/host.dart';
+import 'package:lensai/features/settings/data/models/settings.dart';
+import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:universal_io/io.dart';
 

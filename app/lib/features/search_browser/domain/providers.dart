@@ -2,12 +2,12 @@
 
 import 'dart:async';
 
-import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/data.dart';
-import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
-import 'package:bang_navigator/features/search_browser/domain/entities/sheet.dart';
-import 'package:bang_navigator/features/search_browser/domain/services/create_tab.dart';
 import 'package:flutter/widgets.dart';
+import 'package:lensai/features/bangs/data/models/bang_data.dart';
+import 'package:lensai/features/bangs/domain/repositories/data.dart';
+import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/search_browser/domain/entities/sheet.dart';
+import 'package:lensai/features/search_browser/domain/services/create_tab.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 

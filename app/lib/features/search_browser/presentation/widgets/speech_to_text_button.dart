@@ -1,5 +1,5 @@
-import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
 import 'package:flutter/material.dart';
+import 'package:lensai/utils/ui_helper.dart' as ui_helper;
 import 'package:speech_to_text_google_dialog/speech_to_text_google_dialog.dart';
 
 class SpeechToTextButton extends StatelessWidget {

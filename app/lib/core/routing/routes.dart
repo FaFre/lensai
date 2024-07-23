@@ -1,15 +1,15 @@
-import 'package:bang_navigator/core/routing/dialog_page.dart';
-import 'package:bang_navigator/features/about/presentation/screens/about.dart';
-import 'package:bang_navigator/features/bangs/presentation/screens/categories.dart';
-import 'package:bang_navigator/features/bangs/presentation/screens/list.dart';
-import 'package:bang_navigator/features/bangs/presentation/screens/search.dart';
-import 'package:bang_navigator/features/chat_archive/presentation/screens/detail.dart';
-import 'package:bang_navigator/features/chat_archive/presentation/screens/list.dart';
-import 'package:bang_navigator/features/chat_archive/presentation/screens/search.dart';
-import 'package:bang_navigator/features/search_browser/presentation/screens/browser.dart';
-import 'package:bang_navigator/features/settings/presentation/screens/settings.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:lensai/core/routing/dialog_page.dart';
+import 'package:lensai/features/about/presentation/screens/about.dart';
+import 'package:lensai/features/bangs/presentation/screens/categories.dart';
+import 'package:lensai/features/bangs/presentation/screens/list.dart';
+import 'package:lensai/features/bangs/presentation/screens/search.dart';
+import 'package:lensai/features/chat_archive/presentation/screens/detail.dart';
+import 'package:lensai/features/chat_archive/presentation/screens/list.dart';
+import 'package:lensai/features/chat_archive/presentation/screens/search.dart';
+import 'package:lensai/features/search_browser/presentation/screens/browser.dart';
+import 'package:lensai/features/settings/presentation/screens/settings.dart';
 
 part 'routes.g.dart';
 

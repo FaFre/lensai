@@ -1,8 +1,8 @@
 import 'dart:math' as math;
 
-import 'package:bang_navigator/features/query/domain/entities/abstract/i_query_builder.dart';
-import 'package:bang_navigator/features/query/domain/entities/bareword.dart';
 import 'package:collection/collection.dart';
+import 'package:lensai/features/query/domain/entities/abstract/i_query_builder.dart';
+import 'package:lensai/features/query/domain/entities/bareword.dart';
 
 typedef _Phrase = List<Bareword>;
 

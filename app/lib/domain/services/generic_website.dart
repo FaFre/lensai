@@ -1,13 +1,13 @@
-import 'package:bang_navigator/core/http_error_handler.dart';
-import 'package:bang_navigator/domain/entities/web_page_info.dart';
-import 'package:bang_navigator/extensions/web_uri_favicon.dart';
-import 'package:bang_navigator/features/web_view/utils/favicon_helper.dart';
 import 'package:exceptions/exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:http/http.dart' as http;
+import 'package:lensai/core/http_error_handler.dart';
+import 'package:lensai/domain/entities/web_page_info.dart';
+import 'package:lensai/extensions/web_uri_favicon.dart';
+import 'package:lensai/features/web_view/utils/favicon_helper.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:universal_io/io.dart';
 

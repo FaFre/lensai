@@ -1,5 +1,5 @@
-import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
-import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
+import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/share_intent/domain/entities/shared_content.dart';
 
 final _baseUrl = Uri.https('kagi.com');
 

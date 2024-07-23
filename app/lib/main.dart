@@ -1,13 +1,13 @@
-import 'package:bang_navigator/core/error_observer.dart';
-import 'package:bang_navigator/domain/services/app_initialization.dart';
-import 'package:bang_navigator/features/settings/data/models/settings.dart';
-import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
-import 'package:bang_navigator/presentation/hooks/on_initialization.dart';
-import 'package:bang_navigator/presentation/widgets/main_app.dart';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:home_widget/home_widget.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/core/error_observer.dart';
+import 'package:lensai/domain/services/app_initialization.dart';
+import 'package:lensai/features/settings/data/models/settings.dart';
+import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/presentation/hooks/on_initialization.dart';
+import 'package:lensai/presentation/widgets/main_app.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

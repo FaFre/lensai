@@ -1,10 +1,10 @@
-import 'package:bang_navigator/core/routing/routes.dart';
-import 'package:bang_navigator/features/bangs/domain/providers.dart';
-import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/core/routing/routes.dart';
+import 'package:lensai/features/bangs/domain/providers.dart';
+import 'package:lensai/presentation/widgets/failure_widget.dart';
 
 class BangCategoriesScreen extends HookConsumerWidget {
   const BangCategoriesScreen({super.key});

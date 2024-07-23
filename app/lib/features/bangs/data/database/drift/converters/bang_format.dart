@@ -1,7 +1,7 @@
 import 'dart:convert';
 
-import 'package:bang_navigator/features/bangs/data/models/bang.dart';
 import 'package:drift/drift.dart';
+import 'package:lensai/features/bangs/data/models/bang.dart';
 
 class BangFormatConverter extends TypeConverter<Set<BangFormat>?, String?> {
   const BangFormatConverter();

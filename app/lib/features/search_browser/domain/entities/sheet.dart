@@ -1,5 +1,5 @@
-import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
 import 'package:fast_equatable/fast_equatable.dart';
+import 'package:lensai/features/search_browser/domain/entities/modes.dart';
 
 // ignore: missing_override_of_must_be_overridden
 sealed class Sheet with FastEquatable {}

@@ -1,6 +1,6 @@
-import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
-import 'package:bang_navigator/features/bangs/presentation/widgets/bang_icon.dart';
 import 'package:flutter/material.dart';
+import 'package:lensai/features/bangs/data/models/bang_data.dart';
+import 'package:lensai/features/bangs/presentation/widgets/bang_icon.dart';
 
 class BangChips extends StatelessWidget {
   final List<BangData> availableBangs;

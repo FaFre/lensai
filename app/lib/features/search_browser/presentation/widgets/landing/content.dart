@@ -1,12 +1,12 @@
-import 'package:bang_navigator/domain/services/app_initialization.dart';
-import 'package:bang_navigator/features/search_browser/presentation/widgets/error_container.dart';
-import 'package:bang_navigator/features/search_browser/presentation/widgets/landing/action.dart';
-import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
-import 'package:bang_navigator/presentation/hooks/cached_future.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/domain/services/app_initialization.dart';
+import 'package:lensai/features/search_browser/presentation/widgets/error_container.dart';
+import 'package:lensai/features/search_browser/presentation/widgets/landing/action.dart';
+import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
+import 'package:lensai/presentation/hooks/cached_future.dart';
 
 class LandingContent extends HookConsumerWidget {
   const LandingContent({super.key});

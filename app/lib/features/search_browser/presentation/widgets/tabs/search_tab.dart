@@ -1,16 +1,16 @@
-import 'package:bang_navigator/core/routing/routes.dart';
-import 'package:bang_navigator/features/bangs/domain/providers.dart';
-import 'package:bang_navigator/features/bangs/domain/repositories/data.dart';
-import 'package:bang_navigator/features/bangs/presentation/widgets/bang_chips.dart';
-import 'package:bang_navigator/features/bangs/presentation/widgets/search_field.dart';
-import 'package:bang_navigator/features/search_browser/domain/providers.dart';
-import 'package:bang_navigator/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
-import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/core/routing/routes.dart';
+import 'package:lensai/features/bangs/domain/providers.dart';
+import 'package:lensai/features/bangs/domain/repositories/data.dart';
+import 'package:lensai/features/bangs/presentation/widgets/bang_chips.dart';
+import 'package:lensai/features/bangs/presentation/widgets/search_field.dart';
+import 'package:lensai/features/search_browser/domain/providers.dart';
+import 'package:lensai/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
+import 'package:lensai/features/share_intent/domain/entities/shared_content.dart';
 
 class SearchTab extends HookConsumerWidget {
   final SharedContent? sharedContent;

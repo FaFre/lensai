@@ -1,13 +1,13 @@
-import 'package:bang_navigator/core/routing/routes.dart';
-import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
-import 'package:bang_navigator/features/bangs/presentation/widgets/bang_icon.dart';
-import 'package:bang_navigator/features/settings/data/models/settings.dart';
-import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
-import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
-import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/core/routing/routes.dart';
+import 'package:lensai/features/bangs/data/models/bang_data.dart';
+import 'package:lensai/features/bangs/presentation/widgets/bang_icon.dart';
+import 'package:lensai/features/settings/data/models/settings.dart';
+import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
+import 'package:lensai/utils/ui_helper.dart' as ui_helper;
 
 class BangDetails extends HookConsumerWidget {
   final BangData bangData;

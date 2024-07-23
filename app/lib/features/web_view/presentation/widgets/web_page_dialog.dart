@@ -1,25 +1,25 @@
-import 'package:bang_navigator/domain/entities/web_page_info.dart';
-import 'package:bang_navigator/features/bangs/data/models/bang_data.dart';
-import 'package:bang_navigator/features/bangs/domain/providers.dart';
-import 'package:bang_navigator/features/bangs/presentation/widgets/site_search.dart';
-import 'package:bang_navigator/features/search_browser/domain/entities/modes.dart';
-import 'package:bang_navigator/features/search_browser/utils/url_builder.dart'
-    as uri_builder;
-import 'package:bang_navigator/features/settings/data/models/settings.dart';
-import 'package:bang_navigator/features/settings/data/repositories/settings_repository.dart';
-import 'package:bang_navigator/features/share_intent/domain/entities/shared_content.dart';
-import 'package:bang_navigator/features/web_view/presentation/controllers/switch_new_tab.dart';
-import 'package:bang_navigator/features/web_view/presentation/widgets/favicon.dart';
-import 'package:bang_navigator/presentation/controllers/website_title.dart';
-import 'package:bang_navigator/presentation/widgets/failure_widget.dart';
-import 'package:bang_navigator/utils/ui_helper.dart' as ui_helper;
-import 'package:bang_navigator/utils/uri_parser.dart' as uri_parser;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/domain/entities/web_page_info.dart';
+import 'package:lensai/features/bangs/data/models/bang_data.dart';
+import 'package:lensai/features/bangs/domain/providers.dart';
+import 'package:lensai/features/bangs/presentation/widgets/site_search.dart';
+import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/search_browser/utils/url_builder.dart'
+    as uri_builder;
+import 'package:lensai/features/settings/data/models/settings.dart';
+import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/features/share_intent/domain/entities/shared_content.dart';
+import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
+import 'package:lensai/features/web_view/presentation/widgets/favicon.dart';
+import 'package:lensai/presentation/controllers/website_title.dart';
+import 'package:lensai/presentation/widgets/failure_widget.dart';
+import 'package:lensai/utils/ui_helper.dart' as ui_helper;
+import 'package:lensai/utils/uri_parser.dart' as uri_parser;
 import 'package:share_plus/share_plus.dart';
 
 class LoadingWebPageDialog extends HookConsumerWidget {
