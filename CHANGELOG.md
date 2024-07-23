@@ -1,3 +1,11 @@
+## 0.6.0
+
+* Renamed BangNavigator to Lensai.
+* Implemented Reader Mode to extract and simplify web pages, enhancing readability by removing ads, sidebars, and other non-essential elements.
+* Improved the layout and style of the browser app bar.
+* Added a setting to show a selectable quick action that appears in the browser app bar between the website title and tab count.
+* Added an accessibility feature to directly use speech-to-text for quick actions.
+
 ## 0.5.2
 
 * Enhanced bottom sheet behavior for better UI and UX
