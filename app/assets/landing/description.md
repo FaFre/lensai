@@ -1,4 +1,5 @@
-Welcome to Lensai, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure during research. Lensai offers a seamless and intuitive interface, integrating the powerful tools of Kagi Search Engine.
+Lensai enhances your mobile research experience while keeping your personal data and identity secure. 
+Powered by advanced AI tools and browser extensions, Lensai offers modern features designed to elevate your browsing experience.
 
 Lensai is packed with a variety of features aimed at improving usability and maintaining privacy:
 

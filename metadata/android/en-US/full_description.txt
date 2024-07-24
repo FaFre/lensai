@@ -1,17 +1,37 @@
-Lensai - A Privacy-Focused Browser for Kagi
+Lensai: The Privacy-Focused & AI-Powered Research Browser with Kagi integration.
 
-Welcome to Lensai, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure during research. Built with Flutter, Lensai offers a seamless and intuitive interface across both Android and iOS devices, integrating the powerful tools of Kagi Search Engine.
+Lensai enhances your mobile research experience while keeping your personal data and identity secure. 
+Powered by advanced AI tools and browser extensions, Lensai offers modern features designed to elevate your browsing experience.
 
-Lensai is packed with a variety of features aimed at improving usability and maintaining privacy:
+<b>• Privacy by Default</b>
+Incognito mode is enabled by default to keep your searches and browsing history private.
 
-- Cross-Platform Support: Developed using Flutter, ensuring a consistent and smooth experience on both Android and iOS.
--Native Browser Engine: Utilizes the native browser engine of the device for optimal performance and compatibility.
-- Privacy by Default: Incognito mode is enabled by default to keep your searches and browsing history private.
-- Full Browser Functionality: Includes all the essential features of a basic browser to browse the web efficiently.
-- Kagi Integration: Seamlessly integrates Kagi's search, assistant, and summarizer tools within a user-friendly interface.
-- Easy Sharing: Share URLs or text from any app directly into Lensai without the need to copy and paste, for direct use with summarizer/assistant.
-- Quick Summarization: Long press any link on a website to get a summary via Kagi's summarizer.
-- Enhanced Text Interaction: Custom context menu allows for easy passage of marked text to Kagi's search or assistant tools.
-- Home Widget: Includes a home screen widget for quick actions, enhancing productivity.
-- Speech Input: Supports voice commands for hands-free operation and accessibility.
-- PDF processing: Open and directly summarize/prompt PDF documents.
+<b>• Kagi Integration</b>
+Seamlessly integrates Kagi's search, assistant, and summarizer tools within a user-friendly interface.
+
+<b>• Easy Sharing</b>
+Share URLs or text from any app directly into Lensai without the need to copy and paste, for direct use with summarizer/assistant.
+
+<b>• Quick Summarization</b>
+Long press any link on a website to get a summary via Kagi's summarizer.
+
+<b>• Content Blocking</b>
+A powerful content blocker is enabled by default to filter out ads, malware, and tracking sites.
+
+<b>• Home Widgets</b>
+Includes home screen widgets in three different sizes for quick actions, enhancing productivity.
+
+<b>• PDF processing</b>
+Open and directly summarize/prompt PDF documents.
+
+<b>• Chat Archive</b>
+Easily archive conversations with the Kagi assistant on your device and search through them locally.
+
+<b>• Bang Repository</b>
+Automatically synchronizes all official Kagi Bangs from the official Repository and makes them available through a convenient interface.
+
+<b>• Enhanced Text Interaction</b>
+Custom context menu allows for easy passage of marked text to Kagi's search or assistant tools.
+
+<b>• Speech Input</b>
+Supports voice commands for hands-free operation and accessibility.

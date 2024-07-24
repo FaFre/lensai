@@ -2,9 +2,10 @@
   <img width="250" src="https://raw.githubusercontent.com/FaFre/lensai/main/app/assets/icon/icon.png" alt="Lensai Logo">
 </p>
 
-# Lensai - A Privacy-Focused Browser for Kagi
+# Lensai - The Privacy-Focused & AI-Powered Research Browser with Kagi integration
 
-Welcome to the GitHub repository of Lensai, a privacy-centric search and research browser designed to enhance your mobile search experience while ensuring your personal data and identity remains secure during research. Built with Flutter, Lensai offers a seamless and intuitive interface across both Android and iOS devices, integrating the powerful tools of Kagi Search Engine.
+Lensai enhances your mobile research experience while keeping your personal data and identity secure. 
+Powered by advanced AI tools and browser extensions, Lensai offers modern features designed to elevate your browsing experience.
 
 ## Features
 

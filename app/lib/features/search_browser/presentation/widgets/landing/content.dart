@@ -31,7 +31,7 @@ class LandingContent extends HookConsumerWidget {
             textAlign: TextAlign.center,
           ),
           Text(
-            'A Privacy-Focused Browser for Kagi',
+            'The Privacy-Focused & AI-Powered Research Browser with Kagi integration',
             style: textTheme.titleMedium,
             textAlign: TextAlign.center,
           ),

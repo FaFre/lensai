@@ -1,1 +1,1 @@
-Privacy-focused browser with Kagi integration for search, summarization and AI
+The Privacy-Focused & AI-Powered Research Browser with Kagi integration
