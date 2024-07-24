@@ -18,6 +18,7 @@ Lensai is packed with a variety of features aimed at improving usability and mai
 - **[Content Blocking](https://github.com/FaFre/lensai/wiki/Content-Blocking)**: A powerful content blocker is enabled by default to filter out ads, malware, and tracking sites.
 - **[Home Widgets](https://github.com/FaFre/lensai/wiki/Home-Widget)**: Includes home screen widgets in three different sizes for quick actions, enhancing productivity.
 - **[PDF processing](https://github.com/FaFre/lensai/wiki/Kagi-Tools)**: Open and directly summarize/prompt PDF documents.
+- **Reader Mode**: Extract and simplify web pages, enhancing readability by removing ads, sidebars, and other non-essential elements.
 - **[Chat Archive](https://github.com/FaFre/lensai/wiki/Chat-Archive)**: Easily archive conversations with the Kagi assistant on your device and search through them locally
 - **[Bang Repository](https://github.com/FaFre/lensai/wiki/Bangs)**: Automatically synchronizes all official Kagi Bangs from the official Repository and makes them available through a convenient interface.
 - **[Enhanced Text Interaction](https://github.com/FaFre/lensai/wiki/Browser)**: Custom context menu allows for easy passage of marked text to Kagi's search or assistant tools.
