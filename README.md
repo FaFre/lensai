@@ -2,7 +2,7 @@
   <img width="250" src="https://raw.githubusercontent.com/FaFre/lensai/main/app/assets/icon/icon.png" alt="Lensai Logo">
 </p>
 
-# Lensai - The Privacy-Focused & AI-Powered Research Browser with Kagi integration
+# Lensai: The Privacy-Focused & AI-Powered Research Browser with Kagi integration
 
 Lensai enhances your mobile research experience while keeping your personal data and identity secure. 
 Powered by advanced AI tools and browser extensions, Lensai offers modern features designed to elevate your browsing experience.
