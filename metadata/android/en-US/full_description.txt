@@ -24,7 +24,7 @@ Includes home screen widgets in three different sizes for quick actions, enhanci
 <b>• PDF processing</b>
 Open and directly summarize/prompt PDF documents.
 
-<b>• *Reader Mode**</b>
+<b>• Reader Mode</b>
 Extract and simplify web pages, enhancing readability by removing ads, sidebars, and other non-essential elements.
 
 <b>• Chat Archive</b>
