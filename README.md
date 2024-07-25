@@ -7,6 +7,12 @@
 Lensai enhances your mobile research experience while keeping your personal data and identity secure. 
 Powered by advanced AI tools and browser extensions, Lensai offers modern features designed to elevate your browsing experience.
 
+<p align="center">
+  <a href='https://play.google.com/store/apps/details?id=me.movenext.bang_navigator&pcampaignid=pcampaignidMKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'>
+    <img width="240" alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png'/>
+  </a>
+</p>
+
 ## Features
 
 Lensai is packed with a variety of features aimed at improving usability and maintaining privacy:
