@@ -4,6 +4,8 @@
 
 # Lensai: The Privacy-Focused & AI-Powered Research Browser with Kagi integration
 
+<a href="https://liberapay.com/FaFre/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>
+
 Lensai enhances your mobile research experience while keeping your personal data and identity secure. 
 Powered by advanced AI tools and browser extensions, Lensai offers modern features designed to elevate your browsing experience.
 
@@ -29,6 +31,20 @@ Lensai is packed with a variety of features aimed at improving usability and mai
 - **[Bang Repository](https://github.com/FaFre/lensai/wiki/Bangs)**: Automatically synchronizes all official Kagi Bangs from the official Repository and makes them available through a convenient interface.
 - **[Enhanced Text Interaction](https://github.com/FaFre/lensai/wiki/Browser)**: Custom context menu allows for easy passage of marked text to Kagi's search or assistant tools.
 - **[Speech Input](https://github.com/FaFre/lensai/wiki/Kagi-Tools)**: Supports voice commands for hands-free operation and accessibility.
+
+## iOS
+
+This open-source app is developed using a cross-platform framework and can be made available on the App Store with minor configuration effort. However, compared to the Google Play Store, the costs are considerably higher. Apple charges a fee of $100/year to publish apps on the store, and it is required to have Apple hardware to develop and publish apps. Since I do not own Apple hardware, I will need to rent a Mac in the cloud for development.
+
+I estimate the total costs to be $350/year, which includes the store fee and cloud hardware costs necessary to publish and maintain the app for iOS.
+
+Since I am not an iPhone user, I have decided to rely on community donations to make the app available on this platform.
+
+If you would like to see this app on the App Store, please consider donating using the following button:
+
+<a href="https://liberapay.com/FaFre/donate"><img alt="Donate using Liberapay" src="https://liberapay.com/assets/widgets/donate.svg"></a>
+
+Once the goal of $200 has been donated, I will start working on the App Store release.
 
 ## Getting started
 
