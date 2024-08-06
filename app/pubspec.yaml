@@ -41,7 +41,7 @@ dependencies:
   riverpod: ^2.5.1
   riverpod_annotation: ^2.3.5
   rxdart: ^0.27.7
-  share_plus: ^9.0.0
+  share_plus: ^10.0.0
   shared_preferences: ^2.2.3
   skeletonizer: ^1.3.0
   speech_to_text_google_dialog: ^0.0.6
