@@ -1,3 +1,9 @@
+## 0.6.1
+
+* Changed ABI versioning
+* Updated dependencies
+* Updated landing pages
+
 ## 0.6.0
 
 * Renamed BangNavigator to Lensai.
