@@ -27,7 +27,7 @@ class HostSyncRepository extends _$HostSyncRepository {
           await db.syncDao.lastSyncOfSource(source).getSingleOrNull();
 
       if (lastSync != null &&
-          lastSync.difference(DateTime.now()) < syncInterval) {
+          DateTime.now().difference(lastSync) < syncInterval) {
         return Result.success(null);
       }
     }

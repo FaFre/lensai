@@ -27,7 +27,7 @@ class BangSyncRepository extends _$BangSyncRepository {
           await db.syncDao.lastSyncOfGroup(group).getSingleOrNull();
 
       if (lastSync != null &&
-          lastSync.difference(DateTime.now()) < syncInterval) {
+          DateTime.now().difference(lastSync) < syncInterval) {
         return Result.success(null);
       }
     }
