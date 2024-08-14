@@ -1,3 +1,9 @@
+## 0.6.2
+
+* Implemented "Find in page" for web content
+* Fixed Bang & List synchronization timeout issue
+* Updated build files
+
 ## 0.6.1
 
 * Changed ABI versioning

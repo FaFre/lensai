@@ -1,0 +1,3 @@
+* Implemented "Find in page" for web content
+* Fixed Bang & List synchronization timeout issue
+* Updated build files
