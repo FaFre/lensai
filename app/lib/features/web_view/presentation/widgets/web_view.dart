@@ -216,6 +216,28 @@ class _WebViewState extends ConsumerState<WebView> {
     );
 
     final webViewProgress = useValueNotifier(100);
+    final inPageSearchResult =
+        useValueNotifier<({int activeMatchOrdinal, int numberOfMatches})?>(
+      null,
+    );
+
+    final findInteractionController = useMemoized(
+      () => FindInteractionController(
+        onFindResultReceived: (
+          controller,
+          activeMatchOrdinal,
+          numberOfMatches,
+          isDoneCounting,
+        ) {
+          if (isDoneCounting) {
+            inPageSearchResult.value = (
+              activeMatchOrdinal: activeMatchOrdinal,
+              numberOfMatches: numberOfMatches,
+            );
+          }
+        },
+      ),
+    );
 
     useOnAppLifecycleStateChange((previous, current) async {
       switch (current) {
@@ -242,6 +264,7 @@ class _WebViewState extends ConsumerState<WebView> {
         InAppWebView(
           initialUrlRequest: URLRequest(url: WebUri.uri(widget.page.value.url)),
           initialSettings: initialSettings,
+          findInteractionController: findInteractionController,
           contextMenu: ContextMenu(
             menuItems: [
               ContextMenuItem(
@@ -519,6 +542,99 @@ class _WebViewState extends ConsumerState<WebView> {
                 visible: value < 100,
                 child: LinearProgressIndicator(
                   value: value / 100,
+                ),
+              );
+            },
+          ),
+        ),
+        Positioned(
+          bottom: 0,
+          left: 0,
+          right: 0,
+          child: HookConsumer(
+            builder: (context, ref, child) {
+              final showFindInPage = ref.watch(showFindInPageProvider);
+
+              final textController = useTextEditingController();
+              final progress = useValueListenable(webViewProgress);
+
+              return Visibility(
+                visible: showFindInPage,
+                child: Padding(
+                  padding:
+                      EdgeInsets.only(bottom: (progress < 100) ? 4.0 : 0.0),
+                  child: Material(
+                    child: Row(
+                      children: [
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: textController,
+                            autofocus: true,
+                            autocorrect: false,
+                            decoration: const InputDecoration.collapsed(
+                              hintText: 'Find in page',
+                            ),
+                            keyboardType: TextInputType.text,
+                            onSubmitted: (value) async {
+                              if (value == '') {
+                                inPageSearchResult.value = null;
+                                await findInteractionController.clearMatches();
+                              } else {
+                                await findInteractionController.findAll(
+                                  find: value,
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                        HookConsumer(
+                          builder: (context, ref, child) {
+                            final searchResult =
+                                useValueListenable(inPageSearchResult);
+
+                            if (searchResult != null) {
+                              if (searchResult.numberOfMatches == 0) {
+                                return const Text('Not found');
+                              }
+
+                              return Text(
+                                '${searchResult.activeMatchOrdinal + 1} of ${searchResult.numberOfMatches}',
+                              );
+                            }
+
+                            return const SizedBox.shrink();
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_upward),
+                          onPressed: () async {
+                            await findInteractionController.findNext(
+                              forward: false,
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.arrow_downward),
+                          onPressed: () async {
+                            await findInteractionController.findNext();
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.clear),
+                          onPressed: () async {
+                            ref
+                                .read(showFindInPageProvider.notifier)
+                                .update(false);
+
+                            inPageSearchResult.value = null;
+                            await findInteractionController.clearMatches();
+                            textController.clear();
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               );
             },

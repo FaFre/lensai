@@ -125,3 +125,15 @@ class ActiveChatModel extends _$ActiveChatModel {
     return ChatModel.gpt4o;
   }
 }
+
+@Riverpod(keepAlive: true)
+class ShowFindInPage extends _$ShowFindInPage {
+  void update(bool show) {
+    state = show;
+  }
+
+  @override
+  bool build() {
+    return false;
+  }
+}

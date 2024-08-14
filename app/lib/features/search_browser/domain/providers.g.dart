@@ -396,5 +396,20 @@ final activeChatModelProvider =
 );
 
 typedef _$ActiveChatModel = Notifier<ChatModel>;
+String _$showFindInPageHash() => r'7ee5703f7d0c7e8a8dd6b0849d7b1e0a41fe24d9';
+
+/// See also [ShowFindInPage].
+@ProviderFor(ShowFindInPage)
+final showFindInPageProvider = NotifierProvider<ShowFindInPage, bool>.internal(
+  ShowFindInPage.new,
+  name: r'showFindInPageProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$showFindInPageHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$ShowFindInPage = Notifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

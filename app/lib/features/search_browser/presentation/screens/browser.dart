@@ -436,6 +436,14 @@ class KagiScreen extends HookConsumerWidget {
                 const Divider(),
                 MenuItemButton(
                   onPressed: () async {
+                    ref.read(showFindInPageProvider.notifier).update(true);
+                  },
+                  leadingIcon: const Icon(Icons.search),
+                  child: const Text('Find in page'),
+                ),
+                const Divider(),
+                MenuItemButton(
+                  onPressed: () async {
                     await activeWebView?.currentController?.reload();
                   },
                   leadingIcon: const Icon(Icons.refresh),

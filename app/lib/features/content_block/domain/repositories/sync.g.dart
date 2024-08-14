@@ -7,7 +7,7 @@ part of 'sync.dart';
 // **************************************************************************
 
 String _$hostSyncRepositoryHash() =>
-    r'22b89d3687c415441f99caa4d77dabaeb4969534';
+    r'5eed0c51e1b1e4dd1241634e297aff283eef01c5';
 
 /// See also [HostSyncRepository].
 @ProviderFor(HostSyncRepository)
