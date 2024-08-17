@@ -6,11 +6,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/core/routing/routes.dart';
 import 'package:lensai/features/bangs/domain/providers.dart';
 import 'package:lensai/features/bangs/domain/repositories/data.dart';
-import 'package:lensai/features/bangs/presentation/widgets/bang_chips.dart';
+import 'package:lensai/features/bangs/presentation/widgets/bang_icon.dart';
 import 'package:lensai/features/bangs/presentation/widgets/search_field.dart';
 import 'package:lensai/features/search_browser/domain/providers.dart';
 import 'package:lensai/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
 import 'package:lensai/features/share_intent/domain/entities/shared_content.dart';
+import 'package:lensai/presentation/widgets/selectable_chips.dart';
 
 class SearchTab extends HookConsumerWidget {
   final SharedContent? sharedContent;
@@ -66,17 +67,20 @@ class SearchTab extends HookConsumerWidget {
                     children: [
                       if (selectedBang != null || availableBangs.isNotEmpty)
                         Expanded(
-                          child: BangChips(
-                            availableBangs: availableBangs,
-                            selectedBang: selectedBang,
-                            onSelected: (trigger) {
+                          child: SelectableChips(
+                            itemId: (bang) => bang.trigger,
+                            itemAvatar: (bang) => BangIcon(bang, iconSize: 20),
+                            itemLabel: (bang) => Text(bang.websiteName),
+                            available: availableBangs,
+                            selected: selectedBang,
+                            onSelected: (bang) {
                               ref
                                   .read(selectedBangTriggerProvider().notifier)
-                                  .setTrigger(trigger);
+                                  .setTrigger(bang.trigger);
                             },
-                            onDeleted: (trigger) async {
+                            onDeleted: (bang) async {
                               if (ref.read(selectedBangTriggerProvider()) ==
-                                  trigger) {
+                                  bang.trigger) {
                                 ref
                                     .read(
                                       selectedBangTriggerProvider().notifier,
@@ -87,7 +91,7 @@ class SearchTab extends HookConsumerWidget {
                                   context: context,
                                   builder: (context) => AlertDialog(
                                     title: Text(
-                                      'Reset usage frequency of !$trigger?',
+                                      'Reset usage frequency of !${bang.trigger}?',
                                     ),
                                     content: const Text(
                                       'This will remove the Bang from quick select.',
@@ -110,7 +114,7 @@ class SearchTab extends HookConsumerWidget {
                                 if (dialogResult == true) {
                                   await ref
                                       .read(bangDataRepositoryProvider.notifier)
-                                      .resetFrequency(trigger);
+                                      .resetFrequency(bang.trigger);
                                 }
                               }
                             },

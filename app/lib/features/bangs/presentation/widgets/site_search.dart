@@ -4,10 +4,11 @@ import 'package:flutter_material_design_icons/flutter_material_design_icons.dart
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/features/bangs/data/models/bang_data.dart';
 import 'package:lensai/features/bangs/domain/repositories/data.dart';
-import 'package:lensai/features/bangs/presentation/widgets/bang_chips.dart';
+import 'package:lensai/features/bangs/presentation/widgets/bang_icon.dart';
 import 'package:lensai/features/bangs/presentation/widgets/search_field.dart';
 import 'package:lensai/features/search_browser/domain/providers.dart';
 import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
+import 'package:lensai/presentation/widgets/selectable_chips.dart';
 
 class SiteSearch extends HookConsumerWidget {
   final String domain;
@@ -54,21 +55,24 @@ class SiteSearch extends HookConsumerWidget {
           SizedBox(
             height: 48,
             width: double.maxFinite,
-            child: BangChips(
-              availableBangs: availableBangs,
-              selectedBang: selectedBang,
-              onSelected: (trigger) {
+            child: SelectableChips(
+              itemId: (bang) => bang.trigger,
+              itemAvatar: (bang) => BangIcon(bang, iconSize: 20),
+              itemLabel: (bang) => Text(bang.websiteName),
+              available: availableBangs,
+              selected: selectedBang,
+              onSelected: (bang) {
                 ref
                     .read(
                       selectedBangTriggerProvider(domain: domain).notifier,
                     )
-                    .setTrigger(trigger);
+                    .setTrigger(bang.trigger);
               },
-              onDeleted: (trigger) {
+              onDeleted: (bang) {
                 if (ref.read(
                       selectedBangTriggerProvider(domain: domain),
                     ) ==
-                    trigger) {
+                    bang.trigger) {
                   ref
                       .read(
                         selectedBangTriggerProvider(domain: domain).notifier,
