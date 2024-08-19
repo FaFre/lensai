@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
-import 'package:lensai/domain/entities/web_page_info.dart';
 import 'package:lensai/extensions/web_uri_favicon.dart';
 
 class FaviconImage extends StatelessWidget {
   final double size;
   final Icon _iconPlaceholder;
 
-  final WebPageInfo webPageInfo;
+  final Favicon? favicon;
+  final Uri url;
 
   FaviconImage({
-    required this.webPageInfo,
+    required this.url,
+    required this.favicon,
     this.size = 16,
     super.key,
   }) : _iconPlaceholder = Icon(
@@ -20,15 +22,15 @@ class FaviconImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (webPageInfo.favicon != null) {
+    if (favicon != null) {
       return FadeInImage(
         placeholder: NetworkImage(
-          webPageInfo.url.genericFavicon().toString(),
+          url.genericFavicon().toString(),
         ),
-        image: NetworkImage(webPageInfo.favicon!.url.toString()),
+        image: NetworkImage(favicon!.url.toString()),
         placeholderErrorBuilder: (_, __, ___) => _iconPlaceholder,
         imageErrorBuilder: (_, __, ___) => Image.network(
-          webPageInfo.url.genericFavicon().toString(),
+          url.genericFavicon().toString(),
           errorBuilder: (_, __, ___) => _iconPlaceholder,
           height: size,
           width: size,
@@ -38,7 +40,7 @@ class FaviconImage extends StatelessWidget {
       );
     } else {
       return Image.network(
-        webPageInfo.url.genericFavicon().toString(),
+        url.genericFavicon().toString(),
         errorBuilder: (_, __, ___) => _iconPlaceholder,
         height: size,
         width: size,

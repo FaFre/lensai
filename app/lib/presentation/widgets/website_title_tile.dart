@@ -20,7 +20,8 @@ class WebsiteTitleTile extends HookConsumerWidget {
         data: (info) {
           return ListTile(
             leading: FaviconImage(
-              webPageInfo: info,
+              favicon: info.favicon,
+              url: info.url,
               size: 24,
             ),
             contentPadding: EdgeInsets.zero,

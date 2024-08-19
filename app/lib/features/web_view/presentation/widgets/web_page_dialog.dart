@@ -99,7 +99,8 @@ class WebPageDialog extends HookConsumerWidget {
           ),
           title: ListTile(
             leading: FaviconImage(
-              webPageInfo: page,
+              favicon: page.favicon,
+              url: page.url,
               size: 24,
             ),
             contentPadding: EdgeInsets.zero,

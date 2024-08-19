@@ -44,7 +44,8 @@ class AppBarTitle extends HookWidget {
       child: Row(
         children: [
           FaviconImage(
-            webPageInfo: page,
+            favicon: page.favicon,
+            url: page.url,
           ),
           const SizedBox(
             width: 8,

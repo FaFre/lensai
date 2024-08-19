@@ -59,8 +59,8 @@ class SiteSearch extends HookConsumerWidget {
               itemId: (bang) => bang.trigger,
               itemAvatar: (bang) => BangIcon(bang, iconSize: 20),
               itemLabel: (bang) => Text(bang.websiteName),
-              available: availableBangs,
-              selected: selectedBang,
+              availableItems: availableBangs,
+              selectedItem: selectedBang,
               onSelected: (bang) {
                 ref
                     .read(
