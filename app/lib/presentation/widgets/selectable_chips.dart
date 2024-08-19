@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class SelectableChips<T, K> extends StatelessWidget {
-  final List<T> available;
-  final T? selected;
+  final List<T> availableItems;
+  final T? selectedItem;
   final int maxCount;
 
   final K Function(T item) itemId;
@@ -16,8 +16,8 @@ class SelectableChips<T, K> extends StatelessWidget {
     required this.itemId,
     required this.itemLabel,
     this.itemAvatar,
-    required this.available,
-    this.selected,
+    required this.availableItems,
+    this.selectedItem,
     this.maxCount = 25,
     this.onSelected,
     this.onDeleted,
@@ -26,13 +26,14 @@ class SelectableChips<T, K> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var items = available.take(maxCount).toList();
-    if (selected != null) {
+    var items = availableItems.take(maxCount).toList();
+    if (selectedItem case final T selectedItem) {
       final selectedIndex = items.indexWhere(
-          (item) => selected != null && itemId(item) == itemId(selected!));
+        (item) => itemId(item) == itemId(selectedItem),
+      );
       if (selectedIndex < 0) {
         items = [
-          selected!,
+          selectedItem,
           ...items,
         ];
       } else {
@@ -52,7 +53,8 @@ class SelectableChips<T, K> extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.only(right: 8.0),
           child: FilterChip(
-            selected: selected != null && itemId(item) == itemId(selected!),
+            selected: selectedItem != null &&
+                itemId(item) == itemId(selectedItem as T),
             showCheckmark: false,
             onSelected: (value) {
               if (value) {
