@@ -362,43 +362,6 @@ typedef $HostUpdateCompanionBuilder = HostCompanion Function({
   Value<int> rowid,
 });
 
-class $HostTableManager extends RootTableManager<
-    _$HostDatabase,
-    Host,
-    HostData,
-    $HostFilterComposer,
-    $HostOrderingComposer,
-    $HostCreateCompanionBuilder,
-    $HostUpdateCompanionBuilder> {
-  $HostTableManager(_$HostDatabase db, Host table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $HostFilterComposer(ComposerState(db, table)),
-          orderingComposer: $HostOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<String> hostname = const Value.absent(),
-            Value<HostSource> source = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              HostCompanion(
-            hostname: hostname,
-            source: source,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String hostname,
-            required HostSource source,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              HostCompanion.insert(
-            hostname: hostname,
-            source: source,
-            rowid: rowid,
-          ),
-        ));
-}
-
 class $HostFilterComposer extends FilterComposer<_$HostDatabase, Host> {
   $HostFilterComposer(super.$state);
   ColumnFilters<String> get hostname => $state.composableBuilder(
@@ -427,6 +390,61 @@ class $HostOrderingComposer extends OrderingComposer<_$HostDatabase, Host> {
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $HostTableManager extends RootTableManager<
+    _$HostDatabase,
+    Host,
+    HostData,
+    $HostFilterComposer,
+    $HostOrderingComposer,
+    $HostCreateCompanionBuilder,
+    $HostUpdateCompanionBuilder,
+    (HostData, BaseReferences<_$HostDatabase, Host, HostData>),
+    HostData,
+    PrefetchHooks Function()> {
+  $HostTableManager(_$HostDatabase db, Host table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $HostFilterComposer(ComposerState(db, table)),
+          orderingComposer: $HostOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> hostname = const Value.absent(),
+            Value<HostSource> source = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              HostCompanion(
+            hostname: hostname,
+            source: source,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String hostname,
+            required HostSource source,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              HostCompanion.insert(
+            hostname: hostname,
+            source: source,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $HostProcessedTableManager = ProcessedTableManager<
+    _$HostDatabase,
+    Host,
+    HostData,
+    $HostFilterComposer,
+    $HostOrderingComposer,
+    $HostCreateCompanionBuilder,
+    $HostUpdateCompanionBuilder,
+    (HostData, BaseReferences<_$HostDatabase, Host, HostData>),
+    HostData,
+    PrefetchHooks Function()>;
 typedef $HostSyncCreateCompanionBuilder = HostSyncCompanion Function({
   Value<HostSource> source,
   required DateTime lastSync,
@@ -435,39 +453,6 @@ typedef $HostSyncUpdateCompanionBuilder = HostSyncCompanion Function({
   Value<HostSource> source,
   Value<DateTime> lastSync,
 });
-
-class $HostSyncTableManager extends RootTableManager<
-    _$HostDatabase,
-    HostSync,
-    HostSyncData,
-    $HostSyncFilterComposer,
-    $HostSyncOrderingComposer,
-    $HostSyncCreateCompanionBuilder,
-    $HostSyncUpdateCompanionBuilder> {
-  $HostSyncTableManager(_$HostDatabase db, HostSync table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $HostSyncFilterComposer(ComposerState(db, table)),
-          orderingComposer: $HostSyncOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<HostSource> source = const Value.absent(),
-            Value<DateTime> lastSync = const Value.absent(),
-          }) =>
-              HostSyncCompanion(
-            source: source,
-            lastSync: lastSync,
-          ),
-          createCompanionCallback: ({
-            Value<HostSource> source = const Value.absent(),
-            required DateTime lastSync,
-          }) =>
-              HostSyncCompanion.insert(
-            source: source,
-            lastSync: lastSync,
-          ),
-        ));
-}
 
 class $HostSyncFilterComposer extends FilterComposer<_$HostDatabase, HostSync> {
   $HostSyncFilterComposer(super.$state);
@@ -497,6 +482,58 @@ class $HostSyncOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
+
+class $HostSyncTableManager extends RootTableManager<
+    _$HostDatabase,
+    HostSync,
+    HostSyncData,
+    $HostSyncFilterComposer,
+    $HostSyncOrderingComposer,
+    $HostSyncCreateCompanionBuilder,
+    $HostSyncUpdateCompanionBuilder,
+    (HostSyncData, BaseReferences<_$HostDatabase, HostSync, HostSyncData>),
+    HostSyncData,
+    PrefetchHooks Function()> {
+  $HostSyncTableManager(_$HostDatabase db, HostSync table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $HostSyncFilterComposer(ComposerState(db, table)),
+          orderingComposer: $HostSyncOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<HostSource> source = const Value.absent(),
+            Value<DateTime> lastSync = const Value.absent(),
+          }) =>
+              HostSyncCompanion(
+            source: source,
+            lastSync: lastSync,
+          ),
+          createCompanionCallback: ({
+            Value<HostSource> source = const Value.absent(),
+            required DateTime lastSync,
+          }) =>
+              HostSyncCompanion.insert(
+            source: source,
+            lastSync: lastSync,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $HostSyncProcessedTableManager = ProcessedTableManager<
+    _$HostDatabase,
+    HostSync,
+    HostSyncData,
+    $HostSyncFilterComposer,
+    $HostSyncOrderingComposer,
+    $HostSyncCreateCompanionBuilder,
+    $HostSyncUpdateCompanionBuilder,
+    (HostSyncData, BaseReferences<_$HostDatabase, HostSync, HostSyncData>),
+    HostSyncData,
+    PrefetchHooks Function()>;
 
 class $HostDatabaseManager {
   final _$HostDatabase _db;

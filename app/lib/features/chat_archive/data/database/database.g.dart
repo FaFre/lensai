@@ -455,47 +455,6 @@ typedef $ChatUpdateCompanionBuilder = ChatCompanion Function({
   Value<int> rowid,
 });
 
-class $ChatTableManager extends RootTableManager<
-    _$ChatSearchDatabase,
-    Chat,
-    ChatData,
-    $ChatFilterComposer,
-    $ChatOrderingComposer,
-    $ChatCreateCompanionBuilder,
-    $ChatUpdateCompanionBuilder> {
-  $ChatTableManager(_$ChatSearchDatabase db, Chat table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $ChatFilterComposer(ComposerState(db, table)),
-          orderingComposer: $ChatOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<String> fileName = const Value.absent(),
-            Value<String> title = const Value.absent(),
-            Value<String> content = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              ChatCompanion(
-            fileName: fileName,
-            title: title,
-            content: content,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String fileName,
-            required String title,
-            required String content,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              ChatCompanion.insert(
-            fileName: fileName,
-            title: title,
-            content: content,
-            rowid: rowid,
-          ),
-        ));
-}
-
 class $ChatFilterComposer extends FilterComposer<_$ChatSearchDatabase, Chat> {
   $ChatFilterComposer(super.$state);
   ColumnFilters<String> get fileName => $state.composableBuilder(
@@ -533,6 +492,65 @@ class $ChatOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $ChatTableManager extends RootTableManager<
+    _$ChatSearchDatabase,
+    Chat,
+    ChatData,
+    $ChatFilterComposer,
+    $ChatOrderingComposer,
+    $ChatCreateCompanionBuilder,
+    $ChatUpdateCompanionBuilder,
+    (ChatData, BaseReferences<_$ChatSearchDatabase, Chat, ChatData>),
+    ChatData,
+    PrefetchHooks Function()> {
+  $ChatTableManager(_$ChatSearchDatabase db, Chat table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $ChatFilterComposer(ComposerState(db, table)),
+          orderingComposer: $ChatOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> fileName = const Value.absent(),
+            Value<String> title = const Value.absent(),
+            Value<String> content = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ChatCompanion(
+            fileName: fileName,
+            title: title,
+            content: content,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String fileName,
+            required String title,
+            required String content,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ChatCompanion.insert(
+            fileName: fileName,
+            title: title,
+            content: content,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $ChatProcessedTableManager = ProcessedTableManager<
+    _$ChatSearchDatabase,
+    Chat,
+    ChatData,
+    $ChatFilterComposer,
+    $ChatOrderingComposer,
+    $ChatCreateCompanionBuilder,
+    $ChatUpdateCompanionBuilder,
+    (ChatData, BaseReferences<_$ChatSearchDatabase, Chat, ChatData>),
+    ChatData,
+    PrefetchHooks Function()>;
 typedef $ChatFtsCreateCompanionBuilder = ChatFtsCompanion Function({
   required String title,
   required String content,
@@ -543,43 +561,6 @@ typedef $ChatFtsUpdateCompanionBuilder = ChatFtsCompanion Function({
   Value<String> content,
   Value<int> rowid,
 });
-
-class $ChatFtsTableManager extends RootTableManager<
-    _$ChatSearchDatabase,
-    ChatFts,
-    ChatFt,
-    $ChatFtsFilterComposer,
-    $ChatFtsOrderingComposer,
-    $ChatFtsCreateCompanionBuilder,
-    $ChatFtsUpdateCompanionBuilder> {
-  $ChatFtsTableManager(_$ChatSearchDatabase db, ChatFts table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $ChatFtsFilterComposer(ComposerState(db, table)),
-          orderingComposer: $ChatFtsOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<String> title = const Value.absent(),
-            Value<String> content = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              ChatFtsCompanion(
-            title: title,
-            content: content,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String title,
-            required String content,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              ChatFtsCompanion.insert(
-            title: title,
-            content: content,
-            rowid: rowid,
-          ),
-        ));
-}
 
 class $ChatFtsFilterComposer
     extends FilterComposer<_$ChatSearchDatabase, ChatFts> {
@@ -608,6 +589,62 @@ class $ChatFtsOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
+
+class $ChatFtsTableManager extends RootTableManager<
+    _$ChatSearchDatabase,
+    ChatFts,
+    ChatFt,
+    $ChatFtsFilterComposer,
+    $ChatFtsOrderingComposer,
+    $ChatFtsCreateCompanionBuilder,
+    $ChatFtsUpdateCompanionBuilder,
+    (ChatFt, BaseReferences<_$ChatSearchDatabase, ChatFts, ChatFt>),
+    ChatFt,
+    PrefetchHooks Function()> {
+  $ChatFtsTableManager(_$ChatSearchDatabase db, ChatFts table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $ChatFtsFilterComposer(ComposerState(db, table)),
+          orderingComposer: $ChatFtsOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> title = const Value.absent(),
+            Value<String> content = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ChatFtsCompanion(
+            title: title,
+            content: content,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String title,
+            required String content,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              ChatFtsCompanion.insert(
+            title: title,
+            content: content,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $ChatFtsProcessedTableManager = ProcessedTableManager<
+    _$ChatSearchDatabase,
+    ChatFts,
+    ChatFt,
+    $ChatFtsFilterComposer,
+    $ChatFtsOrderingComposer,
+    $ChatFtsCreateCompanionBuilder,
+    $ChatFtsUpdateCompanionBuilder,
+    (ChatFt, BaseReferences<_$ChatSearchDatabase, ChatFts, ChatFt>),
+    ChatFt,
+    PrefetchHooks Function()>;
 
 class $ChatSearchDatabaseManager {
   final _$ChatSearchDatabase _db;

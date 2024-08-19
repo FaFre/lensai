@@ -1214,66 +1214,39 @@ typedef $BangTableUpdateCompanionBuilder = BangCompanion Function({
   Value<int> rowid,
 });
 
-class $BangTableTableManager extends RootTableManager<
-    _$BangDatabase,
-    BangTable,
-    Bang,
-    $BangTableFilterComposer,
-    $BangTableOrderingComposer,
-    $BangTableCreateCompanionBuilder,
-    $BangTableUpdateCompanionBuilder> {
-  $BangTableTableManager(_$BangDatabase db, BangTable table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $BangTableFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $BangTableOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<String> trigger = const Value.absent(),
-            Value<BangGroup> group = const Value.absent(),
-            Value<String> websiteName = const Value.absent(),
-            Value<String> domain = const Value.absent(),
-            Value<String> urlTemplate = const Value.absent(),
-            Value<String?> category = const Value.absent(),
-            Value<String?> subCategory = const Value.absent(),
-            Value<Set<BangFormat>?> format = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              BangCompanion(
-            trigger: trigger,
-            group: group,
-            websiteName: websiteName,
-            domain: domain,
-            urlTemplate: urlTemplate,
-            category: category,
-            subCategory: subCategory,
-            format: format,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String trigger,
-            required BangGroup group,
-            required String websiteName,
-            required String domain,
-            required String urlTemplate,
-            Value<String?> category = const Value.absent(),
-            Value<String?> subCategory = const Value.absent(),
-            Value<Set<BangFormat>?> format = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              BangCompanion.insert(
-            trigger: trigger,
-            group: group,
-            websiteName: websiteName,
-            domain: domain,
-            urlTemplate: urlTemplate,
-            category: category,
-            subCategory: subCategory,
-            format: format,
-            rowid: rowid,
-          ),
-        ));
+final class $BangTableReferences
+    extends BaseReferences<_$BangDatabase, BangTable, Bang> {
+  $BangTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static MultiTypedResultKey<BangFrequency, List<BangFrequencyData>>
+      _bangFrequencyRefsTable(_$BangDatabase db) =>
+          MultiTypedResultKey.fromTable(db.bangFrequency,
+              aliasName: $_aliasNameGenerator(
+                  db.bang.trigger, db.bangFrequency.trigger));
+
+  $BangFrequencyProcessedTableManager get bangFrequencyRefs {
+    final manager = $BangFrequencyTableManager($_db, $_db.bangFrequency)
+        .filter((f) => f.trigger.trigger($_item.trigger));
+
+    final cache = $_typedResult.readTableOrNull(_bangFrequencyRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<BangIcon, List<BangIconData>> _bangIconRefsTable(
+          _$BangDatabase db) =>
+      MultiTypedResultKey.fromTable(db.bangIcon,
+          aliasName:
+              $_aliasNameGenerator(db.bang.trigger, db.bangIcon.trigger));
+
+  $BangIconProcessedTableManager get bangIconRefs {
+    final manager = $BangIconTableManager($_db, $_db.bangIcon)
+        .filter((f) => f.trigger.trigger($_item.trigger));
+
+    final cache = $_typedResult.readTableOrNull(_bangIconRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
 }
 
 class $BangTableFilterComposer
@@ -1394,6 +1367,124 @@ class $BangTableOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $BangTableTableManager extends RootTableManager<
+    _$BangDatabase,
+    BangTable,
+    Bang,
+    $BangTableFilterComposer,
+    $BangTableOrderingComposer,
+    $BangTableCreateCompanionBuilder,
+    $BangTableUpdateCompanionBuilder,
+    (Bang, $BangTableReferences),
+    Bang,
+    PrefetchHooks Function({bool bangFrequencyRefs, bool bangIconRefs})> {
+  $BangTableTableManager(_$BangDatabase db, BangTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $BangTableFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $BangTableOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> trigger = const Value.absent(),
+            Value<BangGroup> group = const Value.absent(),
+            Value<String> websiteName = const Value.absent(),
+            Value<String> domain = const Value.absent(),
+            Value<String> urlTemplate = const Value.absent(),
+            Value<String?> category = const Value.absent(),
+            Value<String?> subCategory = const Value.absent(),
+            Value<Set<BangFormat>?> format = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BangCompanion(
+            trigger: trigger,
+            group: group,
+            websiteName: websiteName,
+            domain: domain,
+            urlTemplate: urlTemplate,
+            category: category,
+            subCategory: subCategory,
+            format: format,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String trigger,
+            required BangGroup group,
+            required String websiteName,
+            required String domain,
+            required String urlTemplate,
+            Value<String?> category = const Value.absent(),
+            Value<String?> subCategory = const Value.absent(),
+            Value<Set<BangFormat>?> format = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BangCompanion.insert(
+            trigger: trigger,
+            group: group,
+            websiteName: websiteName,
+            domain: domain,
+            urlTemplate: urlTemplate,
+            category: category,
+            subCategory: subCategory,
+            format: format,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $BangTableReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: (
+              {bangFrequencyRefs = false, bangIconRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (bangFrequencyRefs) db.bangFrequency,
+                if (bangIconRefs) db.bangIcon
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (bangFrequencyRefs)
+                    await $_getPrefetchedData(
+                        currentTable: table,
+                        referencedTable:
+                            $BangTableReferences._bangFrequencyRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $BangTableReferences(db, table, p0)
+                                .bangFrequencyRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.trigger == item.trigger),
+                        typedResults: items),
+                  if (bangIconRefs)
+                    await $_getPrefetchedData(
+                        currentTable: table,
+                        referencedTable:
+                            $BangTableReferences._bangIconRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $BangTableReferences(db, table, p0).bangIconRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.trigger == item.trigger),
+                        typedResults: items)
+                ];
+              },
+            );
+          },
+        ));
+}
+
+typedef $BangTableProcessedTableManager = ProcessedTableManager<
+    _$BangDatabase,
+    BangTable,
+    Bang,
+    $BangTableFilterComposer,
+    $BangTableOrderingComposer,
+    $BangTableCreateCompanionBuilder,
+    $BangTableUpdateCompanionBuilder,
+    (Bang, $BangTableReferences),
+    Bang,
+    PrefetchHooks Function({bool bangFrequencyRefs, bool bangIconRefs})>;
 typedef $BangSyncCreateCompanionBuilder = BangSyncCompanion Function({
   Value<BangGroup> group,
   required DateTime lastSync,
@@ -1402,39 +1493,6 @@ typedef $BangSyncUpdateCompanionBuilder = BangSyncCompanion Function({
   Value<BangGroup> group,
   Value<DateTime> lastSync,
 });
-
-class $BangSyncTableManager extends RootTableManager<
-    _$BangDatabase,
-    BangSync,
-    BangSyncData,
-    $BangSyncFilterComposer,
-    $BangSyncOrderingComposer,
-    $BangSyncCreateCompanionBuilder,
-    $BangSyncUpdateCompanionBuilder> {
-  $BangSyncTableManager(_$BangDatabase db, BangSync table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $BangSyncFilterComposer(ComposerState(db, table)),
-          orderingComposer: $BangSyncOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<BangGroup> group = const Value.absent(),
-            Value<DateTime> lastSync = const Value.absent(),
-          }) =>
-              BangSyncCompanion(
-            group: group,
-            lastSync: lastSync,
-          ),
-          createCompanionCallback: ({
-            Value<BangGroup> group = const Value.absent(),
-            required DateTime lastSync,
-          }) =>
-              BangSyncCompanion.insert(
-            group: group,
-            lastSync: lastSync,
-          ),
-        ));
-}
 
 class $BangSyncFilterComposer extends FilterComposer<_$BangDatabase, BangSync> {
   $BangSyncFilterComposer(super.$state);
@@ -1465,6 +1523,57 @@ class $BangSyncOrderingComposer
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
 
+class $BangSyncTableManager extends RootTableManager<
+    _$BangDatabase,
+    BangSync,
+    BangSyncData,
+    $BangSyncFilterComposer,
+    $BangSyncOrderingComposer,
+    $BangSyncCreateCompanionBuilder,
+    $BangSyncUpdateCompanionBuilder,
+    (BangSyncData, BaseReferences<_$BangDatabase, BangSync, BangSyncData>),
+    BangSyncData,
+    PrefetchHooks Function()> {
+  $BangSyncTableManager(_$BangDatabase db, BangSync table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $BangSyncFilterComposer(ComposerState(db, table)),
+          orderingComposer: $BangSyncOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<BangGroup> group = const Value.absent(),
+            Value<DateTime> lastSync = const Value.absent(),
+          }) =>
+              BangSyncCompanion(
+            group: group,
+            lastSync: lastSync,
+          ),
+          createCompanionCallback: ({
+            Value<BangGroup> group = const Value.absent(),
+            required DateTime lastSync,
+          }) =>
+              BangSyncCompanion.insert(
+            group: group,
+            lastSync: lastSync,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $BangSyncProcessedTableManager = ProcessedTableManager<
+    _$BangDatabase,
+    BangSync,
+    BangSyncData,
+    $BangSyncFilterComposer,
+    $BangSyncOrderingComposer,
+    $BangSyncCreateCompanionBuilder,
+    $BangSyncUpdateCompanionBuilder,
+    (BangSyncData, BaseReferences<_$BangDatabase, BangSync, BangSyncData>),
+    BangSyncData,
+    PrefetchHooks Function()>;
 typedef $BangFrequencyCreateCompanionBuilder = BangFrequencyCompanion Function({
   required String trigger,
   required int frequency,
@@ -1478,47 +1587,22 @@ typedef $BangFrequencyUpdateCompanionBuilder = BangFrequencyCompanion Function({
   Value<int> rowid,
 });
 
-class $BangFrequencyTableManager extends RootTableManager<
-    _$BangDatabase,
-    BangFrequency,
-    BangFrequencyData,
-    $BangFrequencyFilterComposer,
-    $BangFrequencyOrderingComposer,
-    $BangFrequencyCreateCompanionBuilder,
-    $BangFrequencyUpdateCompanionBuilder> {
-  $BangFrequencyTableManager(_$BangDatabase db, BangFrequency table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer:
-              $BangFrequencyFilterComposer(ComposerState(db, table)),
-          orderingComposer:
-              $BangFrequencyOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<String> trigger = const Value.absent(),
-            Value<int> frequency = const Value.absent(),
-            Value<DateTime> lastUsed = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              BangFrequencyCompanion(
-            trigger: trigger,
-            frequency: frequency,
-            lastUsed: lastUsed,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String trigger,
-            required int frequency,
-            required DateTime lastUsed,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              BangFrequencyCompanion.insert(
-            trigger: trigger,
-            frequency: frequency,
-            lastUsed: lastUsed,
-            rowid: rowid,
-          ),
-        ));
+final class $BangFrequencyReferences
+    extends BaseReferences<_$BangDatabase, BangFrequency, BangFrequencyData> {
+  $BangFrequencyReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static BangTable _triggerTable(_$BangDatabase db) => db.bang.createAlias(
+      $_aliasNameGenerator(db.bangFrequency.trigger, db.bang.trigger));
+
+  $BangTableProcessedTableManager? get trigger {
+    if ($_item.trigger == null) return null;
+    final manager = $BangTableTableManager($_db, $_db.bang)
+        .filter((f) => f.trigger($_item.trigger!));
+    final item = $_typedResult.readTableOrNull(_triggerTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
 }
 
 class $BangFrequencyFilterComposer
@@ -1573,6 +1657,100 @@ class $BangFrequencyOrderingComposer
   }
 }
 
+class $BangFrequencyTableManager extends RootTableManager<
+    _$BangDatabase,
+    BangFrequency,
+    BangFrequencyData,
+    $BangFrequencyFilterComposer,
+    $BangFrequencyOrderingComposer,
+    $BangFrequencyCreateCompanionBuilder,
+    $BangFrequencyUpdateCompanionBuilder,
+    (BangFrequencyData, $BangFrequencyReferences),
+    BangFrequencyData,
+    PrefetchHooks Function({bool trigger})> {
+  $BangFrequencyTableManager(_$BangDatabase db, BangFrequency table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer:
+              $BangFrequencyFilterComposer(ComposerState(db, table)),
+          orderingComposer:
+              $BangFrequencyOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> trigger = const Value.absent(),
+            Value<int> frequency = const Value.absent(),
+            Value<DateTime> lastUsed = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BangFrequencyCompanion(
+            trigger: trigger,
+            frequency: frequency,
+            lastUsed: lastUsed,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String trigger,
+            required int frequency,
+            required DateTime lastUsed,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BangFrequencyCompanion.insert(
+            trigger: trigger,
+            frequency: frequency,
+            lastUsed: lastUsed,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $BangFrequencyReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({trigger = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (trigger) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.trigger,
+                    referencedTable: $BangFrequencyReferences._triggerTable(db),
+                    referencedColumn:
+                        $BangFrequencyReferences._triggerTable(db).trigger,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $BangFrequencyProcessedTableManager = ProcessedTableManager<
+    _$BangDatabase,
+    BangFrequency,
+    BangFrequencyData,
+    $BangFrequencyFilterComposer,
+    $BangFrequencyOrderingComposer,
+    $BangFrequencyCreateCompanionBuilder,
+    $BangFrequencyUpdateCompanionBuilder,
+    (BangFrequencyData, $BangFrequencyReferences),
+    BangFrequencyData,
+    PrefetchHooks Function({bool trigger})>;
 typedef $BangIconCreateCompanionBuilder = BangIconCompanion Function({
   required String trigger,
   required Uint8List iconData,
@@ -1586,45 +1764,22 @@ typedef $BangIconUpdateCompanionBuilder = BangIconCompanion Function({
   Value<int> rowid,
 });
 
-class $BangIconTableManager extends RootTableManager<
-    _$BangDatabase,
-    BangIcon,
-    BangIconData,
-    $BangIconFilterComposer,
-    $BangIconOrderingComposer,
-    $BangIconCreateCompanionBuilder,
-    $BangIconUpdateCompanionBuilder> {
-  $BangIconTableManager(_$BangDatabase db, BangIcon table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $BangIconFilterComposer(ComposerState(db, table)),
-          orderingComposer: $BangIconOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<String> trigger = const Value.absent(),
-            Value<Uint8List> iconData = const Value.absent(),
-            Value<DateTime> fetchDate = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              BangIconCompanion(
-            trigger: trigger,
-            iconData: iconData,
-            fetchDate: fetchDate,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String trigger,
-            required Uint8List iconData,
-            required DateTime fetchDate,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              BangIconCompanion.insert(
-            trigger: trigger,
-            iconData: iconData,
-            fetchDate: fetchDate,
-            rowid: rowid,
-          ),
-        ));
+final class $BangIconReferences
+    extends BaseReferences<_$BangDatabase, BangIcon, BangIconData> {
+  $BangIconReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static BangTable _triggerTable(_$BangDatabase db) => db.bang
+      .createAlias($_aliasNameGenerator(db.bangIcon.trigger, db.bang.trigger));
+
+  $BangTableProcessedTableManager? get trigger {
+    if ($_item.trigger == null) return null;
+    final manager = $BangTableTableManager($_db, $_db.bang)
+        .filter((f) => f.trigger($_item.trigger!));
+    final item = $_typedResult.readTableOrNull(_triggerTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
 }
 
 class $BangIconFilterComposer extends FilterComposer<_$BangDatabase, BangIcon> {
@@ -1678,6 +1833,98 @@ class $BangIconOrderingComposer
   }
 }
 
+class $BangIconTableManager extends RootTableManager<
+    _$BangDatabase,
+    BangIcon,
+    BangIconData,
+    $BangIconFilterComposer,
+    $BangIconOrderingComposer,
+    $BangIconCreateCompanionBuilder,
+    $BangIconUpdateCompanionBuilder,
+    (BangIconData, $BangIconReferences),
+    BangIconData,
+    PrefetchHooks Function({bool trigger})> {
+  $BangIconTableManager(_$BangDatabase db, BangIcon table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $BangIconFilterComposer(ComposerState(db, table)),
+          orderingComposer: $BangIconOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> trigger = const Value.absent(),
+            Value<Uint8List> iconData = const Value.absent(),
+            Value<DateTime> fetchDate = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BangIconCompanion(
+            trigger: trigger,
+            iconData: iconData,
+            fetchDate: fetchDate,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String trigger,
+            required Uint8List iconData,
+            required DateTime fetchDate,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BangIconCompanion.insert(
+            trigger: trigger,
+            iconData: iconData,
+            fetchDate: fetchDate,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) =>
+                  (e.readTable(table), $BangIconReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: ({trigger = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (trigger) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.trigger,
+                    referencedTable: $BangIconReferences._triggerTable(db),
+                    referencedColumn:
+                        $BangIconReferences._triggerTable(db).trigger,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $BangIconProcessedTableManager = ProcessedTableManager<
+    _$BangDatabase,
+    BangIcon,
+    BangIconData,
+    $BangIconFilterComposer,
+    $BangIconOrderingComposer,
+    $BangIconCreateCompanionBuilder,
+    $BangIconUpdateCompanionBuilder,
+    (BangIconData, $BangIconReferences),
+    BangIconData,
+    PrefetchHooks Function({bool trigger})>;
 typedef $BangFtsCreateCompanionBuilder = BangFtsCompanion Function({
   required String trigger,
   required String websiteName,
@@ -1688,43 +1935,6 @@ typedef $BangFtsUpdateCompanionBuilder = BangFtsCompanion Function({
   Value<String> websiteName,
   Value<int> rowid,
 });
-
-class $BangFtsTableManager extends RootTableManager<
-    _$BangDatabase,
-    BangFts,
-    BangFt,
-    $BangFtsFilterComposer,
-    $BangFtsOrderingComposer,
-    $BangFtsCreateCompanionBuilder,
-    $BangFtsUpdateCompanionBuilder> {
-  $BangFtsTableManager(_$BangDatabase db, BangFts table)
-      : super(TableManagerState(
-          db: db,
-          table: table,
-          filteringComposer: $BangFtsFilterComposer(ComposerState(db, table)),
-          orderingComposer: $BangFtsOrderingComposer(ComposerState(db, table)),
-          updateCompanionCallback: ({
-            Value<String> trigger = const Value.absent(),
-            Value<String> websiteName = const Value.absent(),
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              BangFtsCompanion(
-            trigger: trigger,
-            websiteName: websiteName,
-            rowid: rowid,
-          ),
-          createCompanionCallback: ({
-            required String trigger,
-            required String websiteName,
-            Value<int> rowid = const Value.absent(),
-          }) =>
-              BangFtsCompanion.insert(
-            trigger: trigger,
-            websiteName: websiteName,
-            rowid: rowid,
-          ),
-        ));
-}
 
 class $BangFtsFilterComposer extends FilterComposer<_$BangDatabase, BangFts> {
   $BangFtsFilterComposer(super.$state);
@@ -1752,6 +1962,62 @@ class $BangFtsOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 }
+
+class $BangFtsTableManager extends RootTableManager<
+    _$BangDatabase,
+    BangFts,
+    BangFt,
+    $BangFtsFilterComposer,
+    $BangFtsOrderingComposer,
+    $BangFtsCreateCompanionBuilder,
+    $BangFtsUpdateCompanionBuilder,
+    (BangFt, BaseReferences<_$BangDatabase, BangFts, BangFt>),
+    BangFt,
+    PrefetchHooks Function()> {
+  $BangFtsTableManager(_$BangDatabase db, BangFts table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          filteringComposer: $BangFtsFilterComposer(ComposerState(db, table)),
+          orderingComposer: $BangFtsOrderingComposer(ComposerState(db, table)),
+          updateCompanionCallback: ({
+            Value<String> trigger = const Value.absent(),
+            Value<String> websiteName = const Value.absent(),
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BangFtsCompanion(
+            trigger: trigger,
+            websiteName: websiteName,
+            rowid: rowid,
+          ),
+          createCompanionCallback: ({
+            required String trigger,
+            required String websiteName,
+            Value<int> rowid = const Value.absent(),
+          }) =>
+              BangFtsCompanion.insert(
+            trigger: trigger,
+            websiteName: websiteName,
+            rowid: rowid,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ));
+}
+
+typedef $BangFtsProcessedTableManager = ProcessedTableManager<
+    _$BangDatabase,
+    BangFts,
+    BangFt,
+    $BangFtsFilterComposer,
+    $BangFtsOrderingComposer,
+    $BangFtsCreateCompanionBuilder,
+    $BangFtsUpdateCompanionBuilder,
+    (BangFt, BaseReferences<_$BangDatabase, BangFts, BangFt>),
+    BangFt,
+    PrefetchHooks Function()>;
 
 class $BangDatabaseManager {
   final _$BangDatabase _db;

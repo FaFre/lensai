@@ -10,14 +10,15 @@ dependencies:
   animations: ^2.0.11
   collection: ^1.18.0
   copy_with_extension: ^5.0.4
-  drift: ^2.19.2
+  drift: ^2.20.0
   dynamic_color: ^1.7.0
   exceptions: ^0.6.1
   expandable_page_view: ^1.0.17
   fast_equatable: ^1.1.0
-  file_picker: ^8.1.1
+  file_picker: ^8.1.2
   flutter:
     sdk: flutter
+  flutter_colorpicker: ^1.1.0
   flutter_hooks: ^0.20.5
   flutter_inappwebview: ^6.0.0
   flutter_markdown: ^0.7.3+1
@@ -28,7 +29,7 @@ dependencies:
   go_router: ^14.2.3
   google_fonts: ^6.2.1
   home_widget: ^0.6.0
-  hooks_riverpod: ^2.5.1
+  hooks_riverpod: ^2.5.2
   html: ^0.15.4
   http: ^1.2.2
   json_annotation: ^4.9.0
@@ -40,9 +41,9 @@ dependencies:
   path_provider: ^2.1.4
   riverpod: ^2.5.1
   riverpod_annotation: ^2.3.5
-  rxdart: ^0.27.7
-  share_plus: ^10.0.1
-  shared_preferences: ^2.3.1
+  rxdart: ^0.28.0
+  share_plus: ^10.0.2
+  shared_preferences: ^2.3.2
   skeletonizer: ^1.4.2
   speech_to_text_google_dialog: ^0.0.6
   sqlite3: ^2.4.6
@@ -52,21 +53,22 @@ dependencies:
   universal_io: ^2.2.2
   uri_to_file: ^1.0.0
   url_launcher: ^6.3.0
+  uuid: ^4.4.2
   watcher: ^1.1.0
 
 dev_dependencies:
   build_runner: ^2.4.12
   copy_with_extension_gen: ^5.0.4
-  custom_lint: ^0.6.4
+  custom_lint: ^0.6.5
   dependency_validator: ^4.1.0
-  drift_dev: ^2.19.1
+  drift_dev: ^2.20.1
   fast_equatable_lint: ^0.3.0
   flutter_launcher_icons: ^0.13.1
   go_router_builder: ^2.7.1
   json_serializable: ^6.8.0
   lint: ^2.3.0
-  riverpod_generator: ^2.4.2
-  riverpod_lint: ^2.3.12
+  riverpod_generator: ^2.4.3
+  riverpod_lint: ^2.3.13
 
 flutter:
   uses-material-design: true
