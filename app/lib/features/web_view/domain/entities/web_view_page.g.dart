@@ -86,6 +86,7 @@ class _$WebViewPageCWProxyImpl implements _$WebViewPageCWProxy {
   }) {
     return WebViewPage._(
       key: _value.key,
+      id: _value.id,
       controller: controller == const $CopyWithPlaceholder()
           ? _value.controller
           // ignore: cast_nullable_to_non_nullable

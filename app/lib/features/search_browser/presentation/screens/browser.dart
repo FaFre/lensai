@@ -542,7 +542,7 @@ class KagiScreen extends HookConsumerWidget {
                     if (activeWebView?.key != null && webViews.length > 1) {
                       ref
                           .read(webViewRepositoryProvider.notifier)
-                          .closeTab(activeWebView!.key!);
+                          .closeTab(activeWebView!.tabId);
                       return true;
                     } else {
                       //Mark back as unhandled and navigator will pop
@@ -584,13 +584,13 @@ class KagiScreen extends HookConsumerWidget {
                           (activeWebView != null)
                               ? webViews.keys
                                   .toList()
-                                  .indexOf(activeWebView.page.value.key)
+                                  .indexOf(activeWebView.tabId)
                               : null,
                         ),
                         index: (activeWebView != null)
                             ? webViews.keys
                                     .toList()
-                                    .indexOf(activeWebView.page.value.key) +
+                                    .indexOf(activeWebView.tabId) +
                                 1
                             : 0,
                         children: [const LandingContent(), ...webViews.values],

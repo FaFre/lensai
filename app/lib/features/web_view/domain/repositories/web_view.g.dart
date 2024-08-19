@@ -7,7 +7,7 @@ part of 'web_view.dart';
 // **************************************************************************
 
 String _$webViewTabControllerHash() =>
-    r'45eaa10e6032b04717e8ba08b8dce8ed22764f46';
+    r'3f1d7460295c6399382881ee56c4ed7f1fd5fe03';
 
 /// See also [WebViewTabController].
 @ProviderFor(WebViewTabController)
@@ -23,12 +23,12 @@ final webViewTabControllerProvider =
 );
 
 typedef _$WebViewTabController = Notifier<WebView?>;
-String _$webViewRepositoryHash() => r'6732fd1b8a465073b599f64d6710a61cd605c779';
+String _$webViewRepositoryHash() => r'dae5e1527ab4ad27f6a882fb63d8e88cd812b20b';
 
 /// See also [WebViewRepository].
 @ProviderFor(WebViewRepository)
 final webViewRepositoryProvider =
-    NotifierProvider<WebViewRepository, Map<Key, WebView>>.internal(
+    NotifierProvider<WebViewRepository, Map<String, WebView>>.internal(
   WebViewRepository.new,
   name: r'webViewRepositoryProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -38,6 +38,6 @@ final webViewRepositoryProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$WebViewRepository = Notifier<Map<Key, WebView>>;
+typedef _$WebViewRepository = Notifier<Map<String, WebView>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/web_view/domain/entities/abstract/tab.dart';
 import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:lensai/features/web_view/presentation/widgets/web_view_tab.dart';
@@ -109,7 +110,7 @@ class ViewTabsSheet extends HookConsumerWidget {
             );
             final activeTab = ref.watch(
               webViewTabControllerProvider.select(
-                (webView) => webView?.page.value.key,
+                (webView) => webView?.tabId,
               ),
             );
 
@@ -128,7 +129,7 @@ class ViewTabsSheet extends HookConsumerWidget {
             useEffect(
               () {
                 final index =
-                    tabs.indexWhere((webView) => webView.key == activeTab);
+                    tabs.indexWhere((webView) => webView.tabId == activeTab);
 
                 if (index > -1) {
                   final reversedIndex = tabs.length - 1 - index;
@@ -160,10 +161,17 @@ class ViewTabsSheet extends HookConsumerWidget {
                 crossAxisCount: 2,
                 children: tabs.reversed
                     .map(
-                      (webView) => WebViewTab(
-                        webView: webView,
-                        isActive: webView.key == activeTab,
-                        onClose: onClose,
+                      (webView) => HookBuilder(
+                        key: ValueKey(webView.tabId),
+                        builder: (context) {
+                          final tab = useValueListenable(webView.page) as ITab;
+
+                          return WebViewTab(
+                            tab: tab,
+                            isActive: webView.tabId == activeTab,
+                            onClose: onClose,
+                          );
+                        },
                       ),
                     )
                     .toList(),

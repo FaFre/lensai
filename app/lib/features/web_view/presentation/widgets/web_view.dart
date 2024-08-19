@@ -37,6 +37,8 @@ const _webViewSupportedSchemes = [
 ];
 
 class WebView extends StatefulHookConsumerWidget {
+  final String tabId;
+
   final ValueNotifier<WebViewPage> _pageNotifier;
 
   final ValueNotifier<bool?> _isReaderable;
@@ -76,6 +78,7 @@ class WebView extends StatefulHookConsumerWidget {
       : _pageNotifier = ValueNotifier(tab),
         _isReaderable = ValueNotifier(null),
         _readerableApplied = ValueNotifier(false),
+        tabId = tab.id,
         super(key: tab.key);
 
   @override

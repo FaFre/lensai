@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/web_view/domain/entities/abstract/tab.dart';
 import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:lensai/features/web_view/presentation/widgets/favicon.dart';
-import 'package:lensai/features/web_view/presentation/widgets/web_view.dart';
 
 class WebViewTab extends HookConsumerWidget {
-  final WebView webView;
+  final ITab tab;
   final bool isActive;
 
   final VoidCallback onClose;
 
   const WebViewTab({
-    required this.webView,
+    required this.tab,
     required this.isActive,
     required this.onClose,
     super.key,
@@ -20,10 +19,8 @@ class WebViewTab extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
-    final page = useValueListenable(webView.page);
 
     return Container(
-      key: UniqueKey(),
       decoration: BoxDecoration(
         border: Border.all(
           color: isActive ? colorScheme.primary : colorScheme.outline,
@@ -38,8 +35,9 @@ class WebViewTab extends HookConsumerWidget {
           borderRadius: const BorderRadius.all(Radius.circular(16.0)),
           onTap: () {
             if (!isActive) {
-              ref.read(webViewTabControllerProvider.notifier).showTab(page.key);
+              //Close first to avoid rebuilds
               onClose();
+              ref.read(webViewTabControllerProvider.notifier).showTab(tab.id);
             } else {
               onClose();
             }
@@ -53,7 +51,7 @@ class WebViewTab extends HookConsumerWidget {
                       padding: const EdgeInsets.only(left: 6.0),
                       child: Text(
                         overflow: TextOverflow.ellipsis,
-                        page.title ?? 'New Tab',
+                        tab.title ?? 'New Tab',
                         maxLines: 2,
                       ),
                     ),
@@ -64,7 +62,7 @@ class WebViewTab extends HookConsumerWidget {
                     onPressed: () {
                       ref
                           .read(webViewRepositoryProvider.notifier)
-                          .closeTab(page.key);
+                          .closeTab(tab.id);
                     },
                     icon: const Icon(Icons.close),
                   ),
@@ -76,14 +74,15 @@ class WebViewTab extends HookConsumerWidget {
                     width: 6.0,
                   ),
                   FaviconImage(
-                    webPageInfo: page,
+                    url: tab.url,
+                    favicon: tab.favicon,
                   ),
                   const SizedBox(
                     width: 6.0,
                   ),
                   Expanded(
                     child: Text(
-                      page.url.authority,
+                      tab.url.authority,
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),
@@ -92,7 +91,7 @@ class WebViewTab extends HookConsumerWidget {
               const SizedBox(
                 height: 6,
               ),
-              if (page.screenshot != null)
+              if (tab.screenshot != null)
                 Expanded(
                   child: ClipRRect(
                     borderRadius: const BorderRadius.only(
@@ -103,7 +102,7 @@ class WebViewTab extends HookConsumerWidget {
                       width: double.infinity,
                       child: Image.memory(
                         fit: BoxFit.fitWidth,
-                        page.screenshot!,
+                        tab.screenshot!,
                       ),
                     ),
                   ),

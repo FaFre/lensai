@@ -23,7 +23,7 @@ class SwitchNewTabController extends _$SwitchNewTabController {
             .read(webViewRepositoryProvider.notifier)
             .addTab(WebView(tab: newTab));
 
-        ref.read(webViewTabControllerProvider.notifier).showTab(newTab.key);
+        ref.read(webViewTabControllerProvider.notifier).showTab(newTab.id);
       },
     );
   }

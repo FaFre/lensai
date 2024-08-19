@@ -7,7 +7,7 @@ part of 'switch_new_tab.dart';
 // **************************************************************************
 
 String _$switchNewTabControllerHash() =>
-    r'acc20371e95db182cfc5cdc924a289ff56981692';
+    r'a5b8f7fd71c8cb6cc2023b41504e5cd467c5b063';
 
 /// See also [SwitchNewTabController].
 @ProviderFor(SwitchNewTabController)
