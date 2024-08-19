@@ -7,7 +7,7 @@ part of 'readerability_script.dart';
 // **************************************************************************
 
 String _$readerabilityScriptServiceHash() =>
-    r'7a4fe65f683c31545b2f2bcb3ea199619be4bf4b';
+    r'bb38e2934ed124502b70faed11b6921c40d0eec2';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -32,10 +32,10 @@ class _SystemHash {
 
 abstract class _$ReaderabilityScriptService
     extends BuildlessAutoDisposeAsyncNotifier<void> {
-  late final InAppWebViewController? controller;
+  late final ConsistentController controller;
 
   FutureOr<void> build(
-    InAppWebViewController? controller,
+    ConsistentController controller,
   );
 }
 
@@ -50,7 +50,7 @@ class ReaderabilityScriptServiceFamily extends Family<AsyncValue<void>> {
 
   /// See also [ReaderabilityScriptService].
   ReaderabilityScriptServiceProvider call(
-    InAppWebViewController? controller,
+    ConsistentController controller,
   ) {
     return ReaderabilityScriptServiceProvider(
       controller,
@@ -87,7 +87,7 @@ class ReaderabilityScriptServiceProvider
         void> {
   /// See also [ReaderabilityScriptService].
   ReaderabilityScriptServiceProvider(
-    InAppWebViewController? controller,
+    ConsistentController controller,
   ) : this._internal(
           () => ReaderabilityScriptService()..controller = controller,
           from: readerabilityScriptServiceProvider,
@@ -112,7 +112,7 @@ class ReaderabilityScriptServiceProvider
     required this.controller,
   }) : super.internal();
 
-  final InAppWebViewController? controller;
+  final ConsistentController controller;
 
   @override
   FutureOr<void> runNotifierBuild(
@@ -163,7 +163,7 @@ class ReaderabilityScriptServiceProvider
 mixin ReaderabilityScriptServiceRef
     on AutoDisposeAsyncNotifierProviderRef<void> {
   /// The parameter `controller` of this provider.
-  InAppWebViewController? get controller;
+  ConsistentController get controller;
 }
 
 class _ReaderabilityScriptServiceProviderElement
@@ -172,7 +172,7 @@ class _ReaderabilityScriptServiceProviderElement
   _ReaderabilityScriptServiceProviderElement(super.provider);
 
   @override
-  InAppWebViewController? get controller =>
+  ConsistentController get controller =>
       (origin as ReaderabilityScriptServiceProvider).controller;
 }
 // ignore_for_file: type=lint

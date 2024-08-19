@@ -1,6 +1,7 @@
 import 'dart:collection';
 
-import 'package:flutter/foundation.dart';
+import 'package:lensai/features/web_view/domain/entities/consistent_controller.dart';
+import 'package:lensai/features/web_view/presentation/controllers/readerability.dart';
 import 'package:lensai/features/web_view/presentation/widgets/web_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -30,15 +31,29 @@ class WebViewRepository extends _$WebViewRepository {
     return stateOrNull ?? {};
   }
 
+  void _disposeReaderability(String id) {
+    final controller = state[id]?.currentController;
+    if (controller != null) {
+      ref
+          .read(
+            readerabilityControllerProvider(ConsistentController(controller))
+                .notifier,
+          )
+          .dispose();
+    }
+  }
+
   void addTab(WebView webView) {
     state = {...state, webView.tabId: webView};
   }
 
   void closeTab(String id) {
+    _disposeReaderability(id);
     state = Map.of(state)..remove(id);
   }
 
   void closeAllTabs() {
+    state.keys.forEach(_disposeReaderability);
     state = {};
   }
 }

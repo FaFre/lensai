@@ -19,6 +19,7 @@ import 'package:lensai/features/search_browser/presentation/widgets/sheets/view_
 import 'package:lensai/features/search_browser/presentation/widgets/tabs_action_button.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/features/web_view/domain/entities/consistent_controller.dart';
 import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:lensai/features/web_view/presentation/controllers/readerability.dart';
 import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
@@ -188,7 +189,9 @@ class KagiScreen extends HookConsumerWidget {
                   final controller =
                       useListenable(activeWebView.page).value.controller;
                   final readerabilityState = ref.watch(
-                    readerabilityControllerProvider(controller),
+                    readerabilityControllerProvider(
+                      ConsistentController(controller),
+                    ),
                   );
 
                   final enableReadability = ref.watch(
@@ -198,13 +201,11 @@ class KagiScreen extends HookConsumerWidget {
                     ),
                   );
 
-                  final isReaderable = useValueListenable(
-                    activeWebView.isReaderable,
-                  );
+                  final isReaderable =
+                      readerabilityState.valueOrNull?.readerable ?? false;
 
-                  final readerableApplied = useValueListenable(
-                    activeWebView.readerableApplied,
-                  );
+                  final readerableApplied =
+                      readerabilityState.valueOrNull?.applied ?? false;
 
                   final icon = useMemoized(
                     () => readerableApplied
@@ -220,54 +221,49 @@ class KagiScreen extends HookConsumerWidget {
                   );
 
                   return Visibility(
-                    visible: enableReadability &&
-                        (isReaderable == true || readerableApplied),
-                    child: InkWell(
-                      onTap: readerabilityState.isLoading
-                          ? null
-                          : () async {
-                              final controller =
-                                  activeWebView.currentController;
+                    visible: enableReadability,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 15.0,
+                        horizontal: 8.0,
+                      ),
+                      child: readerabilityState.when(
+                        data: (_) => (isReaderable == true || readerableApplied)
+                            ? InkWell(
+                                onTap: readerabilityState.isLoading
+                                    ? null
+                                    : () async {
+                                        final controller =
+                                            activeWebView.currentController;
 
-                              if (controller != null) {
-                                final readabilityNotifier = ref.read(
-                                  readerabilityControllerProvider(
-                                    controller,
-                                  ).notifier,
-                                );
+                                        if (controller != null) {
+                                          final readabilityNotifier = ref.read(
+                                            readerabilityControllerProvider(
+                                              ConsistentController(controller),
+                                            ).notifier,
+                                          );
 
-                                if (readerableApplied) {
-                                  await activeWebView
-                                      .updateReaderableApplied(false);
-                                } else {
-                                  await readabilityNotifier.applyReaderable();
-                                  await activeWebView
-                                      .updateReaderableApplied(true);
-                                }
-                              }
-                            },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 15.0,
-                          horizontal: 8.0,
-                        ),
-                        child: readerabilityState.when(
-                          data: (_) => icon,
-                          error: (error, stackTrace) => SizedBox.shrink(),
-                          loading: () => AnimateGradientShader(
-                            duration: const Duration(milliseconds: 500),
-                            primaryEnd: Alignment.bottomLeft,
-                            secondaryEnd: Alignment.topRight,
-                            primaryColors: [
-                              colorScheme.primary,
-                              colorScheme.primaryContainer,
-                            ],
-                            secondaryColors: [
-                              colorScheme.secondary,
-                              colorScheme.secondaryContainer,
-                            ],
-                            child: icon,
-                          ),
+                                          await readabilityNotifier
+                                              .toggleReaderable();
+                                        }
+                                      },
+                                child: icon,
+                              )
+                            : const SizedBox.shrink(),
+                        error: (error, stackTrace) => SizedBox.shrink(),
+                        loading: () => AnimateGradientShader(
+                          duration: const Duration(milliseconds: 500),
+                          primaryEnd: Alignment.bottomLeft,
+                          secondaryEnd: Alignment.topRight,
+                          primaryColors: [
+                            colorScheme.primary,
+                            colorScheme.primaryContainer,
+                          ],
+                          secondaryColors: [
+                            colorScheme.secondary,
+                            colorScheme.secondaryContainer,
+                          ],
+                          child: icon,
                         ),
                       ),
                     ),

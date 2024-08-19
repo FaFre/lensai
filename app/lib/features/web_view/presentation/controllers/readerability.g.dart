@@ -7,7 +7,7 @@ part of 'readerability.dart';
 // **************************************************************************
 
 String _$readerabilityControllerHash() =>
-    r'1260623c58d23511c3e4f58f97e18663be354ced';
+    r'1237e57abce82f71dbc66b6ab46f50dad9e3ddf9';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -30,12 +30,12 @@ class _SystemHash {
   }
 }
 
-abstract class _$ReaderabilityController
-    extends BuildlessAutoDisposeAsyncNotifier<void> {
-  late final InAppWebViewController? controller;
+abstract class _$ReaderabilityController extends BuildlessAutoDisposeNotifier<
+    AsyncValue<({bool readerable, bool applied})>> {
+  late final ConsistentController controller;
 
-  FutureOr<void> build(
-    InAppWebViewController? controller,
+  AsyncValue<({bool readerable, bool applied})> build(
+    ConsistentController controller,
   );
 }
 
@@ -44,13 +44,14 @@ abstract class _$ReaderabilityController
 const readerabilityControllerProvider = ReaderabilityControllerFamily();
 
 /// See also [ReaderabilityController].
-class ReaderabilityControllerFamily extends Family<AsyncValue<void>> {
+class ReaderabilityControllerFamily
+    extends Family<AsyncValue<({bool readerable, bool applied})>> {
   /// See also [ReaderabilityController].
   const ReaderabilityControllerFamily();
 
   /// See also [ReaderabilityController].
   ReaderabilityControllerProvider call(
-    InAppWebViewController? controller,
+    ConsistentController controller,
   ) {
     return ReaderabilityControllerProvider(
       controller,
@@ -82,12 +83,11 @@ class ReaderabilityControllerFamily extends Family<AsyncValue<void>> {
 }
 
 /// See also [ReaderabilityController].
-class ReaderabilityControllerProvider
-    extends AutoDisposeAsyncNotifierProviderImpl<ReaderabilityController,
-        void> {
+class ReaderabilityControllerProvider extends AutoDisposeNotifierProviderImpl<
+    ReaderabilityController, AsyncValue<({bool readerable, bool applied})>> {
   /// See also [ReaderabilityController].
   ReaderabilityControllerProvider(
-    InAppWebViewController? controller,
+    ConsistentController controller,
   ) : this._internal(
           () => ReaderabilityController()..controller = controller,
           from: readerabilityControllerProvider,
@@ -112,10 +112,10 @@ class ReaderabilityControllerProvider
     required this.controller,
   }) : super.internal();
 
-  final InAppWebViewController? controller;
+  final ConsistentController controller;
 
   @override
-  FutureOr<void> runNotifierBuild(
+  AsyncValue<({bool readerable, bool applied})> runNotifierBuild(
     covariant ReaderabilityController notifier,
   ) {
     return notifier.build(
@@ -140,8 +140,8 @@ class ReaderabilityControllerProvider
   }
 
   @override
-  AutoDisposeAsyncNotifierProviderElement<ReaderabilityController, void>
-      createElement() {
+  AutoDisposeNotifierProviderElement<ReaderabilityController,
+      AsyncValue<({bool readerable, bool applied})>> createElement() {
     return _ReaderabilityControllerProviderElement(this);
   }
 
@@ -160,18 +160,20 @@ class ReaderabilityControllerProvider
   }
 }
 
-mixin ReaderabilityControllerRef on AutoDisposeAsyncNotifierProviderRef<void> {
+mixin ReaderabilityControllerRef on AutoDisposeNotifierProviderRef<
+    AsyncValue<({bool readerable, bool applied})>> {
   /// The parameter `controller` of this provider.
-  InAppWebViewController? get controller;
+  ConsistentController get controller;
 }
 
 class _ReaderabilityControllerProviderElement
-    extends AutoDisposeAsyncNotifierProviderElement<ReaderabilityController,
-        void> with ReaderabilityControllerRef {
+    extends AutoDisposeNotifierProviderElement<ReaderabilityController,
+        AsyncValue<({bool readerable, bool applied})>>
+    with ReaderabilityControllerRef {
   _ReaderabilityControllerProviderElement(super.provider);
 
   @override
-  InAppWebViewController? get controller =>
+  ConsistentController get controller =>
       (origin as ReaderabilityControllerProvider).controller;
 }
 // ignore_for_file: type=lint

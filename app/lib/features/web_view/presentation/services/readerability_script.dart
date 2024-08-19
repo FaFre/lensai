@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/features/web_view/domain/entities/consistent_controller.dart';
 import 'package:lensai/features/web_view/domain/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -8,11 +9,13 @@ part 'readerability_script.g.dart';
 
 @Riverpod()
 class ReaderabilityScriptService extends _$ReaderabilityScriptService {
+  late InAppWebViewController? _controller;
   late Future<String> _readerabilityScript;
   late bool _enableReadability;
 
   @override
-  Future<void> build(InAppWebViewController? controller) async {
+  Future<void> build(ConsistentController controller) async {
+    _controller = controller.value;
     _readerabilityScript = ref.watch(readerabilityScriptProvider.future);
     _enableReadability = ref.watch(
       settingsRepositoryProvider.select(
@@ -23,15 +26,15 @@ class ReaderabilityScriptService extends _$ReaderabilityScriptService {
   }
 
   Future<void> _injectScript() async {
-    if (controller != null) {
+    if (_controller != null) {
       await _readerabilityScript
-          .then((script) => controller!.evaluateJavascript(source: script));
+          .then((script) => _controller!.evaluateJavascript(source: script));
     }
   }
 
   Future<void> _ensureScriptInjected() async {
-    if (controller != null) {
-      final injected = await controller!.evaluateJavascript(
+    if (_controller != null) {
+      final injected = await _controller!.evaluateJavascript(
         source:
             "(typeof window !== 'undefined' && typeof window.isReaderable === 'function')",
       ) as bool;
@@ -46,8 +49,8 @@ class ReaderabilityScriptService extends _$ReaderabilityScriptService {
     if (_enableReadability) {
       await _ensureScriptInjected();
 
-      if (controller != null) {
-        return await controller!.evaluateJavascript(
+      if (_controller != null) {
+        return await _controller!.evaluateJavascript(
           source: 'isReaderable();',
         ) as bool;
       }
@@ -60,8 +63,8 @@ class ReaderabilityScriptService extends _$ReaderabilityScriptService {
     if (_enableReadability) {
       await _ensureScriptInjected();
 
-      if (controller != null) {
-        await controller!.evaluateJavascript(source: 'applyReaderable();');
+      if (_controller != null) {
+        await _controller!.evaluateJavascript(source: 'applyReaderable();');
       }
     }
   }

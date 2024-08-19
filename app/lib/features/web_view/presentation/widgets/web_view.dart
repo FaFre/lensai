@@ -16,6 +16,7 @@ import 'package:lensai/features/search_browser/domain/entities/sheet.dart';
 import 'package:lensai/features/search_browser/domain/providers.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/features/web_view/domain/entities/consistent_controller.dart';
 import 'package:lensai/features/web_view/domain/entities/web_view_page.dart';
 import 'package:lensai/features/web_view/domain/providers.dart';
 import 'package:lensai/features/web_view/presentation/controllers/readerability.dart';
@@ -41,43 +42,18 @@ class WebView extends StatefulHookConsumerWidget {
 
   final ValueNotifier<WebViewPage> _pageNotifier;
 
-  final ValueNotifier<bool?> _isReaderable;
-  final ValueNotifier<bool> _readerableApplied;
-
   ValueListenable<WebViewPage> get page => _pageNotifier;
 
   /// Don't cache this value as it depends on current value of a ValueListenable
   InAppWebViewController? get currentController =>
       _pageNotifier.value.controller;
 
-  ValueListenable<bool?> get isReaderable => _isReaderable;
-  ValueListenable<bool> get readerableApplied => _readerableApplied;
-
   void updatePage(WebViewPage Function(WebViewPage page) update) {
     _pageNotifier.value = update(_pageNotifier.value);
   }
 
-  void resetReaderable() {
-    _isReaderable.value = null;
-    _readerableApplied.value = false;
-  }
-
-  Future<void> updateReaderableApplied(bool value) async {
-    if (value == false) {
-      await _pageNotifier.value.controller?.reload();
-    }
-
-    _readerableApplied.value = value;
-  }
-
-  void updateIsReaderable(bool value) {
-    _isReaderable.value = value;
-  }
-
   WebView({required WebViewPage tab})
       : _pageNotifier = ValueNotifier(tab),
-        _isReaderable = ValueNotifier(null),
-        _readerableApplied = ValueNotifier(false),
         tabId = tab.id,
         super(key: tab.key);
 
@@ -162,8 +138,6 @@ class _WebViewState extends ConsumerState<WebView> {
     _periodicScreenshotUpdate?.cancel();
 
     widget._pageNotifier.dispose();
-    widget._isReaderable.dispose();
-    widget._readerableApplied.dispose();
 
     logger.i('Disposed ${widget.key} (${widget.page.value.title})');
   }
@@ -390,6 +364,12 @@ class _WebViewState extends ConsumerState<WebView> {
             webViewProgress.value = progress;
           },
           onLoadStart: (controller, url) {
+            final readabilityNotifier = ref.read(
+              readerabilityControllerProvider(
+                ConsistentController(controller),
+              ).notifier,
+            );
+
             if (url != null) {
               widget.updatePage(
                 (page) => page.copyWith(
@@ -400,7 +380,7 @@ class _WebViewState extends ConsumerState<WebView> {
               );
             }
 
-            widget.resetReaderable();
+            readabilityNotifier.reset();
           },
           onLoadStop: (controller, url) async {
             if (url != null) {
@@ -410,10 +390,13 @@ class _WebViewState extends ConsumerState<WebView> {
             _onLoadStopDebounce?.cancel();
             _onLoadStopDebounce =
                 Timer(const Duration(milliseconds: 150), () async {
-              // final favicon = await widget.page.value.controller
-              //     ?.getFavicons()
-              //     .then((icons) => choseFavicon(icons));
-              // widget.updatePage((page) => page.copyWith.favicon(favicon));
+              final readabilityNotifier = ref.read(
+                readerabilityControllerProvider(
+                  ConsistentController(controller),
+                ).notifier,
+              );
+
+              await readabilityNotifier.checkReaderable();
 
               await _updateScreenshot().whenComplete(() {
                 _periodicScreenshotUpdate?.cancel();
@@ -426,12 +409,6 @@ class _WebViewState extends ConsumerState<WebView> {
                 });
               });
             });
-
-            final readabilityNotifier = ref.read(
-              readerabilityControllerProvider(controller).notifier,
-            );
-
-            widget.updateIsReaderable(await readabilityNotifier.isReaderable());
           },
           onUpdateVisitedHistory: (controller, url, isReload) async {
             if (isReload != true) {
