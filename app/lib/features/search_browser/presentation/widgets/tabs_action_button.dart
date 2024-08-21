@@ -3,12 +3,19 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 
 class TabsActionButton extends HookConsumerWidget {
+  final bool isActive;
   final VoidCallback onTap;
 
-  const TabsActionButton({required this.onTap, super.key});
+  const TabsActionButton({
+    required this.onTap,
+    this.isActive = false,
+    super.key,
+  });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+
     final tabCount =
         ref.watch(webViewRepositoryProvider.select((tabs) => tabs.length));
 
@@ -23,7 +30,9 @@ class TabsActionButton extends HookConsumerWidget {
           decoration: BoxDecoration(
             border: Border.all(
               width: 2.0,
-              color: DefaultTextStyle.of(context).style.color!,
+              color: isActive
+                  ? theme.colorScheme.primary
+                  : DefaultTextStyle.of(context).style.color!,
             ),
             borderRadius: BorderRadius.circular(5.0),
           ),
@@ -31,9 +40,10 @@ class TabsActionButton extends HookConsumerWidget {
           child: Center(
             child: Text(
               tabCount.toString(),
-              style: const TextStyle(
+              style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 14.0,
+                color: isActive ? theme.colorScheme.primary : null,
               ),
             ),
           ),

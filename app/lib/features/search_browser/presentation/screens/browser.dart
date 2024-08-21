@@ -228,8 +228,9 @@ class KagiScreen extends HookConsumerWidget {
                         horizontal: 8.0,
                       ),
                       child: readerabilityState.when(
-                        data: (_) => (isReaderable == true || readerableApplied)
-                            ? InkWell(
+                        data: (_) => Visibility(
+                          visible: isReaderable == true || readerableApplied,
+                          child: InkWell(
                                 onTap: readerabilityState.isLoading
                                     ? null
                                     : () async {
@@ -248,8 +249,8 @@ class KagiScreen extends HookConsumerWidget {
                                         }
                                       },
                                 child: icon,
-                              )
-                            : const SizedBox.shrink(),
+                          ),
+                        ),
                         error: (error, stackTrace) => SizedBox.shrink(),
                         loading: () => AnimateGradientShader(
                           duration: const Duration(milliseconds: 500),
@@ -315,6 +316,7 @@ class KagiScreen extends HookConsumerWidget {
                 ),
               ),
             TabsActionButton(
+              isActive: displayedSheet is ViewTabs,
               onTap: () {
                 if (displayedSheet case ViewTabs()) {
                   ref.read(bottomSheetProvider.notifier).dismiss();
