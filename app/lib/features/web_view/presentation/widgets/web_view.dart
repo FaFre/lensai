@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 
+import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -37,6 +38,109 @@ const _webViewSupportedSchemes = [
   "about",
 ];
 
+abstract class _WebViewPageCWProxy {
+  WebViewPage controller(InAppWebViewController? controller);
+
+  WebViewPage url(Uri url);
+
+  WebViewPage sslError(SslError? sslError);
+
+  WebViewPage title(String? title);
+
+  WebViewPage topicId(String? topicId);
+
+  WebViewPage favicon(Favicon? favicon);
+
+  WebViewPage screenshot(Uint8List? screenshot);
+
+  WebViewPage pageHistory(({bool canGoBack, bool canGoForward}) pageHistory);
+
+  WebViewPage call({
+    InAppWebViewController? controller,
+    Uri? url,
+    SslError? sslError,
+    String? title,
+    String? topicId,
+    Favicon? favicon,
+    Uint8List? screenshot,
+    ({bool canGoBack, bool canGoForward})? pageHistory,
+  });
+}
+
+class _WebViewPageCWProxyImpl implements _WebViewPageCWProxy {
+  const _WebViewPageCWProxyImpl(this._value);
+
+  final WebViewPage _value;
+
+  @override
+  WebViewPage controller(InAppWebViewController? controller) =>
+      this(controller: controller);
+
+  @override
+  WebViewPage url(Uri url) => this(url: url);
+
+  @override
+  WebViewPage sslError(SslError? sslError) => this(sslError: sslError);
+
+  @override
+  WebViewPage title(String? title) => this(title: title);
+
+  @override
+  WebViewPage topicId(String? topicId) => this(topicId: topicId);
+
+  @override
+  WebViewPage favicon(Favicon? favicon) => this(favicon: favicon);
+
+  @override
+  WebViewPage screenshot(Uint8List? screenshot) => this(screenshot: screenshot);
+
+  @override
+  WebViewPage pageHistory(({bool canGoBack, bool canGoForward}) pageHistory) =>
+      this(pageHistory: pageHistory);
+
+  @override
+  WebViewPage call({
+    Object? controller = const $CopyWithPlaceholder(),
+    Object? url = const $CopyWithPlaceholder(),
+    Object? sslError = const $CopyWithPlaceholder(),
+    Object? title = const $CopyWithPlaceholder(),
+    Object? topicId = const $CopyWithPlaceholder(),
+    Object? favicon = const $CopyWithPlaceholder(),
+    Object? screenshot = const $CopyWithPlaceholder(),
+    Object? pageHistory = const $CopyWithPlaceholder(),
+  }) {
+    return WebViewPage(
+      key: _value.key,
+      id: _value.id,
+      controller: controller == const $CopyWithPlaceholder()
+          ? _value.controller
+          : controller as InAppWebViewController?,
+      url: url == const $CopyWithPlaceholder() || url == null
+          ? _value.url
+          : url as Uri,
+      sslError: sslError == const $CopyWithPlaceholder()
+          ? _value.sslError
+          : sslError as SslError?,
+      title: title == const $CopyWithPlaceholder()
+          ? _value.title
+          : title as String?,
+      topicId: topicId == const $CopyWithPlaceholder()
+          ? _value.topicId
+          : topicId as String?,
+      favicon: favicon == const $CopyWithPlaceholder()
+          ? _value.favicon
+          : favicon as Favicon?,
+      screenshot: screenshot == const $CopyWithPlaceholder()
+          ? _value.screenshot
+          : screenshot as Uint8List?,
+      pageHistory:
+          pageHistory == const $CopyWithPlaceholder() || pageHistory == null
+              ? _value.pageHistory
+              : pageHistory as ({bool canGoBack, bool canGoForward}),
+    );
+  }
+}
+
 class WebView extends StatefulHookConsumerWidget {
   final String tabId;
 
@@ -47,10 +151,6 @@ class WebView extends StatefulHookConsumerWidget {
   /// Don't cache this value as it depends on current value of a ValueListenable
   InAppWebViewController? get currentController =>
       _pageNotifier.value.controller;
-
-  void updatePage(WebViewPage Function(WebViewPage page) update) {
-    _pageNotifier.value = update(_pageNotifier.value);
-  }
 
   WebView({required WebViewPage tab})
       : _pageNotifier = ValueNotifier(tab),
@@ -64,6 +164,13 @@ class WebView extends StatefulHookConsumerWidget {
 class _WebViewState extends ConsumerState<WebView> {
   Timer? _onLoadStopDebounce;
   Timer? _periodicScreenshotUpdate;
+
+  void updatePage(
+    WebViewPage Function(_WebViewPageCWProxyImpl copyWith) update,
+  ) {
+    final x = widget._pageNotifier.value =
+        update(_WebViewPageCWProxyImpl(widget._pageNotifier.value));
+  }
 
   Future<bool> _downloadChat(
     DownloadStartRequest downloadStartRequest,
@@ -125,9 +232,7 @@ class _WebViewState extends ConsumerState<WebView> {
       },
     );
 
-    widget.updatePage(
-      (page) => page.copyWith.screenshot(screenshot),
-    );
+    updatePage((copyWith) => copyWith.screenshot(screenshot));
   }
 
   @override
@@ -286,7 +391,7 @@ class _WebViewState extends ConsumerState<WebView> {
               await controller.startSafeBrowsing();
             }
 
-            widget.updatePage((page) => page.copyWith.controller(controller));
+            updatePage((copyWith) => copyWith.controller(controller));
           },
           onReceivedServerTrustAuthRequest: (controller, challenge) async {
             final sslError = challenge.protectionSpace.sslError;
@@ -294,7 +399,7 @@ class _WebViewState extends ConsumerState<WebView> {
             if (sslError != null && sslError.code != null) {
               if (challenge.protectionSpace.host ==
                   await controller.getUrl().then((value) => value?.host)) {
-                widget.updatePage((page) => page.copyWith.sslError(sslError));
+                updatePage((copyWith) => copyWith.sslError(sslError));
                 if (context.mounted) {
                   ui_helper.showErrorMessage(
                     context,
@@ -309,7 +414,7 @@ class _WebViewState extends ConsumerState<WebView> {
               );
             }
 
-            widget.updatePage((page) => page.copyWith.sslError(null));
+            updatePage((copyWith) => copyWith.sslError(null));
             return ServerTrustAuthResponse(
               action: ServerTrustAuthResponseAction.PROCEED,
             );
@@ -371,8 +476,8 @@ class _WebViewState extends ConsumerState<WebView> {
             );
 
             if (url != null) {
-              widget.updatePage(
-                (page) => page.copyWith(
+              updatePage(
+                (copyWith) => copyWith(
                   url: url,
                   // ignore: avoid_redundant_argument_values
                   sslError: null,
@@ -384,7 +489,7 @@ class _WebViewState extends ConsumerState<WebView> {
           },
           onLoadStop: (controller, url) async {
             if (url != null) {
-              widget.updatePage((page) => page.copyWith.url(url));
+              updatePage((copyWith) => copyWith.url(url));
             }
 
             _onLoadStopDebounce?.cancel();
@@ -417,7 +522,7 @@ class _WebViewState extends ConsumerState<WebView> {
                 canGoForward: await controller.canGoForward()
               );
 
-              widget.updatePage((page) => page.copyWith.pageHistory(history));
+              updatePage((copyWith) => copyWith.pageHistory(history));
             }
           },
           shouldOverrideUrlLoading: (controller, navigationAction) async {
@@ -488,7 +593,7 @@ class _WebViewState extends ConsumerState<WebView> {
             }
           },
           onTitleChanged: (controller, title) {
-            widget.updatePage((page) => page.copyWith.title(title));
+            updatePage((copyWith) => copyWith.title(title));
           },
           onDownloadStartRequest: (controller, downloadStartRequest) async {
             final handled = switch (downloadStartRequest.mimeType) {

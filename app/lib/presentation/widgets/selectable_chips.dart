@@ -4,10 +4,11 @@ class SelectableChips<T, K> extends StatelessWidget {
   final List<T> availableItems;
   final T? selectedItem;
   final int maxCount;
+  final bool deleteIcon;
 
   final K Function(T item) itemId;
   final Widget Function(T item) itemLabel;
-  final Widget Function(T item)? itemAvatar;
+  final Widget? Function(T item)? itemAvatar;
 
   final void Function(T item)? onSelected;
   final void Function(T item)? onDeleted;
@@ -19,6 +20,7 @@ class SelectableChips<T, K> extends StatelessWidget {
     required this.availableItems,
     this.selectedItem,
     this.maxCount = 25,
+    this.deleteIcon = true,
     this.onSelected,
     this.onDeleted,
     super.key,
@@ -63,9 +65,11 @@ class SelectableChips<T, K> extends StatelessWidget {
                 onDeleted?.call(item);
               }
             },
-            onDeleted: () {
-              onDeleted?.call(item);
-            },
+            onDeleted: deleteIcon
+                ? () {
+                    onDeleted?.call(item);
+                  }
+                : null,
             label: itemLabel.call(item),
             avatar: itemAvatar?.call(item),
           ),

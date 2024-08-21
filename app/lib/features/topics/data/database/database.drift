@@ -1,0 +1,27 @@
+import 'package:lensai/features/topics/data/database/drift/converters/color.dart';
+import 'package:lensai/features/topics/data/database/drift/converters/uri.dart';
+
+CREATE TABLE topic (
+  id TEXT PRIMARY KEY NOT NULL,
+  name TEXT,
+  color INTEGER NOT NULL MAPPED BY `const ColorConverter()`
+);
+
+CREATE TABLE tab (
+  id TEXT PRIMARY KEY NOT NULL,
+  topic_id TEXT REFERENCES topic (id) ON DELETE CASCADE,
+  timestamp DATETIME NOT NULL,
+  url TEXT NOT NULL MAPPED BY `const UriConverter()`,
+  title TEXT,
+  screenshot BLOB
+);
+
+topics:
+  SELECT topic.*
+  FROM topic
+  LEFT JOIN (
+    SELECT topic_id, MAX(timestamp) AS last_updated
+    FROM tab
+    GROUP BY topic_id
+  ) AS tab_max ON topic.id = tab_max.topic_id
+  ORDER BY tab_max.last_updated DESC NULLS FIRST;

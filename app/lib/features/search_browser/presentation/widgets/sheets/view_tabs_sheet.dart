@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/topics/presentation/widgets/topic_chips.dart';
 import 'package:lensai/features/web_view/domain/entities/abstract/tab.dart';
 import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
@@ -24,28 +25,36 @@ class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
         builder: (context, ref, child) {
           //Fix layout issue https://github.com/flutter/flutter/issues/78748#issuecomment-1194680555
           return Align(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
               children: [
-                TextButton.icon(
-                  onPressed: () async {
-                    await ref
-                        .read(switchNewTabControllerProvider.notifier)
-                        .add(Uri.https('kagi.com'));
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () async {
+                        await ref
+                            .read(switchNewTabControllerProvider.notifier)
+                            .add(Uri.https('kagi.com'));
 
-                    onClose();
-                  },
-                  icon: const Icon(Icons.add),
-                  label: const Text('New Tab'),
+                        onClose();
+                      },
+                      icon: const Icon(Icons.add),
+                      label: const Text('New Tab'),
+                    ),
+                    TextButton.icon(
+                      onPressed: () {
+                        ref
+                            .read(webViewRepositoryProvider.notifier)
+                            .closeAllTabs();
+                        onClose();
+                      },
+                      icon: const Icon(Icons.delete),
+                      label: const Text('Close All'),
+                    ),
+                  ],
                 ),
-                TextButton.icon(
-                  onPressed: () {
-                    ref.read(webViewRepositoryProvider.notifier).closeAllTabs();
-                    onClose();
-                  },
-                  icon: const Icon(Icons.delete),
-                  label: const Text('Close All'),
-                ),
+                TopicChips(),
               ],
             ),
           );
@@ -55,10 +64,10 @@ class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get minExtent => 48;
+  double get minExtent => 96;
 
   @override
-  double get maxExtent => 48;
+  double get maxExtent => 96;
 
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>

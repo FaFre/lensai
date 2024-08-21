@@ -15,7 +15,7 @@ class SwitchNewTabController extends _$SwitchNewTabController {
     state = const AsyncLoading();
     state = await AsyncValue.guard(
       () async {
-        final newTab = WebViewPage(
+        final newTab = WebViewPage.create(
           url: WebUri.uri(url),
         );
 

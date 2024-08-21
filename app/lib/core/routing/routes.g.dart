@@ -46,6 +46,11 @@ RouteBase get $kagiRoute => GoRouteData.$route(
             ),
           ],
         ),
+        GoRouteData.$route(
+          path: 'topics',
+          name: 'TopicsRoute',
+          factory: $TopicListRouteExtension._fromState,
+        ),
       ],
     );
 
@@ -146,6 +151,23 @@ extension $BangSubCategoryRouteExtension on BangSubCategoryRoute {
 
   String get location => GoRouteData.$location(
         '/bangs/category/${Uri.encodeComponent(category)}/${Uri.encodeComponent(subCategory)}',
+      );
+
+  void go(BuildContext context) => context.go(location);
+
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  void replace(BuildContext context) => context.replace(location);
+}
+
+extension $TopicListRouteExtension on TopicListRoute {
+  static TopicListRoute _fromState(GoRouterState state) => TopicListRoute();
+
+  String get location => GoRouteData.$location(
+        '/topics',
       );
 
   void go(BuildContext context) => context.go(location);

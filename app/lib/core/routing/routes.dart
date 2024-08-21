@@ -10,6 +10,7 @@ import 'package:lensai/features/chat_archive/presentation/screens/list.dart';
 import 'package:lensai/features/chat_archive/presentation/screens/search.dart';
 import 'package:lensai/features/search_browser/presentation/screens/browser.dart';
 import 'package:lensai/features/settings/presentation/screens/settings.dart';
+import 'package:lensai/features/topics/presentation/screens/topic_list.dart';
 
 part 'routes.g.dart';
 
@@ -40,6 +41,10 @@ part 'routes.g.dart';
           ],
         ),
       ],
+    ),
+    TypedGoRoute<TopicListRoute>(
+      name: 'TopicsRoute',
+      path: 'topics',
     ),
   ],
 )
@@ -94,6 +99,13 @@ class BangSearchRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const BangSearchScreen();
+  }
+}
+
+class TopicListRoute extends GoRouteData {
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const TopicListScreen();
   }
 }
 

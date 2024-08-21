@@ -91,7 +91,7 @@ class WebPageDialog extends HookConsumerWidget {
           onDismiss: onDismiss,
         ),
         SimpleDialog(
-          titlePadding: const EdgeInsets.fromLTRB(24.0, 12.0, 24.0, 0.0),
+          titlePadding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 0.0),
           contentPadding: EdgeInsets.zero,
           insetPadding: const EdgeInsets.symmetric(
             horizontal: 20.0,
