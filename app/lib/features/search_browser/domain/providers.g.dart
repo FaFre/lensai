@@ -411,5 +411,22 @@ final showFindInPageProvider = NotifierProvider<ShowFindInPage, bool>.internal(
 );
 
 typedef _$ShowFindInPage = Notifier<bool>;
+String _$webViewWidgetCacheHash() =>
+    r'7d6f769e8c314d9dc579d700d36d6d4c944e600f';
+
+/// See also [WebViewWidgetCache].
+@ProviderFor(WebViewWidgetCache)
+final webViewWidgetCacheProvider =
+    AutoDisposeNotifierProvider<WebViewWidgetCache, List<WebView>>.internal(
+  WebViewWidgetCache.new,
+  name: r'webViewWidgetCacheProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$webViewWidgetCacheHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$WebViewWidgetCache = AutoDisposeNotifier<List<WebView>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

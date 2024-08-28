@@ -7,7 +7,7 @@ part of 'app_initialization.dart';
 // **************************************************************************
 
 String _$appInitializationServiceHash() =>
-    r'19ec598e2141dd306eee61c1f9edd7f515b56738';
+    r'dadcf205d32efa61eb2a0ff1c9b3d49658b76a56';
 
 /// See also [AppInitializationService].
 @ProviderFor(AppInitializationService)

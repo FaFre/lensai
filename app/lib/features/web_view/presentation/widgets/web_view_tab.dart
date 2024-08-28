@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/features/web_view/domain/entities/abstract/tab.dart';
-import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:lensai/features/web_view/presentation/widgets/favicon.dart';
 
-class WebViewTab extends HookConsumerWidget {
+class WebViewTab extends StatelessWidget {
   final ITab tab;
   final bool isActive;
 
-  final VoidCallback onClose;
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final VoidCallback? onDelete;
 
   const WebViewTab({
     required this.tab,
     required this.isActive,
-    required this.onClose,
+    this.onTap,
+    this.onLongPress,
+    this.onDelete,
     super.key,
   });
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
@@ -33,15 +35,8 @@ class WebViewTab extends HookConsumerWidget {
         borderRadius: const BorderRadius.all(Radius.circular(16.0)),
         child: InkWell(
           borderRadius: const BorderRadius.all(Radius.circular(16.0)),
-          onTap: () {
-            if (!isActive) {
-              //Close first to avoid rebuilds
-              onClose();
-              ref.read(webViewTabControllerProvider.notifier).showTab(tab.id);
-            } else {
-              onClose();
-            }
-          },
+          onTap: onTap,
+          onLongPress: onLongPress,
           child: Column(
             children: [
               Row(
@@ -59,11 +54,7 @@ class WebViewTab extends HookConsumerWidget {
                   IconButton(
                     visualDensity:
                         const VisualDensity(horizontal: -4.0, vertical: -4.0),
-                    onPressed: () {
-                      ref
-                          .read(webViewRepositoryProvider.notifier)
-                          .closeTab(tab.id);
-                    },
+                    onPressed: onDelete,
                     icon: const Icon(Icons.close),
                   ),
                 ],

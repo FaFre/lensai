@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:lensai/features/topics/data/database/database.dart';
+import 'package:lensai/features/topics/data/models/topic_data.dart';
 import 'package:lensai/features/topics/data/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -11,8 +12,9 @@ class TopicRepository extends _$TopicRepository {
   late TabDatabase _db;
 
   @override
-  void build() {
+  Stream<List<TopicDataWithCount>> build() {
     _db = ref.watch(tabDatabaseProvider);
+    return _db.topicsWithCount().watch();
   }
 
   Future<void> addTopic({required String? name, required Color color}) {
@@ -29,18 +31,6 @@ class TopicRepository extends _$TopicRepository {
 
   Future<void> deleteTopic(String id) {
     return _db.topicDao.deleteTopic(id);
-  }
-
-  Stream<List<TopicData>> watchTopics() {
-    return _db.topics().watch();
-  }
-
-  Stream<TopicData?> watchTopic(String? id) {
-    if (id != null) {
-      return _db.topicDao.getTopicData(id).watchSingleOrNull();
-    } else {
-      return Stream.value(null);
-    }
   }
 
   Future<Set<Color>> getDistinctColors() {

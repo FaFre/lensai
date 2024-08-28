@@ -6,21 +6,7 @@ part of 'providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$topicListHash() => r'7220aef5653bb3c2b44b016ce4f083f20896b353';
-
-/// See also [topicList].
-@ProviderFor(topicList)
-final topicListProvider = AutoDisposeStreamProvider<List<TopicData>>.internal(
-  topicList,
-  name: r'topicListProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$topicListHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef TopicListRef = AutoDisposeStreamProviderRef<List<TopicData>>;
-String _$selectedTopicDataHash() => r'191ad088ab90ef2348a836593f92b48d095afdc8';
+String _$selectedTopicDataHash() => r'fa450784052498014f592c356bde4ff5ec675281';
 
 /// See also [selectedTopicData].
 @ProviderFor(selectedTopicData)
@@ -36,25 +22,8 @@ final selectedTopicDataProvider =
 );
 
 typedef SelectedTopicDataRef = AutoDisposeStreamProviderRef<TopicData?>;
-String _$distinctTopicColorsHash() =>
-    r'c671f349615313d3b17e93e9e46fae12889e5e1f';
-
-/// See also [distinctTopicColors].
-@ProviderFor(distinctTopicColors)
-final distinctTopicColorsProvider =
-    AutoDisposeFutureProvider<Set<Color>>.internal(
-  distinctTopicColors,
-  name: r'distinctTopicColorsProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$distinctTopicColorsHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef DistinctTopicColorsRef = AutoDisposeFutureProviderRef<Set<Color>>;
 String _$unusedRandomTopicColorHash() =>
-    r'8f6907bb50a5bf2ac0320e93531d9e61616337b9';
+    r'099730b0d987cc37bcae4ef5c999cbebfa67d7da';
 
 /// See also [unusedRandomTopicColor].
 @ProviderFor(unusedRandomTopicColor)

@@ -3,12 +3,13 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/core/routing/routes.dart';
 import 'package:lensai/features/topics/domain/providers.dart';
+import 'package:lensai/features/topics/domain/repositories/topic.dart';
 import 'package:lensai/presentation/widgets/selectable_chips.dart';
 
 class TopicChips extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final topicsAsync = ref.watch(topicListProvider);
+    final topicsAsync = ref.watch(topicRepositoryProvider);
     final selectedTopic = ref
         .watch(selectedTopicDataProvider.select((value) => value.valueOrNull));
 
@@ -17,6 +18,7 @@ class TopicChips extends HookConsumerWidget {
         height: 48,
         child: Row(
           children: [
+            const SizedBox(width: 16),
             if (selectedTopic != null || availableTopics.isNotEmpty)
               Expanded(
                 child: SelectableChips(
@@ -31,6 +33,7 @@ class TopicChips extends HookConsumerWidget {
                     ),
                   ),
                   itemLabel: (topic) => Text(topic.name ?? 'New Topic'),
+                  itemBadgeCount: (topic) => topic.tabCount,
                   availableItems: availableTopics,
                   selectedItem: selectedTopic,
                   onSelected: (topic) {

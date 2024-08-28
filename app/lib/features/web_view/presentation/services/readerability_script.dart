@@ -1,8 +1,8 @@
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
-import 'package:lensai/features/web_view/domain/entities/consistent_controller.dart';
 import 'package:lensai/features/web_view/domain/providers.dart';
+import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'readerability_script.g.dart';
@@ -14,8 +14,8 @@ class ReaderabilityScriptService extends _$ReaderabilityScriptService {
   late bool _enableReadability;
 
   @override
-  Future<void> build(ConsistentController controller) async {
-    _controller = controller.value;
+  Future<void> build(String tabId) async {
+    _controller = ref.watch(webViewControllerProvider(tabId));
     _readerabilityScript = ref.watch(readerabilityScriptProvider.future);
     _enableReadability = ref.watch(
       settingsRepositoryProvider.select(

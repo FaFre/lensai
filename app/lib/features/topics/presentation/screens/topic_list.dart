@@ -1,7 +1,8 @@
+import 'package:fading_scroll/fading_scroll.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lensai/features/topics/data/database/database.dart';
+import 'package:lensai/features/topics/data/models/topic_data.dart';
 import 'package:lensai/features/topics/domain/providers.dart';
 import 'package:lensai/features/topics/domain/repositories/topic.dart';
 import 'package:lensai/features/topics/presentation/widgets/topic_dialog.dart';
@@ -147,38 +148,44 @@ class TopicListScreen extends HookConsumerWidget {
       ),
       body: HookConsumer(
         builder: (context, ref, child) {
-          final topicsAsync = ref.watch(topicListProvider);
+          final topicsAsync = ref.watch(topicRepositoryProvider);
           final selectedTopic = ref.watch(selectedTopicProvider);
 
           return Skeletonizer(
             enabled: topicsAsync.isLoading,
             child: topicsAsync.when(
-              data: (topics) => ListView.builder(
-                itemCount: topics.length,
-                itemBuilder: (context, index) {
-                  final topic = topics[index];
-                  return _TopicTile(
-                    topic,
-                    key: ValueKey(topic.id),
-                    isSelected: topic.id == selectedTopic,
-                    onEdit: (edited) async {
-                      await ref
-                          .read(topicRepositoryProvider.notifier)
-                          .replaceTopic(
-                            id: topic.id,
-                            name: edited.name,
-                            color: edited.color,
-                          );
-                    },
-                    onDelete: () async {
-                      await ref
-                          .read(topicRepositoryProvider.notifier)
-                          .deleteTopic(topic.id);
-                    },
-                    onTap: () {
-                      ref
-                          .read(selectedTopicProvider.notifier)
-                          .toggleTopic(topic.id);
+              data: (topics) => FadingScroll(
+                fadingSize: 25,
+                builder: (context, controller) {
+                  return ListView.builder(
+                    controller: controller,
+                    itemCount: topics.length,
+                    itemBuilder: (context, index) {
+                      final topic = topics[index];
+                      return _TopicTile(
+                        topic,
+                        key: ValueKey(topic.id),
+                        isSelected: topic.id == selectedTopic,
+                        onEdit: (edited) async {
+                          await ref
+                              .read(topicRepositoryProvider.notifier)
+                              .replaceTopic(
+                                id: topic.id,
+                                name: edited.name,
+                                color: edited.color,
+                              );
+                        },
+                        onDelete: () async {
+                          await ref
+                              .read(topicRepositoryProvider.notifier)
+                              .deleteTopic(topic.id);
+                        },
+                        onTap: () {
+                          ref
+                              .read(selectedTopicProvider.notifier)
+                              .toggleTopic(topic.id);
+                        },
+                      );
                     },
                   );
                 },
@@ -187,7 +194,7 @@ class TopicListScreen extends HookConsumerWidget {
               loading: () => ListView.builder(
                 itemCount: 3,
                 itemBuilder: (context, index) => _TopicTile(
-                  const TopicData(id: 'null', color: Colors.transparent),
+                  TopicData(id: 'null', color: Colors.transparent),
                   isSelected: false,
                   onEdit: (_) {},
                   onDelete: () {},

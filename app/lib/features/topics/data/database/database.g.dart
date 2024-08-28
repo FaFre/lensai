@@ -56,81 +56,6 @@ class Topic extends Table with TableInfo<Topic, TopicData> {
   bool get dontWriteConstraints => true;
 }
 
-class TopicData extends DataClass implements Insertable<TopicData> {
-  final String id;
-  final String? name;
-  final Color color;
-  const TopicData({required this.id, this.name, required this.color});
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<String>(id);
-    if (!nullToAbsent || name != null) {
-      map['name'] = Variable<String>(name);
-    }
-    {
-      map['color'] = Variable<int>(Topic.$convertercolor.toSql(color));
-    }
-    return map;
-  }
-
-  factory TopicData.fromJson(Map<String, dynamic> json,
-      {ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return TopicData(
-      id: serializer.fromJson<String>(json['id']),
-      name: serializer.fromJson<String?>(json['name']),
-      color: serializer.fromJson<Color>(json['color']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<String>(id),
-      'name': serializer.toJson<String?>(name),
-      'color': serializer.toJson<Color>(color),
-    };
-  }
-
-  TopicData copyWith(
-          {String? id,
-          Value<String?> name = const Value.absent(),
-          Color? color}) =>
-      TopicData(
-        id: id ?? this.id,
-        name: name.present ? name.value : this.name,
-        color: color ?? this.color,
-      );
-  TopicData copyWithCompanion(TopicCompanion data) {
-    return TopicData(
-      id: data.id.present ? data.id.value : this.id,
-      name: data.name.present ? data.name.value : this.name,
-      color: data.color.present ? data.color.value : this.color,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('TopicData(')
-          ..write('id: $id, ')
-          ..write('name: $name, ')
-          ..write('color: $color')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(id, name, color);
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is TopicData &&
-          other.id == this.id &&
-          other.name == this.name &&
-          other.color == this.color);
-}
-
 class TopicCompanion extends UpdateCompanion<TopicData> {
   final Value<String> id;
   final Value<String?> name;
@@ -511,14 +436,19 @@ abstract class _$TabDatabase extends GeneratedDatabase {
   late final Tab tab = Tab(this);
   late final TopicDao topicDao = TopicDao(this as TabDatabase);
   late final TabDao tabDao = TabDao(this as TabDatabase);
-  Selectable<TopicData> topics() {
+  Selectable<TopicDataWithCount> topicsWithCount() {
     return customSelect(
-        'SELECT topic.* FROM topic LEFT JOIN (SELECT topic_id, MAX(timestamp) AS last_updated FROM tab GROUP BY topic_id) AS tab_max ON topic.id = tab_max.topic_id ORDER BY tab_max.last_updated DESC NULLS FIRST',
+        'SELECT topic.*, tab_agg.tab_count FROM topic LEFT JOIN (SELECT topic_id, COUNT(*) AS tab_count, MAX(timestamp) AS last_updated FROM tab GROUP BY topic_id) AS tab_agg ON topic.id = tab_agg.topic_id ORDER BY tab_agg.last_updated DESC NULLS FIRST',
         variables: [],
         readsFrom: {
           topic,
           tab,
-        }).asyncMap(topic.mapFromRow);
+        }).map((QueryRow row) => TopicDataWithCount(
+          id: row.read<String>('id'),
+          name: row.readNullable<String>('name'),
+          color: Topic.$convertercolor.fromSql(row.read<int>('color')),
+          tabCount: row.readNullable<int>('tab_count'),
+        ));
   }
 
   @override

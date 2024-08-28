@@ -9,6 +9,7 @@ import 'package:lensai/features/content_block/domain/repositories/sync.dart';
 import 'package:lensai/features/search_browser/domain/services/session.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/features/topics/data/providers.dart';
 import 'package:lensai/features/web_view/domain/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -79,6 +80,8 @@ class AppInitializationService extends _$AppInitializationService {
 
     if (settings.incognitoMode) {
       await ref.read(sessionServiceProvider.notifier).clearAllData();
+      //Delete all unsasigned tabs
+      await ref.read(tabDatabaseProvider).tabDao.deleteTopicTabs(null);
     }
 
     if (settings.kagiSession case final String session) {

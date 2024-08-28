@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:copy_with_extension/copy_with_extension.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -17,9 +15,8 @@ import 'package:lensai/features/search_browser/domain/entities/sheet.dart';
 import 'package:lensai/features/search_browser/domain/providers.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
-import 'package:lensai/features/web_view/domain/entities/consistent_controller.dart';
-import 'package:lensai/features/web_view/domain/entities/web_view_page.dart';
 import 'package:lensai/features/web_view/domain/providers.dart';
+import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:lensai/features/web_view/presentation/controllers/readerability.dart';
 import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:lensai/features/web_view/presentation/widgets/web_page_dialog.dart';
@@ -38,124 +35,15 @@ const _webViewSupportedSchemes = [
   "about",
 ];
 
-abstract class _WebViewPageCWProxy {
-  WebViewPage controller(InAppWebViewController? controller);
-
-  WebViewPage url(Uri url);
-
-  WebViewPage sslError(SslError? sslError);
-
-  WebViewPage title(String? title);
-
-  WebViewPage topicId(String? topicId);
-
-  WebViewPage favicon(Favicon? favicon);
-
-  WebViewPage screenshot(Uint8List? screenshot);
-
-  WebViewPage pageHistory(({bool canGoBack, bool canGoForward}) pageHistory);
-
-  WebViewPage call({
-    InAppWebViewController? controller,
-    Uri? url,
-    SslError? sslError,
-    String? title,
-    String? topicId,
-    Favicon? favicon,
-    Uint8List? screenshot,
-    ({bool canGoBack, bool canGoForward})? pageHistory,
-  });
-}
-
-class _WebViewPageCWProxyImpl implements _WebViewPageCWProxy {
-  const _WebViewPageCWProxyImpl(this._value);
-
-  final WebViewPage _value;
-
-  @override
-  WebViewPage controller(InAppWebViewController? controller) =>
-      this(controller: controller);
-
-  @override
-  WebViewPage url(Uri url) => this(url: url);
-
-  @override
-  WebViewPage sslError(SslError? sslError) => this(sslError: sslError);
-
-  @override
-  WebViewPage title(String? title) => this(title: title);
-
-  @override
-  WebViewPage topicId(String? topicId) => this(topicId: topicId);
-
-  @override
-  WebViewPage favicon(Favicon? favicon) => this(favicon: favicon);
-
-  @override
-  WebViewPage screenshot(Uint8List? screenshot) => this(screenshot: screenshot);
-
-  @override
-  WebViewPage pageHistory(({bool canGoBack, bool canGoForward}) pageHistory) =>
-      this(pageHistory: pageHistory);
-
-  @override
-  WebViewPage call({
-    Object? controller = const $CopyWithPlaceholder(),
-    Object? url = const $CopyWithPlaceholder(),
-    Object? sslError = const $CopyWithPlaceholder(),
-    Object? title = const $CopyWithPlaceholder(),
-    Object? topicId = const $CopyWithPlaceholder(),
-    Object? favicon = const $CopyWithPlaceholder(),
-    Object? screenshot = const $CopyWithPlaceholder(),
-    Object? pageHistory = const $CopyWithPlaceholder(),
-  }) {
-    return WebViewPage(
-      key: _value.key,
-      id: _value.id,
-      controller: controller == const $CopyWithPlaceholder()
-          ? _value.controller
-          : controller as InAppWebViewController?,
-      url: url == const $CopyWithPlaceholder() || url == null
-          ? _value.url
-          : url as Uri,
-      sslError: sslError == const $CopyWithPlaceholder()
-          ? _value.sslError
-          : sslError as SslError?,
-      title: title == const $CopyWithPlaceholder()
-          ? _value.title
-          : title as String?,
-      topicId: topicId == const $CopyWithPlaceholder()
-          ? _value.topicId
-          : topicId as String?,
-      favicon: favicon == const $CopyWithPlaceholder()
-          ? _value.favicon
-          : favicon as Favicon?,
-      screenshot: screenshot == const $CopyWithPlaceholder()
-          ? _value.screenshot
-          : screenshot as Uint8List?,
-      pageHistory:
-          pageHistory == const $CopyWithPlaceholder() || pageHistory == null
-              ? _value.pageHistory
-              : pageHistory as ({bool canGoBack, bool canGoForward}),
-    );
-  }
-}
-
 class WebView extends StatefulHookConsumerWidget {
   final String tabId;
+  final URLRequest? initialUrlRequest;
 
-  final ValueNotifier<WebViewPage> _pageNotifier;
-
-  ValueListenable<WebViewPage> get page => _pageNotifier;
-
-  /// Don't cache this value as it depends on current value of a ValueListenable
-  InAppWebViewController? get currentController =>
-      _pageNotifier.value.controller;
-
-  WebView({required WebViewPage tab})
-      : _pageNotifier = ValueNotifier(tab),
-        tabId = tab.id,
-        super(key: tab.key);
+  const WebView({
+    required this.tabId,
+    required super.key,
+    this.initialUrlRequest,
+  });
 
   @override
   ConsumerState<ConsumerStatefulWidget> createState() => _WebViewState();
@@ -164,13 +52,6 @@ class WebView extends StatefulHookConsumerWidget {
 class _WebViewState extends ConsumerState<WebView> {
   Timer? _onLoadStopDebounce;
   Timer? _periodicScreenshotUpdate;
-
-  void updatePage(
-    WebViewPage Function(_WebViewPageCWProxyImpl copyWith) update,
-  ) {
-    final x = widget._pageNotifier.value =
-        update(_WebViewPageCWProxyImpl(widget._pageNotifier.value));
-  }
 
   Future<bool> _downloadChat(
     DownloadStartRequest downloadStartRequest,
@@ -216,25 +97,6 @@ class _WebViewState extends ConsumerState<WebView> {
     return false;
   }
 
-  Future<void> _updateScreenshot() async {
-    final screenshot = await widget.page.value.controller
-        ?.takeScreenshot(
-      screenshotConfiguration: ScreenshotConfiguration(
-        compressFormat: CompressFormat.JPEG,
-        quality: 20,
-      ),
-    )
-        .timeout(
-      const Duration(milliseconds: 1500),
-      onTimeout: () {
-        logger.w('Screenshot timed out');
-        return null;
-      },
-    );
-
-    updatePage((copyWith) => copyWith.screenshot(screenshot));
-  }
-
   @override
   Future<void> dispose() async {
     super.dispose();
@@ -242,9 +104,7 @@ class _WebViewState extends ConsumerState<WebView> {
     _onLoadStopDebounce?.cancel();
     _periodicScreenshotUpdate?.cancel();
 
-    widget._pageNotifier.dispose();
-
-    logger.i('Disposed ${widget.key} (${widget.page.value.title})');
+    logger.i('Disposed ${widget.key} ${widget.tabId}');
   }
 
   @override
@@ -291,7 +151,8 @@ class _WebViewState extends ConsumerState<WebView> {
             (value.valueOrNull ?? Settings.withDefaults()).enableJavascript,
       ),
       (previous, next) async {
-        await widget.page.value.controller?.setSettings(
+        final controller = ref.read(webViewControllerProvider(widget.tabId));
+        await controller?.setSettings(
           settings: initialSettings.copy()..javaScriptEnabled = next,
         );
       },
@@ -322,20 +183,22 @@ class _WebViewState extends ConsumerState<WebView> {
     );
 
     useOnAppLifecycleStateChange((previous, current) async {
+      final controller = ref.read(webViewControllerProvider(widget.tabId));
+
       switch (current) {
         case AppLifecycleState.paused:
           if (platform_util.isAndroid()) {
-            await widget.page.value.controller?.pause();
+            await controller?.pause();
           }
           if (platform_util.isAndroid() || platform_util.isIOS()) {
-            await widget.page.value.controller?.pauseTimers();
+            await controller?.pauseTimers();
           }
         case AppLifecycleState.resumed:
           if (platform_util.isAndroid()) {
-            await widget.page.value.controller?.resume();
+            await controller?.resume();
           }
           if (platform_util.isAndroid() || platform_util.isIOS()) {
-            await widget.page.value.controller?.resumeTimers();
+            await controller?.resumeTimers();
           }
         default:
       }
@@ -344,7 +207,7 @@ class _WebViewState extends ConsumerState<WebView> {
     return Stack(
       children: [
         InAppWebView(
-          initialUrlRequest: URLRequest(url: WebUri.uri(widget.page.value.url)),
+          initialUrlRequest: widget.initialUrlRequest,
           initialSettings: initialSettings,
           findInteractionController: findInteractionController,
           contextMenu: ContextMenu(
@@ -353,8 +216,10 @@ class _WebViewState extends ConsumerState<WebView> {
                 id: 1,
                 title: "Search",
                 action: () async {
-                  final selectedText =
-                      await widget.page.value.controller?.getSelectedText();
+                  final controller =
+                      ref.read(webViewControllerProvider(widget.tabId));
+
+                  final selectedText = await controller?.getSelectedText();
 
                   if (selectedText != null && selectedText.isNotEmpty) {
                     final searchBang =
@@ -371,8 +236,10 @@ class _WebViewState extends ConsumerState<WebView> {
                   id: 2,
                   title: "Assistant",
                   action: () async {
-                    final selectedText =
-                        await widget.page.value.controller?.getSelectedText();
+                    final controller =
+                        ref.read(webViewControllerProvider(widget.tabId));
+
+                    final selectedText = await controller?.getSelectedText();
 
                     if (selectedText != null && selectedText.isNotEmpty) {
                       ref.read(bottomSheetProvider.notifier).show(
@@ -391,19 +258,24 @@ class _WebViewState extends ConsumerState<WebView> {
               await controller.startSafeBrowsing();
             }
 
-            updatePage((copyWith) => copyWith.controller(controller));
+            await ref
+                .read(tabStateProvider(widget.tabId).notifier)
+                .copyWith(controller: controller);
           },
           onReceivedServerTrustAuthRequest: (controller, challenge) async {
             final sslError = challenge.protectionSpace.sslError;
 
             if (sslError != null && sslError.code != null) {
-              if (challenge.protectionSpace.host ==
-                  await controller.getUrl().then((value) => value?.host)) {
-                updatePage((copyWith) => copyWith.sslError(sslError));
+              final url = await controller.getUrl();
+              if (challenge.protectionSpace.host == url?.host) {
+                await ref
+                    .read(tabStateProvider(widget.tabId).notifier)
+                    .copyWith(sslError: sslError);
+
                 if (context.mounted) {
                   ui_helper.showErrorMessage(
                     context,
-                    'We detected an security issue and did not continue to ${widget.page.value.url.authority}: ${sslError.message}',
+                    'We detected an security issue and did not continue to ${url?.authority}: ${sslError.message}',
                   );
                 }
               }
@@ -414,7 +286,10 @@ class _WebViewState extends ConsumerState<WebView> {
               );
             }
 
-            updatePage((copyWith) => copyWith.sslError(null));
+            await ref
+                .read(tabStateProvider(widget.tabId).notifier)
+                .copyWith(sslError: null);
+
             return ServerTrustAuthResponse(
               action: ServerTrustAuthResponseAction.PROCEED,
             );
@@ -468,46 +343,48 @@ class _WebViewState extends ConsumerState<WebView> {
           onProgressChanged: (controller, progress) {
             webViewProgress.value = progress;
           },
-          onLoadStart: (controller, url) {
+          onLoadStart: (controller, url) async {
             final readabilityNotifier = ref.read(
-              readerabilityControllerProvider(
-                ConsistentController(controller),
-              ).notifier,
+              readerabilityControllerProvider(widget.tabId).notifier,
             );
 
             if (url != null) {
-              updatePage(
-                (copyWith) => copyWith(
-                  url: url,
-                  // ignore: avoid_redundant_argument_values
-                  sslError: null,
-                ),
-              );
+              await ref.read(tabStateProvider(widget.tabId).notifier).copyWith(
+                    url: url,
+                    // ignore: avoid_redundant_argument_values
+                    sslError: null,
+                  );
             }
 
             readabilityNotifier.reset();
           },
           onLoadStop: (controller, url) async {
             if (url != null) {
-              updatePage((copyWith) => copyWith.url(url));
+              await ref
+                  .read(tabStateProvider(widget.tabId).notifier)
+                  .copyWith(url: url);
             }
 
             _onLoadStopDebounce?.cancel();
             _onLoadStopDebounce =
                 Timer(const Duration(milliseconds: 150), () async {
               final readabilityNotifier = ref.read(
-                readerabilityControllerProvider(
-                  ConsistentController(controller),
-                ).notifier,
+                readerabilityControllerProvider(widget.tabId).notifier,
               );
 
               await readabilityNotifier.checkReaderable();
 
-              await _updateScreenshot().whenComplete(() {
+              await ref
+                  .read(tabStateProvider(widget.tabId).notifier)
+                  .updateScreenshot()
+                  .whenComplete(() {
                 _periodicScreenshotUpdate?.cancel();
                 _periodicScreenshotUpdate =
                     Timer.periodic(const Duration(seconds: 5), (timer) async {
-                  await _updateScreenshot().onError((error, stackTrace) {
+                  await ref
+                      .read(tabStateProvider(widget.tabId).notifier)
+                      .updateScreenshot()
+                      .onError((error, stackTrace) {
                     logger.e(error, stackTrace: stackTrace);
                     timer.cancel();
                   });
@@ -522,7 +399,9 @@ class _WebViewState extends ConsumerState<WebView> {
                 canGoForward: await controller.canGoForward()
               );
 
-              updatePage((copyWith) => copyWith.pageHistory(history));
+              await ref
+                  .read(tabStateProvider(widget.tabId).notifier)
+                  .copyWith(pageHistory: history);
             }
           },
           shouldOverrideUrlLoading: (controller, navigationAction) async {
@@ -582,8 +461,8 @@ class _WebViewState extends ConsumerState<WebView> {
                   Uri.tryParse(requestFocusNodeHrefResult?.src ?? '');
               if (url?.hasScheme == true && url?.hasAuthority == true) {
                 ref.read(overlayDialogProvider.notifier).show(
-                      LoadingWebPageDialog(
-                        url!,
+                      WebPageDialog(
+                        url: url!,
                         onDismiss: () {
                           ref.read(overlayDialogProvider.notifier).dismiss();
                         },
@@ -592,8 +471,10 @@ class _WebViewState extends ConsumerState<WebView> {
               }
             }
           },
-          onTitleChanged: (controller, title) {
-            updatePage((copyWith) => copyWith.title(title));
+          onTitleChanged: (controller, title) async {
+            await ref
+                .read(tabStateProvider(widget.tabId).notifier)
+                .copyWith(title: title);
           },
           onDownloadStartRequest: (controller, downloadStartRequest) async {
             final handled = switch (downloadStartRequest.mimeType) {

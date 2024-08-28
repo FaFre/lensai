@@ -35,3 +35,15 @@ TabDatabase tabDatabase(TabDatabaseRef ref) {
     }),
   );
 }
+
+@Riverpod()
+Stream<bool> isTabExisting(IsTabExistingRef ref, String tabId) {
+  final db = ref.watch(tabDatabaseProvider);
+  return db.tabDao.watchTabExisiting(tabId);
+}
+
+@Riverpod()
+Stream<TabData?> tabData(TabDataRef ref, String tabId) {
+  final db = ref.watch(tabDatabaseProvider);
+  return db.tabDao.watchTab(tabId);
+}

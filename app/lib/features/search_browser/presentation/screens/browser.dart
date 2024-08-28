@@ -19,7 +19,7 @@ import 'package:lensai/features/search_browser/presentation/widgets/sheets/view_
 import 'package:lensai/features/search_browser/presentation/widgets/tabs_action_button.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
-import 'package:lensai/features/web_view/domain/entities/consistent_controller.dart';
+import 'package:lensai/features/topics/domain/repositories/tab.dart';
 import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:lensai/features/web_view/presentation/controllers/readerability.dart';
 import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
@@ -64,7 +64,7 @@ class KagiScreen extends HookConsumerWidget {
       ),
     );
 
-    final activeWebView = ref.watch(webViewTabControllerProvider);
+    final activeTabId = ref.watch(webViewTabControllerProvider);
 
     final menuController = useMemoized(() => MenuController());
 
@@ -102,21 +102,28 @@ class KagiScreen extends HookConsumerWidget {
         child: AppBar(
           automaticallyImplyLeading: false,
           titleSpacing: 8.0,
-          title: (activeWebView != null)
-              ? AppBarTitle(
-                  activeWebView: activeWebView,
-                  onTap: () {
-                    final page = activeWebView.page.value;
+          title: (activeTabId != null)
+              ? Consumer(
+                  builder: (context, ref, child) {
+                    final page = ref.watch(tabStateProvider(activeTabId));
 
-                    ref.read(overlayDialogProvider.notifier).show(
-                          WebPageDialog(
+                    return (page != null)
+                        ? AppBarTitle(
                             page: page,
-                            webViewController: page.controller,
-                            onDismiss: ref
-                                .read(overlayDialogProvider.notifier)
-                                .dismiss,
-                          ),
-                        );
+                            onTap: () {
+                              ref.read(overlayDialogProvider.notifier).show(
+                                    WebPageDialog(
+                                      url: page.url,
+                                      precachedInfo: page,
+                                      webViewController: page.controller,
+                                      onDismiss: ref
+                                          .read(overlayDialogProvider.notifier)
+                                          .dismiss,
+                                    ),
+                                  );
+                            },
+                          )
+                        : const SizedBox.shrink();
                   },
                 )
               : HookBuilder(
@@ -181,17 +188,13 @@ class KagiScreen extends HookConsumerWidget {
                   },
                 ),
           actions: [
-            if (activeWebView != null)
+            if (activeTabId != null)
               HookConsumer(
                 builder: (context, ref, child) {
                   final colorScheme = Theme.of(context).colorScheme;
 
-                  final controller =
-                      useListenable(activeWebView.page).value.controller;
                   final readerabilityState = ref.watch(
-                    readerabilityControllerProvider(
-                      ConsistentController(controller),
-                    ),
+                    readerabilityControllerProvider(activeTabId),
                   );
 
                   final enableReadability = ref.watch(
@@ -231,24 +234,25 @@ class KagiScreen extends HookConsumerWidget {
                         data: (_) => Visibility(
                           visible: isReaderable == true || readerableApplied,
                           child: InkWell(
-                                onTap: readerabilityState.isLoading
-                                    ? null
-                                    : () async {
-                                        final controller =
-                                            activeWebView.currentController;
+                            onTap: readerabilityState.isLoading
+                                ? null
+                                : () async {
+                                    final controller = ref.read(
+                                      webViewControllerProvider(activeTabId),
+                                    );
 
-                                        if (controller != null) {
-                                          final readabilityNotifier = ref.read(
-                                            readerabilityControllerProvider(
-                                              ConsistentController(controller),
-                                            ).notifier,
-                                          );
+                                    if (controller != null) {
+                                      final readabilityNotifier = ref.read(
+                                        readerabilityControllerProvider(
+                                          activeTabId,
+                                        ).notifier,
+                                      );
 
-                                          await readabilityNotifier
-                                              .toggleReaderable();
-                                        }
-                                      },
-                                child: icon,
+                                      await readabilityNotifier
+                                          .toggleReaderable();
+                                    }
+                                  },
+                            child: icon,
                           ),
                         ),
                         error: (error, stackTrace) => SizedBox.shrink(),
@@ -271,7 +275,7 @@ class KagiScreen extends HookConsumerWidget {
                   );
                 },
               ),
-            if (activeWebView != null && quickAction != null)
+            if (quickAction != null)
               InkWell(
                 onTap: () async {
                   var tab = CreateTab(
@@ -408,86 +412,106 @@ class KagiScreen extends HookConsumerWidget {
                   child: const Text('Search'),
                 ),
                 const Divider(),
-                MenuItemButton(
-                  onPressed: () async {
-                    final url =
-                        await activeWebView?.currentController?.getUrl();
-                    if (url != null) {
-                      // ignore: use_build_context_synchronously
-                      await ui_helper.launchUrlFeedback(context, url);
-                    }
-                  },
-                  leadingIcon: const Icon(Icons.open_in_browser),
-                  child: const Text('Launch External'),
-                ),
-                MenuItemButton(
-                  onPressed: () async {
-                    final url =
-                        await activeWebView?.currentController?.getUrl();
-                    if (url != null) {
-                      await Share.shareUri(url);
-                    }
-                  },
-                  leadingIcon: const Icon(Icons.share),
-                  child: const Text('Share'),
-                ),
-                const Divider(),
-                MenuItemButton(
-                  onPressed: () async {
-                    ref.read(showFindInPageProvider.notifier).update(true);
-                  },
-                  leadingIcon: const Icon(Icons.search),
-                  child: const Text('Find in page'),
-                ),
-                const Divider(),
-                MenuItemButton(
-                  onPressed: () async {
-                    await activeWebView?.currentController?.reload();
-                  },
-                  leadingIcon: const Icon(Icons.refresh),
-                  child: const Text('Reload'),
-                ),
-                const Divider(),
-                HookBuilder(
-                  builder: (context) {
-                    final history = useListenableSelector(
-                      activeWebView?.page,
-                      () =>
-                          activeWebView?.page.value.pageHistory ??
-                          (canGoBack: false, canGoForward: false),
-                    );
+                if (activeTabId != null)
+                  MenuItemButton(
+                    onPressed: () async {
+                      final controller =
+                          ref.read(webViewControllerProvider(activeTabId));
 
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: IconButton(
-                            onPressed: (history.canGoBack)
-                                ? () async {
-                                    await activeWebView?.currentController
-                                        ?.goBack();
-                                    menuController.close();
-                                  }
-                                : null,
-                            icon: const Icon(Icons.arrow_back),
+                      final url = await controller?.getUrl();
+                      if (url != null) {
+                        // ignore: use_build_context_synchronously
+                        await ui_helper.launchUrlFeedback(context, url);
+                      }
+                    },
+                    leadingIcon: const Icon(Icons.open_in_browser),
+                    child: const Text('Launch External'),
+                  ),
+                if (activeTabId != null)
+                  MenuItemButton(
+                    onPressed: () async {
+                      final controller =
+                          ref.read(webViewControllerProvider(activeTabId));
+
+                      final url = await controller?.getUrl();
+                      if (url != null) {
+                        await Share.shareUri(url);
+                      }
+                    },
+                    leadingIcon: const Icon(Icons.share),
+                    child: const Text('Share'),
+                  ),
+                if (activeTabId != null) const Divider(),
+                if (activeTabId != null)
+                  MenuItemButton(
+                    onPressed: () async {
+                      ref.read(showFindInPageProvider.notifier).update(true);
+                    },
+                    leadingIcon: const Icon(Icons.search),
+                    child: const Text('Find in page'),
+                  ),
+                if (activeTabId != null) const Divider(),
+                if (activeTabId != null)
+                  MenuItemButton(
+                    onPressed: () async {
+                      final controller =
+                          ref.read(webViewControllerProvider(activeTabId));
+
+                      await controller?.reload();
+                    },
+                    leadingIcon: const Icon(Icons.refresh),
+                    child: const Text('Reload'),
+                  ),
+                if (activeTabId != null) const Divider(),
+                if (activeTabId != null)
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final history = ref.watch(
+                        tabStateProvider(activeTabId)
+                            .select((value) => value?.pageHistory),
+                      );
+
+                      return Row(
+                        children: [
+                          Expanded(
+                            child: IconButton(
+                              onPressed: (history?.canGoBack == true)
+                                  ? () async {
+                                      final controller = ref.read(
+                                        webViewControllerProvider(
+                                          activeTabId,
+                                        ),
+                                      );
+
+                                      await controller?.goBack();
+                                      menuController.close();
+                                    }
+                                  : null,
+                              icon: const Icon(Icons.arrow_back),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 48, child: VerticalDivider()),
-                        Expanded(
-                          child: IconButton(
-                            onPressed: (history.canGoForward)
-                                ? () async {
-                                    await activeWebView?.currentController
-                                        ?.goForward();
-                                    menuController.close();
-                                  }
-                                : null,
-                            icon: const Icon(Icons.arrow_forward),
+                          const SizedBox(height: 48, child: VerticalDivider()),
+                          Expanded(
+                            child: IconButton(
+                              onPressed: (history?.canGoForward == true)
+                                  ? () async {
+                                      final controller = ref.read(
+                                        webViewControllerProvider(
+                                          activeTabId,
+                                        ),
+                                      );
+
+                                      await controller?.goForward();
+                                      menuController.close();
+                                    }
+                                  : null,
+                              icon: const Icon(Icons.arrow_forward),
+                            ),
                           ),
-                        ),
-                      ],
-                    );
-                  },
-                ),
+                        ],
+                      );
+                    },
+                  ),
               ],
             ),
           ],
@@ -506,10 +530,18 @@ class KagiScreen extends HookConsumerWidget {
               : null,
           child: HookConsumer(
             builder: (context, ref, child) {
-              final webViews = ref.watch(webViewRepositoryProvider);
+              final webViewWidgets = ref.watch(webViewWidgetCacheProvider);
+              final activeWebViewStackIndex = (activeTabId != null)
+                  ? webViewWidgets
+                      .indexWhere((view) => view.tabId == activeTabId)
+                  : null;
 
               return BackButtonListener(
                 onBackButtonPressed: () async {
+                  final page = (activeTabId != null)
+                      ? ref.read(tabStateProvider(activeTabId))
+                      : null;
+
                   //Don't do anything if a child route is active
                   if (GoRouterState.of(context).topRoute?.name != 'KagiRoute') {
                     return false;
@@ -525,10 +557,10 @@ class KagiScreen extends HookConsumerWidget {
                     return true;
                   }
 
-                  if (activeWebView?.page.value.pageHistory.canGoBack == true) {
+                  if (page?.pageHistory.canGoBack == true) {
                     lastBackButtonPress.value = null;
 
-                    await activeWebView?.page.value.controller?.goBack();
+                    await page?.controller?.goBack();
                     return true;
                   }
 
@@ -537,10 +569,10 @@ class KagiScreen extends HookConsumerWidget {
                           const Duration(seconds: 2)) {
                     lastBackButtonPress.value = null;
 
-                    if (activeWebView?.key != null && webViews.length > 1) {
-                      ref
-                          .read(webViewRepositoryProvider.notifier)
-                          .closeTab(activeWebView!.tabId);
+                    if (page != null && webViewWidgets.length > 1) {
+                      await ref
+                          .read(tabRepositoryProvider.notifier)
+                          .deleteTab(page.id);
                       return true;
                     } else {
                       //Mark back as unhandled and navigator will pop
@@ -552,7 +584,7 @@ class KagiScreen extends HookConsumerWidget {
                       ..clearSnackBars()
                       ..showSnackBar(
                         SnackBar(
-                          content: (webViews.length > 1)
+                          content: (webViewWidgets.length > 1)
                               ? const Text(
                                   'Please click BACK again to close current tab',
                                 )
@@ -578,20 +610,16 @@ class KagiScreen extends HookConsumerWidget {
                           transitionType: SharedAxisTransitionType.horizontal,
                           child: child,
                         ),
-                        key: ValueKey(
-                          (activeWebView != null)
-                              ? webViews.keys
-                                  .toList()
-                                  .indexOf(activeWebView.tabId)
-                              : null,
-                        ),
-                        index: (activeWebView != null)
-                            ? webViews.keys
-                                    .toList()
-                                    .indexOf(activeWebView.tabId) +
-                                1
+                        // key: ValueKey(
+                        //   (activeTabId != null)
+                        //       ? activeWebViewStackIndex
+                        //       : null,
+                        // ),
+                        index: (activeWebViewStackIndex != null &&
+                                activeWebViewStackIndex > -1)
+                            ? activeWebViewStackIndex + 1
                             : 0,
-                        children: [const LandingContent(), ...webViews.values],
+                        children: [const LandingContent(), ...webViewWidgets],
                       ),
                     ),
                     if (displayedSheet != null)

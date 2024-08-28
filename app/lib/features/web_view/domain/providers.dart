@@ -5,6 +5,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:lensai/features/content_block/domain/repositories/host.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
+import 'package:lensai/features/topics/domain/providers.dart';
+import 'package:lensai/features/topics/domain/repositories/tab.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:universal_io/io.dart';
 
@@ -42,4 +44,13 @@ Future<String> readerabilityScript(ReaderabilityScriptRef ref) {
           value.buffer.asUint8List(),
         ),
       );
+}
+
+@Riverpod()
+List<String> activeTabs(ActiveTabsRef ref) {
+  final topic = ref.watch(selectedTopicProvider);
+  return ref.watch(
+    topicTabRepositoryProvider(topic)
+        .select((value) => value.valueOrNull ?? []),
+  );
 }

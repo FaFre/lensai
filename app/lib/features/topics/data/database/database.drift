@@ -1,11 +1,12 @@
 import 'package:lensai/features/topics/data/database/drift/converters/color.dart';
 import 'package:lensai/features/topics/data/database/drift/converters/uri.dart';
+import 'package:lensai/features/topics/data/models/topic_data.dart';
 
 CREATE TABLE topic (
   id TEXT PRIMARY KEY NOT NULL,
   name TEXT,
   color INTEGER NOT NULL MAPPED BY `const ColorConverter()`
-);
+) WITH TopicData;
 
 CREATE TABLE tab (
   id TEXT PRIMARY KEY NOT NULL,
@@ -16,12 +17,18 @@ CREATE TABLE tab (
   screenshot BLOB
 );
 
-topics:
-  SELECT topic.*
+topicsWithCount WITH TopicDataWithCount:
+  SELECT 
+    topic.*, 
+    tab_agg.tab_count
   FROM topic
   LEFT JOIN (
-    SELECT topic_id, MAX(timestamp) AS last_updated
+    SELECT 
+      topic_id, 
+      COUNT(*) AS tab_count, 
+      MAX(timestamp) AS last_updated
     FROM tab
     GROUP BY topic_id
-  ) AS tab_max ON topic.id = tab_max.topic_id
-  ORDER BY tab_max.last_updated DESC NULLS FIRST;
+  ) AS tab_agg ON topic.id = tab_agg.topic_id
+  ORDER BY tab_agg.last_updated DESC NULLS FIRST;
+

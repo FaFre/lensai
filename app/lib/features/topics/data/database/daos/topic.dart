@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:drift/drift.dart';
 import 'package:lensai/core/uuid.dart';
 import 'package:lensai/features/topics/data/database/database.dart';
+import 'package:lensai/features/topics/data/models/topic_data.dart';
 
 part 'topic.g.dart';
 

@@ -1,59 +1,179 @@
-import 'dart:collection';
-
+import 'package:copy_with_extension/copy_with_extension.dart';
+import 'package:drift/drift.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/core/logger.dart';
+import 'package:lensai/features/topics/data/providers.dart';
+import 'package:lensai/features/topics/domain/providers.dart';
+import 'package:lensai/features/topics/domain/repositories/tab.dart';
 import 'package:lensai/features/web_view/domain/entities/consistent_controller.dart';
-import 'package:lensai/features/web_view/presentation/controllers/readerability.dart';
-import 'package:lensai/features/web_view/presentation/widgets/web_view.dart';
+import 'package:lensai/features/web_view/domain/entities/web_view_page.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'web_view.g.dart';
 
-@Riverpod(keepAlive: true)
+abstract class _TabStateCopyProxy {
+  Future<void> copyWith({
+    InAppWebViewController? controller,
+    Uri? url,
+    SslError? sslError,
+    String? title,
+    String? topicId,
+    Favicon? favicon,
+    Uint8List? screenshot,
+    ({bool canGoBack, bool canGoForward})? pageHistory,
+  });
+}
+
+@Riverpod()
 class WebViewTabController extends _$WebViewTabController {
-  late Map<String, WebView> _webViewTabs;
+  String? _requestedTab;
 
   @override
-  WebView? build() {
-    _webViewTabs = ref.watch(webViewRepositoryProvider);
-    return (stateOrNull != null)
-        ? _webViewTabs[stateOrNull!.tabId] ?? _webViewTabs.values.lastOrNull
-        : null;
+  String? build() {
+    final webViewTabs = ref.watch(
+      tabRepositoryProvider.select(
+        (value) => value.value ?? [],
+      ),
+    );
+
+    if (_requestedTab != null) {
+      if (webViewTabs.any((tab) => tab.id == _requestedTab)) {
+        return _requestedTab;
+      } else if (webViewTabs.isNotEmpty) {
+        final topic = ref.read(selectedTopicProvider);
+        return webViewTabs.where((tab) => tab.topicId == topic).lastOrNull?.id;
+      }
+    }
+
+    return null;
   }
 
   void showTab(String? id) {
-    state = (id != null) ? _webViewTabs[id] : null;
+    _requestedTab = id;
+    ref.invalidateSelf();
   }
 }
 
-@Riverpod(keepAlive: true)
-class WebViewRepository extends _$WebViewRepository {
+@Riverpod()
+class TabState extends _$TabState implements _TabStateCopyProxy {
+  KeepAliveLink? _aliveLink;
+
   @override
-  Map<String, WebView> build() {
-    return stateOrNull ?? {};
+  WebViewPage? build(String tabId) {
+    final tabAsync = ref.watch(tabDataProvider(tabId));
+
+    if (tabAsync.hasValue) {
+      final tab = tabAsync.valueOrNull;
+
+      final current = stateOrNull ??
+          WebViewPage.create(
+            id: tabId,
+            url: tab?.url ?? Uri.https('localhost'),
+          );
+
+      if (tab != null) {
+        _aliveLink ??= ref.keepAlive();
+
+        return current.copyWith(
+          topicId: tab.topicId,
+          url: tab.url,
+          title: tab.title,
+          screenshot: tab.screenshot,
+        );
+      } else {
+        _aliveLink?.close();
+        _aliveLink = null;
+
+        return current;
+      }
+    }
+
+    return null;
   }
 
-  void _disposeReaderability(String id) {
-    final controller = state[id]?.currentController;
-    if (controller != null) {
-      ref
-          .read(
-            readerabilityControllerProvider(ConsistentController(controller))
-                .notifier,
-          )
-          .dispose();
+  Future<void> updateScreenshot() async {
+    final screenshot = await state?.controller
+        ?.takeScreenshot(
+      screenshotConfiguration: ScreenshotConfiguration(
+        compressFormat: CompressFormat.JPEG,
+        quality: 20,
+      ),
+    )
+        .timeout(
+      const Duration(milliseconds: 1500),
+      onTimeout: () {
+        logger.w('Screenshot timed out');
+        return null;
+      },
+    );
+
+    await copyWith(screenshot: screenshot);
+  }
+
+  @override
+  Future<void> copyWith({
+    Object? controller = const $CopyWithPlaceholder(),
+    Object? url = const $CopyWithPlaceholder(),
+    Object? sslError = const $CopyWithPlaceholder(),
+    Object? title = const $CopyWithPlaceholder(),
+    Object? topicId = const $CopyWithPlaceholder(),
+    Object? favicon = const $CopyWithPlaceholder(),
+    Object? screenshot = const $CopyWithPlaceholder(),
+    Object? pageHistory = const $CopyWithPlaceholder(),
+  }) async {
+    if (state != null) {
+      final current = state!;
+
+      state = WebViewPage(
+        id: current.id,
+        controller: controller == const $CopyWithPlaceholder()
+            ? current.controller
+            : controller as InAppWebViewController?,
+        url: current.url,
+        sslError: sslError == const $CopyWithPlaceholder()
+            ? current.sslError
+            : sslError as SslError?,
+        title: current.title,
+        topicId: current.topicId,
+        favicon: favicon == const $CopyWithPlaceholder()
+            ? current.favicon
+            : favicon as Favicon?,
+        screenshot: current.screenshot,
+        pageHistory:
+            pageHistory == const $CopyWithPlaceholder() || pageHistory == null
+                ? current.pageHistory
+                : pageHistory as ({bool canGoBack, bool canGoForward}),
+      );
+
+      await ref.read(tabRepositoryProvider.notifier).updateTab(
+            current.id,
+            url: url == const $CopyWithPlaceholder() || url == null
+                ? const Value.absent()
+                : Value(url as Uri),
+            title: title == const $CopyWithPlaceholder()
+                ? const Value.absent()
+                : Value(title as String?),
+            topicId: topicId == const $CopyWithPlaceholder()
+                ? const Value.absent()
+                : Value(topicId as String?),
+            screenshot: screenshot == const $CopyWithPlaceholder()
+                ? const Value.absent()
+                : Value(screenshot as Uint8List?),
+          );
     }
   }
+}
 
-  void addTab(WebView webView) {
-    state = {...state, webView.tabId: webView};
-  }
-
-  void closeTab(String id) {
-    _disposeReaderability(id);
-    state = Map.of(state)..remove(id);
-  }
-
-  void closeAllTabs() {
-    state.keys.forEach(_disposeReaderability);
-    state = {};
-  }
+@Riverpod()
+InAppWebViewController? webViewController(
+  WebViewControllerRef ref,
+  String tabId,
+) {
+  return ref
+      .watch(
+        tabStateProvider(tabId)
+            .select((value) => ConsistentController(value?.controller)),
+      )
+      .value;
 }

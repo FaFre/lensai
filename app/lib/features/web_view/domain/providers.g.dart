@@ -37,5 +37,19 @@ final readerabilityScriptProvider = FutureProvider<String>.internal(
 );
 
 typedef ReaderabilityScriptRef = FutureProviderRef<String>;
+String _$activeTabsHash() => r'd1ef2ae32d8707f7cc0902dd031e8302a63f50d4';
+
+/// See also [activeTabs].
+@ProviderFor(activeTabs)
+final activeTabsProvider = AutoDisposeProvider<List<String>>.internal(
+  activeTabs,
+  name: r'activeTabsProvider',
+  debugGetCreateSourceHash:
+      const bool.fromEnvironment('dart.vm.product') ? null : _$activeTabsHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef ActiveTabsRef = AutoDisposeProviderRef<List<String>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

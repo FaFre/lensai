@@ -15,46 +15,22 @@ import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
 import 'package:lensai/features/share_intent/domain/entities/shared_content.dart';
 import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
-import 'package:lensai/features/web_view/presentation/widgets/favicon.dart';
-import 'package:lensai/presentation/controllers/website_title.dart';
 import 'package:lensai/presentation/widgets/failure_widget.dart';
+import 'package:lensai/presentation/widgets/website_title_tile.dart';
 import 'package:lensai/utils/ui_helper.dart' as ui_helper;
 import 'package:lensai/utils/uri_parser.dart' as uri_parser;
 import 'package:share_plus/share_plus.dart';
 
-class LoadingWebPageDialog extends HookConsumerWidget {
-  final Uri url;
-
-  final void Function()? onDismiss;
-
-  const LoadingWebPageDialog(this.url, {this.onDismiss});
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final pageInfoAsync = ref.watch(pageInfoProvider(url));
-
-    return pageInfoAsync.when(
-      data: (pageInfo) => WebPageDialog(
-        page: pageInfo,
-        onDismiss: onDismiss,
-      ),
-      error: (error, stackTrace) => SizedBox.shrink(),
-      loading: () => ModalBarrier(
-        color: Theme.of(context).dialogTheme.barrierColor ?? Colors.black54,
-        onDismiss: onDismiss,
-      ),
-    );
-  }
-}
-
 class WebPageDialog extends HookConsumerWidget {
-  final WebPageInfo page;
+  final Uri url;
+  final WebPageInfo? precachedInfo;
   final InAppWebViewController? webViewController;
 
   final void Function()? onDismiss;
 
   const WebPageDialog({
-    required this.page,
+    required this.url,
+    this.precachedInfo,
     this.webViewController,
     this.onDismiss,
     super.key,
@@ -71,7 +47,7 @@ class WebPageDialog extends HookConsumerWidget {
     final availableBangsAsync = ref.watch(
       bangDataListProvider(
         filter: (
-          domain: page.url.host,
+          domain: url.host,
           groups: null,
           categoryFilter: null,
           orderMostFrequentFirst: true,
@@ -81,8 +57,7 @@ class WebPageDialog extends HookConsumerWidget {
     final availableBangCount = availableBangsAsync.valueOrNull?.length;
 
     final formKey = useMemoized(() => GlobalKey<FormState>());
-    final urlTextController =
-        useTextEditingController(text: page.url.toString());
+    final urlTextController = useTextEditingController(text: url.toString());
 
     return Stack(
       children: [
@@ -97,16 +72,7 @@ class WebPageDialog extends HookConsumerWidget {
             horizontal: 20.0,
             vertical: 24.0,
           ),
-          title: ListTile(
-            leading: FaviconImage(
-              favicon: page.favicon,
-              url: page.url,
-              size: 24,
-            ),
-            contentPadding: EdgeInsets.zero,
-            title: Text(page.title ?? 'Unknown Title'),
-            subtitle: Text(page.url.authority),
-          ),
+          title: WebsiteTitleTile(url, precachedInfo: precachedInfo),
           children: [
             SizedBox(
               //We need this to stretch the dialog, then padding from dialog is applied
@@ -164,7 +130,7 @@ class WebPageDialog extends HookConsumerWidget {
                   }
 
                   return SiteSearch(
-                    domain: page.url.host,
+                    domain: url.host,
                     availableBangs: availableBangs,
                   );
                 },
@@ -173,7 +139,7 @@ class WebPageDialog extends HookConsumerWidget {
                   exception: error,
                 ),
                 loading: () => SiteSearch(
-                  domain: page.url.host,
+                  domain: url.host,
                   availableBangs: [
                     BangData(
                       websiteName: 'websiteName',
@@ -194,14 +160,14 @@ class WebPageDialog extends HookConsumerWidget {
               title: const Text('Copy address'),
               onTap: () async {
                 await Clipboard.setData(
-                  ClipboardData(text: page.url.toString()),
+                  ClipboardData(text: url.toString()),
                 );
                 onDismiss?.call();
               },
             ),
             ListTile(
               onTap: () async {
-                await ui_helper.launchUrlFeedback(context, page.url);
+                await ui_helper.launchUrlFeedback(context, url);
               },
               leading: const Icon(Icons.open_in_browser),
               title: const Text('Launch External'),
@@ -212,7 +178,7 @@ class WebPageDialog extends HookConsumerWidget {
               onTap: () async {
                 await ref
                     .read(switchNewTabControllerProvider.notifier)
-                    .add(page.url);
+                    .add(url);
 
                 onDismiss?.call();
               },
@@ -221,7 +187,7 @@ class WebPageDialog extends HookConsumerWidget {
               leading: const Icon(Icons.share),
               title: const Text('Share link'),
               onTap: () async {
-                await Share.shareUri(page.url);
+                await Share.shareUri(url);
 
                 onDismiss?.call();
               },
@@ -231,14 +197,14 @@ class WebPageDialog extends HookConsumerWidget {
               leading: Icon(KagiTool.summarizer.icon),
               title: const Text('Summarize'),
               onTap: () async {
-                final url = uri_builder.summarizerUri(
-                  document: SharedUrl(page.url),
+                final summarizerUrl = uri_builder.summarizerUri(
+                  document: SharedUrl(url),
                   mode: SummarizerMode.keyMoments,
                 );
 
                 await ref
                     .read(switchNewTabControllerProvider.notifier)
-                    .add(url);
+                    .add(summarizerUrl);
 
                 onDismiss?.call();
               },

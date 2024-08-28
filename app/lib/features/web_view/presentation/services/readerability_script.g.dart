@@ -7,7 +7,7 @@ part of 'readerability_script.dart';
 // **************************************************************************
 
 String _$readerabilityScriptServiceHash() =>
-    r'bb38e2934ed124502b70faed11b6921c40d0eec2';
+    r'85f0de50516cadb1f2d1efa8161a8cf45868b9d9';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -32,10 +32,10 @@ class _SystemHash {
 
 abstract class _$ReaderabilityScriptService
     extends BuildlessAutoDisposeAsyncNotifier<void> {
-  late final ConsistentController controller;
+  late final String tabId;
 
   FutureOr<void> build(
-    ConsistentController controller,
+    String tabId,
   );
 }
 
@@ -50,10 +50,10 @@ class ReaderabilityScriptServiceFamily extends Family<AsyncValue<void>> {
 
   /// See also [ReaderabilityScriptService].
   ReaderabilityScriptServiceProvider call(
-    ConsistentController controller,
+    String tabId,
   ) {
     return ReaderabilityScriptServiceProvider(
-      controller,
+      tabId,
     );
   }
 
@@ -62,7 +62,7 @@ class ReaderabilityScriptServiceFamily extends Family<AsyncValue<void>> {
     covariant ReaderabilityScriptServiceProvider provider,
   ) {
     return call(
-      provider.controller,
+      provider.tabId,
     );
   }
 
@@ -87,9 +87,9 @@ class ReaderabilityScriptServiceProvider
         void> {
   /// See also [ReaderabilityScriptService].
   ReaderabilityScriptServiceProvider(
-    ConsistentController controller,
+    String tabId,
   ) : this._internal(
-          () => ReaderabilityScriptService()..controller = controller,
+          () => ReaderabilityScriptService()..tabId = tabId,
           from: readerabilityScriptServiceProvider,
           name: r'readerabilityScriptServiceProvider',
           debugGetCreateSourceHash:
@@ -99,7 +99,7 @@ class ReaderabilityScriptServiceProvider
           dependencies: ReaderabilityScriptServiceFamily._dependencies,
           allTransitiveDependencies:
               ReaderabilityScriptServiceFamily._allTransitiveDependencies,
-          controller: controller,
+          tabId: tabId,
         );
 
   ReaderabilityScriptServiceProvider._internal(
@@ -109,17 +109,17 @@ class ReaderabilityScriptServiceProvider
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.controller,
+    required this.tabId,
   }) : super.internal();
 
-  final ConsistentController controller;
+  final String tabId;
 
   @override
   FutureOr<void> runNotifierBuild(
     covariant ReaderabilityScriptService notifier,
   ) {
     return notifier.build(
-      controller,
+      tabId,
     );
   }
 
@@ -128,13 +128,13 @@ class ReaderabilityScriptServiceProvider
     return ProviderOverride(
       origin: this,
       override: ReaderabilityScriptServiceProvider._internal(
-        () => create()..controller = controller,
+        () => create()..tabId = tabId,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        controller: controller,
+        tabId: tabId,
       ),
     );
   }
@@ -147,14 +147,13 @@ class ReaderabilityScriptServiceProvider
 
   @override
   bool operator ==(Object other) {
-    return other is ReaderabilityScriptServiceProvider &&
-        other.controller == controller;
+    return other is ReaderabilityScriptServiceProvider && other.tabId == tabId;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, controller.hashCode);
+    hash = _SystemHash.combine(hash, tabId.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -162,8 +161,8 @@ class ReaderabilityScriptServiceProvider
 
 mixin ReaderabilityScriptServiceRef
     on AutoDisposeAsyncNotifierProviderRef<void> {
-  /// The parameter `controller` of this provider.
-  ConsistentController get controller;
+  /// The parameter `tabId` of this provider.
+  String get tabId;
 }
 
 class _ReaderabilityScriptServiceProviderElement
@@ -172,8 +171,7 @@ class _ReaderabilityScriptServiceProviderElement
   _ReaderabilityScriptServiceProviderElement(super.provider);
 
   @override
-  ConsistentController get controller =>
-      (origin as ReaderabilityScriptServiceProvider).controller;
+  String get tabId => (origin as ReaderabilityScriptServiceProvider).tabId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
+import 'package:lensai/features/web_view/domain/providers.dart';
 
 class TabsActionButton extends HookConsumerWidget {
   final bool isActive;
@@ -17,7 +17,7 @@ class TabsActionButton extends HookConsumerWidget {
     final theme = Theme.of(context);
 
     final tabCount =
-        ref.watch(webViewRepositoryProvider.select((tabs) => tabs.length));
+        ref.watch(activeTabsProvider.select((tabs) => tabs.length));
 
     return InkWell(
       onTap: onTap,

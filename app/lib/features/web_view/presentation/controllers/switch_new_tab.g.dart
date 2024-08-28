@@ -7,12 +7,12 @@ part of 'switch_new_tab.dart';
 // **************************************************************************
 
 String _$switchNewTabControllerHash() =>
-    r'fb831015e4b99d3ae86bd2a88a3c6f4c7004783d';
+    r'7ebfea953aeb81c279ea11254ff0ad558e6a949f';
 
 /// See also [SwitchNewTabController].
 @ProviderFor(SwitchNewTabController)
 final switchNewTabControllerProvider =
-    AutoDisposeAsyncNotifierProvider<SwitchNewTabController, void>.internal(
+    AsyncNotifierProvider<SwitchNewTabController, void>.internal(
   SwitchNewTabController.new,
   name: r'switchNewTabControllerProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
@@ -22,6 +22,6 @@ final switchNewTabControllerProvider =
   allTransitiveDependencies: null,
 );
 
-typedef _$SwitchNewTabController = AutoDisposeAsyncNotifier<void>;
+typedef _$SwitchNewTabController = AsyncNotifier<void>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

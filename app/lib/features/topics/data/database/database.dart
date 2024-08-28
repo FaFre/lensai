@@ -5,6 +5,7 @@ import 'package:lensai/features/topics/data/database/daos/tab.dart';
 import 'package:lensai/features/topics/data/database/daos/topic.dart';
 import 'package:lensai/features/topics/data/database/drift/converters/color.dart';
 import 'package:lensai/features/topics/data/database/drift/converters/uri.dart';
+import 'package:lensai/features/topics/data/models/topic_data.dart';
 
 part 'database.g.dart';
 

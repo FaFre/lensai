@@ -1,5 +1,5 @@
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:lensai/features/web_view/domain/entities/consistent_controller.dart';
+import 'package:lensai/features/topics/data/providers.dart';
+import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:lensai/features/web_view/presentation/services/readerability_script.dart';
 import 'package:riverpod/riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -8,18 +8,24 @@ part 'readerability.g.dart';
 
 @Riverpod()
 class ReaderabilityController extends _$ReaderabilityController {
-  late InAppWebViewController? _controller;
   late ReaderabilityScriptService _service;
   late KeepAliveLink _aliveLink;
 
   @override
   AsyncValue<({bool readerable, bool applied})> build(
-    ConsistentController controller,
+    String tabId,
   ) {
-    _controller = controller.value;
-    _service =
-        ref.watch(readerabilityScriptServiceProvider(controller).notifier);
+    _service = ref.watch(readerabilityScriptServiceProvider(tabId).notifier);
     _aliveLink = ref.keepAlive();
+
+    ref.listen(
+      isTabExistingProvider(tabId),
+      (previous, next) {
+        if (next.valueOrNull == false) {
+          _aliveLink.close();
+        }
+      },
+    );
 
     return const AsyncLoading();
   }
@@ -43,7 +49,7 @@ class ReaderabilityController extends _$ReaderabilityController {
     state = const AsyncLoading();
     state = await AsyncValue.guard(() async {
       if (applied) {
-        await _controller?.reload();
+        await ref.read(webViewControllerProvider(tabId))?.reload();
       } else {
         await _service.applyReaderable();
       }
@@ -54,9 +60,5 @@ class ReaderabilityController extends _$ReaderabilityController {
 
   void reset() {
     state = const AsyncLoading();
-  }
-
-  void dispose() {
-    _aliveLink.close();
   }
 }

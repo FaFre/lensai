@@ -1,15 +1,21 @@
 import 'dart:async';
 
+import 'package:fading_scroll/fading_scroll.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/features/search_browser/domain/providers.dart';
+import 'package:lensai/features/search_browser/presentation/dialogs/tab_action.dart';
+import 'package:lensai/features/topics/domain/providers.dart';
+import 'package:lensai/features/topics/domain/repositories/tab.dart';
 import 'package:lensai/features/topics/presentation/widgets/topic_chips.dart';
-import 'package:lensai/features/web_view/domain/entities/abstract/tab.dart';
 import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:lensai/features/web_view/presentation/widgets/web_view_tab.dart';
 
 class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
+  static const _headerSize = 104.0;
+
   final VoidCallback onClose;
 
   _SliverHeaderDelagate({required this.onClose});
@@ -43,10 +49,12 @@ class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
                       label: const Text('New Tab'),
                     ),
                     TextButton.icon(
-                      onPressed: () {
-                        ref
-                            .read(webViewRepositoryProvider.notifier)
+                      onPressed: () async {
+                        final topic = ref.read(selectedTopicProvider);
+                        await ref
+                            .read(topicTabRepositoryProvider(topic).notifier)
                             .closeAllTabs();
+
                         onClose();
                       },
                       icon: const Icon(Icons.delete),
@@ -55,6 +63,7 @@ class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
                   ],
                 ),
                 TopicChips(),
+                const SizedBox(height: 8),
               ],
             ),
           );
@@ -64,10 +73,10 @@ class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
   }
 
   @override
-  double get minExtent => 96;
+  double get minExtent => _headerSize;
 
   @override
-  double get maxExtent => 96;
+  double get maxExtent => _headerSize;
 
   @override
   bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
@@ -105,90 +114,135 @@ class ViewTabsSheet extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return CustomScrollView(
+    return FadingScroll(
+      fadingSize: 25,
+      shaderPadding:
+          const EdgeInsets.only(top: _SliverHeaderDelagate._headerSize),
       controller: sheetScrollController,
-      slivers: [
-        SliverPersistentHeader(
-          pinned: true,
-          delegate: _SliverHeaderDelagate(onClose: onClose),
-        ),
-        HookConsumer(
-          builder: (context, ref, child) {
-            final tabs = ref.watch(
-              webViewRepositoryProvider.select((tabs) => tabs.values.toList()),
-            );
-            final activeTab = ref.watch(
-              webViewTabControllerProvider.select(
-                (webView) => webView?.tabId,
-              ),
-            );
+      builder: (context, controller) {
+        return CustomScrollView(
+          controller: controller,
+          slivers: [
+            SliverPersistentHeader(
+              pinned: true,
+              delegate: _SliverHeaderDelagate(onClose: onClose),
+            ),
+            HookConsumer(
+              builder: (context, ref, child) {
+                final topic = ref.watch(selectedTopicProvider);
+                final availableTabs = ref.watch(
+                  topicTabRepositoryProvider(topic)
+                      .select((value) => value.valueOrNull ?? []),
+                );
+                final activeTab = ref.watch(webViewTabControllerProvider);
 
-            final itemHeight = useMemoized(
-              () => _calculateItemHeight(
-                screenWidth: MediaQuery.of(context).size.width,
-                childAspectRatio: 0.75,
-                horizontalPadding: 4.0,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                crossAxisCount: 2,
-              ),
-              [MediaQuery.of(context).size.width],
-            );
+                final itemHeight = useMemoized(
+                  () => _calculateItemHeight(
+                    screenWidth: MediaQuery.of(context).size.width,
+                    childAspectRatio: 0.75,
+                    horizontalPadding: 4.0,
+                    mainAxisSpacing: 8.0,
+                    crossAxisSpacing: 8.0,
+                    crossAxisCount: 2,
+                  ),
+                  [MediaQuery.of(context).size.width],
+                );
 
-            useEffect(
-              () {
-                final index =
-                    tabs.indexWhere((webView) => webView.tabId == activeTab);
+                useEffect(
+                  () {
+                    final index = availableTabs
+                        .indexWhere((webView) => webView == activeTab);
 
-                if (index > -1) {
-                  final reversedIndex = tabs.length - 1 - index;
-                  final offset = (reversedIndex ~/ 2) * itemHeight;
+                    if (index > -1) {
+                      final reversedIndex = availableTabs.length - 1 - index;
+                      final offset = (reversedIndex ~/ 2) * itemHeight;
 
-                  if (offset != sheetScrollController.offset) {
-                    unawaited(
-                      sheetScrollController.animateTo(
-                        offset,
-                        duration: const Duration(milliseconds: 200),
-                        curve: Curves.easeInOut,
-                      ),
-                    );
-                  }
-                }
+                      if (offset != controller.offset) {
+                        unawaited(
+                          controller.animateTo(
+                            offset,
+                            duration: const Duration(milliseconds: 200),
+                            curve: Curves.easeInOut,
+                          ),
+                        );
+                      }
+                    }
 
-                return null;
+                    return null;
+                  },
+                  [],
+                );
+
+                return SliverPadding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                  sliver: SliverGrid.count(
+                    //Sync values for itemHeight calculation _calculateItemHeight
+                    childAspectRatio: 0.75,
+                    mainAxisSpacing: 8.0,
+                    crossAxisSpacing: 8.0,
+                    crossAxisCount: 2,
+                    children: availableTabs.reversed
+                        .map(
+                          (tabId) => Consumer(
+                            key: ValueKey(tabId),
+                            builder: (context, ref, child) {
+                              final tab = ref.watch(tabStateProvider(tabId));
+
+                              return (tab != null)
+                                  ? WebViewTab(
+                                      tab: tab,
+                                      isActive: tabId == activeTab,
+                                      onTap: () {
+                                        if (tabId != activeTab) {
+                                          //Close first to avoid rebuilds
+                                          onClose();
+                                          ref
+                                              .read(
+                                                webViewTabControllerProvider
+                                                    .notifier,
+                                              )
+                                              .showTab(tab.id);
+                                        } else {
+                                          onClose();
+                                        }
+                                      },
+                                      onLongPress: () {
+                                        ref
+                                            .read(
+                                              overlayDialogProvider.notifier,
+                                            )
+                                            .show(
+                                              TabActionDialog(
+                                                initialTab: tab,
+                                                onDismiss: ref
+                                                    .read(
+                                                      overlayDialogProvider
+                                                          .notifier,
+                                                    )
+                                                    .dismiss,
+                                              ),
+                                            );
+                                      },
+                                      onDelete: () async {
+                                        await ref
+                                            .read(
+                                              tabRepositoryProvider.notifier,
+                                            )
+                                            .deleteTab(tab.id);
+                                      },
+                                    )
+                                  : const SizedBox.shrink();
+                            },
+                          ),
+                        )
+                        .toList(),
+                  ),
+                );
               },
-              [],
-            );
-
-            return SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              sliver: SliverGrid.count(
-                //Sync values for itemHeight calculation _calculateItemHeight
-                childAspectRatio: 0.75,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                crossAxisCount: 2,
-                children: tabs.reversed
-                    .map(
-                      (webView) => HookBuilder(
-                        key: ValueKey(webView.tabId),
-                        builder: (context) {
-                          final tab = useValueListenable(webView.page) as ITab;
-
-                          return WebViewTab(
-                            tab: tab,
-                            isActive: webView.tabId == activeTab,
-                            onClose: onClose,
-                          );
-                        },
-                      ),
-                    )
-                    .toList(),
-              ),
-            );
-          },
-        ),
-      ],
+            ),
+          ],
+        );
+      },
     );
   }
 }

@@ -7,7 +7,7 @@ part of 'readerability.dart';
 // **************************************************************************
 
 String _$readerabilityControllerHash() =>
-    r'1237e57abce82f71dbc66b6ab46f50dad9e3ddf9';
+    r'a1c8da3a9cf48300089e390a4fcae89862a6ec1a';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -32,10 +32,10 @@ class _SystemHash {
 
 abstract class _$ReaderabilityController extends BuildlessAutoDisposeNotifier<
     AsyncValue<({bool readerable, bool applied})>> {
-  late final ConsistentController controller;
+  late final String tabId;
 
   AsyncValue<({bool readerable, bool applied})> build(
-    ConsistentController controller,
+    String tabId,
   );
 }
 
@@ -51,10 +51,10 @@ class ReaderabilityControllerFamily
 
   /// See also [ReaderabilityController].
   ReaderabilityControllerProvider call(
-    ConsistentController controller,
+    String tabId,
   ) {
     return ReaderabilityControllerProvider(
-      controller,
+      tabId,
     );
   }
 
@@ -63,7 +63,7 @@ class ReaderabilityControllerFamily
     covariant ReaderabilityControllerProvider provider,
   ) {
     return call(
-      provider.controller,
+      provider.tabId,
     );
   }
 
@@ -87,9 +87,9 @@ class ReaderabilityControllerProvider extends AutoDisposeNotifierProviderImpl<
     ReaderabilityController, AsyncValue<({bool readerable, bool applied})>> {
   /// See also [ReaderabilityController].
   ReaderabilityControllerProvider(
-    ConsistentController controller,
+    String tabId,
   ) : this._internal(
-          () => ReaderabilityController()..controller = controller,
+          () => ReaderabilityController()..tabId = tabId,
           from: readerabilityControllerProvider,
           name: r'readerabilityControllerProvider',
           debugGetCreateSourceHash:
@@ -99,7 +99,7 @@ class ReaderabilityControllerProvider extends AutoDisposeNotifierProviderImpl<
           dependencies: ReaderabilityControllerFamily._dependencies,
           allTransitiveDependencies:
               ReaderabilityControllerFamily._allTransitiveDependencies,
-          controller: controller,
+          tabId: tabId,
         );
 
   ReaderabilityControllerProvider._internal(
@@ -109,17 +109,17 @@ class ReaderabilityControllerProvider extends AutoDisposeNotifierProviderImpl<
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.controller,
+    required this.tabId,
   }) : super.internal();
 
-  final ConsistentController controller;
+  final String tabId;
 
   @override
   AsyncValue<({bool readerable, bool applied})> runNotifierBuild(
     covariant ReaderabilityController notifier,
   ) {
     return notifier.build(
-      controller,
+      tabId,
     );
   }
 
@@ -128,13 +128,13 @@ class ReaderabilityControllerProvider extends AutoDisposeNotifierProviderImpl<
     return ProviderOverride(
       origin: this,
       override: ReaderabilityControllerProvider._internal(
-        () => create()..controller = controller,
+        () => create()..tabId = tabId,
         from: from,
         name: null,
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        controller: controller,
+        tabId: tabId,
       ),
     );
   }
@@ -147,14 +147,13 @@ class ReaderabilityControllerProvider extends AutoDisposeNotifierProviderImpl<
 
   @override
   bool operator ==(Object other) {
-    return other is ReaderabilityControllerProvider &&
-        other.controller == controller;
+    return other is ReaderabilityControllerProvider && other.tabId == tabId;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, controller.hashCode);
+    hash = _SystemHash.combine(hash, tabId.hashCode);
 
     return _SystemHash.finish(hash);
   }
@@ -162,8 +161,8 @@ class ReaderabilityControllerProvider extends AutoDisposeNotifierProviderImpl<
 
 mixin ReaderabilityControllerRef on AutoDisposeNotifierProviderRef<
     AsyncValue<({bool readerable, bool applied})>> {
-  /// The parameter `controller` of this provider.
-  ConsistentController get controller;
+  /// The parameter `tabId` of this provider.
+  String get tabId;
 }
 
 class _ReaderabilityControllerProviderElement
@@ -173,8 +172,7 @@ class _ReaderabilityControllerProviderElement
   _ReaderabilityControllerProviderElement(super.provider);
 
   @override
-  ConsistentController get controller =>
-      (origin as ReaderabilityControllerProvider).controller;
+  String get tabId => (origin as ReaderabilityControllerProvider).tabId;
 }
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member
