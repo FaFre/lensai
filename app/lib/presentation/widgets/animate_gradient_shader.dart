@@ -91,8 +91,8 @@ class AnimateGradientShader extends StatefulWidget {
 
 class _AnimateGradientShaderState extends State<AnimateGradientShader>
     with TickerProviderStateMixin {
-  late Animation<double> _animation;
-  late AnimationController _controller;
+  AnimationController? _controller;
+  Animation<double>? _animation;
 
   late List<ColorTween> _colorTween;
 
@@ -123,17 +123,21 @@ class _AnimateGradientShaderState extends State<AnimateGradientShader>
 
   @override
   Widget build(BuildContext context) {
+    if (_animation == null) {
+      return const SizedBox.shrink();
+    }
+
     return AnimatedBuilder(
-      animation: _animation,
+      animation: _animation!,
       builder: (BuildContext context, Widget? child) {
         final gradient = LinearGradient(
           begin: widget.animateAlignments
-              ? begin.evaluate(_animation)
+              ? begin.evaluate(_animation!)
               : widget.primaryBegin,
           end: widget.animateAlignments
-              ? end.evaluate(_animation)
+              ? end.evaluate(_animation!)
               : widget.primaryEnd,
-          colors: _evaluateColors(_animation),
+          colors: _evaluateColors(_animation!),
         );
 
         return ShaderMask(
@@ -199,21 +203,23 @@ class _AnimateGradientShaderState extends State<AnimateGradientShader>
   }
 
   void _setAnimations() {
-    _controller = widget.controller ??
+    _controller?.dispose();
+    _controller = (widget.controller ??
         AnimationController(
           vsync: this,
           duration: widget.duration,
-        )
+        ))
       ..repeat(reverse: widget.reverse);
+
     _animation = CurvedAnimation(
-      parent: _controller,
+      parent: _controller!,
       curve: Curves.easeInOut,
     );
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    _controller?.dispose();
     super.dispose();
   }
 }
