@@ -1,17 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:lensai/features/web_view/domain/entities/web_view_page.dart';
 import 'package:lensai/features/web_view/presentation/widgets/favicon.dart';
-import 'package:lensai/features/web_view/presentation/widgets/web_view.dart';
 import 'package:text_scroll/text_scroll.dart';
 
-class AppBarTitle extends HookWidget {
-  final WebView activeWebView;
+class AppBarTitle extends StatelessWidget {
+  final WebViewPage page;
 
   final void Function()? onTap;
 
-  const AppBarTitle({required this.activeWebView, this.onTap, super.key});
+  const AppBarTitle({required this.page, this.onTap, super.key});
 
   Icon _securityStatusIcon(BuildContext context, WebViewPage page) {
     if (page.url.isScheme('http')) {
@@ -36,8 +34,6 @@ class AppBarTitle extends HookWidget {
 
   @override
   Widget build(BuildContext context) {
-    final page = useValueListenable(activeWebView.page);
-
     final theme = Theme.of(context);
     return GestureDetector(
       onTap: onTap,

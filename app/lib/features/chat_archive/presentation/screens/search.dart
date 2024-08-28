@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:fading_scroll/fading_scroll.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_markdown/flutter_markdown.dart';
@@ -60,43 +61,52 @@ class ChatArchiveSearchScreen extends HookConsumerWidget {
       ),
       body: resultsAsync.when(
         skipLoadingOnReload: true,
-        data: (chats) => ListView.builder(
-          itemCount: chats.length,
-          itemBuilder: (context, index) {
-            final chat = chats[index];
-            final chatEntity = ChatEntity.fromFileName(chat.fileName);
+        data: (chats) => FadingScroll(
+          fadingSize: 25,
+          builder: (context, controller) {
+            return ListView.builder(
+              controller: controller,
+              itemCount: chats.length,
+              itemBuilder: (context, index) {
+                final chat = chats[index];
+                final chatEntity = ChatEntity.fromFileName(chat.fileName);
 
-            return Card(
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: () async {
-                  await context.push(
-                    ChatArchiveDetailRoute(fileName: chat.fileName).location,
-                  );
-                },
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Markdown(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        data: '## ${chat.title}',
+                return Card(
+                  clipBehavior: Clip.antiAlias,
+                  child: InkWell(
+                    onTap: () async {
+                      await context.push(
+                        ChatArchiveDetailRoute(fileName: chat.fileName)
+                            .location,
+                      );
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Markdown(
+                            shrinkWrap: true,
+                            padding: EdgeInsets.zero,
+                            data: '## ${chat.title}',
+                          ),
+                          if (chatEntity.dateTime != null)
+                            Text(
+                              chatEntity.dateTime!.formatWithMinutePrecision(),
+                            ),
+                          const SizedBox(height: 8.0),
+                          Markdown(
+                            shrinkWrap: true,
+                            padding: EdgeInsets.zero,
+                            data: chat.contentSnippet,
+                          ),
+                        ],
                       ),
-                      if (chatEntity.dateTime != null)
-                        Text(chatEntity.dateTime!.formatWithMinutePrecision()),
-                      const SizedBox(height: 8.0),
-                      Markdown(
-                        shrinkWrap: true,
-                        padding: EdgeInsets.zero,
-                        data: chat.contentSnippet,
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
+                );
+              },
             );
           },
         ),

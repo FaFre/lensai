@@ -22,7 +22,7 @@ final widgetPinnableProvider = FutureProvider<bool>.internal(
 
 typedef WidgetPinnableRef = FutureProviderRef<bool>;
 String _$appWidgetLaunchStreamHash() =>
-    r'1cda869c62e270be74efcb9b052bc498cfbd98a5';
+    r'8c5e21346d492f89f546b4e32135a283719e70e1';
 
 /// See also [appWidgetLaunchStream].
 @ProviderFor(appWidgetLaunchStream)

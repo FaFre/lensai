@@ -1,3 +1,4 @@
+import 'package:fading_scroll/fading_scroll.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -29,19 +30,26 @@ class ChatArchiveListScreen extends HookConsumerWidget {
         enabled: chatsAsync.isLoading,
         child: chatsAsync.when(
           data: (chats) {
-            return ListView.builder(
-              itemCount: chats.length,
-              itemBuilder: (context, index) {
-                final chat = chats[index];
+            return FadingScroll(
+              fadingSize: 25,
+              builder: (context, controller) {
+                return ListView.builder(
+                  controller: controller,
+                  itemCount: chats.length,
+                  itemBuilder: (context, index) {
+                    final chat = chats[index];
 
-                return ListTile(
-                  title: Text(chat.toString()),
-                  subtitle: (chat.dateTime != null)
-                      ? Text(chat.dateTime!.formatWithMinutePrecision())
-                      : null,
-                  onTap: () async {
-                    await context.push(
-                      ChatArchiveDetailRoute(fileName: chat.fileName).location,
+                    return ListTile(
+                      title: Text(chat.toString()),
+                      subtitle: (chat.dateTime != null)
+                          ? Text(chat.dateTime!.formatWithMinutePrecision())
+                          : null,
+                      onTap: () async {
+                        await context.push(
+                          ChatArchiveDetailRoute(fileName: chat.fileName)
+                              .location,
+                        );
+                      },
                     );
                   },
                 );

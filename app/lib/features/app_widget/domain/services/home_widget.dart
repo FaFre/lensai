@@ -10,7 +10,7 @@ FutureOr<bool> widgetPinnable(WidgetPinnableRef ref) async {
   return await HomeWidget.isRequestPinWidgetSupported() ?? false;
 }
 
-@riverpod
+@Riverpod()
 Raw<Stream<ReceivedParameter>> appWidgetLaunchStream(
   AppWidgetLaunchStreamRef ref,
 ) {

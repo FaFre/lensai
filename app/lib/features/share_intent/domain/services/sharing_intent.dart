@@ -47,7 +47,7 @@ final _sharingIntentTransformer =
   },
 );
 
-@riverpod
+@Riverpod()
 Raw<Stream<ReceivedParameter>> sharingIntentStream(SharingIntentStreamRef ref) {
   final initialStream = FlutterSharingIntent.instance
       // ignore: discarded_futures
