@@ -1,3 +1,8 @@
+## 0.7.0
+
+* Enhanced user interface for improved usability
+* Introduced "Topics," a new feature to save and organize browser tabs by subject
+
 ## 0.6.2
 
 * Implemented "Find in page" for web content

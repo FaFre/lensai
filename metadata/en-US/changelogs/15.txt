@@ -1,0 +1,2 @@
+* Enhanced user interface for improved usability
+* Introduced "Topics," a new feature to save and organize browser tabs by subject
