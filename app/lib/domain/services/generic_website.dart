@@ -4,7 +4,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:html/dom.dart';
 import 'package:html/parser.dart' as html_parser;
 import 'package:http/http.dart' as http;
-import 'package:lensai/core/http/http_error_handler.dart';
+import 'package:lensai/core/http/error_handler.dart';
 import 'package:lensai/domain/entities/web_page_info.dart';
 import 'package:lensai/extensions/web_uri_favicon.dart';
 import 'package:lensai/features/web_view/utils/favicon_helper.dart';
