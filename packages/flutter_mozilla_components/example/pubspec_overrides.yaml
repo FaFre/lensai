@@ -1,0 +1,4 @@
+# melos_managed_dependency_overrides: flutter_mozilla_components
+dependency_overrides:
+  flutter_mozilla_components:
+    path: ..

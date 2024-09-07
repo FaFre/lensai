@@ -1,0 +1,112 @@
+group = "eu.lensai.flutter_mozilla_components"
+version = "1.0-SNAPSHOT"
+
+buildscript {
+    ext.kotlin_version = "1.9.20"
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.6.0")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version")
+    }
+}
+
+rootProject.allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven {
+            url "https://maven.mozilla.org/maven2/"
+        }
+    }
+}
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+
+android {
+    if (project.android.hasProperty("namespace")) {
+        namespace = "eu.lensai.flutter_mozilla_components"
+    }
+
+    compileSdk = 35
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
+        jvmTarget = '17'
+    }
+
+    sourceSets {
+        main.java.srcDirs += "src/main/kotlin"
+        test.java.srcDirs += "src/test/kotlin"
+    }
+
+    defaultConfig {
+        minSdk = 21
+    }
+
+    buildFeatures {
+        viewBinding true
+    }
+
+    dependencies {
+        implementation 'org.mozilla.components:support-utils:131.0b1'
+        implementation 'org.mozilla.components:support-ktx:131.0b1'
+        implementation 'org.mozilla.components:support-webextensions:131.0b1'
+        implementation 'org.mozilla.components:support-locale:131.0b1'
+        implementation 'org.mozilla.components:lib-fetch-httpurlconnection:131.0b1'
+        implementation 'org.mozilla.components:lib-crash:131.0b1'
+        implementation 'org.mozilla.components:lib-publicsuffixlist:131.0b1'
+        implementation 'org.mozilla.components:lib-dataprotect:131.0b1'
+        implementation 'org.mozilla.components:concept-engine:131.0b1'
+        implementation 'org.mozilla.components:concept-fetch:131.0b1'
+        implementation 'org.mozilla.components:browser-engine-gecko:131.0b1'
+        implementation 'org.mozilla.components:browser-state:131.0b1'
+        implementation 'org.mozilla.components:browser-session-storage:131.0b1'
+        implementation 'org.mozilla.components:browser-icons:131.0b1'
+        //implementation 'org.mozilla.components:browser-storage-sync:131.0b1'
+        implementation 'org.mozilla.components:browser-thumbnails:131.0b1'
+        implementation 'org.mozilla.components:feature-addons:131.0b1'
+        implementation 'org.mozilla.components:feature-app-links:131.0b1'
+        implementation 'org.mozilla.components:feature-autofill:131.0b1'
+        implementation 'org.mozilla.components:feature-downloads:131.0b1'
+        implementation 'org.mozilla.components:feature-media:131.0b1'
+        implementation 'org.mozilla.components:feature-tabs:131.0b1'
+        implementation 'org.mozilla.components:feature-prompts:131.0b1'
+        implementation 'org.mozilla.components:feature-session:131.0b1'
+        implementation 'org.mozilla.components:feature-readerview:131.0b1'
+        implementation 'org.mozilla.components:feature-privatemode:131.0b1'
+        implementation 'org.mozilla.components:feature-sitepermissions:131.0b1'
+        implementation 'org.mozilla.components:feature-webcompat:131.0b1'
+        implementation 'org.mozilla.components:feature-webnotifications:131.0b1'
+        implementation 'org.mozilla.components:service-digitalassetlinks:131.0b1'
+        implementation 'org.mozilla.components:ui-widgets:131.0b1'
+
+        implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
+        implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+        implementation 'com.google.android.material:material:1.12.0'
+        //https://stackoverflow.com/questions/73782320/onbackinvokedcallback-is-not-enabled-for-the-application-in-set-androidenableo
+        implementation 'androidx.activity:activity:1.9.1'
+
+        testImplementation("org.jetbrains.kotlin:kotlin-test")
+        testImplementation("org.mockito:mockito-core:5.0.0")
+    }
+
+    testOptions {
+        unitTests.all {
+            useJUnitPlatform()
+
+            testLogging {
+               events "passed", "skipped", "failed", "standardOut", "standardError"
+               outputs.upToDateWhen {false}
+               showStandardStreams = true
+            }
+        }
+    }
+}
