@@ -1,0 +1,5 @@
+name: lensai_project
+
+packages:
+  - app/
+  - packages/**
