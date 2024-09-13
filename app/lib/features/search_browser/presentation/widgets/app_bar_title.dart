@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
-import 'package:lensai/features/web_view/domain/entities/web_view_page.dart';
-import 'package:lensai/features/web_view/presentation/widgets/favicon.dart';
+import 'package:lensai/features/geckoview/domain/entities/tab_state.dart';
 import 'package:text_scroll/text_scroll.dart';
 
 class AppBarTitle extends StatelessWidget {
-  final WebViewPage page;
+  final TabState tab;
 
   final void Function()? onTap;
 
-  const AppBarTitle({required this.page, this.onTap, super.key});
+  const AppBarTitle({required this.tab, this.onTap, super.key});
 
-  Icon _securityStatusIcon(BuildContext context, WebViewPage page) {
-    if (page.url.isScheme('http')) {
+  Icon _securityStatusIcon(BuildContext context) {
+    if (tab.url.isScheme('http')) {
       return Icon(
         MdiIcons.lockOff,
         color: Theme.of(context).colorScheme.error,
         size: 14,
       );
-    } else if (page.sslError != null) {
+    } else if (!tab.securityInfoState.secure) {
       return Icon(
         MdiIcons.lockAlert,
         color: Theme.of(context).colorScheme.errorContainer,
@@ -39,9 +38,10 @@ class AppBarTitle extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          FaviconImage(
-            favicon: page.favicon,
-            url: page.url,
+          RawImage(
+            image: tab.icon?.value,
+            height: 16,
+            width: 16,
           ),
           const SizedBox(
             width: 8,
@@ -52,8 +52,8 @@ class AppBarTitle extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextScroll(
-                  key: ValueKey(page.title),
-                  page.title ?? 'New Tab',
+                  key: ValueKey(tab.title),
+                  tab.title,
                   style: theme.textTheme.bodyLarge
                       ?.copyWith(color: theme.colorScheme.onSurface),
                   // mode: TextScrollMode.bouncing,
@@ -68,13 +68,13 @@ class AppBarTitle extends StatelessWidget {
                 ),
                 Row(
                   children: [
-                    _securityStatusIcon(context, page),
+                    _securityStatusIcon(context),
                     const SizedBox(
                       width: 4,
                     ),
                     Expanded(
                       child: Text(
-                        page.url.authority,
+                        tab.url.authority,
                         style: theme.textTheme.bodyMedium
                             ?.copyWith(color: theme.colorScheme.onSurface),
                       ),

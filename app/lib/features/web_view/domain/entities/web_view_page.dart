@@ -1,10 +1,9 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:fast_equatable/fast_equatable.dart';
 import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
 import 'package:lensai/core/uuid.dart';
-import 'package:lensai/domain/entities/web_page_info.dart';
-import 'package:lensai/features/web_view/domain/entities/abstract/tab.dart';
+import 'package:lensai/data/models/web_page_info.dart';
 
 part 'web_view_page.g.dart';
 

@@ -4,14 +4,10 @@ import 'package:fading_scroll/fading_scroll.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lensai/features/search_browser/domain/providers.dart';
+import 'package:lensai/features/geckoview/features/topics/domain/providers.dart';
+import 'package:lensai/features/geckoview/features/topics/domain/repositories/tab_link.dart';
+import 'package:lensai/features/geckoview/features/topics/presentation/widgets/topic_chips.dart';
 import 'package:lensai/features/search_browser/presentation/dialogs/tab_action.dart';
-import 'package:lensai/features/topics/domain/providers.dart';
-import 'package:lensai/features/topics/domain/repositories/tab.dart';
-import 'package:lensai/features/topics/presentation/widgets/topic_chips.dart';
-import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
-import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
-import 'package:lensai/features/web_view/presentation/widgets/web_view_tab.dart';
 
 class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
   static const _headerSize = 104.0;

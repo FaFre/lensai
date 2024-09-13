@@ -7,7 +7,6 @@ import 'package:lensai/features/bangs/domain/repositories/data.dart';
 import 'package:lensai/features/bangs/presentation/widgets/bang_icon.dart';
 import 'package:lensai/features/bangs/presentation/widgets/search_field.dart';
 import 'package:lensai/features/search_browser/domain/providers.dart';
-import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:lensai/presentation/widgets/selectable_chips.dart';
 
 class SiteSearch extends HookConsumerWidget {

@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoStateEvents
 import mozilla.components.browser.thumbnails.BrowserThumbnails
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.feature.media.fullscreen.MediaSessionFullscreenFeature

@@ -5,8 +5,8 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'package:lensai/features/content_block/domain/repositories/host.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
-import 'package:lensai/features/topics/domain/providers.dart';
-import 'package:lensai/features/topics/domain/repositories/tab.dart';
+import 'package:lensai/features/geckoview/features/topics/domain/providers.dart';
+import 'package:lensai/features/geckoview/features/topics/domain/repositories/tab_link.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:universal_io/io.dart';
 

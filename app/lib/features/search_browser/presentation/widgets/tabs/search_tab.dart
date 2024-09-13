@@ -9,6 +9,7 @@ import 'package:lensai/features/bangs/domain/repositories/data.dart';
 import 'package:lensai/features/bangs/presentation/widgets/bang_icon.dart';
 import 'package:lensai/features/bangs/presentation/widgets/search_field.dart';
 import 'package:lensai/features/search_browser/domain/providers.dart';
+import 'package:lensai/features/search_browser/presentation/controllers/bottom_sheet.dart';
 import 'package:lensai/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
 import 'package:lensai/features/share_intent/domain/entities/shared_content.dart';
 import 'package:lensai/presentation/widgets/selectable_chips.dart';

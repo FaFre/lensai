@@ -1,6 +1,7 @@
 package eu.lensai.flutter_mozilla_components
 
 import android.content.Context
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoStateEvents
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -28,8 +29,8 @@ object GlobalComponents {
             .whenSessionsChange()
     }
 
-    fun setUp(applicationContext: Context) {
-        val newComponents = Components(applicationContext)
+    fun setUp(applicationContext: Context, flutterEvents: GeckoStateEvents) {
+        val newComponents = Components(applicationContext, flutterEvents)
 
         newComponents.crashReporter.install(applicationContext)
         Facts.registerProcessor(LogFactProcessor())

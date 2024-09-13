@@ -2,7 +2,7 @@ import 'package:expandable_page_view/expandable_page_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/kagi/data/entities/modes.dart';
 import 'package:lensai/features/search_browser/domain/entities/sheet.dart';
 import 'package:lensai/features/search_browser/presentation/widgets/tabs/assistant_tab.dart';
 import 'package:lensai/features/search_browser/presentation/widgets/tabs/search_tab.dart';
@@ -15,7 +15,7 @@ import 'package:lensai/presentation/hooks/sync_page_tab.dart';
 typedef OnSubmitUri = void Function(Uri url);
 
 class SharedContentSheet extends HookConsumerWidget {
-  final CreateTab parameter;
+  final CreateTabSheet parameter;
   final OnSubmitUri onSubmit;
   final void Function(KagiTool tool)? onActiveToolChanged;
 

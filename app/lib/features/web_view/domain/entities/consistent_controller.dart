@@ -1,5 +1,3 @@
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-
 class ConsistentController {
   final InAppWebViewController? value;
 

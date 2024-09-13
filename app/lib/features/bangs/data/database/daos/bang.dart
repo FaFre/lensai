@@ -1,4 +1,7 @@
+import 'dart:ui';
+
 import 'package:drift/drift.dart';
+import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:lensai/features/bangs/data/database/database.dart';
 import 'package:lensai/features/bangs/data/models/bang.dart';
 import 'package:lensai/features/bangs/data/models/bang_data.dart';
@@ -94,14 +97,17 @@ class BangDao extends DatabaseAccessor<BangDatabase> with _$BangDaoMixin {
     return db.bangQuery(query: db.buildQuery(searchString));
   }
 
-  Future<int> upsertBangIcon(String trigger, Uint8List iconData) {
-    return db.bangIcon.insertOne(
-      BangIconCompanion.insert(
-        trigger: trigger,
-        iconData: iconData,
-        fetchDate: DateTime.now(),
-      ),
-      mode: InsertMode.insertOrReplace,
-    );
-  }
+  // Future<int> upsertBangIcon(String trigger, BrowserIcon icon) async {
+  //   //TODO: swithc to WEBP in future, requires 3rd party
+  //   final compressed = await icon.image.toByteData(format: ImageByteFormat.png);
+
+  //   return db.bangIcon.insertOne(
+  //     BangIconCompanion.insert(
+  //       trigger: trigger,
+  //       iconData: compressed!.buffer.asUint8List(),
+  //       fetchDate: DateTime.now(),
+  //     ),
+  //     mode: InsertMode.insertOrReplace,
+  //   );
+  // }
 }

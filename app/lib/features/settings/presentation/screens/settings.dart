@@ -8,7 +8,7 @@ import 'package:lensai/features/bangs/data/models/bang.dart';
 import 'package:lensai/features/bangs/domain/providers.dart';
 import 'package:lensai/features/bangs/domain/repositories/data.dart';
 import 'package:lensai/features/content_block/data/models/host.dart';
-import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/kagi/data/entities/modes.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
 import 'package:lensai/features/settings/presentation/controllers/save_settings.dart';

@@ -8,7 +8,6 @@ import 'package:lensai/features/bangs/data/database/database.dart';
 import 'package:lensai/features/bangs/data/models/bang.dart';
 import 'package:lensai/features/bangs/data/models/bang_data.dart';
 import 'package:lensai/features/bangs/data/providers.dart';
-import 'package:lensai/utils/image_helper.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'data.g.dart';
@@ -69,24 +68,16 @@ class BangDataRepository extends _$BangDataRepository {
   }
 
   Future<Result<BangData>> ensureIconAvailable(BangData bang) async {
-    if (bang.iconData != null) {
+    if (bang.icon != null) {
       return Result.success(bang);
     }
 
-    final result = await ref
+    final icon = await ref
         .read(genericWebsiteServiceProvider.notifier)
-        .getFaviconBytes(Uri.parse(bang.getUrl('').origin));
+        .getUrlFavicon(url: Uri.parse(bang.getUrl('').origin));
 
-    return result.flatMapAsync(
-      (faviconBytes) async {
-        if (faviconBytes != null && await isImageValid(faviconBytes)) {
-          await _db.bangDao.upsertBangIcon(bang.trigger, faviconBytes);
-          return bang.copyWith.iconData(faviconBytes);
-        }
-
-        return bang;
-      },
-    );
+    // await _db.bangDao.upsertBangIcon(bang.trigger, icon);
+    return Result.success(bang.copyWith.icon(icon));
   }
 
   Stream<double> watchIconCacheSize() {

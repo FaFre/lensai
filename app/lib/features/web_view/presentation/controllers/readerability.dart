@@ -1,4 +1,4 @@
-import 'package:lensai/features/topics/data/providers.dart';
+import 'package:lensai/features/geckoview/features/topics/data/providers.dart';
 import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:lensai/features/web_view/presentation/services/readerability_script.dart';
 import 'package:riverpod/riverpod.dart';

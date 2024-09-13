@@ -7,17 +7,17 @@ part of 'web_view_page.dart';
 // **************************************************************************
 
 abstract class _$WebViewPageCWProxy {
-  WebViewPage controller(InAppWebViewController? controller);
+  WebViewPage controller(InvalidType controller);
 
   WebViewPage url(Uri url);
 
-  WebViewPage sslError(SslError? sslError);
+  WebViewPage sslError(InvalidType sslError);
 
   WebViewPage title(String? title);
 
   WebViewPage topicId(String? topicId);
 
-  WebViewPage favicon(Favicon? favicon);
+  WebViewPage favicon(BrowserIcon? favicon);
 
   WebViewPage screenshot(Uint8List? screenshot);
 
@@ -30,12 +30,12 @@ abstract class _$WebViewPageCWProxy {
   /// WebViewPage(...).copyWith(id: 12, name: "My name")
   /// ````
   WebViewPage call({
-    InAppWebViewController? controller,
+    InvalidType? controller,
     Uri? url,
-    SslError? sslError,
+    InvalidType? sslError,
     String? title,
     String? topicId,
-    Favicon? favicon,
+    BrowserIcon? favicon,
     Uint8List? screenshot,
     ({bool canGoBack, bool canGoForward})? pageHistory,
   });
@@ -48,14 +48,14 @@ class _$WebViewPageCWProxyImpl implements _$WebViewPageCWProxy {
   final WebViewPage _value;
 
   @override
-  WebViewPage controller(InAppWebViewController? controller) =>
+  WebViewPage controller(InvalidType controller) =>
       this(controller: controller);
 
   @override
   WebViewPage url(Uri url) => this(url: url);
 
   @override
-  WebViewPage sslError(SslError? sslError) => this(sslError: sslError);
+  WebViewPage sslError(InvalidType sslError) => this(sslError: sslError);
 
   @override
   WebViewPage title(String? title) => this(title: title);
@@ -64,7 +64,7 @@ class _$WebViewPageCWProxyImpl implements _$WebViewPageCWProxy {
   WebViewPage topicId(String? topicId) => this(topicId: topicId);
 
   @override
-  WebViewPage favicon(Favicon? favicon) => this(favicon: favicon);
+  WebViewPage favicon(BrowserIcon? favicon) => this(favicon: favicon);
 
   @override
   WebViewPage screenshot(Uint8List? screenshot) => this(screenshot: screenshot);
@@ -93,18 +93,19 @@ class _$WebViewPageCWProxyImpl implements _$WebViewPageCWProxy {
   }) {
     return WebViewPage(
       id: _value.id,
-      controller: controller == const $CopyWithPlaceholder()
-          ? _value.controller
-          // ignore: cast_nullable_to_non_nullable
-          : controller as InAppWebViewController?,
+      controller:
+          controller == const $CopyWithPlaceholder() || controller == null
+              ? _value.controller
+              // ignore: cast_nullable_to_non_nullable
+              : controller as InvalidType,
       url: url == const $CopyWithPlaceholder() || url == null
           ? _value.url
           // ignore: cast_nullable_to_non_nullable
           : url as Uri,
-      sslError: sslError == const $CopyWithPlaceholder()
+      sslError: sslError == const $CopyWithPlaceholder() || sslError == null
           ? _value.sslError
           // ignore: cast_nullable_to_non_nullable
-          : sslError as SslError?,
+          : sslError as InvalidType,
       title: title == const $CopyWithPlaceholder()
           ? _value.title
           // ignore: cast_nullable_to_non_nullable
@@ -116,7 +117,7 @@ class _$WebViewPageCWProxyImpl implements _$WebViewPageCWProxy {
       favicon: favicon == const $CopyWithPlaceholder()
           ? _value.favicon
           // ignore: cast_nullable_to_non_nullable
-          : favicon as Favicon?,
+          : favicon as BrowserIcon?,
       screenshot: screenshot == const $CopyWithPlaceholder()
           ? _value.screenshot
           // ignore: cast_nullable_to_non_nullable

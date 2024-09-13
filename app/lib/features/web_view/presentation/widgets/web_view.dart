@@ -3,14 +3,14 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/core/logger.dart';
 import 'package:lensai/domain/services/generic_website.dart';
 import 'package:lensai/features/bangs/domain/providers.dart';
 import 'package:lensai/features/chat_archive/domain/entities/chat_entity.dart';
 import 'package:lensai/features/chat_archive/domain/repositories/archive.dart';
-import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/kagi/data/entities/modes.dart';
 import 'package:lensai/features/search_browser/domain/entities/sheet.dart';
 import 'package:lensai/features/search_browser/domain/providers.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
@@ -243,7 +243,7 @@ class _WebViewState extends ConsumerState<WebView> {
 
                     if (selectedText != null && selectedText.isNotEmpty) {
                       ref.read(bottomSheetProvider.notifier).show(
-                            CreateTab(
+                            CreateTabSheet(
                               content: selectedText,
                               preferredTool: KagiTool.assistant,
                             ),

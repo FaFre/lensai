@@ -20,18 +20,12 @@ class BangIcon extends HookConsumerWidget {
       enabled: bangAsync.isLoading,
       child: SizedBox.square(
         dimension: iconSize,
-        child: (bang.iconData != null)
-            ? Image.memory(
-                bang.iconData!,
+        child: (bang.icon != null)
+            ? RawImage(
+                image: bang.icon?.image.value,
                 height: iconSize,
                 width: iconSize,
                 fit: BoxFit.fill,
-                errorBuilder: (context, error, stackTrace) {
-                  return Icon(
-                    MdiIcons.web,
-                    size: iconSize,
-                  );
-                },
               )
             : Icon(
                 MdiIcons.web,

@@ -156,53 +156,6 @@ class _SelectedBangDataProviderElement
   String? get domain => (origin as SelectedBangDataProvider).domain;
 }
 
-String _$overlayDialogHash() => r'7a0376fff0ba12c70a257a47391e7c049dabd36d';
-
-/// See also [OverlayDialog].
-@ProviderFor(OverlayDialog)
-final overlayDialogProvider =
-    AutoDisposeNotifierProvider<OverlayDialog, Widget?>.internal(
-  OverlayDialog.new,
-  name: r'overlayDialogProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$overlayDialogHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$OverlayDialog = AutoDisposeNotifier<Widget?>;
-String _$bottomSheetHash() => r'4040ec50a488b4b12123bedceab6d8620e6abe3d';
-
-/// See also [BottomSheet].
-@ProviderFor(BottomSheet)
-final bottomSheetProvider =
-    AutoDisposeNotifierProvider<BottomSheet, Sheet?>.internal(
-  BottomSheet.new,
-  name: r'bottomSheetProvider',
-  debugGetCreateSourceHash:
-      const bool.fromEnvironment('dart.vm.product') ? null : _$bottomSheetHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$BottomSheet = AutoDisposeNotifier<Sheet?>;
-String _$bottomSheetExtendHash() => r'81ae254499d1d7f57309274b0f18747b94d6dda3';
-
-/// See also [BottomSheetExtend].
-@ProviderFor(BottomSheetExtend)
-final bottomSheetExtendProvider =
-    StreamNotifierProvider<BottomSheetExtend, double>.internal(
-  BottomSheetExtend.new,
-  name: r'bottomSheetExtendProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$bottomSheetExtendHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$BottomSheetExtend = StreamNotifier<double>;
 String _$selectedBangTriggerHash() =>
     r'b0e12bc95e93d50d04f1c658230cea9f15ff0385';
 
@@ -411,22 +364,5 @@ final showFindInPageProvider = NotifierProvider<ShowFindInPage, bool>.internal(
 );
 
 typedef _$ShowFindInPage = Notifier<bool>;
-String _$webViewWidgetCacheHash() =>
-    r'7d6f769e8c314d9dc579d700d36d6d4c944e600f';
-
-/// See also [WebViewWidgetCache].
-@ProviderFor(WebViewWidgetCache)
-final webViewWidgetCacheProvider =
-    AutoDisposeNotifierProvider<WebViewWidgetCache, List<WebView>>.internal(
-  WebViewWidgetCache.new,
-  name: r'webViewWidgetCacheProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$webViewWidgetCacheHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef _$WebViewWidgetCache = AutoDisposeNotifier<List<WebView>>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

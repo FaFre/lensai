@@ -3,18 +3,24 @@
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 package eu.lensai.flutter_mozilla_components.middleware
 
+import android.graphics.Bitmap
 import android.util.Log
+import eu.lensai.flutter_mozilla_components.ext.toWebPBytes
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoStateEvents
 import mozilla.components.browser.state.action.BrowserAction
 import mozilla.components.browser.state.action.ContentAction
 import mozilla.components.browser.state.state.BrowserState
 import mozilla.components.lib.state.Middleware
 import mozilla.components.lib.state.MiddlewareContext
+import java.io.ByteArrayOutputStream
+
+
 
 /**
  * [Middleware] implementation for handling [ContentAction.UpdateThumbnailAction] and storing
  * the thumbnail to the disk cache.
  */
-class FlutterEventMiddleware() : Middleware<BrowserState, BrowserAction> {
+class FlutterEventMiddleware(private val flutterEvents: GeckoStateEvents) : Middleware<BrowserState, BrowserAction> {
     @Suppress("ComplexMethod")
     override fun invoke(
         context: MiddlewareContext<BrowserState, BrowserAction>,
@@ -23,10 +29,8 @@ class FlutterEventMiddleware() : Middleware<BrowserState, BrowserAction> {
     ) {
         when (action) {
             is ContentAction.UpdateThumbnailAction -> {
-                Log.d("UpdateThumbnailAction", action.sessionId)
-            }
-            is ContentAction.UpdateTitleAction -> {
-                Log.d("UpdateTitleAction", action.title)
+                val bytes = action.thumbnail.toWebPBytes()
+                flutterEvents.onThumbnailChange(action.sessionId, bytes) { _ -> }
             }
             else -> {
                 // no-op

@@ -4,7 +4,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/core/routing/routes.dart';
 import 'package:lensai/features/bangs/domain/providers.dart';
 import 'package:lensai/features/bangs/presentation/widgets/bang_details.dart';
-import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/kagi/data/entities/modes.dart';
 import 'package:lensai/features/search_browser/domain/entities/sheet.dart';
 import 'package:lensai/features/search_browser/domain/providers.dart';
 import 'package:lensai/presentation/widgets/failure_widget.dart';
@@ -49,9 +49,9 @@ class BangListScreen extends HookConsumerWidget {
                           .read(selectedBangTriggerProvider().notifier)
                           .setTrigger(bang.trigger);
 
-                      if (ref.read(bottomSheetProvider) is! CreateTab) {
+                      if (ref.read(bottomSheetProvider) is! CreateTabSheet) {
                         ref.read(bottomSheetProvider.notifier).show(
-                              CreateTab(
+                              CreateTabSheet(
                                 preferredTool: KagiTool.search,
                               ),
                             );

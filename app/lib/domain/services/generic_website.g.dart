@@ -7,7 +7,7 @@ part of 'generic_website.dart';
 // **************************************************************************
 
 String _$genericWebsiteServiceHash() =>
-    r'517304ca95e1ef8377d4c1a3bd06fef9c68c92cd';
+    r'0b1d953fe1b30b9dd0396df34e6176424cdaf941';
 
 /// See also [GenericWebsiteService].
 @ProviderFor(GenericWebsiteService)

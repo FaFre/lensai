@@ -50,7 +50,7 @@ class ReaderState {
 
 /// Details about the last playing media in this tab.
 class LastMediaAccessState {
-  /// [ContentState.url] when media started playing.
+  /// [TabContentState.url] when media started playing.
   /// This is not the URL of the media but of the page when media started.
   /// Defaults to "" (an empty String) if media hasn't started playing.
   /// This value is only updated when media starts playing.
@@ -173,7 +173,7 @@ class TabState {
   /// The last [HistoryMetadataKey] of the tab.
   final HistoryMetadataKey? historyMetadata;
 
-  /// The last [Source] of the tab.
+  /// The last [IconSource] of the tab.
   final SourceValue source;
 
   /// The index the tab should be restored at.
@@ -241,12 +241,228 @@ enum RestoreLocation {
   atIndex,
 }
 
+/// An icon resource type.
+enum IconType {
+  favicon,
+  appleTouchIcon,
+  fluidIcon,
+  imageSrc,
+  openGraph,
+  twitter,
+  microsoftTile,
+  tippyTop,
+  manifestIcon,
+}
+
+/// Supported sizes.
+///
+/// We are trying to limit the supported sizes in order to optimize our caching strategy.
+enum IconSize {
+  defaultSize,
+  launcher,
+  launcherAdaptive,
+}
+
+/// A request to load an [Icon].
+class IconRequest {
+  final String url;
+  final IconSize size;
+  final List<Resource?> resources;
+  final int? color;
+  final bool isPrivate;
+  final bool waitOnNetworkLoad;
+
+  IconRequest({
+    required this.url,
+    this.size = IconSize.defaultSize,
+    this.resources = const [],
+    this.color,
+    this.isPrivate = false,
+    this.waitOnNetworkLoad = true,
+  });
+}
+
+class ResourceSize {
+  final int height;
+  final int width;
+
+  const ResourceSize({required this.height, required this.width});
+}
+
+/// An icon resource that can be loaded.
+class Resource {
+  final String url;
+  final IconType type;
+  final List<ResourceSize?> sizes;
+  final String? mimeType;
+  final bool maskable;
+
+  Resource({
+    required this.url,
+    required this.type,
+    this.sizes = const [],
+    this.mimeType,
+    this.maskable = false,
+  });
+}
+
+/// An [Icon] returned by [BrowserIcons] after processing an [IconRequest]
+class IconResult {
+  /// The loaded icon as an [Uint8List].
+  final Uint8List image;
+
+  /// The dominant color of the icon. Will be null if no color could be extracted.
+  final int? color;
+
+  /// The source of the icon.
+  final IconSource source;
+
+  /// True if the icon represents as full-bleed icon that can be cropped to other shapes.
+  final bool maskable;
+
+  IconResult({
+    required this.image,
+    this.color,
+    required this.source,
+    this.maskable = false,
+  });
+}
+
+/// The source of an [Icon].
+enum IconSource {
+  /// This icon was generated.
+  generator,
+
+  /// This icon was downloaded.
+  download,
+
+  /// This icon was inlined in the document.
+  inline,
+
+  /// This icon was loaded from an in-memory cache.
+  memory,
+
+  /// This icon was loaded from a disk cache.
+  disk,
+}
+
+enum CookieSameSiteStatus {
+  noRestriction,
+  lax,
+  strict,
+  unspecified;
+}
+
+class CookiePartitionKey {
+  final String topLevelSite;
+
+  CookiePartitionKey(this.topLevelSite);
+}
+
+class Cookie {
+  final String domain;
+  final int? expirationDate;
+  final String firstPartyDomain;
+  final bool hostOnly;
+  final bool httpOnly;
+  final String name;
+  final CookiePartitionKey? partitionKey;
+  final String path;
+  final bool secure;
+  final bool session;
+  final CookieSameSiteStatus sameSite;
+  final String storeId;
+  final String value;
+
+  Cookie(
+      this.domain,
+      this.expirationDate,
+      this.firstPartyDomain,
+      this.hostOnly,
+      this.httpOnly,
+      this.name,
+      this.partitionKey,
+      this.path,
+      this.secure,
+      this.session,
+      this.sameSite,
+      this.storeId,
+      this.value);
+}
+
+class HistoryItem {
+  final String url;
+  final String title;
+
+  HistoryItem(this.url, this.title);
+}
+
+class HistoryState {
+  final List<HistoryItem?> items;
+  final int currentIndex;
+
+  final bool canGoBack;
+  final bool canGoForward;
+
+  HistoryState(
+    this.items,
+    this.currentIndex,
+    this.canGoBack,
+    this.canGoForward,
+  );
+}
+
+class ReaderableState {
+  /// Whether or not the current page can be transformed to
+  /// be displayed in a reader view.
+  final bool readerable;
+
+  /// Whether or not reader view is active.
+  final bool active;
+
+  ReaderableState(this.readerable, this.active);
+}
+
+class SecurityInfoState {
+  final bool secure;
+  final String host;
+  final String issuer;
+
+  SecurityInfoState(this.secure, this.host, this.issuer);
+}
+
+class TabContentState {
+  final String id;
+  final String? contextId;
+
+  final String url;
+  final String title;
+
+  final int progress;
+
+  final bool isPrivate;
+  final bool isFullScreen;
+  final bool isLoading;
+
+  TabContentState(
+    this.id,
+    this.contextId,
+    this.url,
+    this.title,
+    this.progress,
+    this.isPrivate,
+    this.isFullScreen,
+    this.isLoading,
+  );
+}
+
 @ConfigurePigeon(PigeonOptions(
   dartOut: 'lib/src/pigeons/gecko.g.dart',
   dartOptions: DartOptions(),
   kotlinOut:
       'android/src/main/kotlin/eu/lensai/flutter_mozilla_components/pigeons/Gecko.g.kt',
-  kotlinOptions: KotlinOptions(),
+  kotlinOptions:
+      KotlinOptions(package: 'eu.lensai.flutter_mozilla_components.pigeons'),
   dartPackageName: 'flutter_mozilla_components',
 ))
 @HostApi()
@@ -411,4 +627,70 @@ abstract class GeckoTabsApi {
     required String tabId,
     required String? alternativeUrl,
   });
+}
+
+@HostApi()
+abstract class GeckoIconsApi {
+  @async
+  IconResult loadIcon(IconRequest request);
+}
+
+@HostApi()
+abstract class GeckoCookieApi {
+  @async
+  Cookie getCookie(
+    String? firstPartyDomain,
+    String name,
+    CookiePartitionKey? partitionKey,
+    String? storeId,
+    String url,
+  );
+
+  @async
+  List<Cookie> getAllCookies(
+    String? domain,
+    String? firstPartyDomain,
+    String? name,
+    CookiePartitionKey? partitionKey,
+    String? storeId,
+    String url,
+  );
+
+  @async
+  void setCookie(
+    String? domain,
+    int? expirationDate,
+    String? firstPartyDomain,
+    bool? httpOnly,
+    String? name,
+    CookiePartitionKey? partitionKey,
+    String? path,
+    CookieSameSiteStatus? sameSite,
+    bool? secure,
+    String? storeId,
+    String url,
+    String? value,
+  );
+
+  @async
+  void removeCookie(
+    String? firstPartyDomain,
+    String name,
+    CookiePartitionKey? partitionKey,
+    String? storeId,
+    String url,
+  );
+}
+
+@FlutterApi()
+abstract class GeckoStateEvents {
+  void onTabListChange(List<String> tabIds);
+  void onSelectedTabChange(String? id);
+
+  void onTabContentStateChange(TabContentState state);
+  void onHistoryStateChange(String id, HistoryState state);
+  void onReaderableStateChange(String id, ReaderableState state);
+  void onSecurityInfoStateChange(String id, SecurityInfoState state);
+  void onIconChange(String id, Uint8List? bytes);
+  void onThumbnailChange(String id, Uint8List? bytes);
 }

@@ -1,5 +1,4 @@
 import 'package:drift/drift.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 abstract interface class ITab {
   String get id;

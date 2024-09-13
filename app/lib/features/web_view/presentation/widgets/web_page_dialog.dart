@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lensai/domain/entities/web_page_info.dart';
+import 'package:lensai/data/models/web_page_info.dart';
 import 'package:lensai/features/bangs/data/models/bang_data.dart';
 import 'package:lensai/features/bangs/domain/providers.dart';
 import 'package:lensai/features/bangs/presentation/widgets/site_search.dart';
-import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/kagi/data/entities/modes.dart';
 import 'package:lensai/features/search_browser/utils/url_builder.dart'
     as uri_builder;
 import 'package:lensai/features/settings/data/models/settings.dart';
@@ -24,14 +24,12 @@ import 'package:share_plus/share_plus.dart';
 class WebPageDialog extends HookConsumerWidget {
   final Uri url;
   final WebPageInfo? precachedInfo;
-  final InAppWebViewController? webViewController;
 
   final void Function()? onDismiss;
 
   const WebPageDialog({
     required this.url,
     this.precachedInfo,
-    this.webViewController,
     this.onDismiss,
     super.key,
   });

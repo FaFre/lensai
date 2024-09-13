@@ -1,16 +1,16 @@
 package eu.lensai.flutter_mozilla_components.api
 
-import GeckoSessionApi
-import LoadUrlFlagsValue
 import android.util.Log
 import eu.lensai.flutter_mozilla_components.GlobalComponents
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoSessionApi
+import eu.lensai.flutter_mozilla_components.pigeons.LoadUrlFlagsValue
+import eu.lensai.flutter_mozilla_components.pigeons.TranslationOptions as PigeonTranslationOptions
 import mozilla.components.browser.state.state.BrowserState
 import mozilla.components.concept.engine.EngineSession
 import mozilla.components.concept.engine.translate.TranslationOptions
-import TranslationOptions as PigeonTranslationOptions
 import mozilla.components.feature.session.SessionUseCases
 
-class GeckoSessionApiImpl() : GeckoSessionApi {
+class GeckoSessionApiImpl : GeckoSessionApi {
     private val sessionUseCases: SessionUseCases by lazy { GlobalComponents.components!!.sessionUseCases }
     private val state: BrowserState by lazy { GlobalComponents.components!!.store.state }
 
@@ -33,21 +33,19 @@ class GeckoSessionApiImpl() : GeckoSessionApi {
             data = data,
             tabId = tabId ?: state.selectedTabId,
             mimeType = mimeType,
-            encoding = encoding,
+            encoding = encoding
         )
     }
 
     override fun reload(tabId: String?, flags: LoadUrlFlagsValue) {
         sessionUseCases.reload(
             tabId = tabId ?: state.selectedTabId,
-            flags = EngineSession.LoadUrlFlags.select(flags.value.toInt()),
+            flags = EngineSession.LoadUrlFlags.select(flags.value.toInt())
         )
     }
 
     override fun stopLoading(tabId: String?) {
-        sessionUseCases.stopLoading(
-            tabId = tabId
-        )
+        sessionUseCases.stopLoading(tabId = tabId ?: state.selectedTabId)
     }
 
     override fun goBack(tabId: String?, userInteraction: Boolean) {
@@ -74,26 +72,20 @@ class GeckoSessionApiImpl() : GeckoSessionApi {
     override fun requestDesktopSite(tabId: String?, enable: Boolean) {
         sessionUseCases.requestDesktopSite(
             tabId = tabId ?: state.selectedTabId,
-            enable = enable,
+            enable = enable
         )
     }
 
     override fun exitFullscreen(tabId: String?) {
-        sessionUseCases.exitFullscreen(
-            tabId = tabId ?: state.selectedTabId,
-        )
+        sessionUseCases.exitFullscreen(tabId = tabId ?: state.selectedTabId)
     }
 
     override fun saveToPdf(tabId: String?) {
-        sessionUseCases.saveToPdf(
-            tabId = tabId ?: state.selectedTabId,
-        )
+        sessionUseCases.saveToPdf(tabId = tabId ?: state.selectedTabId)
     }
 
     override fun printContent(tabId: String?) {
-        sessionUseCases.printContent(
-            tabId = tabId ?: state.selectedTabId,
-        )
+        sessionUseCases.printContent(tabId = tabId ?: state.selectedTabId)
     }
 
     override fun translate(
@@ -106,18 +98,16 @@ class GeckoSessionApiImpl() : GeckoSessionApi {
             tabId = tabId ?: state.selectedTabId,
             fromLanguage = fromLanguage,
             toLanguage = toLanguage,
-            options = if (options != null) TranslationOptions(downloadModel = options.downloadModel) else null,
+            options = options?.let { TranslationOptions(downloadModel = it.downloadModel) }
         )
     }
 
     override fun translateRestore(tabId: String?) {
-        sessionUseCases.translateRestore(
-            tabId = tabId ?: state.selectedTabId,
-        )
+        sessionUseCases.translateRestore(tabId = tabId ?: state.selectedTabId)
     }
 
     override fun crashRecovery(tabIds: List<String>?) {
-        if(tabIds != null) {
+        if (tabIds != null) {
             sessionUseCases.crashRecovery.invoke(tabIds = tabIds)
         } else {
             sessionUseCases.crashRecovery.invoke()

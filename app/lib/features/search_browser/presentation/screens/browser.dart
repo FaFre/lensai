@@ -7,11 +7,12 @@ import 'package:flutter_material_design_icons/flutter_material_design_icons.dart
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/core/routing/routes.dart';
-import 'package:lensai/features/search_browser/domain/entities/modes.dart';
+import 'package:lensai/features/kagi/data/entities/modes.dart';
 import 'package:lensai/features/search_browser/domain/entities/sheet.dart';
 import 'package:lensai/features/search_browser/domain/providers.dart';
 import 'package:lensai/features/search_browser/domain/services/create_tab.dart';
-import 'package:lensai/features/search_browser/domain/services/session.dart';
+import 'package:lensai/features/search_browser/presentation/controllers/bottom_sheet.dart';
+import 'package:lensai/features/search_browser/presentation/controllers/overlay_dialog.dart';
 import 'package:lensai/features/search_browser/presentation/widgets/app_bar_title.dart';
 import 'package:lensai/features/search_browser/presentation/widgets/landing/content.dart';
 import 'package:lensai/features/search_browser/presentation/widgets/sheets/shared_content_sheet.dart';
@@ -19,11 +20,6 @@ import 'package:lensai/features/search_browser/presentation/widgets/sheets/view_
 import 'package:lensai/features/search_browser/presentation/widgets/tabs_action_button.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
-import 'package:lensai/features/topics/domain/repositories/tab.dart';
-import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
-import 'package:lensai/features/web_view/presentation/controllers/readerability.dart';
-import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
-import 'package:lensai/features/web_view/presentation/widgets/web_page_dialog.dart';
 import 'package:lensai/presentation/hooks/overlay_portal_controller.dart';
 import 'package:lensai/presentation/widgets/animate_gradient_shader.dart';
 import 'package:lensai/presentation/widgets/animated_indexed_stack.dart';
@@ -41,8 +37,8 @@ class KagiScreen extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final displayedSheet = ref.watch(bottomSheetProvider);
-    final displayedOverlayDialog = ref.watch(overlayDialogProvider);
+    final displayedSheet = ref.watch(bottomSheetControllerProvider);
+    final displayedOverlayDialog = ref.watch(overlayDialogControllerProvider);
 
     final showEarlyAccessFeatures = ref.watch(
       settingsRepositoryProvider.select(
@@ -75,7 +71,7 @@ class KagiScreen extends HookConsumerWidget {
     final activeKagiTool = useValueNotifier<KagiTool?>(null, [displayedSheet]);
 
     ref.listen(
-      overlayDialogProvider,
+      overlayDialogControllerProvider,
       (previous, next) {
         if (next != null) {
           overlayController.show();
@@ -109,7 +105,7 @@ class KagiScreen extends HookConsumerWidget {
 
                     return (page != null)
                         ? AppBarTitle(
-                            page: page,
+                            tab: page,
                             onTap: () {
                               ref.read(overlayDialogProvider.notifier).show(
                                     WebPageDialog(
@@ -149,7 +145,8 @@ class KagiScreen extends HookConsumerWidget {
                             ref
                                 .read(createTabStreamProvider.notifier)
                                 .createTab(
-                                  CreateTab(preferredTool: KagiTool.search),
+                                  CreateTabSheet(
+                                      preferredTool: KagiTool.search),
                                 );
                           },
                           icon: Icon(KagiTool.search.icon),
@@ -162,7 +159,8 @@ class KagiScreen extends HookConsumerWidget {
                             ref
                                 .read(createTabStreamProvider.notifier)
                                 .createTab(
-                                  CreateTab(preferredTool: KagiTool.summarizer),
+                                  CreateTabSheet(
+                                      preferredTool: KagiTool.summarizer),
                                 );
                           },
                           icon: Icon(KagiTool.summarizer.icon),
@@ -176,7 +174,7 @@ class KagiScreen extends HookConsumerWidget {
                               ref
                                   .read(createTabStreamProvider.notifier)
                                   .createTab(
-                                    CreateTab(
+                                    CreateTabSheet(
                                       preferredTool: KagiTool.assistant,
                                     ),
                                   );
@@ -278,7 +276,7 @@ class KagiScreen extends HookConsumerWidget {
             if (quickAction != null)
               InkWell(
                 onTap: () async {
-                  var tab = CreateTab(
+                  var tab = CreateTabSheet(
                     preferredTool: quickAction,
                   );
 
@@ -303,7 +301,7 @@ class KagiScreen extends HookConsumerWidget {
                       }
                     }
 
-                    tab = CreateTab(
+                    tab = CreateTabSheet(
                       preferredTool: quickAction,
                       content: await completer.future,
                     );
@@ -320,12 +318,12 @@ class KagiScreen extends HookConsumerWidget {
                 ),
               ),
             TabsActionButton(
-              isActive: displayedSheet is ViewTabs,
+              isActive: displayedSheet is ViewTabsSheet,
               onTap: () {
-                if (displayedSheet case ViewTabs()) {
+                if (displayedSheet case ViewTabsSheet()) {
                   ref.read(bottomSheetProvider.notifier).dismiss();
                 } else {
-                  ref.read(bottomSheetProvider.notifier).show(ViewTabs());
+                  ref.read(bottomSheetProvider.notifier).show(ViewTabsSheet());
                 }
               },
             ),
@@ -387,7 +385,7 @@ class KagiScreen extends HookConsumerWidget {
                   MenuItemButton(
                     onPressed: () {
                       ref.read(createTabStreamProvider.notifier).createTab(
-                            CreateTab(preferredTool: KagiTool.assistant),
+                            CreateTabSheet(preferredTool: KagiTool.assistant),
                           );
                     },
                     leadingIcon: Icon(KagiTool.assistant.icon),
@@ -396,7 +394,7 @@ class KagiScreen extends HookConsumerWidget {
                 MenuItemButton(
                   onPressed: () {
                     ref.read(createTabStreamProvider.notifier).createTab(
-                          CreateTab(preferredTool: KagiTool.summarizer),
+                          CreateTabSheet(preferredTool: KagiTool.summarizer),
                         );
                   },
                   leadingIcon: Icon(KagiTool.summarizer.icon),
@@ -405,7 +403,7 @@ class KagiScreen extends HookConsumerWidget {
                 MenuItemButton(
                   onPressed: () {
                     ref.read(createTabStreamProvider.notifier).createTab(
-                          CreateTab(preferredTool: KagiTool.search),
+                          CreateTabSheet(preferredTool: KagiTool.search),
                         );
                   },
                   leadingIcon: Icon(KagiTool.search.icon),
@@ -649,7 +647,7 @@ class KagiScreen extends HookConsumerWidget {
                 return false;
               },
               child: switch (displayedSheet) {
-                ViewTabs() => DraggableScrollableSheet(
+                ViewTabsSheet() => DraggableScrollableSheet(
                     key: ValueKey(displayedSheet),
                     expand: false,
                     minChildSize: 0.1,
@@ -669,7 +667,7 @@ class KagiScreen extends HookConsumerWidget {
                       );
                     },
                   ),
-                final CreateTab parameter => DraggableScrollableSheet(
+                final CreateTabSheet parameter => DraggableScrollableSheet(
                     key: ValueKey(displayedSheet),
                     expand: false,
                     initialChildSize: 0.8,

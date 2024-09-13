@@ -2,25 +2,25 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lensai/features/topics/domain/repositories/topic.dart';
-import 'package:lensai/features/web_view/domain/entities/web_view_page.dart';
-import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
-import 'package:lensai/features/web_view/presentation/widgets/favicon.dart';
+import 'package:lensai/features/geckoview/domain/entities/tab_state.dart';
+import 'package:lensai/features/geckoview/domain/providers.dart';
+import 'package:lensai/features/geckoview/features/topics/domain/repositories/topic.dart';
 
 class TabActionDialog extends HookConsumerWidget {
-  final WebViewPage initialTab;
+  final String tabId;
 
   final void Function()? onDismiss;
 
   const TabActionDialog({
-    required this.initialTab,
+    required this.tabId,
     this.onDismiss,
     super.key,
   });
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final tabState = ref.watch(tabStateProvider(initialTab.id)) ?? initialTab;
+    final tabState =
+        ref.watch(tabStateProvider(tabId)) ?? TabState.$default(tabId);
     final topics =
         ref.watch(topicRepositoryProvider.select((value) => value.valueOrNull));
     final selectedTopic =
@@ -42,13 +42,13 @@ class TabActionDialog extends HookConsumerWidget {
             vertical: 24.0,
           ),
           title: ListTile(
-            leading: FaviconImage(
-              favicon: tabState.favicon,
-              url: tabState.url,
-              size: 24,
+            leading: RawImage(
+              image: tabState.icon?.value,
+              width: 24,
+              height: 24,
             ),
             contentPadding: EdgeInsets.zero,
-            title: Text(tabState.title ?? 'Unknown Title'),
+            title: Text(tabState.title),
             subtitle: Text(tabState.url.authority),
           ),
           children: [

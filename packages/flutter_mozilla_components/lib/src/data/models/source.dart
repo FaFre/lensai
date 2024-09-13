@@ -1,4 +1,3 @@
-import 'package:flutter_mozilla_components/src/helper/helper.dart';
 import 'package:flutter_mozilla_components/src/pigeons/gecko.g.dart';
 
 /// Describes a category of an external package.
@@ -15,6 +14,13 @@ enum PackageCategory {
 
   final int id;
   const PackageCategory(this.id);
+
+  factory PackageCategory.fromInt(int? id) {
+    return PackageCategory.values.firstWhere(
+      (category) => category.id == id,
+      orElse: () => PackageCategory.unknown,
+    );
+  }
 
   PackageCategoryValue toValue() {
     return PackageCategoryValue(value: id);
@@ -36,7 +42,7 @@ abstract class Source {
     final caller = packageId != null
         ? ExternalPackage(
             packageId: packageId,
-            category: packageCategoryfromInt(packageCategory).toValue())
+            category: PackageCategory.fromInt(packageCategory).toValue())
         : null;
 
     switch (sourceId) {

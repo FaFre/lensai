@@ -1,13 +1,14 @@
 package eu.lensai.flutter_mozilla_components.api
 
-import GeckoTabsApi
-import HistoryMetadataKey as PigeonHistoryMetadataKey
-import LoadUrlFlagsValue
-import RecoverableBrowserState as PigeonRecoverableBrowserState
-import RestoreLocation as PigeonRestoreLocation
-import RecoverableTab as PigeonRecoverableTab
-import SourceValue
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoTabsApi
+import eu.lensai.flutter_mozilla_components.pigeons.HistoryMetadataKey as PigeonHistoryMetadataKey
+import eu.lensai.flutter_mozilla_components.pigeons.LoadUrlFlagsValue
+import eu.lensai.flutter_mozilla_components.pigeons.RecoverableBrowserState as PigeonRecoverableBrowserState
+import eu.lensai.flutter_mozilla_components.pigeons.RestoreLocation as PigeonRestoreLocation
+import eu.lensai.flutter_mozilla_components.pigeons.RecoverableTab as PigeonRecoverableTab
+import eu.lensai.flutter_mozilla_components.pigeons.SourceValue
 import eu.lensai.flutter_mozilla_components.GlobalComponents
+import eu.lensai.flutter_mozilla_components.pigeons.RestoreLocation
 import mozilla.components.browser.session.storage.RecoverableBrowserState
 import mozilla.components.browser.state.action.TabListAction
 import mozilla.components.browser.state.selector.findTab
@@ -80,7 +81,11 @@ class GeckoTabsApiImpl() : GeckoTabsApi {
     }
 
     private fun mapRestoreLocation(t: PigeonRestoreLocation) : TabListAction.RestoreAction.RestoreLocation {
-        return TabListAction.RestoreAction.RestoreLocation.entries.first { it.ordinal == t.ordinal }
+        return when(t) {
+            RestoreLocation.BEGINNING -> TabListAction.RestoreAction.RestoreLocation.BEGINNING
+            RestoreLocation.END -> TabListAction.RestoreAction.RestoreLocation.END
+            RestoreLocation.AT_INDEX -> TabListAction.RestoreAction.RestoreLocation.AT_INDEX
+        }
     }
 
     override fun selectTab(tabId: String) {

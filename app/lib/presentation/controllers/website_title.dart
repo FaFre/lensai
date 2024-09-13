@@ -1,4 +1,4 @@
-import 'package:lensai/domain/entities/web_page_info.dart';
+import 'package:lensai/data/models/web_page_info.dart';
 import 'package:lensai/domain/services/generic_website.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 

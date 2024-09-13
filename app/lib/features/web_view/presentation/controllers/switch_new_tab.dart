@@ -1,6 +1,5 @@
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:lensai/features/topics/domain/providers.dart';
-import 'package:lensai/features/topics/domain/repositories/tab.dart';
+import 'package:lensai/features/geckoview/features/topics/domain/providers.dart';
+import 'package:lensai/features/geckoview/features/topics/domain/repositories/tab_link.dart';
 import 'package:lensai/features/web_view/domain/entities/web_view_page.dart';
 import 'package:lensai/features/web_view/domain/repositories/web_view.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';

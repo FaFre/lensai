@@ -6,7 +6,6 @@ import 'package:lensai/features/bangs/data/models/bang_data.dart';
 import 'package:lensai/features/bangs/presentation/widgets/bang_icon.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
-import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:lensai/utils/ui_helper.dart' as ui_helper;
 
 class BangDetails extends HookConsumerWidget {

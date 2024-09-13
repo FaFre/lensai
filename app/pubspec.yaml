@@ -10,6 +10,7 @@ dependencies:
   animations: ^2.0.11
   collection: ^1.18.0
   copy_with_extension: ^5.0.4
+  crypto: ^3.0.5
   drift: ^2.20.0
   dynamic_color: ^1.7.0
   exceptions: ^0.6.1
@@ -23,6 +24,8 @@ dependencies:
   flutter_inappwebview: ^6.0.0
   flutter_markdown: ^0.7.3+1
   flutter_material_design_icons: ^1.1.7447
+  flutter_mozilla_components:
+    path: ../packages/flutter_mozilla_components
   flutter_pdf_text: ^0.6.0
   flutter_secure_storage: ^9.2.2
   flutter_sharing_intent: ^1.1.1

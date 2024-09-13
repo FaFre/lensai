@@ -1,8 +1,5 @@
 package eu.lensai.flutter_mozilla_components
 
-import GeckoBrowserApi
-import GeckoSessionApi
-import GeckoTabsApi
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -10,8 +7,17 @@ import androidx.annotation.NonNull
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import eu.lensai.flutter_mozilla_components.api.GeckoBrowserApiImpl
+import eu.lensai.flutter_mozilla_components.api.GeckoCookieApiImpl
+import eu.lensai.flutter_mozilla_components.api.GeckoIconsApiImpl
 import eu.lensai.flutter_mozilla_components.api.GeckoSessionApiImpl
 import eu.lensai.flutter_mozilla_components.api.GeckoTabsApiImpl
+import eu.lensai.flutter_mozilla_components.feature.CookieManagerFeature
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoBrowserApi
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoCookieApi
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoIconsApi
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoSessionApi
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoStateEvents
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoTabsApi
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
@@ -34,7 +40,7 @@ import org.mozilla.geckoview.GeckoRuntimeSettings
 /**
  * Helper class for lazily instantiating components needed by the application.
  */
-class Components(private val applicationContext: Context) : DefaultComponents(applicationContext) {
+class Components(private val applicationContext: Context, flutterEvents: GeckoStateEvents) : DefaultComponents(applicationContext, flutterEvents) {
   private val runtime by lazy {
     // Allow for exfiltrating Gecko metrics through the Glean SDK.
     val builder = GeckoRuntimeSettings.Builder().aboutConfigEnabled(true)
@@ -56,6 +62,7 @@ class Components(private val applicationContext: Context) : DefaultComponents(ap
 //      }
 
       WebCompatFeature.install(it)
+      CookieManagerFeature.install(it)
       //WebCompatReporterFeature.install(it)
     }
   }
@@ -77,7 +84,9 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     _flutterPluginBinding = flutterPluginBinding
 
-    GlobalComponents.setUp(flutterPluginBinding.applicationContext)
+    val flutterEvents = GeckoStateEvents(_flutterPluginBinding.binaryMessenger)
+
+    GlobalComponents.setUp(flutterPluginBinding.applicationContext, flutterEvents)
 
     val intent = Intent(flutterPluginBinding.applicationContext, NotificationActivity::class.java)
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -89,6 +98,8 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
 
     GeckoSessionApi.setUp(_flutterPluginBinding.binaryMessenger, GeckoSessionApiImpl())
     GeckoTabsApi.setUp(_flutterPluginBinding.binaryMessenger, GeckoTabsApiImpl())
+    GeckoIconsApi.setUp(_flutterPluginBinding.binaryMessenger, GeckoIconsApiImpl())
+    GeckoCookieApi.setUp(_flutterPluginBinding.binaryMessenger, GeckoCookieApiImpl())
   }
 
   private fun showNativeFragment() {

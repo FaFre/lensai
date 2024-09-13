@@ -29,13 +29,13 @@ class MyAppState extends State<MyApp> {
                 menuChildren: [
                   MenuItemButton(
                     onPressed: () async {
-                      await GeckoSessionService.forCurrentTab().reload();
+                      await GeckoSessionService.forActiveTab().reload();
                     },
                     child: const Text('Reload'),
                   ),
                   MenuItemButton(
                     onPressed: () async {
-                      await GeckoSessionService.forCurrentTab().goBack();
+                      await GeckoSessionService.forActiveTab().goBack();
                     },
                     child: const Text('Back'),
                   )

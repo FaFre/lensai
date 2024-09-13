@@ -6,7 +6,6 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/domain/services/app_initialization.dart';
 import 'package:lensai/features/search_browser/presentation/widgets/error_container.dart';
 import 'package:lensai/features/search_browser/presentation/widgets/landing/action.dart';
-import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:lensai/presentation/hooks/cached_future.dart';
 
 class LandingContent extends HookConsumerWidget {

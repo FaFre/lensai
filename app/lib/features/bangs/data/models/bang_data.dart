@@ -1,6 +1,6 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
-import 'package:drift/drift.dart';
 import 'package:lensai/features/bangs/data/models/bang.dart';
+import 'package:lensai/features/geckoview/domain/entities/browser_icon.dart';
 
 part 'bang_data.g.dart';
 
@@ -9,7 +9,7 @@ class BangData extends Bang {
   final int frequency;
   final DateTime? lastUsed;
 
-  final Uint8List? iconData;
+  final BrowserIcon? icon;
 
   BangData({
     required super.websiteName,
@@ -21,7 +21,7 @@ class BangData extends Bang {
     super.format,
     int? frequency,
     this.lastUsed,
-    this.iconData,
+    this.icon,
   }) : frequency = frequency ?? 0;
 
   @override
@@ -32,6 +32,6 @@ class BangData extends Bang {
         ...super.hashParameters,
         frequency,
         lastUsed,
-        iconData,
+        icon,
       ];
 }

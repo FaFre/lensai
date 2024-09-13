@@ -25,7 +25,7 @@ abstract class _$BangDataCWProxy {
 
   BangData lastUsed(DateTime? lastUsed);
 
-  BangData iconData(Uint8List? iconData);
+  BangData icon(BrowserIcon? icon);
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `BangData(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -43,7 +43,7 @@ abstract class _$BangDataCWProxy {
     Set<BangFormat>? format,
     int? frequency,
     DateTime? lastUsed,
-    Uint8List? iconData,
+    BrowserIcon? icon,
   });
 }
 
@@ -81,7 +81,7 @@ class _$BangDataCWProxyImpl implements _$BangDataCWProxy {
   BangData lastUsed(DateTime? lastUsed) => this(lastUsed: lastUsed);
 
   @override
-  BangData iconData(Uint8List? iconData) => this(iconData: iconData);
+  BangData icon(BrowserIcon? icon) => this(icon: icon);
 
   @override
 
@@ -101,7 +101,7 @@ class _$BangDataCWProxyImpl implements _$BangDataCWProxy {
     Object? format = const $CopyWithPlaceholder(),
     Object? frequency = const $CopyWithPlaceholder(),
     Object? lastUsed = const $CopyWithPlaceholder(),
-    Object? iconData = const $CopyWithPlaceholder(),
+    Object? icon = const $CopyWithPlaceholder(),
   }) {
     return BangData(
       websiteName:
@@ -142,10 +142,10 @@ class _$BangDataCWProxyImpl implements _$BangDataCWProxy {
           ? _value.lastUsed
           // ignore: cast_nullable_to_non_nullable
           : lastUsed as DateTime?,
-      iconData: iconData == const $CopyWithPlaceholder()
-          ? _value.iconData
+      icon: icon == const $CopyWithPlaceholder()
+          ? _value.icon
           // ignore: cast_nullable_to_non_nullable
-          : iconData as Uint8List?,
+          : icon as BrowserIcon?,
     );
   }
 }

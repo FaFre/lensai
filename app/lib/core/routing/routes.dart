@@ -10,7 +10,7 @@ import 'package:lensai/features/chat_archive/presentation/screens/list.dart';
 import 'package:lensai/features/chat_archive/presentation/screens/search.dart';
 import 'package:lensai/features/search_browser/presentation/screens/browser.dart';
 import 'package:lensai/features/settings/presentation/screens/settings.dart';
-import 'package:lensai/features/topics/presentation/screens/topic_list.dart';
+import 'package:lensai/features/geckoview/features/topics/presentation/screens/topic_list.dart';
 
 part 'routes.g.dart';
 

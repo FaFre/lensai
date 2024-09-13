@@ -1,0 +1,23 @@
+{
+  "manifest_version": 2,
+  "name": "cookie-manager",
+  "version": "1.0",
+  "description": "Cookie manager",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "cookie-manager@lensai.eu"
+    }
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "permissions": [
+    "nativeMessaging",
+    "nativeMessagingFromContent",
+    "geckoViewAddons",
+    "cookies",
+    "<all_urls>"
+  ]
+}

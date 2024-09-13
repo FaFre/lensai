@@ -2,6 +2,7 @@
 // See also: https://pub.dev/packages/pigeon
 @file:Suppress("UNCHECKED_CAST", "ArrayInDataClass")
 
+package eu.lensai.flutter_mozilla_components.pigeons
 
 import android.util.Log
 import io.flutter.plugin.common.BasicMessageChannel
@@ -31,6 +32,9 @@ private fun wrapError(exception: Throwable): List<Any?> {
   }
 }
 
+private fun createConnectionError(channelName: String): FlutterError {
+  return FlutterError("channel-error",  "Unable to establish connection on channel: '$channelName'.", "")}
+
 /**
  * Error class for passing custom error details to Flutter via a thrown PlatformException.
  * @property code The error code.
@@ -54,6 +58,75 @@ enum class RestoreLocation(val raw: Int) {
 
   companion object {
     fun ofRaw(raw: Int): RestoreLocation? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+/** An icon resource type. */
+enum class IconType(val raw: Int) {
+  FAVICON(0),
+  APPLE_TOUCH_ICON(1),
+  FLUID_ICON(2),
+  IMAGE_SRC(3),
+  OPEN_GRAPH(4),
+  TWITTER(5),
+  MICROSOFT_TILE(6),
+  TIPPY_TOP(7),
+  MANIFEST_ICON(8);
+
+  companion object {
+    fun ofRaw(raw: Int): IconType? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+/**
+ * Supported sizes.
+ *
+ * We are trying to limit the supported sizes in order to optimize our caching strategy.
+ */
+enum class IconSize(val raw: Int) {
+  DEFAULT_SIZE(0),
+  LAUNCHER(1),
+  LAUNCHER_ADAPTIVE(2);
+
+  companion object {
+    fun ofRaw(raw: Int): IconSize? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+/** The source of an [Icon]. */
+enum class IconSource(val raw: Int) {
+  /** This icon was generated. */
+  GENERATOR(0),
+  /** This icon was downloaded. */
+  DOWNLOAD(1),
+  /** This icon was inlined in the document. */
+  INLINE(2),
+  /** This icon was loaded from an in-memory cache. */
+  MEMORY(3),
+  /** This icon was loaded from a disk cache. */
+  DISK(4);
+
+  companion object {
+    fun ofRaw(raw: Int): IconSource? {
+      return values().firstOrNull { it.raw == raw }
+    }
+  }
+}
+
+enum class CookieSameSiteStatus(val raw: Int) {
+  NO_RESTRICTION(0),
+  LAX(1),
+  STRICT(2),
+  UNSPECIFIED(3);
+
+  companion object {
+    fun ofRaw(raw: Int): CookieSameSiteStatus? {
       return values().firstOrNull { it.raw == raw }
     }
   }
@@ -150,7 +223,7 @@ data class ReaderState (
  */
 data class LastMediaAccessState (
   /**
-   * [ContentState.url] when media started playing.
+   * [TabContentState.url] when media started playing.
    * This is not the URL of the media but of the page when media started.
    * Defaults to "" (an empty String) if media hasn't started playing.
    * This value is only updated when media starts playing.
@@ -354,7 +427,7 @@ data class TabState (
   val private: Boolean,
   /** The last [HistoryMetadataKey] of the tab. */
   val historyMetadata: HistoryMetadataKey? = null,
-  /** The last [Source] of the tab. */
+  /** The last [IconSource] of the tab. */
   val source: SourceValue,
   /** The index the tab should be restored at. */
   val index: Long,
@@ -456,6 +529,342 @@ data class RecoverableBrowserState (
     )
   }
 }
+
+/**
+ * A request to load an [Icon].
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class IconRequest (
+  val url: String,
+  val size: IconSize,
+  val resources: List<Resource?>,
+  val color: Long? = null,
+  val isPrivate: Boolean,
+  val waitOnNetworkLoad: Boolean
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): IconRequest {
+      val url = pigeonVar_list[0] as String
+      val size = pigeonVar_list[1] as IconSize
+      val resources = pigeonVar_list[2] as List<Resource?>
+      val color = pigeonVar_list[3] as Long?
+      val isPrivate = pigeonVar_list[4] as Boolean
+      val waitOnNetworkLoad = pigeonVar_list[5] as Boolean
+      return IconRequest(url, size, resources, color, isPrivate, waitOnNetworkLoad)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      url,
+      size,
+      resources,
+      color,
+      isPrivate,
+      waitOnNetworkLoad,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ResourceSize (
+  val height: Long,
+  val width: Long
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ResourceSize {
+      val height = pigeonVar_list[0] as Long
+      val width = pigeonVar_list[1] as Long
+      return ResourceSize(height, width)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      height,
+      width,
+    )
+  }
+}
+
+/**
+ * An icon resource that can be loaded.
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class Resource (
+  val url: String,
+  val type: IconType,
+  val sizes: List<ResourceSize?>,
+  val mimeType: String? = null,
+  val maskable: Boolean
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): Resource {
+      val url = pigeonVar_list[0] as String
+      val type = pigeonVar_list[1] as IconType
+      val sizes = pigeonVar_list[2] as List<ResourceSize?>
+      val mimeType = pigeonVar_list[3] as String?
+      val maskable = pigeonVar_list[4] as Boolean
+      return Resource(url, type, sizes, mimeType, maskable)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      url,
+      type,
+      sizes,
+      mimeType,
+      maskable,
+    )
+  }
+}
+
+/**
+ * An [Icon] returned by [BrowserIcons] after processing an [IconRequest]
+ *
+ * Generated class from Pigeon that represents data sent in messages.
+ */
+data class IconResult (
+  /** The loaded icon as an [Uint8List]. */
+  val image: ByteArray,
+  /** The dominant color of the icon. Will be null if no color could be extracted. */
+  val color: Long? = null,
+  /** The source of the icon. */
+  val source: IconSource,
+  /** True if the icon represents as full-bleed icon that can be cropped to other shapes. */
+  val maskable: Boolean
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): IconResult {
+      val image = pigeonVar_list[0] as ByteArray
+      val color = pigeonVar_list[1] as Long?
+      val source = pigeonVar_list[2] as IconSource
+      val maskable = pigeonVar_list[3] as Boolean
+      return IconResult(image, color, source, maskable)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      image,
+      color,
+      source,
+      maskable,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class CookiePartitionKey (
+  val topLevelSite: String
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): CookiePartitionKey {
+      val topLevelSite = pigeonVar_list[0] as String
+      return CookiePartitionKey(topLevelSite)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      topLevelSite,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class Cookie (
+  val domain: String,
+  val expirationDate: Long? = null,
+  val firstPartyDomain: String,
+  val hostOnly: Boolean,
+  val httpOnly: Boolean,
+  val name: String,
+  val partitionKey: CookiePartitionKey? = null,
+  val path: String,
+  val secure: Boolean,
+  val session: Boolean,
+  val sameSite: CookieSameSiteStatus,
+  val storeId: String,
+  val value: String
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): Cookie {
+      val domain = pigeonVar_list[0] as String
+      val expirationDate = pigeonVar_list[1] as Long?
+      val firstPartyDomain = pigeonVar_list[2] as String
+      val hostOnly = pigeonVar_list[3] as Boolean
+      val httpOnly = pigeonVar_list[4] as Boolean
+      val name = pigeonVar_list[5] as String
+      val partitionKey = pigeonVar_list[6] as CookiePartitionKey?
+      val path = pigeonVar_list[7] as String
+      val secure = pigeonVar_list[8] as Boolean
+      val session = pigeonVar_list[9] as Boolean
+      val sameSite = pigeonVar_list[10] as CookieSameSiteStatus
+      val storeId = pigeonVar_list[11] as String
+      val value = pigeonVar_list[12] as String
+      return Cookie(domain, expirationDate, firstPartyDomain, hostOnly, httpOnly, name, partitionKey, path, secure, session, sameSite, storeId, value)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      domain,
+      expirationDate,
+      firstPartyDomain,
+      hostOnly,
+      httpOnly,
+      name,
+      partitionKey,
+      path,
+      secure,
+      session,
+      sameSite,
+      storeId,
+      value,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class HistoryItem (
+  val url: String,
+  val title: String
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): HistoryItem {
+      val url = pigeonVar_list[0] as String
+      val title = pigeonVar_list[1] as String
+      return HistoryItem(url, title)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      url,
+      title,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class HistoryState (
+  val items: List<HistoryItem?>,
+  val currentIndex: Long,
+  val canGoBack: Boolean,
+  val canGoForward: Boolean
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): HistoryState {
+      val items = pigeonVar_list[0] as List<HistoryItem?>
+      val currentIndex = pigeonVar_list[1] as Long
+      val canGoBack = pigeonVar_list[2] as Boolean
+      val canGoForward = pigeonVar_list[3] as Boolean
+      return HistoryState(items, currentIndex, canGoBack, canGoForward)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      items,
+      currentIndex,
+      canGoBack,
+      canGoForward,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class ReaderableState (
+  /**
+   * Whether or not the current page can be transformed to
+   * be displayed in a reader view.
+   */
+  val readerable: Boolean,
+  /** Whether or not reader view is active. */
+  val active: Boolean
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): ReaderableState {
+      val readerable = pigeonVar_list[0] as Boolean
+      val active = pigeonVar_list[1] as Boolean
+      return ReaderableState(readerable, active)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      readerable,
+      active,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class SecurityInfoState (
+  val secure: Boolean,
+  val host: String,
+  val issuer: String
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): SecurityInfoState {
+      val secure = pigeonVar_list[0] as Boolean
+      val host = pigeonVar_list[1] as String
+      val issuer = pigeonVar_list[2] as String
+      return SecurityInfoState(secure, host, issuer)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      secure,
+      host,
+      issuer,
+    )
+  }
+}
+
+/** Generated class from Pigeon that represents data sent in messages. */
+data class TabContentState (
+  val id: String,
+  val contextId: String? = null,
+  val url: String,
+  val title: String,
+  val progress: Long,
+  val isPrivate: Boolean,
+  val isFullScreen: Boolean,
+  val isLoading: Boolean
+)
+ {
+  companion object {
+    fun fromList(pigeonVar_list: List<Any?>): TabContentState {
+      val id = pigeonVar_list[0] as String
+      val contextId = pigeonVar_list[1] as String?
+      val url = pigeonVar_list[2] as String
+      val title = pigeonVar_list[3] as String
+      val progress = pigeonVar_list[4] as Long
+      val isPrivate = pigeonVar_list[5] as Boolean
+      val isFullScreen = pigeonVar_list[6] as Boolean
+      val isLoading = pigeonVar_list[7] as Boolean
+      return TabContentState(id, contextId, url, title, progress, isPrivate, isFullScreen, isLoading)
+    }
+  }
+  fun toList(): List<Any?> {
+    return listOf(
+      id,
+      contextId,
+      url,
+      title,
+      progress,
+      isPrivate,
+      isFullScreen,
+      isLoading,
+    )
+  }
+}
 private open class GeckoPigeonCodec : StandardMessageCodec() {
   override fun readValueOfType(type: Byte, buffer: ByteBuffer): Any? {
     return when (type) {
@@ -465,58 +874,133 @@ private open class GeckoPigeonCodec : StandardMessageCodec() {
         }
       }
       130.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          TranslationOptions.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          IconType.ofRaw(it.toInt())
         }
       }
       131.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          ReaderState.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          IconSize.ofRaw(it.toInt())
         }
       }
       132.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          LastMediaAccessState.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          IconSource.ofRaw(it.toInt())
         }
       }
       133.toByte() -> {
-        return (readValue(buffer) as? List<Any?>)?.let {
-          HistoryMetadataKey.fromList(it)
+        return (readValue(buffer) as Long?)?.let {
+          CookieSameSiteStatus.ofRaw(it.toInt())
         }
       }
       134.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          PackageCategoryValue.fromList(it)
+          TranslationOptions.fromList(it)
         }
       }
       135.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          ExternalPackage.fromList(it)
+          ReaderState.fromList(it)
         }
       }
       136.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          LoadUrlFlagsValue.fromList(it)
+          LastMediaAccessState.fromList(it)
         }
       }
       137.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          SourceValue.fromList(it)
+          HistoryMetadataKey.fromList(it)
         }
       }
       138.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          TabState.fromList(it)
+          PackageCategoryValue.fromList(it)
         }
       }
       139.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
-          RecoverableTab.fromList(it)
+          ExternalPackage.fromList(it)
         }
       }
       140.toByte() -> {
         return (readValue(buffer) as? List<Any?>)?.let {
+          LoadUrlFlagsValue.fromList(it)
+        }
+      }
+      141.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SourceValue.fromList(it)
+        }
+      }
+      142.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          TabState.fromList(it)
+        }
+      }
+      143.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          RecoverableTab.fromList(it)
+        }
+      }
+      144.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
           RecoverableBrowserState.fromList(it)
+        }
+      }
+      145.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          IconRequest.fromList(it)
+        }
+      }
+      146.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ResourceSize.fromList(it)
+        }
+      }
+      147.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          Resource.fromList(it)
+        }
+      }
+      148.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          IconResult.fromList(it)
+        }
+      }
+      149.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          CookiePartitionKey.fromList(it)
+        }
+      }
+      150.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          Cookie.fromList(it)
+        }
+      }
+      151.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          HistoryItem.fromList(it)
+        }
+      }
+      152.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          HistoryState.fromList(it)
+        }
+      }
+      153.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          ReaderableState.fromList(it)
+        }
+      }
+      154.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          SecurityInfoState.fromList(it)
+        }
+      }
+      155.toByte() -> {
+        return (readValue(buffer) as? List<Any?>)?.let {
+          TabContentState.fromList(it)
         }
       }
       else -> super.readValueOfType(type, buffer)
@@ -528,54 +1012,115 @@ private open class GeckoPigeonCodec : StandardMessageCodec() {
         stream.write(129)
         writeValue(stream, value.raw)
       }
-      is TranslationOptions -> {
+      is IconType -> {
         stream.write(130)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw)
       }
-      is ReaderState -> {
+      is IconSize -> {
         stream.write(131)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw)
       }
-      is LastMediaAccessState -> {
+      is IconSource -> {
         stream.write(132)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw)
       }
-      is HistoryMetadataKey -> {
+      is CookieSameSiteStatus -> {
         stream.write(133)
-        writeValue(stream, value.toList())
+        writeValue(stream, value.raw)
       }
-      is PackageCategoryValue -> {
+      is TranslationOptions -> {
         stream.write(134)
         writeValue(stream, value.toList())
       }
-      is ExternalPackage -> {
+      is ReaderState -> {
         stream.write(135)
         writeValue(stream, value.toList())
       }
-      is LoadUrlFlagsValue -> {
+      is LastMediaAccessState -> {
         stream.write(136)
         writeValue(stream, value.toList())
       }
-      is SourceValue -> {
+      is HistoryMetadataKey -> {
         stream.write(137)
         writeValue(stream, value.toList())
       }
-      is TabState -> {
+      is PackageCategoryValue -> {
         stream.write(138)
         writeValue(stream, value.toList())
       }
-      is RecoverableTab -> {
+      is ExternalPackage -> {
         stream.write(139)
         writeValue(stream, value.toList())
       }
-      is RecoverableBrowserState -> {
+      is LoadUrlFlagsValue -> {
         stream.write(140)
+        writeValue(stream, value.toList())
+      }
+      is SourceValue -> {
+        stream.write(141)
+        writeValue(stream, value.toList())
+      }
+      is TabState -> {
+        stream.write(142)
+        writeValue(stream, value.toList())
+      }
+      is RecoverableTab -> {
+        stream.write(143)
+        writeValue(stream, value.toList())
+      }
+      is RecoverableBrowserState -> {
+        stream.write(144)
+        writeValue(stream, value.toList())
+      }
+      is IconRequest -> {
+        stream.write(145)
+        writeValue(stream, value.toList())
+      }
+      is ResourceSize -> {
+        stream.write(146)
+        writeValue(stream, value.toList())
+      }
+      is Resource -> {
+        stream.write(147)
+        writeValue(stream, value.toList())
+      }
+      is IconResult -> {
+        stream.write(148)
+        writeValue(stream, value.toList())
+      }
+      is CookiePartitionKey -> {
+        stream.write(149)
+        writeValue(stream, value.toList())
+      }
+      is Cookie -> {
+        stream.write(150)
+        writeValue(stream, value.toList())
+      }
+      is HistoryItem -> {
+        stream.write(151)
+        writeValue(stream, value.toList())
+      }
+      is HistoryState -> {
+        stream.write(152)
+        writeValue(stream, value.toList())
+      }
+      is ReaderableState -> {
+        stream.write(153)
+        writeValue(stream, value.toList())
+      }
+      is SecurityInfoState -> {
+        stream.write(154)
+        writeValue(stream, value.toList())
+      }
+      is TabContentState -> {
+        stream.write(155)
         writeValue(stream, value.toList())
       }
       else -> super.writeValue(stream, value)
     }
   }
 }
+
 
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface GeckoBrowserApi {
@@ -1253,6 +1798,308 @@ interface GeckoTabsApi {
           channel.setMessageHandler(null)
         }
       }
+    }
+  }
+}
+/** Generated interface from Pigeon that represents a handler of messages from Flutter. */
+interface GeckoIconsApi {
+  fun loadIcon(request: IconRequest, callback: (Result<IconResult>) -> Unit)
+
+  companion object {
+    /** The codec used by GeckoIconsApi. */
+    val codec: MessageCodec<Any?> by lazy {
+      GeckoPigeonCodec()
+    }
+    /** Sets up an instance of `GeckoIconsApi` to handle messages through the `binaryMessenger`. */
+    @JvmOverloads
+    fun setUp(binaryMessenger: BinaryMessenger, api: GeckoIconsApi?, messageChannelSuffix: String = "") {
+      val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mozilla_components.GeckoIconsApi.loadIcon$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val requestArg = args[0] as IconRequest
+            api.loadIcon(requestArg) { result: Result<IconResult> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+    }
+  }
+}
+/** Generated interface from Pigeon that represents a handler of messages from Flutter. */
+interface GeckoCookieApi {
+  fun getCookie(firstPartyDomain: String?, name: String, partitionKey: CookiePartitionKey?, storeId: String?, url: String, callback: (Result<Cookie>) -> Unit)
+  fun getAllCookies(domain: String?, firstPartyDomain: String?, name: String?, partitionKey: CookiePartitionKey?, storeId: String?, url: String, callback: (Result<List<Cookie>>) -> Unit)
+  fun setCookie(domain: String?, expirationDate: Long?, firstPartyDomain: String?, httpOnly: Boolean?, name: String?, partitionKey: CookiePartitionKey?, path: String?, sameSite: CookieSameSiteStatus?, secure: Boolean?, storeId: String?, url: String, value: String?, callback: (Result<Unit>) -> Unit)
+  fun removeCookie(firstPartyDomain: String?, name: String, partitionKey: CookiePartitionKey?, storeId: String?, url: String, callback: (Result<Unit>) -> Unit)
+
+  companion object {
+    /** The codec used by GeckoCookieApi. */
+    val codec: MessageCodec<Any?> by lazy {
+      GeckoPigeonCodec()
+    }
+    /** Sets up an instance of `GeckoCookieApi` to handle messages through the `binaryMessenger`. */
+    @JvmOverloads
+    fun setUp(binaryMessenger: BinaryMessenger, api: GeckoCookieApi?, messageChannelSuffix: String = "") {
+      val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mozilla_components.GeckoCookieApi.getCookie$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val firstPartyDomainArg = args[0] as String?
+            val nameArg = args[1] as String
+            val partitionKeyArg = args[2] as CookiePartitionKey?
+            val storeIdArg = args[3] as String?
+            val urlArg = args[4] as String
+            api.getCookie(firstPartyDomainArg, nameArg, partitionKeyArg, storeIdArg, urlArg) { result: Result<Cookie> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mozilla_components.GeckoCookieApi.getAllCookies$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val domainArg = args[0] as String?
+            val firstPartyDomainArg = args[1] as String?
+            val nameArg = args[2] as String?
+            val partitionKeyArg = args[3] as CookiePartitionKey?
+            val storeIdArg = args[4] as String?
+            val urlArg = args[5] as String
+            api.getAllCookies(domainArg, firstPartyDomainArg, nameArg, partitionKeyArg, storeIdArg, urlArg) { result: Result<List<Cookie>> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                val data = result.getOrNull()
+                reply.reply(wrapResult(data))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mozilla_components.GeckoCookieApi.setCookie$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val domainArg = args[0] as String?
+            val expirationDateArg = args[1] as Long?
+            val firstPartyDomainArg = args[2] as String?
+            val httpOnlyArg = args[3] as Boolean?
+            val nameArg = args[4] as String?
+            val partitionKeyArg = args[5] as CookiePartitionKey?
+            val pathArg = args[6] as String?
+            val sameSiteArg = args[7] as CookieSameSiteStatus?
+            val secureArg = args[8] as Boolean?
+            val storeIdArg = args[9] as String?
+            val urlArg = args[10] as String
+            val valueArg = args[11] as String?
+            api.setCookie(domainArg, expirationDateArg, firstPartyDomainArg, httpOnlyArg, nameArg, partitionKeyArg, pathArg, sameSiteArg, secureArg, storeIdArg, urlArg, valueArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                reply.reply(wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mozilla_components.GeckoCookieApi.removeCookie$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val firstPartyDomainArg = args[0] as String?
+            val nameArg = args[1] as String
+            val partitionKeyArg = args[2] as CookiePartitionKey?
+            val storeIdArg = args[3] as String?
+            val urlArg = args[4] as String
+            api.removeCookie(firstPartyDomainArg, nameArg, partitionKeyArg, storeIdArg, urlArg) { result: Result<Unit> ->
+              val error = result.exceptionOrNull()
+              if (error != null) {
+                reply.reply(wrapError(error))
+              } else {
+                reply.reply(wrapResult(null))
+              }
+            }
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+    }
+  }
+}
+/** Generated class from Pigeon that represents Flutter messages that can be called from Kotlin. */
+class GeckoStateEvents(private val binaryMessenger: BinaryMessenger, private val messageChannelSuffix: String = "") {
+  companion object {
+    /** The codec used by GeckoStateEvents. */
+    val codec: MessageCodec<Any?> by lazy {
+      GeckoPigeonCodec()
+    }
+  }
+  fun onTabListChange(tabIdsArg: List<String>, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabListChange$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(tabIdsArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onSelectedTabChange(idArg: String?, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSelectedTabChange$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(idArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onTabContentStateChange(stateArg: TabContentState, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabContentStateChange$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(stateArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onHistoryStateChange(idArg: String, stateArg: HistoryState, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onHistoryStateChange$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(idArg, stateArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onReaderableStateChange(idArg: String, stateArg: ReaderableState, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onReaderableStateChange$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(idArg, stateArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onSecurityInfoStateChange(idArg: String, stateArg: SecurityInfoState, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSecurityInfoStateChange$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(idArg, stateArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onIconChange(idArg: String, bytesArg: ByteArray?, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onIconChange$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(idArg, bytesArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onThumbnailChange(idArg: String, bytesArg: ByteArray?, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onThumbnailChange$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(idArg, bytesArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
     }
   }
 }

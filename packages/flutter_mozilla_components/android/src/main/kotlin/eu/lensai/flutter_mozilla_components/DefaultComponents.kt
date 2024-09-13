@@ -9,9 +9,18 @@ import android.util.Log
 import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
+import eu.lensai.flutter_mozilla_components.ext.toWebPBytes
 import eu.lensai.flutter_mozilla_components.middleware.FlutterEventMiddleware
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoStateEvents
+import eu.lensai.flutter_mozilla_components.pigeons.HistoryItem
+import eu.lensai.flutter_mozilla_components.pigeons.HistoryState
+import eu.lensai.flutter_mozilla_components.pigeons.ReaderableState
+import eu.lensai.flutter_mozilla_components.pigeons.SecurityInfoState
+import eu.lensai.flutter_mozilla_components.pigeons.TabContentState
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.distinctUntilChangedBy
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import mozilla.components.browser.engine.gecko.GeckoEngine
@@ -66,7 +75,7 @@ private const val DAY_IN_MINUTES = 24 * 60L
 
 @SuppressLint("NewApi")
 @Suppress("LargeClass")
-open class DefaultComponents(private val applicationContext: Context) {
+open class DefaultComponents(private val applicationContext: Context, private val flutterEvents: GeckoStateEvents) {
     companion object {
         const val SAMPLE_BROWSER_PREFERENCES = "sample_browser_preferences"
         const val PREF_LAUNCH_EXTERNAL_APP = "sample_browser_launch_external_app"
@@ -133,7 +142,7 @@ open class DefaultComponents(private val applicationContext: Context) {
     val store by lazy {
         BrowserStore(
             middleware = listOf(
-                FlutterEventMiddleware(),
+                FlutterEventMiddleware(flutterEvents),
                 DownloadMiddleware(applicationContext, DownloadService::class.java),
                 ReaderViewMiddleware(),
                 ThumbnailsMiddleware(thumbnailStorage),
@@ -145,12 +154,63 @@ open class DefaultComponents(private val applicationContext: Context) {
             ) + EngineMiddleware.create(engine),
         ).apply {
             this.flowScoped { flow ->
-                flow.mapNotNull { state -> state.selectedTab }
-                    .distinctUntilChangedBy {
-                        it.content.url
+                flow.map { state -> state.selectedTabId }
+                    .collect { tabId ->
+                        flutterEvents.onSelectedTabChange(
+                            tabId
+                        ) { _ -> }
+                    }
+            }
+
+            this.flowScoped { flow ->
+                flow.mapNotNull { state -> state.tabs }
+                    .filterChanged {
+                        it.content.icon
                     }
                     .collect { tab ->
-                        Log.d("URL_CHANGE", tab.content.url)
+                        val iconBytes = tab.content.icon?.toWebPBytes()
+                        flutterEvents.onIconChange(
+                            tab.id,
+                            iconBytes
+                        ) { _ -> }
+                    }
+            }
+
+            this.flowScoped { flow ->
+                flow.mapNotNull { state -> state.tabs }
+                    .filterChanged {
+                        it.content.securityInfo
+                    }
+                    .collect { tab ->
+                        flutterEvents.onSecurityInfoStateChange(
+                            tab.id,
+                            SecurityInfoState(
+                                tab.content.securityInfo.secure,
+                                tab.content.securityInfo.host,
+                                tab.content.securityInfo.issuer,
+                            )
+                        ) { _ -> }
+                    }
+            }
+
+            this.flowScoped { flow ->
+                flow.mapNotNull { state -> state.tabs }
+                    .filterChanged {
+                        it.readerState
+                    }
+                    .ifAnyChanged { arrayOf(
+                        it.readerState.readerable,
+                        it.readerState.active,
+                    )
+                    }
+                    .collect { tab ->
+                        flutterEvents.onReaderableStateChange(
+                            tab.id,
+                            ReaderableState(
+                                tab.readerState.readerable,
+                                tab.readerState.active,
+                            )
+                        ) { _ -> }
                     }
             }
 
@@ -159,9 +219,61 @@ open class DefaultComponents(private val applicationContext: Context) {
                     .filterChanged {
                         it.content
                     }
-                    .ifAnyChanged { arrayOf(it.content.url) }
+                    .ifAnyChanged { arrayOf(
+                        it.content.history,
+                        it.content.canGoBack,
+                        it.content.canGoForward,
+                        )
+                    }
                     .collect { tab ->
-                        Log.d("URL_CHANGE2", tab.content.url)
+                        flutterEvents.onHistoryStateChange(
+                            tab.id,
+                            HistoryState(
+                                items = tab.content.history.items.map { item -> HistoryItem(
+                                    url = item.uri,
+                                    title = item.title
+                                ) },
+                                currentIndex = tab.content.history.currentIndex.toLong(),
+                                canGoBack = tab.content.canGoBack,
+                                canGoForward = tab.content.canGoForward,
+                            )
+                        ) { _ -> }
+                    }
+            }
+
+            this.flowScoped { flow ->
+                flow.mapNotNull { state -> state.tabs.map {tab -> tab.id} }
+                    .distinctUntilChanged()
+                    .collect { tabs ->
+                        flutterEvents.onTabListChange(tabs) { _ -> }
+                    }
+            }
+
+            this.flowScoped { flow ->
+                flow.mapNotNull { state -> state.tabs }
+                    .filterChanged {
+                        it.content
+                    }
+                    .ifAnyChanged { arrayOf(
+                        it.content.url,
+                        it.content.title,
+                        it.content.private,
+                        it.content.fullScreen,
+                        it.content.progress,
+                        it.content.loading) }
+                    .collect { tab ->
+                        flutterEvents.onTabContentStateChange(
+                            TabContentState(
+                                id = tab.id,
+                                contextId = tab.contextId,
+                                url = tab.content.url,
+                                title = tab.content.title,
+                                progress = tab.content.progress.toLong(),
+                                isPrivate = tab.content.private,
+                                isFullScreen = tab.content.fullScreen,
+                                isLoading = tab.content.loading
+                            )
+                        ) { _ -> }
                     }
             }
 

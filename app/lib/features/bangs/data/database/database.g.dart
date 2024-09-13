@@ -1021,8 +1021,6 @@ class BangDataView extends ViewInfo<BangDataView, BangData>
           .read(DriftSqlType.int, data['${effectivePrefix}frequency']),
       lastUsed: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}last_used']),
-      iconData: attachedDatabase.typeMapping
-          .read(DriftSqlType.blob, data['${effectivePrefix}icon_data']),
     );
   }
 
@@ -1121,7 +1119,6 @@ abstract class _$BangDatabase extends GeneratedDatabase {
               .fromSql(row.readNullable<String>('format')),
           frequency: row.readNullable<int>('frequency'),
           lastUsed: row.readNullable<DateTime>('last_used'),
-          iconData: row.readNullable<Uint8List>('icon_data'),
         ));
   }
 

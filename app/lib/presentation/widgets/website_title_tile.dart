@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lensai/domain/entities/web_page_info.dart';
-import 'package:lensai/features/web_view/presentation/widgets/favicon.dart';
+import 'package:lensai/data/models/web_page_info.dart';
 import 'package:lensai/presentation/controllers/website_title.dart';
 import 'package:lensai/presentation/widgets/failure_widget.dart';
 import 'package:skeletonizer/skeletonizer.dart';

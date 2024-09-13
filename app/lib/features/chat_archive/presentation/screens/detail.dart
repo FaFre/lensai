@@ -12,7 +12,6 @@ import 'package:lensai/features/chat_archive/domain/repositories/archive.dart';
 import 'package:lensai/features/chat_archive/utils/markdown_to_text.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
-import 'package:lensai/features/web_view/presentation/controllers/switch_new_tab.dart';
 import 'package:lensai/presentation/widgets/failure_widget.dart';
 import 'package:lensai/utils/ui_helper.dart' as ui_helper;
 import 'package:skeletonizer/skeletonizer.dart';
@@ -51,7 +50,7 @@ class ChatArchiveDetailScreen extends HookConsumerWidget {
                   if (chatAsync.valueOrNull != null) {
                     await Clipboard.setData(
                       ClipboardData(
-                        text: await Future.microtask(
+                        text: await Future(
                           () => markdownToText(chatAsync.valueOrNull!),
                         ),
                       ),

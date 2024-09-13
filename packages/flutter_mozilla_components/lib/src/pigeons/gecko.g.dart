@@ -15,6 +15,16 @@ PlatformException _createConnectionError(String channelName) {
   );
 }
 
+List<Object?> wrapResponse({Object? result, PlatformException? error, bool empty = false}) {
+  if (empty) {
+    return <Object?>[];
+  }
+  if (error == null) {
+    return <Object?>[result];
+  }
+  return <Object?>[error.code, error.message, error.details];
+}
+
 /// Indicates what location the tabs should be restored at
 enum RestoreLocation {
   /// Restore tabs at the beginning of the tab list
@@ -23,6 +33,49 @@ enum RestoreLocation {
   end,
   /// Restore tabs at a specific index in the tab list
   atIndex,
+}
+
+/// An icon resource type.
+enum IconType {
+  favicon,
+  appleTouchIcon,
+  fluidIcon,
+  imageSrc,
+  openGraph,
+  twitter,
+  microsoftTile,
+  tippyTop,
+  manifestIcon,
+}
+
+/// Supported sizes.
+///
+/// We are trying to limit the supported sizes in order to optimize our caching strategy.
+enum IconSize {
+  defaultSize,
+  launcher,
+  launcherAdaptive,
+}
+
+/// The source of an [Icon].
+enum IconSource {
+  /// This icon was generated.
+  generator,
+  /// This icon was downloaded.
+  download,
+  /// This icon was inlined in the document.
+  inline,
+  /// This icon was loaded from an in-memory cache.
+  memory,
+  /// This icon was loaded from a disk cache.
+  disk,
+}
+
+enum CookieSameSiteStatus {
+  noRestriction,
+  lax,
+  strict,
+  unspecified,
 }
 
 /// Translation options that map to the Gecko Translations Options.
@@ -121,7 +174,7 @@ class LastMediaAccessState {
     required this.mediaSessionActive,
   });
 
-  /// [ContentState.url] when media started playing.
+  /// [TabContentState.url] when media started playing.
   /// This is not the URL of the media but of the page when media started.
   /// Defaults to "" (an empty String) if media hasn't started playing.
   /// This value is only updated when media starts playing.
@@ -357,7 +410,7 @@ class TabState {
   /// The last [HistoryMetadataKey] of the tab.
   HistoryMetadataKey? historyMetadata;
 
-  /// The last [Source] of the tab.
+  /// The last [IconSource] of the tab.
   SourceValue source;
 
   /// The index the tab should be restored at.
@@ -466,6 +519,442 @@ class RecoverableBrowserState {
   }
 }
 
+/// A request to load an [Icon].
+class IconRequest {
+  IconRequest({
+    required this.url,
+    required this.size,
+    required this.resources,
+    this.color,
+    required this.isPrivate,
+    required this.waitOnNetworkLoad,
+  });
+
+  String url;
+
+  IconSize size;
+
+  List<Resource?> resources;
+
+  int? color;
+
+  bool isPrivate;
+
+  bool waitOnNetworkLoad;
+
+  Object encode() {
+    return <Object?>[
+      url,
+      size,
+      resources,
+      color,
+      isPrivate,
+      waitOnNetworkLoad,
+    ];
+  }
+
+  static IconRequest decode(Object result) {
+    result as List<Object?>;
+    return IconRequest(
+      url: result[0]! as String,
+      size: result[1]! as IconSize,
+      resources: (result[2] as List<Object?>?)!.cast<Resource?>(),
+      color: result[3] as int?,
+      isPrivate: result[4]! as bool,
+      waitOnNetworkLoad: result[5]! as bool,
+    );
+  }
+}
+
+class ResourceSize {
+  ResourceSize({
+    required this.height,
+    required this.width,
+  });
+
+  int height;
+
+  int width;
+
+  Object encode() {
+    return <Object?>[
+      height,
+      width,
+    ];
+  }
+
+  static ResourceSize decode(Object result) {
+    result as List<Object?>;
+    return ResourceSize(
+      height: result[0]! as int,
+      width: result[1]! as int,
+    );
+  }
+}
+
+/// An icon resource that can be loaded.
+class Resource {
+  Resource({
+    required this.url,
+    required this.type,
+    required this.sizes,
+    this.mimeType,
+    required this.maskable,
+  });
+
+  String url;
+
+  IconType type;
+
+  List<ResourceSize?> sizes;
+
+  String? mimeType;
+
+  bool maskable;
+
+  Object encode() {
+    return <Object?>[
+      url,
+      type,
+      sizes,
+      mimeType,
+      maskable,
+    ];
+  }
+
+  static Resource decode(Object result) {
+    result as List<Object?>;
+    return Resource(
+      url: result[0]! as String,
+      type: result[1]! as IconType,
+      sizes: (result[2] as List<Object?>?)!.cast<ResourceSize?>(),
+      mimeType: result[3] as String?,
+      maskable: result[4]! as bool,
+    );
+  }
+}
+
+/// An [Icon] returned by [BrowserIcons] after processing an [IconRequest]
+class IconResult {
+  IconResult({
+    required this.image,
+    this.color,
+    required this.source,
+    required this.maskable,
+  });
+
+  /// The loaded icon as an [Uint8List].
+  Uint8List image;
+
+  /// The dominant color of the icon. Will be null if no color could be extracted.
+  int? color;
+
+  /// The source of the icon.
+  IconSource source;
+
+  /// True if the icon represents as full-bleed icon that can be cropped to other shapes.
+  bool maskable;
+
+  Object encode() {
+    return <Object?>[
+      image,
+      color,
+      source,
+      maskable,
+    ];
+  }
+
+  static IconResult decode(Object result) {
+    result as List<Object?>;
+    return IconResult(
+      image: result[0]! as Uint8List,
+      color: result[1] as int?,
+      source: result[2]! as IconSource,
+      maskable: result[3]! as bool,
+    );
+  }
+}
+
+class CookiePartitionKey {
+  CookiePartitionKey({
+    required this.topLevelSite,
+  });
+
+  String topLevelSite;
+
+  Object encode() {
+    return <Object?>[
+      topLevelSite,
+    ];
+  }
+
+  static CookiePartitionKey decode(Object result) {
+    result as List<Object?>;
+    return CookiePartitionKey(
+      topLevelSite: result[0]! as String,
+    );
+  }
+}
+
+class Cookie {
+  Cookie({
+    required this.domain,
+    this.expirationDate,
+    required this.firstPartyDomain,
+    required this.hostOnly,
+    required this.httpOnly,
+    required this.name,
+    this.partitionKey,
+    required this.path,
+    required this.secure,
+    required this.session,
+    required this.sameSite,
+    required this.storeId,
+    required this.value,
+  });
+
+  String domain;
+
+  int? expirationDate;
+
+  String firstPartyDomain;
+
+  bool hostOnly;
+
+  bool httpOnly;
+
+  String name;
+
+  CookiePartitionKey? partitionKey;
+
+  String path;
+
+  bool secure;
+
+  bool session;
+
+  CookieSameSiteStatus sameSite;
+
+  String storeId;
+
+  String value;
+
+  Object encode() {
+    return <Object?>[
+      domain,
+      expirationDate,
+      firstPartyDomain,
+      hostOnly,
+      httpOnly,
+      name,
+      partitionKey,
+      path,
+      secure,
+      session,
+      sameSite,
+      storeId,
+      value,
+    ];
+  }
+
+  static Cookie decode(Object result) {
+    result as List<Object?>;
+    return Cookie(
+      domain: result[0]! as String,
+      expirationDate: result[1] as int?,
+      firstPartyDomain: result[2]! as String,
+      hostOnly: result[3]! as bool,
+      httpOnly: result[4]! as bool,
+      name: result[5]! as String,
+      partitionKey: result[6] as CookiePartitionKey?,
+      path: result[7]! as String,
+      secure: result[8]! as bool,
+      session: result[9]! as bool,
+      sameSite: result[10]! as CookieSameSiteStatus,
+      storeId: result[11]! as String,
+      value: result[12]! as String,
+    );
+  }
+}
+
+class HistoryItem {
+  HistoryItem({
+    required this.url,
+    required this.title,
+  });
+
+  String url;
+
+  String title;
+
+  Object encode() {
+    return <Object?>[
+      url,
+      title,
+    ];
+  }
+
+  static HistoryItem decode(Object result) {
+    result as List<Object?>;
+    return HistoryItem(
+      url: result[0]! as String,
+      title: result[1]! as String,
+    );
+  }
+}
+
+class HistoryState {
+  HistoryState({
+    required this.items,
+    required this.currentIndex,
+    required this.canGoBack,
+    required this.canGoForward,
+  });
+
+  List<HistoryItem?> items;
+
+  int currentIndex;
+
+  bool canGoBack;
+
+  bool canGoForward;
+
+  Object encode() {
+    return <Object?>[
+      items,
+      currentIndex,
+      canGoBack,
+      canGoForward,
+    ];
+  }
+
+  static HistoryState decode(Object result) {
+    result as List<Object?>;
+    return HistoryState(
+      items: (result[0] as List<Object?>?)!.cast<HistoryItem?>(),
+      currentIndex: result[1]! as int,
+      canGoBack: result[2]! as bool,
+      canGoForward: result[3]! as bool,
+    );
+  }
+}
+
+class ReaderableState {
+  ReaderableState({
+    required this.readerable,
+    required this.active,
+  });
+
+  /// Whether or not the current page can be transformed to
+  /// be displayed in a reader view.
+  bool readerable;
+
+  /// Whether or not reader view is active.
+  bool active;
+
+  Object encode() {
+    return <Object?>[
+      readerable,
+      active,
+    ];
+  }
+
+  static ReaderableState decode(Object result) {
+    result as List<Object?>;
+    return ReaderableState(
+      readerable: result[0]! as bool,
+      active: result[1]! as bool,
+    );
+  }
+}
+
+class SecurityInfoState {
+  SecurityInfoState({
+    required this.secure,
+    required this.host,
+    required this.issuer,
+  });
+
+  bool secure;
+
+  String host;
+
+  String issuer;
+
+  Object encode() {
+    return <Object?>[
+      secure,
+      host,
+      issuer,
+    ];
+  }
+
+  static SecurityInfoState decode(Object result) {
+    result as List<Object?>;
+    return SecurityInfoState(
+      secure: result[0]! as bool,
+      host: result[1]! as String,
+      issuer: result[2]! as String,
+    );
+  }
+}
+
+class TabContentState {
+  TabContentState({
+    required this.id,
+    this.contextId,
+    required this.url,
+    required this.title,
+    required this.progress,
+    required this.isPrivate,
+    required this.isFullScreen,
+    required this.isLoading,
+  });
+
+  String id;
+
+  String? contextId;
+
+  String url;
+
+  String title;
+
+  int progress;
+
+  bool isPrivate;
+
+  bool isFullScreen;
+
+  bool isLoading;
+
+  Object encode() {
+    return <Object?>[
+      id,
+      contextId,
+      url,
+      title,
+      progress,
+      isPrivate,
+      isFullScreen,
+      isLoading,
+    ];
+  }
+
+  static TabContentState decode(Object result) {
+    result as List<Object?>;
+    return TabContentState(
+      id: result[0]! as String,
+      contextId: result[1] as String?,
+      url: result[2]! as String,
+      title: result[3]! as String,
+      progress: result[4]! as int,
+      isPrivate: result[5]! as bool,
+      isFullScreen: result[6]! as bool,
+      isLoading: result[7]! as bool,
+    );
+  }
+}
+
 
 class _PigeonCodec extends StandardMessageCodec {
   const _PigeonCodec();
@@ -477,38 +966,83 @@ class _PigeonCodec extends StandardMessageCodec {
     }    else if (value is RestoreLocation) {
       buffer.putUint8(129);
       writeValue(buffer, value.index);
-    }    else if (value is TranslationOptions) {
+    }    else if (value is IconType) {
       buffer.putUint8(130);
-      writeValue(buffer, value.encode());
-    }    else if (value is ReaderState) {
+      writeValue(buffer, value.index);
+    }    else if (value is IconSize) {
       buffer.putUint8(131);
-      writeValue(buffer, value.encode());
-    }    else if (value is LastMediaAccessState) {
+      writeValue(buffer, value.index);
+    }    else if (value is IconSource) {
       buffer.putUint8(132);
-      writeValue(buffer, value.encode());
-    }    else if (value is HistoryMetadataKey) {
+      writeValue(buffer, value.index);
+    }    else if (value is CookieSameSiteStatus) {
       buffer.putUint8(133);
-      writeValue(buffer, value.encode());
-    }    else if (value is PackageCategoryValue) {
+      writeValue(buffer, value.index);
+    }    else if (value is TranslationOptions) {
       buffer.putUint8(134);
       writeValue(buffer, value.encode());
-    }    else if (value is ExternalPackage) {
+    }    else if (value is ReaderState) {
       buffer.putUint8(135);
       writeValue(buffer, value.encode());
-    }    else if (value is LoadUrlFlagsValue) {
+    }    else if (value is LastMediaAccessState) {
       buffer.putUint8(136);
       writeValue(buffer, value.encode());
-    }    else if (value is SourceValue) {
+    }    else if (value is HistoryMetadataKey) {
       buffer.putUint8(137);
       writeValue(buffer, value.encode());
-    }    else if (value is TabState) {
+    }    else if (value is PackageCategoryValue) {
       buffer.putUint8(138);
       writeValue(buffer, value.encode());
-    }    else if (value is RecoverableTab) {
+    }    else if (value is ExternalPackage) {
       buffer.putUint8(139);
       writeValue(buffer, value.encode());
-    }    else if (value is RecoverableBrowserState) {
+    }    else if (value is LoadUrlFlagsValue) {
       buffer.putUint8(140);
+      writeValue(buffer, value.encode());
+    }    else if (value is SourceValue) {
+      buffer.putUint8(141);
+      writeValue(buffer, value.encode());
+    }    else if (value is TabState) {
+      buffer.putUint8(142);
+      writeValue(buffer, value.encode());
+    }    else if (value is RecoverableTab) {
+      buffer.putUint8(143);
+      writeValue(buffer, value.encode());
+    }    else if (value is RecoverableBrowserState) {
+      buffer.putUint8(144);
+      writeValue(buffer, value.encode());
+    }    else if (value is IconRequest) {
+      buffer.putUint8(145);
+      writeValue(buffer, value.encode());
+    }    else if (value is ResourceSize) {
+      buffer.putUint8(146);
+      writeValue(buffer, value.encode());
+    }    else if (value is Resource) {
+      buffer.putUint8(147);
+      writeValue(buffer, value.encode());
+    }    else if (value is IconResult) {
+      buffer.putUint8(148);
+      writeValue(buffer, value.encode());
+    }    else if (value is CookiePartitionKey) {
+      buffer.putUint8(149);
+      writeValue(buffer, value.encode());
+    }    else if (value is Cookie) {
+      buffer.putUint8(150);
+      writeValue(buffer, value.encode());
+    }    else if (value is HistoryItem) {
+      buffer.putUint8(151);
+      writeValue(buffer, value.encode());
+    }    else if (value is HistoryState) {
+      buffer.putUint8(152);
+      writeValue(buffer, value.encode());
+    }    else if (value is ReaderableState) {
+      buffer.putUint8(153);
+      writeValue(buffer, value.encode());
+    }    else if (value is SecurityInfoState) {
+      buffer.putUint8(154);
+      writeValue(buffer, value.encode());
+    }    else if (value is TabContentState) {
+      buffer.putUint8(155);
       writeValue(buffer, value.encode());
     } else {
       super.writeValue(buffer, value);
@@ -522,27 +1056,61 @@ class _PigeonCodec extends StandardMessageCodec {
         final int? value = readValue(buffer) as int?;
         return value == null ? null : RestoreLocation.values[value];
       case 130: 
-        return TranslationOptions.decode(readValue(buffer)!);
+        final int? value = readValue(buffer) as int?;
+        return value == null ? null : IconType.values[value];
       case 131: 
-        return ReaderState.decode(readValue(buffer)!);
+        final int? value = readValue(buffer) as int?;
+        return value == null ? null : IconSize.values[value];
       case 132: 
-        return LastMediaAccessState.decode(readValue(buffer)!);
+        final int? value = readValue(buffer) as int?;
+        return value == null ? null : IconSource.values[value];
       case 133: 
-        return HistoryMetadataKey.decode(readValue(buffer)!);
+        final int? value = readValue(buffer) as int?;
+        return value == null ? null : CookieSameSiteStatus.values[value];
       case 134: 
-        return PackageCategoryValue.decode(readValue(buffer)!);
+        return TranslationOptions.decode(readValue(buffer)!);
       case 135: 
-        return ExternalPackage.decode(readValue(buffer)!);
+        return ReaderState.decode(readValue(buffer)!);
       case 136: 
-        return LoadUrlFlagsValue.decode(readValue(buffer)!);
+        return LastMediaAccessState.decode(readValue(buffer)!);
       case 137: 
-        return SourceValue.decode(readValue(buffer)!);
+        return HistoryMetadataKey.decode(readValue(buffer)!);
       case 138: 
-        return TabState.decode(readValue(buffer)!);
+        return PackageCategoryValue.decode(readValue(buffer)!);
       case 139: 
-        return RecoverableTab.decode(readValue(buffer)!);
+        return ExternalPackage.decode(readValue(buffer)!);
       case 140: 
+        return LoadUrlFlagsValue.decode(readValue(buffer)!);
+      case 141: 
+        return SourceValue.decode(readValue(buffer)!);
+      case 142: 
+        return TabState.decode(readValue(buffer)!);
+      case 143: 
+        return RecoverableTab.decode(readValue(buffer)!);
+      case 144: 
         return RecoverableBrowserState.decode(readValue(buffer)!);
+      case 145: 
+        return IconRequest.decode(readValue(buffer)!);
+      case 146: 
+        return ResourceSize.decode(readValue(buffer)!);
+      case 147: 
+        return Resource.decode(readValue(buffer)!);
+      case 148: 
+        return IconResult.decode(readValue(buffer)!);
+      case 149: 
+        return CookiePartitionKey.decode(readValue(buffer)!);
+      case 150: 
+        return Cookie.decode(readValue(buffer)!);
+      case 151: 
+        return HistoryItem.decode(readValue(buffer)!);
+      case 152: 
+        return HistoryState.decode(readValue(buffer)!);
+      case 153: 
+        return ReaderableState.decode(readValue(buffer)!);
+      case 154: 
+        return SecurityInfoState.decode(readValue(buffer)!);
+      case 155: 
+        return TabContentState.decode(readValue(buffer)!);
       default:
         return super.readValueOfType(type, buffer);
     }
@@ -1319,6 +1887,392 @@ class GeckoTabsApi {
       );
     } else {
       return (pigeonVar_replyList[0] as String?)!;
+    }
+  }
+}
+
+class GeckoIconsApi {
+  /// Constructor for [GeckoIconsApi].  The [binaryMessenger] named argument is
+  /// available for dependency injection.  If it is left null, the default
+  /// BinaryMessenger will be used which routes to the host platform.
+  GeckoIconsApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+      : pigeonVar_binaryMessenger = binaryMessenger,
+        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  final BinaryMessenger? pigeonVar_binaryMessenger;
+
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+
+  final String pigeonVar_messageChannelSuffix;
+
+  Future<IconResult> loadIcon(IconRequest request) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mozilla_components.GeckoIconsApi.loadIcon$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_channel.send(<Object?>[request]) as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as IconResult?)!;
+    }
+  }
+}
+
+class GeckoCookieApi {
+  /// Constructor for [GeckoCookieApi].  The [binaryMessenger] named argument is
+  /// available for dependency injection.  If it is left null, the default
+  /// BinaryMessenger will be used which routes to the host platform.
+  GeckoCookieApi({BinaryMessenger? binaryMessenger, String messageChannelSuffix = ''})
+      : pigeonVar_binaryMessenger = binaryMessenger,
+        pigeonVar_messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+  final BinaryMessenger? pigeonVar_binaryMessenger;
+
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+
+  final String pigeonVar_messageChannelSuffix;
+
+  Future<Cookie> getCookie(String? firstPartyDomain, String name, CookiePartitionKey? partitionKey, String? storeId, String url) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mozilla_components.GeckoCookieApi.getCookie$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_channel.send(<Object?>[firstPartyDomain, name, partitionKey, storeId, url]) as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as Cookie?)!;
+    }
+  }
+
+  Future<List<Cookie?>> getAllCookies(String? domain, String? firstPartyDomain, String? name, CookiePartitionKey? partitionKey, String? storeId, String url) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mozilla_components.GeckoCookieApi.getAllCookies$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_channel.send(<Object?>[domain, firstPartyDomain, name, partitionKey, storeId, url]) as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else if (pigeonVar_replyList[0] == null) {
+      throw PlatformException(
+        code: 'null-error',
+        message: 'Host platform returned null value for non-null return value.',
+      );
+    } else {
+      return (pigeonVar_replyList[0] as List<Object?>?)!.cast<Cookie?>();
+    }
+  }
+
+  Future<void> setCookie(String? domain, int? expirationDate, String? firstPartyDomain, bool? httpOnly, String? name, CookiePartitionKey? partitionKey, String? path, CookieSameSiteStatus? sameSite, bool? secure, String? storeId, String url, String? value) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mozilla_components.GeckoCookieApi.setCookie$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_channel.send(<Object?>[domain, expirationDate, firstPartyDomain, httpOnly, name, partitionKey, path, sameSite, secure, storeId, url, value]) as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+
+  Future<void> removeCookie(String? firstPartyDomain, String name, CookiePartitionKey? partitionKey, String? storeId, String url) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mozilla_components.GeckoCookieApi.removeCookie$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_channel.send(<Object?>[firstPartyDomain, name, partitionKey, storeId, url]) as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
+}
+
+abstract class GeckoStateEvents {
+  static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
+
+  void onTabListChange(List<String?> tabIds);
+
+  void onSelectedTabChange(String? id);
+
+  void onTabContentStateChange(TabContentState state);
+
+  void onHistoryStateChange(String id, HistoryState state);
+
+  void onReaderableStateChange(String id, ReaderableState state);
+
+  void onSecurityInfoStateChange(String id, SecurityInfoState state);
+
+  void onIconChange(String id, Uint8List? bytes);
+
+  void onThumbnailChange(String id, Uint8List? bytes);
+
+  static void setUp(GeckoStateEvents? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
+    messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabListChange$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabListChange was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final List<String?>? arg_tabIds = (args[0] as List<Object?>?)?.cast<String?>();
+          assert(arg_tabIds != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabListChange was null, expected non-null List<String?>.');
+          try {
+            api.onTabListChange(arg_tabIds!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSelectedTabChange$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSelectedTabChange was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_id = (args[0] as String?);
+          try {
+            api.onSelectedTabChange(arg_id);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabContentStateChange$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabContentStateChange was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final TabContentState? arg_state = (args[0] as TabContentState?);
+          assert(arg_state != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabContentStateChange was null, expected non-null TabContentState.');
+          try {
+            api.onTabContentStateChange(arg_state!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onHistoryStateChange$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onHistoryStateChange was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_id = (args[0] as String?);
+          assert(arg_id != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onHistoryStateChange was null, expected non-null String.');
+          final HistoryState? arg_state = (args[1] as HistoryState?);
+          assert(arg_state != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onHistoryStateChange was null, expected non-null HistoryState.');
+          try {
+            api.onHistoryStateChange(arg_id!, arg_state!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onReaderableStateChange$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onReaderableStateChange was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_id = (args[0] as String?);
+          assert(arg_id != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onReaderableStateChange was null, expected non-null String.');
+          final ReaderableState? arg_state = (args[1] as ReaderableState?);
+          assert(arg_state != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onReaderableStateChange was null, expected non-null ReaderableState.');
+          try {
+            api.onReaderableStateChange(arg_id!, arg_state!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSecurityInfoStateChange$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSecurityInfoStateChange was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_id = (args[0] as String?);
+          assert(arg_id != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSecurityInfoStateChange was null, expected non-null String.');
+          final SecurityInfoState? arg_state = (args[1] as SecurityInfoState?);
+          assert(arg_state != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSecurityInfoStateChange was null, expected non-null SecurityInfoState.');
+          try {
+            api.onSecurityInfoStateChange(arg_id!, arg_state!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onIconChange$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onIconChange was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_id = (args[0] as String?);
+          assert(arg_id != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onIconChange was null, expected non-null String.');
+          final Uint8List? arg_bytes = (args[1] as Uint8List?);
+          try {
+            api.onIconChange(arg_id!, arg_bytes);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onThumbnailChange$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onThumbnailChange was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final String? arg_id = (args[0] as String?);
+          assert(arg_id != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onThumbnailChange was null, expected non-null String.');
+          final Uint8List? arg_bytes = (args[1] as Uint8List?);
+          try {
+            api.onThumbnailChange(arg_id!, arg_bytes);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
     }
   }
 }

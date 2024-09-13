@@ -9,8 +9,7 @@ import 'package:lensai/features/content_block/domain/repositories/sync.dart';
 import 'package:lensai/features/search_browser/domain/services/session.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
-import 'package:lensai/features/topics/data/providers.dart';
-import 'package:lensai/features/web_view/domain/providers.dart';
+import 'package:lensai/features/geckoview/features/topics/data/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_initialization.g.dart';
@@ -95,8 +94,6 @@ class AppInitializationService extends _$AppInitializationService {
     state = await Result.fromAsync(() async {
       final settings = await ref.read(settingsRepositoryProvider.future);
       final errors = <ErrorMessage>[];
-
-      unawaited(ref.read(readerabilityScriptProvider.future));
 
       await _initPackageInfo();
 

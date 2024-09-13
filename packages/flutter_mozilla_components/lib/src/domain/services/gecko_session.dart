@@ -1,16 +1,18 @@
 import 'package:flutter_mozilla_components/src/data/models/load_url_flags.dart';
 import 'package:flutter_mozilla_components/src/pigeons/gecko.g.dart';
 
+final _apiInstance = GeckoSessionApi();
+
 class GeckoSessionService {
   final String? tabId;
   final GeckoSessionApi _api;
 
-  GeckoSessionService.forCurrentTab({GeckoSessionApi? api})
-      : _api = api ?? GeckoSessionApi(),
+  GeckoSessionService.forActiveTab({GeckoSessionApi? api})
+      : _api = api ?? _apiInstance,
         tabId = null;
 
   GeckoSessionService({required String this.tabId, GeckoSessionApi? api})
-      : _api = api ?? GeckoSessionApi();
+      : _api = api ?? _apiInstance;
 
   Future<void> loadUrl({
     required Uri url,

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lensai/features/web_view/domain/entities/abstract/tab.dart';
-import 'package:lensai/features/web_view/presentation/widgets/favicon.dart';
+import 'package:lensai/features/search_browser/presentation/widgets/favicon.dart';
 
 class WebViewTab extends StatelessWidget {
   final ITab tab;

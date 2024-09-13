@@ -1,5 +1,18 @@
 name: lensai_project
 
+scripts:
+  build-pigeons:
+    exec: |
+      echo "Running pigeon for files in pigeons directory:"
+      for file in ./pigeons/*; do
+        if [ -f "\$file" ]; then
+          echo "Processing \$file"
+          flutter pub run pigeon --input "\$file"
+        fi
+      done
+    packageFilters:
+      dirExists: 'pigeons'
+
 packages:
   - app/
   - packages/**
