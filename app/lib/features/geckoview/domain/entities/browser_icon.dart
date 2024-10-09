@@ -21,14 +21,14 @@ class BrowserIcon with FastEquatable {
     final image =
         await tryDecodeImage(bytes).then((image) => image!.toEquatable());
 
-    return BrowserIcon._(
+    return BrowserIcon(
       image: image,
       dominantColor: dominantColor,
       source: source,
     );
   }
 
-  BrowserIcon._({
+  BrowserIcon({
     required this.image,
     required this.dominantColor,
     required this.source,

@@ -7,15 +7,15 @@ part of 'routes.dart';
 // **************************************************************************
 
 List<RouteBase> get $appRoutes => [
-      $kagiRoute,
+      $browserRoute,
       $settingsRoute,
       $chatArchiveListRoute,
     ];
 
-RouteBase get $kagiRoute => GoRouteData.$route(
+RouteBase get $browserRoute => GoRouteData.$route(
       path: '/',
-      name: 'KagiRoute',
-      factory: $KagiRouteExtension._fromState,
+      name: 'BrowserRoute',
+      factory: $BrowserRouteExtension._fromState,
       routes: [
         GoRouteData.$route(
           path: 'about',
@@ -54,8 +54,8 @@ RouteBase get $kagiRoute => GoRouteData.$route(
       ],
     );
 
-extension $KagiRouteExtension on KagiRoute {
-  static KagiRoute _fromState(GoRouterState state) => KagiRoute();
+extension $BrowserRouteExtension on BrowserRoute {
+  static BrowserRoute _fromState(GoRouterState state) => BrowserRoute();
 
   String get location => GoRouteData.$location(
         '/',

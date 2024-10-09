@@ -38,11 +38,15 @@ abstract class Source {
   /// Initializes a [Source] of a correct type from its component properties.
   /// Intended use is for restoring persisted state.
   static Source restore(
-      int? sourceId, String? packageId, int? packageCategory) {
+    int? sourceId,
+    String? packageId,
+    int? packageCategory,
+  ) {
     final caller = packageId != null
         ? ExternalPackage(
             packageId: packageId,
-            category: PackageCategory.fromInt(packageCategory).toValue())
+            category: PackageCategory.fromInt(packageCategory).toValue(),
+          )
         : null;
 
     switch (sourceId) {

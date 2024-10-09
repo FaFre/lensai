@@ -1,6 +1,10 @@
 import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:fast_equatable/fast_equatable.dart';
+import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
+import 'package:lensai/data/models/web_page_info.dart';
 import 'package:lensai/domain/entities/equatable_image.dart';
+import 'package:lensai/features/geckoview/domain/entities/browser_icon.dart';
+import 'package:lensai/features/geckoview/domain/entities/find_result_state.dart';
 import 'package:lensai/features/geckoview/domain/entities/history_state.dart';
 import 'package:lensai/features/geckoview/domain/entities/readerable_state.dart';
 import 'package:lensai/features/geckoview/domain/entities/security_state.dart';
@@ -8,16 +12,28 @@ import 'package:lensai/features/geckoview/domain/entities/security_state.dart';
 part 'tab_state.g.dart';
 
 @CopyWith()
-class TabState with FastEquatable {
+class TabState with FastEquatable implements WebPageInfo {
   @CopyWithField(immutable: true)
   final String id;
 
   final String? contextId;
 
+  @override
   final Uri url;
+  @override
   final String title;
 
   final EquatableImage? icon;
+
+  @override
+  BrowserIcon? get favicon => (icon != null)
+      ? BrowserIcon(
+          image: icon!,
+          dominantColor: null,
+          source: IconSource.memory,
+        )
+      : null;
+
   final EquatableImage? thumbnail;
 
   final int progress;
@@ -29,6 +45,7 @@ class TabState with FastEquatable {
   final SecurityState securityInfoState;
   final HistoryState historyState;
   final ReaderableState readerableState;
+  final FindResultState findResultState;
 
   TabState({
     required this.id,
@@ -44,6 +61,7 @@ class TabState with FastEquatable {
     required this.securityInfoState,
     required this.historyState,
     required this.readerableState,
+    required this.findResultState,
   });
 
   factory TabState.$default(String tabId) => TabState(
@@ -60,6 +78,7 @@ class TabState with FastEquatable {
         securityInfoState: SecurityState.$default(),
         historyState: HistoryState.$default(),
         readerableState: ReaderableState.$default(),
+        findResultState: FindResultState.$default(),
       );
 
   @override
@@ -80,5 +99,6 @@ class TabState with FastEquatable {
         securityInfoState,
         historyState,
         readerableState,
+        findResultState,
       ];
 }

@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
-import 'package:lensai/features/geckoview/domain/repositories/selected_tab.dart';
+import 'package:lensai/features/geckoview/domain/providers/selected_tab.dart';
+import 'package:lensai/features/geckoview/domain/providers/tab_state.dart';
 import 'package:lensai/features/geckoview/domain/repositories/tab.dart';
 import 'package:lensai/features/geckoview/features/topics/data/database/database.dart';
 import 'package:lensai/features/geckoview/features/topics/data/providers.dart';
@@ -17,7 +18,7 @@ class TabLinkRepository extends _$TabLinkRepository {
 
     //Sync existing tabs
     ref.listen(
-      tabRepositoryProvider.select((tabs) => tabs.keys.toList()),
+      tabStatesProvider.select((tabs) => tabs.keys.toList()),
       (previous, next) async {
         //No empty list to avoid data loss
         if (next.isNotEmpty) {
@@ -27,7 +28,7 @@ class TabLinkRepository extends _$TabLinkRepository {
     );
 
     ref.listen(
-      selectedTabControllerProvider,
+      selectedTabProvider,
       (previous, next) async {
         if (next != null) {
           await _db.tabLinkDao.touchTabLink(next, timestamp: DateTime.now());

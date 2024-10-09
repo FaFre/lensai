@@ -71,7 +71,10 @@ class GeckoTabService {
     RestoreLocation restoreLocation = RestoreLocation.end,
   }) {
     return _api.restoreTabsByList(
-        tabs: tabs, selectTabId: selectTabId, restoreLocation: restoreLocation);
+      tabs: tabs,
+      selectTabId: selectTabId,
+      restoreLocation: restoreLocation,
+    );
   }
 
   Future<void> restoreTabsByBrowserState({
@@ -79,7 +82,9 @@ class GeckoTabService {
     RestoreLocation restoreLocation = RestoreLocation.end,
   }) {
     return _api.restoreTabsByBrowserState(
-        state: state, restoreLocation: restoreLocation);
+      state: state,
+      restoreLocation: restoreLocation,
+    );
   }
   //The calls with engin storage for restore are not supported at the moment
 
@@ -91,7 +96,9 @@ class GeckoTabService {
     required HistoryMetadataKey historyMetadata,
   }) {
     return _api.selectOrAddTabByHistory(
-        url: url.toString(), historyMetadata: historyMetadata);
+      url: url.toString(),
+      historyMetadata: historyMetadata,
+    );
   }
 
   /// Selects an already existing tab displaying [url] or otherwise creates a new tab.
@@ -116,7 +123,9 @@ class GeckoTabService {
     bool selectNewTab = true,
   }) {
     return _api.duplicateTab(
-        selectTabId: selectTabId, selectNewTab: selectNewTab);
+      selectTabId: selectTabId,
+      selectNewTab: selectNewTab,
+    );
   }
 
   Future<void> moveTabs({
@@ -125,7 +134,10 @@ class GeckoTabService {
     required bool placeAfter,
   }) {
     return _api.moveTabs(
-        tabIds: tabIds, targetTabId: targetTabId, placeAfter: placeAfter);
+      tabIds: tabIds,
+      targetTabId: targetTabId,
+      placeAfter: placeAfter,
+    );
   }
 
   Future<String> migratePrivateTabUseCase({
@@ -133,6 +145,8 @@ class GeckoTabService {
     Uri? alternativeUrl,
   }) {
     return _api.migratePrivateTabUseCase(
-        tabId: tabId, alternativeUrl: alternativeUrl?.toString());
+      tabId: tabId,
+      alternativeUrl: alternativeUrl?.toString(),
+    );
   }
 }

@@ -8,14 +8,22 @@ class TabLinkDao extends DatabaseAccessor<TabDatabase> with _$TabLinkDaoMixin {
   TabLinkDao(super.db);
 
   Selectable<String> topicTabIds(String? topicId) {
-    final query = (selectOnly(db.tabLink)
+    final query = selectOnly(db.tabLink)
       ..addColumns([db.tabLink.id])
       ..where(
         (topicId == null)
             ? db.tabLink.topicId.isNull()
             : db.tabLink.topicId.equals(topicId),
       )
-      ..orderBy([OrderingTerm.asc(db.tabLink.id)]));
+      ..orderBy([OrderingTerm.asc(db.tabLink.id)]);
+
+    return query.map((row) => row.read(db.tabLink.id)!);
+  }
+
+  SingleOrNullSelectable<String> tabTopicId(String tabId) {
+    final query = selectOnly(db.tabLink)
+      ..addColumns([db.tabLink.topicId])
+      ..where(db.tabLink.id.equals(tabId));
 
     return query.map((row) => row.read(db.tabLink.id)!);
   }

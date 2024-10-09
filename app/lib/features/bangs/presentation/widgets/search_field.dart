@@ -5,8 +5,8 @@ import 'package:flutter_material_design_icons/flutter_material_design_icons.dart
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/features/bangs/data/models/bang_data.dart';
 import 'package:lensai/features/bangs/presentation/widgets/bang_icon.dart';
+import 'package:lensai/features/geckoview/features/browser/presentation/widgets/speech_to_text_button.dart';
 import 'package:lensai/features/kagi/domain/repositories/autosuggest.dart';
-import 'package:lensai/features/search_browser/presentation/widgets/speech_to_text_button.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
 import 'package:lensai/presentation/widgets/autocomplete.dart';

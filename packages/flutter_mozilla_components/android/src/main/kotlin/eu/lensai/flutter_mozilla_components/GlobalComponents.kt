@@ -2,6 +2,8 @@ package eu.lensai.flutter_mozilla_components
 
 import android.content.Context
 import eu.lensai.flutter_mozilla_components.pigeons.GeckoStateEvents
+import eu.lensai.flutter_mozilla_components.pigeons.ReaderViewController
+import eu.lensai.flutter_mozilla_components.pigeons.SelectionAction
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -29,8 +31,18 @@ object GlobalComponents {
             .whenSessionsChange()
     }
 
-    fun setUp(applicationContext: Context, flutterEvents: GeckoStateEvents) {
-        val newComponents = Components(applicationContext, flutterEvents)
+    fun setUp(
+        applicationContext: Context,
+        flutterEvents: GeckoStateEvents,
+        readerViewController: ReaderViewController,
+        selectionAction: SelectionAction
+    ) {
+        val newComponents = Components(
+            applicationContext,
+            flutterEvents,
+            readerViewController,
+            selectionAction
+        )
 
         newComponents.crashReporter.install(applicationContext)
         Facts.registerProcessor(LogFactProcessor())

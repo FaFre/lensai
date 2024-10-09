@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:collection/collection.dart';
 import 'package:exceptions/exceptions.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -30,10 +29,7 @@ class HostSourceService extends _$HostSourceService {
             );
 
             final matches = hostRegex.allMatches(utf8.decode(args[0]));
-            return matches
-                .map((match) => match.group(2))
-                .whereNotNull()
-                .toSet();
+            return matches.map((match) => match.group(2)).nonNulls.toSet();
           },
           [response.bodyBytes],
         );

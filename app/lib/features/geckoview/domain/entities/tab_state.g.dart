@@ -31,6 +31,8 @@ abstract class _$TabStateCWProxy {
 
   TabState readerableState(ReaderableState readerableState);
 
+  TabState findResultState(FindResultState findResultState);
+
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `TabState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
   /// Usage
@@ -50,6 +52,7 @@ abstract class _$TabStateCWProxy {
     SecurityState? securityInfoState,
     HistoryState? historyState,
     ReaderableState? readerableState,
+    FindResultState? findResultState,
   });
 }
 
@@ -99,6 +102,10 @@ class _$TabStateCWProxyImpl implements _$TabStateCWProxy {
       this(readerableState: readerableState);
 
   @override
+  TabState findResultState(FindResultState findResultState) =>
+      this(findResultState: findResultState);
+
+  @override
 
   /// This function **does support** nullification of nullable fields. All `null` values passed to `non-nullable` fields will be ignored. You can also use `TabState(...).copyWith.fieldName(...)` to override fields one at a time with nullification support.
   ///
@@ -119,6 +126,7 @@ class _$TabStateCWProxyImpl implements _$TabStateCWProxy {
     Object? securityInfoState = const $CopyWithPlaceholder(),
     Object? historyState = const $CopyWithPlaceholder(),
     Object? readerableState = const $CopyWithPlaceholder(),
+    Object? findResultState = const $CopyWithPlaceholder(),
   }) {
     return TabState(
       id: _value.id,
@@ -174,6 +182,11 @@ class _$TabStateCWProxyImpl implements _$TabStateCWProxy {
           ? _value.readerableState
           // ignore: cast_nullable_to_non_nullable
           : readerableState as ReaderableState,
+      findResultState: findResultState == const $CopyWithPlaceholder() ||
+              findResultState == null
+          ? _value.findResultState
+          // ignore: cast_nullable_to_non_nullable
+          : findResultState as FindResultState,
     );
   }
 }

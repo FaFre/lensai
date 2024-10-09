@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:lensai/core/logger.dart';
 import 'package:lensai/features/chat_archive/data/database/database.dart';
 import 'package:lensai/features/chat_archive/data/providers.dart';
@@ -53,7 +52,7 @@ class ChatArchiveSearchRepository extends _$ChatArchiveSearchRepository {
           ),
         );
 
-    return availableChats.whereNotNull();
+    return availableChats.nonNulls;
   }
 
   Future<void> search(

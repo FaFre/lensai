@@ -18,9 +18,9 @@ bool useWhiteForeground(Color backgroundColor, {double bias = 0.0}) {
 
   // New:
   final v = sqrt(
-    pow(backgroundColor.red, 2) * 0.299 +
-        pow(backgroundColor.green, 2) * 0.587 +
-        pow(backgroundColor.blue, 2) * 0.114,
+    pow(backgroundColor.r, 2) * 0.299 +
+        pow(backgroundColor.g, 2) * 0.587 +
+        pow(backgroundColor.b, 2) * 0.114,
   ).round();
   return v < (130 + bias);
 }

@@ -3,28 +3,30 @@ package eu.lensai.flutter_mozilla_components
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import androidx.annotation.NonNull
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import eu.lensai.flutter_mozilla_components.api.GeckoBrowserApiImpl
 import eu.lensai.flutter_mozilla_components.api.GeckoCookieApiImpl
+import eu.lensai.flutter_mozilla_components.api.GeckoEngineSettingsApiImpl
+import eu.lensai.flutter_mozilla_components.api.GeckoFindApiImpl
 import eu.lensai.flutter_mozilla_components.api.GeckoIconsApiImpl
 import eu.lensai.flutter_mozilla_components.api.GeckoSessionApiImpl
 import eu.lensai.flutter_mozilla_components.api.GeckoTabsApiImpl
 import eu.lensai.flutter_mozilla_components.feature.CookieManagerFeature
 import eu.lensai.flutter_mozilla_components.pigeons.GeckoBrowserApi
 import eu.lensai.flutter_mozilla_components.pigeons.GeckoCookieApi
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoEngineSettingsApi
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoFindApi
 import eu.lensai.flutter_mozilla_components.pigeons.GeckoIconsApi
 import eu.lensai.flutter_mozilla_components.pigeons.GeckoSessionApi
 import eu.lensai.flutter_mozilla_components.pigeons.GeckoStateEvents
 import eu.lensai.flutter_mozilla_components.pigeons.GeckoTabsApi
+import eu.lensai.flutter_mozilla_components.pigeons.ReaderViewController
+import eu.lensai.flutter_mozilla_components.pigeons.ReaderViewEvents
+import eu.lensai.flutter_mozilla_components.pigeons.SelectionAction
 
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.embedding.engine.plugins.activity.ActivityAware
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
-import io.flutter.plugin.common.MethodCall
-import io.flutter.plugin.common.MethodChannel
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import mozilla.components.browser.engine.gecko.GeckoEngine
 import mozilla.components.browser.engine.gecko.fetch.GeckoViewFetchClient
 import mozilla.components.concept.engine.Engine
@@ -32,7 +34,6 @@ import mozilla.components.experiment.NimbusExperimentDelegate
 import mozilla.components.feature.webcompat.WebCompatFeature
 import mozilla.components.lib.crash.handler.CrashHandlerService
 import mozilla.components.support.base.log.Log
-import mozilla.components.support.base.log.logger.Logger
 import mozilla.components.support.base.log.sink.AndroidLogSink
 import org.mozilla.geckoview.GeckoRuntime
 import org.mozilla.geckoview.GeckoRuntimeSettings
@@ -40,7 +41,17 @@ import org.mozilla.geckoview.GeckoRuntimeSettings
 /**
  * Helper class for lazily instantiating components needed by the application.
  */
-class Components(private val applicationContext: Context, flutterEvents: GeckoStateEvents) : DefaultComponents(applicationContext, flutterEvents) {
+class Components(
+  private val applicationContext: Context,
+  flutterEvents: GeckoStateEvents,
+  readerViewController: ReaderViewController,
+  selectionAction: SelectionAction,
+) : DefaultComponents(
+  applicationContext,
+  flutterEvents,
+  readerViewController,
+  selectionAction
+) {
   private val runtime by lazy {
     // Allow for exfiltrating Gecko metrics through the Glean SDK.
     val builder = GeckoRuntimeSettings.Builder().aboutConfigEnabled(true)
@@ -85,8 +96,16 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
     _flutterPluginBinding = flutterPluginBinding
 
     val flutterEvents = GeckoStateEvents(_flutterPluginBinding.binaryMessenger)
+    val readerViewController =
+      ReaderViewController(_flutterPluginBinding.binaryMessenger)
+    val selectionActionDelegate = SelectionAction(_flutterPluginBinding.binaryMessenger)
 
-    GlobalComponents.setUp(flutterPluginBinding.applicationContext, flutterEvents)
+    GlobalComponents.setUp(
+      flutterPluginBinding.applicationContext,
+      flutterEvents,
+      readerViewController,
+      selectionActionDelegate
+    )
 
     val intent = Intent(flutterPluginBinding.applicationContext, NotificationActivity::class.java)
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
@@ -96,10 +115,17 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
       showNativeFragment()
     })
 
+    GeckoEngineSettingsApi.setUp(_flutterPluginBinding.binaryMessenger, GeckoEngineSettingsApiImpl())
     GeckoSessionApi.setUp(_flutterPluginBinding.binaryMessenger, GeckoSessionApiImpl())
     GeckoTabsApi.setUp(_flutterPluginBinding.binaryMessenger, GeckoTabsApiImpl())
     GeckoIconsApi.setUp(_flutterPluginBinding.binaryMessenger, GeckoIconsApiImpl())
     GeckoCookieApi.setUp(_flutterPluginBinding.binaryMessenger, GeckoCookieApiImpl())
+    GeckoFindApi.setUp(_flutterPluginBinding.binaryMessenger, GeckoFindApiImpl())
+
+    ReaderViewEvents.setUp(
+      _flutterPluginBinding.binaryMessenger,
+      GlobalComponents.components!!.readerViewEvents
+    )
   }
 
   private fun showNativeFragment() {

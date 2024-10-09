@@ -1,7 +1,5 @@
 package eu.lensai.flutter_mozilla_components.api
 
-import android.graphics.Bitmap
-import android.os.Build
 import eu.lensai.flutter_mozilla_components.GlobalComponents
 import eu.lensai.flutter_mozilla_components.ext.toWebPBytes
 import eu.lensai.flutter_mozilla_components.pigeons.*
@@ -9,7 +7,6 @@ import kotlinx.coroutines.*
 import mozilla.components.browser.icons.BrowserIcons
 import mozilla.components.browser.icons.Icon
 import mozilla.components.concept.engine.manifest.Size as HtmlSize
-import java.io.ByteArrayOutputStream
 
 typealias MozillaIconRequest = mozilla.components.browser.icons.IconRequest
 typealias MozillaIconSize = mozilla.components.browser.icons.IconRequest.Size
@@ -86,11 +83,11 @@ class GeckoIconsApiImpl() : GeckoIconsApi {
         IconType.MANIFEST_ICON -> MozillaIconResourceType.MANIFEST_ICON
     }
 
-    private fun Icon.Source.toApiSource(): Source = when (this) {
-        Icon.Source.GENERATOR -> Source.GENERATOR
-        Icon.Source.DOWNLOAD -> Source.DOWNLOAD
-        Icon.Source.INLINE -> Source.INLINE
-        Icon.Source.MEMORY -> Source.MEMORY
-        Icon.Source.DISK -> Source.DISK
+    private fun Icon.Source.toApiSource(): IconSource = when (this) {
+        Icon.Source.GENERATOR -> IconSource.GENERATOR
+        Icon.Source.DOWNLOAD -> IconSource.DOWNLOAD
+        Icon.Source.INLINE -> IconSource.INLINE
+        Icon.Source.MEMORY -> IconSource.MEMORY
+        Icon.Source.DISK -> IconSource.DISK
     }
 }

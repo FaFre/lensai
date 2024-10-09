@@ -39,8 +39,8 @@ class LoadUrlFlags {
         ALLOW_JAVASCRIPT_URL.value,
   );
 
-  static LoadUrlFlags select(List<LoadUrlFlags> flags) {
-    int combinedValue = flags.fold(0, (sum, flag) => sum | flag.value);
+  factory LoadUrlFlags.select(List<LoadUrlFlags> flags) {
+    final combinedValue = flags.fold(0, (sum, flag) => sum | flag.value);
     return LoadUrlFlags._(combinedValue);
   }
 }

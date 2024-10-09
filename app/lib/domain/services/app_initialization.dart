@@ -6,10 +6,9 @@ import 'package:lensai/features/bangs/data/models/bang.dart';
 import 'package:lensai/features/bangs/domain/repositories/sync.dart';
 import 'package:lensai/features/content_block/data/models/host.dart';
 import 'package:lensai/features/content_block/domain/repositories/sync.dart';
-import 'package:lensai/features/search_browser/domain/services/session.dart';
+import 'package:lensai/features/kagi/data/services/session.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
-import 'package:lensai/features/geckoview/features/topics/data/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_initialization.g.dart';
@@ -77,15 +76,11 @@ class AppInitializationService extends _$AppInitializationService {
       ),
     );
 
-    if (settings.incognitoMode) {
-      await ref.read(sessionServiceProvider.notifier).clearAllData();
-      //Delete all unsasigned tabs
-      await ref.read(tabDatabaseProvider).tabDao.deleteTopicTabs(null);
-    }
-
     if (settings.kagiSession case final String session) {
       if (session.isNotEmpty) {
-        await ref.read(sessionServiceProvider.notifier).setKagiSession(session);
+        await ref
+            .read(kagiSessionServiceProvider.notifier)
+            .setKagiSession(session);
       }
     }
   }

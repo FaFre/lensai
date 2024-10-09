@@ -8,6 +8,7 @@ typedef ReaderableEvent = ({String tabId, ReaderableState readerable});
 typedef SecurityInfoEvent = ({String tabId, SecurityInfoState securityInfo});
 typedef IconEvent = ({String tabId, Uint8List? bytes});
 typedef ThumbnailEvent = ({String tabId, Uint8List? bytes});
+typedef FindResultsEvent = ({String tabId, List<FindResultState> results});
 
 class GeckoEventService extends GeckoStateEvents {
   // Stream controllers
@@ -20,6 +21,7 @@ class GeckoEventService extends GeckoStateEvents {
       StreamController<SecurityInfoEvent>.broadcast();
   final _iconController = StreamController<IconEvent>.broadcast();
   final _thumbnailController = StreamController<ThumbnailEvent>.broadcast();
+  final _findResultsController = StreamController<FindResultsEvent>.broadcast();
 
   // Event streams
   Stream<List<String>> get tabListEvents => _tabListController.stream;
@@ -31,6 +33,8 @@ class GeckoEventService extends GeckoStateEvents {
       _securityInfoController.stream;
   Stream<IconEvent> get iconEvents => _iconController.stream;
   Stream<ThumbnailEvent> get thumbnailEvents => _thumbnailController.stream;
+  Stream<FindResultsEvent> get findResultsEvent =>
+      _findResultsController.stream;
 
   // Overridden methods
   @override
@@ -73,21 +77,31 @@ class GeckoEventService extends GeckoStateEvents {
     _thumbnailController.add((tabId: id, bytes: bytes));
   }
 
+  @override
+  void onFindResults(String id, List<FindResultState?> results) {
+    _findResultsController.add((tabId: id, results: results.nonNulls.toList()));
+  }
+
   GeckoEventService.setUp({
     BinaryMessenger? binaryMessenger,
     String messageChannelSuffix = '',
   }) {
-    GeckoStateEvents.setUp(this);
+    GeckoStateEvents.setUp(
+      this,
+      binaryMessenger: binaryMessenger,
+      messageChannelSuffix: messageChannelSuffix,
+    );
   }
 
   void dispose() {
-    _tabListController.close();
-    _selectedTabController.close();
-    _tabContentController.close();
-    _historyController.close();
-    _readerableController.close();
-    _securityInfoController.close();
-    _iconController.close();
-    _thumbnailController.close();
+    unawaited(_tabListController.close());
+    unawaited(_selectedTabController.close());
+    unawaited(_tabContentController.close());
+    unawaited(_historyController.close());
+    unawaited(_readerableController.close());
+    unawaited(_securityInfoController.close());
+    unawaited(_iconController.close());
+    unawaited(_thumbnailController.close());
+    unawaited(_findResultsController.close());
   }
 }

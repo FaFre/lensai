@@ -8,7 +8,7 @@ Set<HostSource>? parseHostSources(List<String>? input) => input
       (list) =>
           HostSource.values.firstWhereOrNull((source) => source.name == list),
     )
-    .whereNotNull()
+    .nonNulls
     .toSet();
 
 ThemeMode? parseThemeMode(int? index) {

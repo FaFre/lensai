@@ -375,19 +375,20 @@ class Cookie {
   final String value;
 
   Cookie(
-      this.domain,
-      this.expirationDate,
-      this.firstPartyDomain,
-      this.hostOnly,
-      this.httpOnly,
-      this.name,
-      this.partitionKey,
-      this.path,
-      this.secure,
-      this.session,
-      this.sameSite,
-      this.storeId,
-      this.value);
+    this.domain,
+    this.expirationDate,
+    this.firstPartyDomain,
+    this.hostOnly,
+    this.httpOnly,
+    this.name,
+    this.partitionKey,
+    this.path,
+    this.secure,
+    this.session,
+    this.sameSite,
+    this.storeId,
+    this.value,
+  );
 }
 
 class HistoryItem {
@@ -456,18 +457,93 @@ class TabContentState {
   );
 }
 
-@ConfigurePigeon(PigeonOptions(
-  dartOut: 'lib/src/pigeons/gecko.g.dart',
-  dartOptions: DartOptions(),
-  kotlinOut:
-      'android/src/main/kotlin/eu/lensai/flutter_mozilla_components/pigeons/Gecko.g.kt',
-  kotlinOptions:
-      KotlinOptions(package: 'eu.lensai.flutter_mozilla_components.pigeons'),
-  dartPackageName: 'flutter_mozilla_components',
-))
+class FindResultState {
+  final int activeMatchOrdinal;
+  final int numberOfMatches;
+  final bool isDoneCounting;
+
+  FindResultState(
+    this.activeMatchOrdinal,
+    this.numberOfMatches,
+    this.isDoneCounting,
+  );
+}
+
+// /// Represents all the different supported types of data that can be found from long clicking
+// /// an element.
+// sealed class HitResult {
+//   final String src;
+
+//   HitResult(this.src);
+// }
+
+// /// Default type if we're unable to match the type to anything. It may or may not have a src.
+// class UnknownHitResult extends HitResult {
+//   UnknownHitResult(super.src);
+// }
+
+// /// If the HTML element was of type 'HTMLImageElement'.
+// class ImageHitResult extends HitResult {
+//   final String? title;
+
+//   ImageHitResult(super.src, {this.title});
+// }
+
+// /// If the HTML element was of type 'HTMLVideoElement'.
+// class VideoHitResult extends HitResult {
+//   final String? title;
+
+//   VideoHitResult(super.src, {this.title});
+// }
+
+// /// If the HTML element was of type 'HTMLAudioElement'.
+// class AudioHitResult extends HitResult {
+//   final String? title;
+
+//   AudioHitResult(super.src, {this.title});
+// }
+
+// /// If the HTML element was of type 'HTMLImageElement' and contained a URI.
+// class ImageSrcHitResult extends HitResult {
+//   final String uri;
+
+//   ImageSrcHitResult(super.src, this.uri);
+// }
+
+// /// The type used if the URI is prepended with 'tel:'.
+// class PhoneHitResult extends HitResult {
+//   PhoneHitResult(super.src);
+// }
+
+// /// The type used if the URI is prepended with 'mailto:'.
+// class EmailHitResult extends HitResult {
+//   EmailHitResult(super.src);
+// }
+
+// /// The type used if the URI is prepended with 'geo:'.
+// class GeoHitResult extends HitResult {
+//   GeoHitResult(super.src);
+// }
+
+@ConfigurePigeon(
+  PigeonOptions(
+    dartOut: 'lib/src/pigeons/gecko.g.dart',
+    dartOptions: DartOptions(),
+    kotlinOut:
+        'android/src/main/kotlin/eu/lensai/flutter_mozilla_components/pigeons/Gecko.g.kt',
+    kotlinOptions:
+        KotlinOptions(package: 'eu.lensai.flutter_mozilla_components.pigeons'),
+    dartPackageName: 'flutter_mozilla_components',
+  ),
+)
 @HostApi()
 abstract class GeckoBrowserApi {
   void showNativeFragment();
+}
+
+@HostApi()
+abstract class GeckoEngineSettingsApi {
+  void javaScriptEnabled(bool state);
 }
 
 @HostApi()
@@ -630,6 +706,13 @@ abstract class GeckoTabsApi {
 }
 
 @HostApi()
+abstract class GeckoFindApi {
+  void findAll(String? tabId, String text);
+  void findNext(String? tabId, bool forward);
+  void clearMatches(String? tabId);
+}
+
+@HostApi()
 abstract class GeckoIconsApi {
   @async
   IconResult loadIcon(IconRequest request);
@@ -693,4 +776,48 @@ abstract class GeckoStateEvents {
   void onSecurityInfoStateChange(String id, SecurityInfoState state);
   void onIconChange(String id, Uint8List? bytes);
   void onThumbnailChange(String id, Uint8List? bytes);
+
+  void onFindResults(String id, List<FindResultState> results);
+}
+
+@HostApi()
+abstract class ReaderViewEvents {
+  void onToggleReaderView(bool enable);
+  void onAppearanceButtonTap();
+}
+
+@FlutterApi()
+abstract class ReaderViewController {
+  void appearanceButtonVisibility(bool visible);
+  void readerViewButtonVisibility(bool visible);
+}
+
+@FlutterApi()
+abstract class SelectionAction {
+  /// Gets Strings representing all possible selection actions.
+  ///
+  /// @returns String IDs for each action that could possibly be shown in the context menu. This
+  /// array must include all actions, available or not, and must not change over the class lifetime.
+  List<String> getAllActions();
+
+  /// Checks if an action can be shown on a new selection context menu.
+  ///
+  /// @returns whether or not the the custom action with the id of [id] is currently available
+  ///  which may be informed by [selectedText].
+  bool isActionAvailable(String id, String selectedText);
+
+  /// Gets a title to be shown in the selection context menu.
+  ///
+  /// @returns the text that should be shown on the action.
+  String? getActionTitle(String id);
+
+  /// Should perform the action with the id of [id].
+  ///
+  /// @returns [true] if the action was consumed.
+  bool performAction(String id, String selectedText);
+
+  /// Takes in a list of actions and sorts them.
+  ///
+  /// @returns the sorted list.
+  List<String> sortedActions(List<String> actions);
 }

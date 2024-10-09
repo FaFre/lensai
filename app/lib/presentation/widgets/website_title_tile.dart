@@ -20,10 +20,10 @@ class WebsiteTitleTile extends HookConsumerWidget {
       child: pageInfoAsync.when(
         data: (info) {
           return ListTile(
-            leading: FaviconImage(
-              favicon: info.favicon,
-              url: info.url,
-              size: 24,
+            leading: RawImage(
+              image: info.favicon?.image.value,
+              height: 24,
+              width: 24,
             ),
             contentPadding: EdgeInsets.zero,
             title: Text(info.title ?? 'Unknown Title'),
@@ -38,10 +38,10 @@ class WebsiteTitleTile extends HookConsumerWidget {
         },
         loading: () => (precachedInfo != null)
             ? ListTile(
-                leading: FaviconImage(
-                  favicon: precachedInfo!.favicon,
-                  url: precachedInfo!.url,
-                  size: 24,
+                leading: RawImage(
+                  image: precachedInfo!.favicon?.image.value,
+                  height: 24,
+                  width: 24,
                 ),
                 contentPadding: EdgeInsets.zero,
                 title: Text(precachedInfo!.title ?? 'Unknown Title'),

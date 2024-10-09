@@ -1,7 +1,28 @@
 name: lensai_project
 
 scripts:
+  upgrade-major-tighten:
+    run: |
+      dart pub upgrade --major-versions --tighten
+    exec:
+      concurrency: 1
+  build-watch:
+    description: Generate and watch files with build_runner in the workspace
+    packageFilters:
+      dependsOn: build_runner
+    exec: |
+      dart run build_runner watch --delete-conflicting-outputs
+  build:
+    description: Generate files with build_runner in the workspace
+    packageFilters:
+      dependsOn: build_runner
+    run: |
+      dart run build_runner build --delete-conflicting-outputs
+    exec:
+      failFast: true
+      concurrency: 1
   build-pigeons:
+    description: Running pigeon for files in pigeons directory
     exec: |
       echo "Running pigeon for files in pigeons directory:"
       for file in ./pigeons/*; do

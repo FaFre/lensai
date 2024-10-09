@@ -2,13 +2,13 @@ package eu.lensai.flutter_mozilla_components
 
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.FrameLayout
-import eu.lensai.flutter_mozilla_components.pigeons.GeckoStateEvents
+import eu.lensai.flutter_mozilla_components.feature.DefaultSelectionActionDelegate
+import eu.lensai.flutter_mozilla_components.integration.ReaderViewIntegration
+import eu.lensai.flutter_mozilla_components.pigeons.SelectionAction
 import mozilla.components.browser.thumbnails.BrowserThumbnails
 import mozilla.components.concept.engine.EngineView
 import mozilla.components.feature.media.fullscreen.MediaSessionFullscreenFeature
@@ -24,16 +24,16 @@ import mozilla.components.support.ktx.android.view.exitImmersiveMode
  */
 class BrowserFragment(private val context: Context) : BaseBrowserFragment(), UserInteractionHandler {
     private val thumbnailsFeature = ViewBoundFeatureWrapper<BrowserThumbnails>()
+    private val readerViewFeature = ViewBoundFeatureWrapper<ReaderViewIntegration>()
     private val fullScreenFeature = ViewBoundFeatureWrapper<FullScreenFeature>()
     private val mediaSessionFullscreenFeature =
         ViewBoundFeatureWrapper<MediaSessionFullscreenFeature>()
 
     override fun createEngine(components: Components): EngineView {
         return components.engine.createView(context).apply {
-//            selectionActionDelegate = DefaultSelectionActionDelegate(
-//                store = components.store,
-//                context = context,
-//            )
+            selectionActionDelegate = DefaultSelectionActionDelegate(
+                components.selectionAction
+            )
         }
     }
 
@@ -46,6 +46,19 @@ class BrowserFragment(private val context: Context) : BaseBrowserFragment(), Use
         super.onCreateView(inflater, container, savedInstanceState)
 
         val binding = super.binding
+
+        readerViewFeature.set(
+            feature = ReaderViewIntegration(
+                requireContext(),
+                components.engine,
+                components.store,
+                binding.readerViewBar,
+                components.readerViewEvents,
+                components.readerViewController,
+            ),
+            owner = this,
+            view = binding.root,
+        )
 
         fullScreenFeature.set(
             feature = FullScreenFeature(

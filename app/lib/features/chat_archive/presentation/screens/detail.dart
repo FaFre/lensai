@@ -10,6 +10,7 @@ import 'package:lensai/features/chat_archive/data/services/file.dart';
 import 'package:lensai/features/chat_archive/domain/entities/chat_entity.dart';
 import 'package:lensai/features/chat_archive/domain/repositories/archive.dart';
 import 'package:lensai/features/chat_archive/utils/markdown_to_text.dart';
+import 'package:lensai/features/geckoview/domain/repositories/tab.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
 import 'package:lensai/presentation/widgets/failure_widget.dart';
@@ -113,11 +114,11 @@ class ChatArchiveDetailScreen extends HookConsumerWidget {
                     await ui_helper.launchUrlFeedback(context, Uri.parse(href));
                   } else {
                     await ref
-                        .read(switchNewTabControllerProvider.notifier)
-                        .add(url);
+                        .read(tabRepositoryProvider.notifier)
+                        .addTab(url: url);
 
                     if (context.mounted) {
-                      context.go(KagiRoute().location);
+                      context.go(BrowserRoute().location);
                     }
                   }
                 }

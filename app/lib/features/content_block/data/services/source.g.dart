@@ -6,7 +6,7 @@ part of 'source.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$hostSourceServiceHash() => r'26ac09fcd34cc37440eb643075984707e0e9bba3';
+String _$hostSourceServiceHash() => r'6c1ee7bfde02cc542a4f55db666d49037fda187e';
 
 /// See also [HostSourceService].
 @ProviderFor(HostSourceService)

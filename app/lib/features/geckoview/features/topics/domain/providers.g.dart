@@ -6,22 +6,6 @@ part of 'providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$selectedTopicDataHash() => r'fa450784052498014f592c356bde4ff5ec675281';
-
-/// See also [selectedTopicData].
-@ProviderFor(selectedTopicData)
-final selectedTopicDataProvider =
-    AutoDisposeStreamProvider<TopicData?>.internal(
-  selectedTopicData,
-  name: r'selectedTopicDataProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$selectedTopicDataHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef SelectedTopicDataRef = AutoDisposeStreamProviderRef<TopicData?>;
 String _$unusedRandomTopicColorHash() =>
     r'099730b0d987cc37bcae4ef5c999cbebfa67d7da';
 
@@ -56,7 +40,7 @@ final topicsWithCountProvider =
 
 typedef TopicsWithCountRef
     = AutoDisposeStreamProviderRef<List<TopicDataWithCount>>;
-String _$topicTabIdsHash() => r'43719c70e01cf9e030d75171405ab9650936ddf8';
+String _$topicTabIdsHash() => r'f7ce2633804421a22df1efc42eb4d19d440d9fd3';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -90,7 +74,7 @@ class TopicTabIdsFamily extends Family<AsyncValue<List<String>>> {
 
   /// See also [topicTabIds].
   TopicTabIdsProvider call(
-    String topicId,
+    String? topicId,
   ) {
     return TopicTabIdsProvider(
       topicId,
@@ -125,7 +109,7 @@ class TopicTabIdsFamily extends Family<AsyncValue<List<String>>> {
 class TopicTabIdsProvider extends AutoDisposeStreamProvider<List<String>> {
   /// See also [topicTabIds].
   TopicTabIdsProvider(
-    String topicId,
+    String? topicId,
   ) : this._internal(
           (ref) => topicTabIds(
             ref as TopicTabIdsRef,
@@ -153,7 +137,7 @@ class TopicTabIdsProvider extends AutoDisposeStreamProvider<List<String>> {
     required this.topicId,
   }) : super.internal();
 
-  final String topicId;
+  final String? topicId;
 
   @override
   Override overrideWith(
@@ -194,7 +178,7 @@ class TopicTabIdsProvider extends AutoDisposeStreamProvider<List<String>> {
 
 mixin TopicTabIdsRef on AutoDisposeStreamProviderRef<List<String>> {
   /// The parameter `topicId` of this provider.
-  String get topicId;
+  String? get topicId;
 }
 
 class _TopicTabIdsProviderElement
@@ -202,23 +186,135 @@ class _TopicTabIdsProviderElement
   _TopicTabIdsProviderElement(super.provider);
 
   @override
-  String get topicId => (origin as TopicTabIdsProvider).topicId;
+  String? get topicId => (origin as TopicTabIdsProvider).topicId;
 }
 
-String _$selectedTopicHash() => r'f4e1c0620971a0b7501ee9aff0d5b41da3130ba0';
+String _$tabTopicIdHash() => r'284164ac3acd9be3ba4e15eba99fc8d97602ee84';
 
-/// See also [SelectedTopic].
-@ProviderFor(SelectedTopic)
-final selectedTopicProvider = NotifierProvider<SelectedTopic, String?>.internal(
-  SelectedTopic.new,
-  name: r'selectedTopicProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$selectedTopicHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+/// See also [tabTopicId].
+@ProviderFor(tabTopicId)
+const tabTopicIdProvider = TabTopicIdFamily();
 
-typedef _$SelectedTopic = Notifier<String?>;
+/// See also [tabTopicId].
+class TabTopicIdFamily extends Family<AsyncValue<String?>> {
+  /// See also [tabTopicId].
+  const TabTopicIdFamily();
+
+  /// See also [tabTopicId].
+  TabTopicIdProvider call(
+    String tabId,
+  ) {
+    return TabTopicIdProvider(
+      tabId,
+    );
+  }
+
+  @override
+  TabTopicIdProvider getProviderOverride(
+    covariant TabTopicIdProvider provider,
+  ) {
+    return call(
+      provider.tabId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'tabTopicIdProvider';
+}
+
+/// See also [tabTopicId].
+class TabTopicIdProvider extends AutoDisposeStreamProvider<String?> {
+  /// See also [tabTopicId].
+  TabTopicIdProvider(
+    String tabId,
+  ) : this._internal(
+          (ref) => tabTopicId(
+            ref as TabTopicIdRef,
+            tabId,
+          ),
+          from: tabTopicIdProvider,
+          name: r'tabTopicIdProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$tabTopicIdHash,
+          dependencies: TabTopicIdFamily._dependencies,
+          allTransitiveDependencies:
+              TabTopicIdFamily._allTransitiveDependencies,
+          tabId: tabId,
+        );
+
+  TabTopicIdProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.tabId,
+  }) : super.internal();
+
+  final String tabId;
+
+  @override
+  Override overrideWith(
+    Stream<String?> Function(TabTopicIdRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: TabTopicIdProvider._internal(
+        (ref) => create(ref as TabTopicIdRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        tabId: tabId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<String?> createElement() {
+    return _TabTopicIdProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is TabTopicIdProvider && other.tabId == tabId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, tabId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin TabTopicIdRef on AutoDisposeStreamProviderRef<String?> {
+  /// The parameter `tabId` of this provider.
+  String get tabId;
+}
+
+class _TabTopicIdProviderElement
+    extends AutoDisposeStreamProviderElement<String?> with TabTopicIdRef {
+  _TabTopicIdProviderElement(super.provider);
+
+  @override
+  String get tabId => (origin as TabTopicIdProvider).tabId;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

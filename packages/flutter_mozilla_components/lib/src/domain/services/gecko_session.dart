@@ -7,12 +7,12 @@ class GeckoSessionService {
   final String? tabId;
   final GeckoSessionApi _api;
 
+  GeckoSessionService({required String this.tabId, GeckoSessionApi? api})
+      : _api = api ?? _apiInstance;
+
   GeckoSessionService.forActiveTab({GeckoSessionApi? api})
       : _api = api ?? _apiInstance,
         tabId = null;
-
-  GeckoSessionService({required String this.tabId, GeckoSessionApi? api})
-      : _api = api ?? _apiInstance;
 
   Future<void> loadUrl({
     required Uri url,

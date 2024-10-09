@@ -3,32 +3,28 @@ package eu.lensai.flutter_mozilla_components
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.util.Log
-import android.widget.Toast
 import androidx.core.app.NotificationManagerCompat
-import androidx.core.content.ContextCompat
+import eu.lensai.flutter_mozilla_components.api.ReaderViewEventsImpl
 import eu.lensai.flutter_mozilla_components.ext.toWebPBytes
 import eu.lensai.flutter_mozilla_components.middleware.FlutterEventMiddleware
+import eu.lensai.flutter_mozilla_components.pigeons.FindResultState
 import eu.lensai.flutter_mozilla_components.pigeons.GeckoStateEvents
 import eu.lensai.flutter_mozilla_components.pigeons.HistoryItem
 import eu.lensai.flutter_mozilla_components.pigeons.HistoryState
+import eu.lensai.flutter_mozilla_components.pigeons.ReaderViewController
 import eu.lensai.flutter_mozilla_components.pigeons.ReaderableState
 import eu.lensai.flutter_mozilla_components.pigeons.SecurityInfoState
+import eu.lensai.flutter_mozilla_components.pigeons.SelectionAction
 import eu.lensai.flutter_mozilla_components.pigeons.TabContentState
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.distinctUntilChangedBy
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.launch
 import mozilla.components.browser.engine.gecko.GeckoEngine
 import mozilla.components.browser.icons.BrowserIcons
 import mozilla.components.browser.session.storage.SessionStorage
 import mozilla.components.browser.state.engine.EngineMiddleware
 import mozilla.components.browser.state.engine.middleware.SessionPrioritizationMiddleware
-import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.store.BrowserStore
 import mozilla.components.browser.thumbnails.ThumbnailsMiddleware
 import mozilla.components.browser.thumbnails.storage.ThumbnailStorage
@@ -75,7 +71,12 @@ private const val DAY_IN_MINUTES = 24 * 60L
 
 @SuppressLint("NewApi")
 @Suppress("LargeClass")
-open class DefaultComponents(private val applicationContext: Context, private val flutterEvents: GeckoStateEvents) {
+open class DefaultComponents(
+    private val applicationContext: Context,
+    private val flutterEvents: GeckoStateEvents,
+    val readerViewController: ReaderViewController,
+    val selectionAction: SelectionAction,
+) {
     companion object {
         const val SAMPLE_BROWSER_PREFERENCES = "sample_browser_preferences"
         const val PREF_LAUNCH_EXTERNAL_APP = "sample_browser_launch_external_app"
@@ -277,6 +278,24 @@ open class DefaultComponents(private val applicationContext: Context, private va
                     }
             }
 
+            this.flowScoped { flow ->
+                flow.mapNotNull { state -> state.tabs }
+                    .filterChanged {
+                        it.content.findResults
+                    }
+                    .collect { tab ->
+                        tab.content.findResults
+                        flutterEvents.onFindResults(
+                            tab.id,
+                            tab.content.findResults.map { result -> FindResultState(
+                                activeMatchOrdinal = result.activeMatchOrdinal.toLong(),
+                                numberOfMatches = result.numberOfMatches.toLong(),
+                                isDoneCounting = result.isDoneCounting,
+                            ) }
+                        ) { _ -> }
+                    }
+            }
+
             WebNotificationFeature(
                 applicationContext,
                 engine,
@@ -293,6 +312,8 @@ open class DefaultComponents(private val applicationContext: Context, private va
 
     val sessionUseCases by lazy { SessionUseCases(store) }
     val tabsUseCases by lazy { TabsUseCases(store) }
+
+    val readerViewEvents by lazy { ReaderViewEventsImpl() }
 
     // Addons
     val addonManager by lazy {

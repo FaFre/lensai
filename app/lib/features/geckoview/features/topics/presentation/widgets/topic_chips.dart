@@ -3,13 +3,13 @@ import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/core/routing/routes.dart';
 import 'package:lensai/features/geckoview/features/topics/domain/providers.dart';
-import 'package:lensai/features/geckoview/features/topics/domain/repositories/topic.dart';
+import 'package:lensai/features/geckoview/features/topics/domain/providers/selected_topic.dart';
 import 'package:lensai/presentation/widgets/selectable_chips.dart';
 
 class TopicChips extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final topicsAsync = ref.watch(topicRepositoryProvider);
+    final topicsAsync = ref.watch(topicsWithCountProvider);
     final selectedTopic = ref
         .watch(selectedTopicDataProvider.select((value) => value.valueOrNull));
 

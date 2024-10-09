@@ -8,14 +8,14 @@ import 'package:lensai/features/bangs/presentation/screens/search.dart';
 import 'package:lensai/features/chat_archive/presentation/screens/detail.dart';
 import 'package:lensai/features/chat_archive/presentation/screens/list.dart';
 import 'package:lensai/features/chat_archive/presentation/screens/search.dart';
-import 'package:lensai/features/search_browser/presentation/screens/browser.dart';
-import 'package:lensai/features/settings/presentation/screens/settings.dart';
+import 'package:lensai/features/geckoview/features/browser/screens/browser.dart';
 import 'package:lensai/features/geckoview/features/topics/presentation/screens/topic_list.dart';
+import 'package:lensai/features/settings/presentation/screens/settings.dart';
 
 part 'routes.g.dart';
 
-@TypedGoRoute<KagiRoute>(
-  name: 'KagiRoute',
+@TypedGoRoute<BrowserRoute>(
+  name: 'BrowserRoute',
   path: '/',
   routes: [
     TypedGoRoute<AboutRoute>(
@@ -48,10 +48,10 @@ part 'routes.g.dart';
     ),
   ],
 )
-class KagiRoute extends GoRouteData {
+class BrowserRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const KagiScreen();
+    return const BrowserScreen();
   }
 }
 

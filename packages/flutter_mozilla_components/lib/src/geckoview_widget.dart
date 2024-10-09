@@ -38,6 +38,7 @@ class GeckoView extends StatelessWidget {
               await GeckoBrowserService().showNativeFragment();
             });
           })
+          // ignore: discarded_futures
           ..create();
       },
     );
