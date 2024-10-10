@@ -1,4 +1,3 @@
-import 'package:collection/collection.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/utils/preference_parser.dart';
@@ -15,9 +14,7 @@ enum _StorageKeys {
   incognito('enabe_incognito'),
   javascript('enable_js'),
   launchExternal('enable_launch_external'),
-  contentBlocking('enable_content_blocking'),
   blockHttpProtocol('block_http'),
-  enableHostList('enable_host_lists'),
   themeMode('theme_mode'),
   quickAction('enable_quick_action'),
   quickActionVoiceInput('enable_quick_action_voice_input'),
@@ -81,28 +78,10 @@ class SettingsRepository extends _$SettingsRepository {
         );
       }
 
-      if (newSettings.enableContentBlocking !=
-          oldSettings.enableContentBlocking) {
-        await sharedPreferences.setBool(
-          _StorageKeys.contentBlocking.key,
-          newSettings.enableContentBlocking,
-        );
-      }
-
       if (newSettings.blockHttpProtocol != oldSettings.blockHttpProtocol) {
         await sharedPreferences.setBool(
           _StorageKeys.blockHttpProtocol.key,
           newSettings.blockHttpProtocol,
-        );
-      }
-
-      if (!const DeepCollectionEquality.unordered().equals(
-        newSettings.enableHostList,
-        oldSettings.enableHostList,
-      )) {
-        await sharedPreferences.setStringList(
-          _StorageKeys.enableHostList.key,
-          newSettings.enableHostList.map((list) => list.name).toList(),
         );
       }
 
@@ -157,13 +136,8 @@ class SettingsRepository extends _$SettingsRepository {
       enableJavascript: sharedPreferences.getBool(_StorageKeys.javascript.key),
       launchUrlExternal:
           sharedPreferences.getBool(_StorageKeys.launchExternal.key),
-      enableContentBlocking:
-          sharedPreferences.getBool(_StorageKeys.contentBlocking.key),
       blockHttpProtocol:
           sharedPreferences.getBool(_StorageKeys.blockHttpProtocol.key),
-      enableHostList: parseHostSources(
-        sharedPreferences.getStringList(_StorageKeys.enableHostList.key),
-      ),
       themeMode:
           parseThemeMode(sharedPreferences.getInt(_StorageKeys.themeMode.key)),
       quickAction:

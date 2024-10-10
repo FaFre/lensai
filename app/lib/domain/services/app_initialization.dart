@@ -4,8 +4,6 @@ import 'package:exceptions/exceptions.dart';
 import 'package:lensai/features/about/data/repositories/package_info_repository.dart';
 import 'package:lensai/features/bangs/data/models/bang.dart';
 import 'package:lensai/features/bangs/domain/repositories/sync.dart';
-import 'package:lensai/features/content_block/data/models/host.dart';
-import 'package:lensai/features/content_block/domain/repositories/sync.dart';
 import 'package:lensai/features/kagi/data/services/session.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
@@ -48,25 +46,6 @@ class AppInitializationService extends _$AppInitializationService {
         .syncBangGroups(syncInterval: const Duration(days: 7));
   }
 
-  FutureOr<Map<HostSource, Result<void>>> _initHosts(Settings settings) {
-    if (settings.enableContentBlocking) {
-      state = Result.success(
-        (
-          initialized: false,
-          stage: 'Synchronizing Ad & Content Blocking Lists...',
-          errors: List.empty(),
-        ),
-      );
-
-      return ref.read(hostSyncRepositoryProvider.notifier).syncHostSources(
-            sources: settings.enableHostList,
-            syncInterval: const Duration(days: 7),
-          );
-    }
-
-    return {};
-  }
-
   Future<void> _initIncognito(Settings settings) async {
     state = Result.success(
       (
@@ -94,11 +73,6 @@ class AppInitializationService extends _$AppInitializationService {
 
       final bangSyncResults = await _initBangs();
       for (final MapEntry(value: result) in bangSyncResults.entries) {
-        result.onFailure(errors.add);
-      }
-
-      final hostSyncResults = await _initHosts(settings);
-      for (final MapEntry(value: result) in hostSyncResults.entries) {
         result.onFailure(errors.add);
       }
 

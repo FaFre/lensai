@@ -1,15 +1,5 @@
-import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
-import 'package:lensai/features/content_block/data/models/host.dart';
 import 'package:lensai/features/kagi/data/entities/modes.dart';
-
-Set<HostSource>? parseHostSources(List<String>? input) => input
-    ?.map(
-      (list) =>
-          HostSource.values.firstWhereOrNull((source) => source.name == list),
-    )
-    .nonNulls
-    .toSet();
 
 ThemeMode? parseThemeMode(int? index) {
   if (index != null && index < ThemeMode.values.length) {

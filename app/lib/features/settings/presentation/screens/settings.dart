@@ -7,14 +7,12 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/features/bangs/data/models/bang.dart';
 import 'package:lensai/features/bangs/domain/providers.dart';
 import 'package:lensai/features/bangs/domain/repositories/data.dart';
-import 'package:lensai/features/content_block/data/models/host.dart';
 import 'package:lensai/features/kagi/data/entities/modes.dart';
 import 'package:lensai/features/settings/data/models/settings.dart';
 import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
 import 'package:lensai/features/settings/presentation/controllers/save_settings.dart';
 import 'package:lensai/features/settings/presentation/widgets/bang_group_list_tile.dart';
 import 'package:lensai/features/settings/presentation/widgets/custom_list_tile.dart';
-import 'package:lensai/features/settings/presentation/widgets/host_list_tile.dart';
 import 'package:lensai/features/settings/utils/session_link_extractor.dart';
 import 'package:lensai/presentation/hooks/listenable_callback.dart';
 import 'package:lensai/utils/ui_helper.dart' as ui_helper;
@@ -335,56 +333,7 @@ class SettingsScreen extends HookConsumerWidget {
                     : null,
               ),
               _buildSection(theme, 'Content Blocking'),
-              SwitchListTile.adaptive(
-                title: const Text('Enable Content Blocking'),
-                subtitle: const Text(
-                  'Prevents access to unwanted websites and ads, as defined in the selected lists below.',
-                ),
-                value: settings.enableContentBlocking,
-                onChanged: (value) async {
-                  await ref.read(saveSettingsControllerProvider.notifier).save(
-                        (currentSettings) => currentSettings.copyWith
-                            .enableContentBlocking(value),
-                      );
-                },
-              ),
               _buildSubSection(theme, 'Lists'),
-              HostListTile(
-                enableContentBlocking: settings.enableContentBlocking,
-                enableHostLists: settings.enableHostList,
-                source: HostSource.stevenBlackUnified,
-                title: 'StevenBlack: Unified',
-                subtitle:
-                    'Blocks domains containing adware, malware and trackers.',
-              ),
-              HostListTile(
-                enableContentBlocking: settings.enableContentBlocking,
-                enableHostLists: settings.enableHostList,
-                source: HostSource.stevenBlackFakeNews,
-                title: 'StevenBlack: Fake News',
-                subtitle: 'Blocks domains known for spreading fake news.',
-              ),
-              HostListTile(
-                enableContentBlocking: settings.enableContentBlocking,
-                enableHostLists: settings.enableHostList,
-                source: HostSource.stevenBlackGambling,
-                title: 'StevenBlack: Gambling',
-                subtitle: 'Blocks domains related to gambling.',
-              ),
-              HostListTile(
-                enableContentBlocking: settings.enableContentBlocking,
-                enableHostLists: settings.enableHostList,
-                source: HostSource.stevenBlackPorn,
-                title: 'StevenBlack: Porn',
-                subtitle: 'Blocks adult content domains.',
-              ),
-              HostListTile(
-                enableContentBlocking: settings.enableContentBlocking,
-                enableHostLists: settings.enableHostList,
-                source: HostSource.stevenBlackSocial,
-                title: 'StevenBlack: Social',
-                subtitle: 'Blocks social media domains.',
-              ),
               const SizedBox(
                 height: 16,
               ),
