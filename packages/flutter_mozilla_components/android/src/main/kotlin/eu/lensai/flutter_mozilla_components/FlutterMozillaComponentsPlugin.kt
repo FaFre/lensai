@@ -87,6 +87,7 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
   private var activity: Activity? = null
 
   private lateinit var _flutterPluginBinding: FlutterPlugin.FlutterPluginBinding;
+  private lateinit var _flutterEvents : GeckoStateEvents
 
   init {
     Log.addSink(AndroidLogSink())
@@ -95,14 +96,15 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     _flutterPluginBinding = flutterPluginBinding
 
-    val flutterEvents = GeckoStateEvents(_flutterPluginBinding.binaryMessenger)
+    _flutterEvents = GeckoStateEvents(_flutterPluginBinding.binaryMessenger)
+
     val readerViewController =
       ReaderViewController(_flutterPluginBinding.binaryMessenger)
     val selectionActionDelegate = SelectionAction(_flutterPluginBinding.binaryMessenger)
 
     GlobalComponents.setUp(
       flutterPluginBinding.applicationContext,
-      flutterEvents,
+      _flutterEvents,
       readerViewController,
       selectionActionDelegate
     )
@@ -141,7 +143,6 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
     fm.beginTransaction()
       .replace(FRAGMENT_CONTAINER_ID, nativeFragment)
       .commitAllowingStateLoss()
-
   }
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -152,7 +153,12 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
     this.activity = binding.activity
 
     _flutterPluginBinding.platformViewRegistry.registerViewFactory(
-      "eu.lensai/gecko", GeckoViewFactory(binding.activity, FRAGMENT_CONTAINER_ID))
+      "eu.lensai/gecko", GeckoViewFactory(
+        binding.activity,
+        FRAGMENT_CONTAINER_ID,
+        _flutterEvents
+      )
+    )
   }
 
   override fun onDetachedFromActivityForConfigChanges() {

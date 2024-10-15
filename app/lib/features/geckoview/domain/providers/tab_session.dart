@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -29,6 +31,10 @@ class TabSession extends _$TabSession {
 
   Future<void> goForward() {
     return _sessionService.goForward();
+  }
+
+  Future<Uint8List?> requestScreenshot() {
+    return _sessionService.requestScreenshot();
   }
 
   @override

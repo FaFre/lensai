@@ -9,7 +9,7 @@ CREATE TABLE topic (
 
 CREATE TABLE tab_link ( 
   id TEXT PRIMARY KEY NOT NULL,
-  topic_id TEXT REFERENCES topic (id) ON DELETE CASCADE,
+  topic_id TEXT NOT NULL REFERENCES topic (id) ON DELETE CASCADE,
   timestamp DATETIME NOT NULL
 );
 

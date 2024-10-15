@@ -169,7 +169,7 @@ final selectedTabStateProvider = AutoDisposeProvider<TabState?>.internal(
 );
 
 typedef SelectedTabStateRef = AutoDisposeProviderRef<TabState?>;
-String _$tabStatesHash() => r'22fd36fe2e443fd2dfb703dc3be72716fbccef6d';
+String _$tabStatesHash() => r'f3ae09e49150955dcb29ec89f0f3fe63155a1d6e';
 
 /// See also [TabStates].
 @ProviderFor(TabStates)

@@ -31,7 +31,7 @@ Stream<List<TopicDataWithCount>> topicsWithCount(TopicsWithCountRef ref) {
 }
 
 @Riverpod()
-Stream<List<String>> topicTabIds(TopicTabIdsRef ref, String? topicId) {
+Stream<List<String>> topicTabIds(TopicTabIdsRef ref, String topicId) {
   final db = ref.watch(tabDatabaseProvider);
   return db.tabLinkDao.topicTabIds(topicId).watch();
 }

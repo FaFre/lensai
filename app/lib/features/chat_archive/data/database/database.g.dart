@@ -455,41 +455,58 @@ typedef $ChatUpdateCompanionBuilder = ChatCompanion Function({
   Value<int> rowid,
 });
 
-class $ChatFilterComposer extends FilterComposer<_$ChatSearchDatabase, Chat> {
-  $ChatFilterComposer(super.$state);
-  ColumnFilters<String> get fileName => $state.composableBuilder(
-      column: $state.table.fileName,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+class $ChatFilterComposer extends Composer<_$ChatSearchDatabase, Chat> {
+  $ChatFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get fileName => $composableBuilder(
+      column: $table.fileName, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get title => $state.composableBuilder(
-      column: $state.table.title,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get content => $state.composableBuilder(
-      column: $state.table.content,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnFilters(column));
 }
 
-class $ChatOrderingComposer
-    extends OrderingComposer<_$ChatSearchDatabase, Chat> {
-  $ChatOrderingComposer(super.$state);
-  ColumnOrderings<String> get fileName => $state.composableBuilder(
-      column: $state.table.fileName,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+class $ChatOrderingComposer extends Composer<_$ChatSearchDatabase, Chat> {
+  $ChatOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get fileName => $composableBuilder(
+      column: $table.fileName, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get title => $state.composableBuilder(
-      column: $state.table.title,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get content => $state.composableBuilder(
-      column: $state.table.content,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnOrderings(column));
+}
+
+class $ChatAnnotationComposer extends Composer<_$ChatSearchDatabase, Chat> {
+  $ChatAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get fileName =>
+      $composableBuilder(column: $table.fileName, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
 }
 
 class $ChatTableManager extends RootTableManager<
@@ -498,6 +515,7 @@ class $ChatTableManager extends RootTableManager<
     ChatData,
     $ChatFilterComposer,
     $ChatOrderingComposer,
+    $ChatAnnotationComposer,
     $ChatCreateCompanionBuilder,
     $ChatUpdateCompanionBuilder,
     (ChatData, BaseReferences<_$ChatSearchDatabase, Chat, ChatData>),
@@ -507,8 +525,12 @@ class $ChatTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer: $ChatFilterComposer(ComposerState(db, table)),
-          orderingComposer: $ChatOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $ChatFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $ChatOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $ChatAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> fileName = const Value.absent(),
             Value<String> title = const Value.absent(),
@@ -546,6 +568,7 @@ typedef $ChatProcessedTableManager = ProcessedTableManager<
     ChatData,
     $ChatFilterComposer,
     $ChatOrderingComposer,
+    $ChatAnnotationComposer,
     $ChatCreateCompanionBuilder,
     $ChatUpdateCompanionBuilder,
     (ChatData, BaseReferences<_$ChatSearchDatabase, Chat, ChatData>),
@@ -562,32 +585,50 @@ typedef $ChatFtsUpdateCompanionBuilder = ChatFtsCompanion Function({
   Value<int> rowid,
 });
 
-class $ChatFtsFilterComposer
-    extends FilterComposer<_$ChatSearchDatabase, ChatFts> {
-  $ChatFtsFilterComposer(super.$state);
-  ColumnFilters<String> get title => $state.composableBuilder(
-      column: $state.table.title,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+class $ChatFtsFilterComposer extends Composer<_$ChatSearchDatabase, ChatFts> {
+  $ChatFtsFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get content => $state.composableBuilder(
-      column: $state.table.content,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnFilters(column));
 }
 
-class $ChatFtsOrderingComposer
-    extends OrderingComposer<_$ChatSearchDatabase, ChatFts> {
-  $ChatFtsOrderingComposer(super.$state);
-  ColumnOrderings<String> get title => $state.composableBuilder(
-      column: $state.table.title,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+class $ChatFtsOrderingComposer extends Composer<_$ChatSearchDatabase, ChatFts> {
+  $ChatFtsOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get title => $composableBuilder(
+      column: $table.title, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get content => $state.composableBuilder(
-      column: $state.table.content,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get content => $composableBuilder(
+      column: $table.content, builder: (column) => ColumnOrderings(column));
+}
+
+class $ChatFtsAnnotationComposer
+    extends Composer<_$ChatSearchDatabase, ChatFts> {
+  $ChatFtsAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get content =>
+      $composableBuilder(column: $table.content, builder: (column) => column);
 }
 
 class $ChatFtsTableManager extends RootTableManager<
@@ -596,6 +637,7 @@ class $ChatFtsTableManager extends RootTableManager<
     ChatFt,
     $ChatFtsFilterComposer,
     $ChatFtsOrderingComposer,
+    $ChatFtsAnnotationComposer,
     $ChatFtsCreateCompanionBuilder,
     $ChatFtsUpdateCompanionBuilder,
     (ChatFt, BaseReferences<_$ChatSearchDatabase, ChatFts, ChatFt>),
@@ -605,8 +647,12 @@ class $ChatFtsTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer: $ChatFtsFilterComposer(ComposerState(db, table)),
-          orderingComposer: $ChatFtsOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $ChatFtsFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $ChatFtsOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $ChatFtsAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> title = const Value.absent(),
             Value<String> content = const Value.absent(),
@@ -640,6 +686,7 @@ typedef $ChatFtsProcessedTableManager = ProcessedTableManager<
     ChatFt,
     $ChatFtsFilterComposer,
     $ChatFtsOrderingComposer,
+    $ChatFtsAnnotationComposer,
     $ChatFtsCreateCompanionBuilder,
     $ChatFtsUpdateCompanionBuilder,
     (ChatFt, BaseReferences<_$ChatSearchDatabase, ChatFts, ChatFt>),

@@ -40,7 +40,7 @@ final topicsWithCountProvider =
 
 typedef TopicsWithCountRef
     = AutoDisposeStreamProviderRef<List<TopicDataWithCount>>;
-String _$topicTabIdsHash() => r'f7ce2633804421a22df1efc42eb4d19d440d9fd3';
+String _$topicTabIdsHash() => r'43719c70e01cf9e030d75171405ab9650936ddf8';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -74,7 +74,7 @@ class TopicTabIdsFamily extends Family<AsyncValue<List<String>>> {
 
   /// See also [topicTabIds].
   TopicTabIdsProvider call(
-    String? topicId,
+    String topicId,
   ) {
     return TopicTabIdsProvider(
       topicId,
@@ -109,7 +109,7 @@ class TopicTabIdsFamily extends Family<AsyncValue<List<String>>> {
 class TopicTabIdsProvider extends AutoDisposeStreamProvider<List<String>> {
   /// See also [topicTabIds].
   TopicTabIdsProvider(
-    String? topicId,
+    String topicId,
   ) : this._internal(
           (ref) => topicTabIds(
             ref as TopicTabIdsRef,
@@ -137,7 +137,7 @@ class TopicTabIdsProvider extends AutoDisposeStreamProvider<List<String>> {
     required this.topicId,
   }) : super.internal();
 
-  final String? topicId;
+  final String topicId;
 
   @override
   Override overrideWith(
@@ -178,7 +178,7 @@ class TopicTabIdsProvider extends AutoDisposeStreamProvider<List<String>> {
 
 mixin TopicTabIdsRef on AutoDisposeStreamProviderRef<List<String>> {
   /// The parameter `topicId` of this provider.
-  String? get topicId;
+  String get topicId;
 }
 
 class _TopicTabIdsProviderElement
@@ -186,7 +186,7 @@ class _TopicTabIdsProviderElement
   _TopicTabIdsProviderElement(super.provider);
 
   @override
-  String? get topicId => (origin as TopicTabIdsProvider).topicId;
+  String get topicId => (origin as TopicTabIdsProvider).topicId;
 }
 
 String _$tabTopicIdHash() => r'284164ac3acd9be3ba4e15eba99fc8d97602ee84';

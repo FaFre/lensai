@@ -1,5 +1,10 @@
 name: lensai_project
 
+command:
+  clean:
+    hooks:
+      pre: melos exec -c 6 -- "flutter clean"
+
 scripts:
   upgrade-major-tighten:
     run: |

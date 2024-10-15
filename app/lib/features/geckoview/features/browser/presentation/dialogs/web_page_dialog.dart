@@ -1,3 +1,5 @@
+import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
@@ -7,6 +9,7 @@ import 'package:lensai/data/models/web_page_info.dart';
 import 'package:lensai/features/bangs/data/models/bang_data.dart';
 import 'package:lensai/features/bangs/domain/providers.dart';
 import 'package:lensai/features/bangs/presentation/widgets/site_search.dart';
+import 'package:lensai/features/geckoview/domain/providers.dart';
 import 'package:lensai/features/geckoview/domain/providers/tab_session.dart';
 import 'package:lensai/features/geckoview/domain/repositories/tab.dart';
 import 'package:lensai/features/kagi/data/entities/modes.dart';
@@ -55,6 +58,7 @@ class WebPageDialog extends HookConsumerWidget {
 
     final formKey = useMemoized(() => GlobalKey<FormState>());
     final urlTextController = useTextEditingController(text: url.toString());
+    final urlTextFocusNode = useFocusNode();
 
     return Stack(
       children: [
@@ -80,6 +84,7 @@ class WebPageDialog extends HookConsumerWidget {
                   key: formKey,
                   child: TextFormField(
                     controller: urlTextController,
+                    focusNode: urlTextFocusNode,
                     enableIMEPersonalizedLearning: !incognitoEnabled,
                     decoration: InputDecoration(
                       labelText: 'URL',
@@ -108,6 +113,15 @@ class WebPageDialog extends HookConsumerWidget {
                       }
 
                       return 'Invalid URL';
+                    },
+                    onTap: () {
+                      if (!urlTextFocusNode.hasFocus) {
+                        // Select all text when the field is tapped
+                        urlTextController.selection = TextSelection(
+                          baseOffset: 0,
+                          extentOffset: urlTextController.text.length,
+                        );
+                      }
                     },
                   ),
                 ),
@@ -179,6 +193,40 @@ class WebPageDialog extends HookConsumerWidget {
               title: const Text('Share link'),
               onTap: () async {
                 await Share.shareUri(url);
+
+                onDismiss?.call();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.mobile_screen_share),
+              title: const Text('Share screenshot'),
+              onTap: () async {
+                final screenshot = await ref
+                    .read(selectedTabSessionNotifierProvider)
+                    .requestScreenshot();
+
+                if (screenshot != null) {
+                  ui.decodeImageFromList(
+                    screenshot,
+                    (result) async {
+                      final png = await result.toByteData(
+                        format: ui.ImageByteFormat.png,
+                      );
+
+                      if (png != null) {
+                        final file = XFile.fromData(
+                          png.buffer.asUint8List(),
+                          mimeType: 'image/png',
+                        );
+
+                        await Share.shareXFiles(
+                          [file],
+                          subject: precachedInfo?.title,
+                        );
+                      }
+                    },
+                  );
+                }
 
                 onDismiss?.call();
               },

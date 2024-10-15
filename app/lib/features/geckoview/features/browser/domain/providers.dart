@@ -2,8 +2,11 @@
 
 import 'dart:async';
 
+import 'package:lensai/data/models/equatable_iterable.dart';
 import 'package:lensai/features/bangs/data/models/bang_data.dart';
 import 'package:lensai/features/bangs/domain/repositories/data.dart';
+import 'package:lensai/features/geckoview/domain/providers/tab_state.dart';
+import 'package:lensai/features/geckoview/features/topics/data/providers.dart';
 import 'package:lensai/features/kagi/data/entities/modes.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -78,5 +81,31 @@ class ShowFindInPage extends _$ShowFindInPage {
   @override
   bool build() {
     return false;
+  }
+}
+
+@Riverpod()
+Stream<List<String>> availableTabIds(AvailableTabIdsRef ref, String? topicId) {
+  final db = ref.watch(tabDatabaseProvider);
+  final openTabs = ref
+      .watch(
+        tabStatesProvider.select(
+          (states) =>
+              EquatableCollection(states.keys.toSet(), immutable: false),
+        ),
+      )
+      .collection;
+
+  if (topicId != null) {
+    return db.tabLinkDao.topicTabIds(topicId).watch().map(
+          (tabIds) =>
+              tabIds.where((tabId) => openTabs.contains(tabId)).toList(),
+        );
+  } else {
+    return db.tabLinkDao.allTabIds().watch().map(
+          (assignedTabIds) => openTabs
+              .where((tabId) => !assignedTabIds.contains(tabId))
+              .toList(),
+        );
   }
 }

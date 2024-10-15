@@ -624,10 +624,25 @@ abstract class GeckoSessionApi {
     required String? tabId, //If null = current tab
     required int? lastAccess, //If null datetime.now
   });
+
+  @async
+  Uint8List? requestScreenshot();
 }
 
 @HostApi()
 abstract class GeckoTabsApi {
+  void syncEvents({
+    required bool onSelectedTabChange,
+    required bool onTabListChange,
+    required bool onTabContentStateChange,
+    required bool onIconChange,
+    required bool onSecurityInfoStateChange,
+    required bool onReaderableStateChange,
+    required bool onHistoryStateChange,
+    required bool onFindResults,
+    required bool onThumbnailChange,
+  });
+
   void selectTab({required String tabId});
 
   void removeTab({required String tabId});
@@ -767,6 +782,8 @@ abstract class GeckoCookieApi {
 
 @FlutterApi()
 abstract class GeckoStateEvents {
+  void onFragmentReadyStateChange(bool state);
+
   void onTabListChange(List<String> tabIds);
   void onSelectedTabChange(String? id);
 
@@ -789,7 +806,6 @@ abstract class ReaderViewEvents {
 @FlutterApi()
 abstract class ReaderViewController {
   void appearanceButtonVisibility(bool visible);
-  void readerViewButtonVisibility(bool visible);
 }
 
 @FlutterApi()

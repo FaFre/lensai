@@ -19,9 +19,3 @@ Stream<bool> appearanceButtonVisibility(AppearanceButtonVisibilityRef ref) {
   final service = ref.watch(readerableServiceProvider);
   return service.appearanceVisibility;
 }
-
-@Riverpod()
-Stream<bool> readerButtonVisibility(ReaderButtonVisibilityRef ref) {
-  final service = ref.watch(readerableServiceProvider);
-  return service.readerVisibility;
-}

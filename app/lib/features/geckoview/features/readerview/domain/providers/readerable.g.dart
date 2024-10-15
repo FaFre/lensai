@@ -38,21 +38,5 @@ final appearanceButtonVisibilityProvider =
 );
 
 typedef AppearanceButtonVisibilityRef = AutoDisposeStreamProviderRef<bool>;
-String _$readerButtonVisibilityHash() =>
-    r'd58132aa4e9a5ba311a0b5d99b9f8416e952b1ab';
-
-/// See also [readerButtonVisibility].
-@ProviderFor(readerButtonVisibility)
-final readerButtonVisibilityProvider = AutoDisposeStreamProvider<bool>.internal(
-  readerButtonVisibility,
-  name: r'readerButtonVisibilityProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$readerButtonVisibilityHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
-
-typedef ReaderButtonVisibilityRef = AutoDisposeStreamProviderRef<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

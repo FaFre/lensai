@@ -2,6 +2,7 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/data/models/equatable_iterable.dart';
 import 'package:lensai/features/geckoview/domain/entities/tab_state.dart';
 import 'package:lensai/features/geckoview/domain/providers/tab_state.dart';
 import 'package:lensai/features/geckoview/features/topics/domain/providers.dart';
@@ -25,8 +26,14 @@ class TabActionDialog extends HookConsumerWidget {
       tabTopicIdProvider(initialTab.id).select((value) => value.valueOrNull),
     );
 
-    final topics =
-        ref.watch(topicsWithCountProvider.select((value) => value.valueOrNull));
+    final topics = ref
+        .watch(
+          topicsWithCountProvider.select(
+            (value) => EquatableCollection(value.valueOrNull, immutable: true),
+          ),
+        )
+        .collection;
+
     final selectedTopic =
         topics?.firstWhereOrNull((topic) => topic.id == tabTopicId);
 

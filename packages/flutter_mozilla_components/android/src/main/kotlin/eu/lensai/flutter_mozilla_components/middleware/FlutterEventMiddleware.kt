@@ -12,6 +12,7 @@ import mozilla.components.browser.state.action.ContentAction
 import mozilla.components.browser.state.state.BrowserState
 import mozilla.components.lib.state.Middleware
 import mozilla.components.lib.state.MiddlewareContext
+import org.mozilla.gecko.util.ThreadUtils.runOnUiThread
 import java.io.ByteArrayOutputStream
 
 
@@ -30,7 +31,9 @@ class FlutterEventMiddleware(private val flutterEvents: GeckoStateEvents) : Midd
         when (action) {
             is ContentAction.UpdateThumbnailAction -> {
                 val bytes = action.thumbnail.toWebPBytes()
-                flutterEvents.onThumbnailChange(action.sessionId, bytes) { _ -> }
+                runOnUiThread {
+                    flutterEvents.onThumbnailChange(action.sessionId, bytes) { _ -> }
+                }
             }
             else -> {
                 // no-op

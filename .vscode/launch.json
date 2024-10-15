@@ -26,6 +26,29 @@
             "type": "dart",
             "flutterMode": "release",
             "args": ["--device-user", "0"]
+        },
+        {
+            "name": "example",
+            "cwd": "packages/flutter_mozilla_components/example",
+            "request": "launch",
+            "type": "dart",
+            "args": ["--device-user", "0"]
+        },
+        {
+            "name": "example (profile mode)",
+            "cwd": "packages/flutter_mozilla_components/example",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile",
+            "args": ["--device-user", "0"]
+        },
+        {
+            "name": "example (release mode)",
+            "cwd": "packages/flutter_mozilla_components/example",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release",
+            "args": ["--device-user", "0"]
         }
     ]
 }

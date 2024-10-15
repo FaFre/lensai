@@ -1,10 +1,47 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
+    <!-- This is needed because the android.permission.CAMERA above automatically
+    adds a requirements for camera hardware and we don't want add those restrictions -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-feature
+        android:name="android.hardware.camera.autofocus"
+        android:required="false" />
+
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"  />
+
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" />
+    <uses-permission android:name="android.permission.ACCESS_WIFI_STATE"/>
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
+
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Needed for uploading media files on devices with Android 13 and later. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
+    
     <application
         android:label="Lensai"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:usesCleartextTraffic="true">
+        <activity android:name="eu.lensai.flutter_mozilla_components.NotificationActivity" android:theme="@style/Theme.AppCompat.Translucent" />
+        
         <activity
             android:name=".MainActivity"
             android:exported="true"
@@ -46,6 +83,7 @@
                 <data android:mimeType="application/pdf" />
             </intent-filter>
         </activity>
+
         <receiver android:name="FullWidgetProvider" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -54,6 +92,7 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/full_widget_info"/>
         </receiver>
+
         <receiver android:name="CompactWidgetProvider" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -62,6 +101,7 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/compact_widget_info"/>
         </receiver>
+
         <receiver android:name="SearchBarWidgetProvider" android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
@@ -70,6 +110,15 @@
             <meta-data android:name="android.appwidget.provider"
                 android:resource="@xml/search_bar_widget_info"/>
         </receiver>
+
+        <service
+            android:name="eu.lensai.flutter_mozilla_components.DownloadService"
+            android:foregroundServiceType="dataSync" />
+
+        <service android:name="eu.lensai.flutter_mozilla_components.MediaSessionService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="false" />
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

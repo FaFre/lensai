@@ -6,7 +6,9 @@ import 'package:flutter_material_design_icons/flutter_material_design_icons.dart
 import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/core/logger.dart';
 import 'package:lensai/core/routing/routes.dart';
+import 'package:lensai/features/geckoview/domain/providers.dart';
 import 'package:lensai/features/geckoview/domain/providers/tab_session.dart';
 import 'package:lensai/features/geckoview/domain/providers/tab_state.dart';
 import 'package:lensai/features/geckoview/domain/repositories/tab.dart';
@@ -22,6 +24,7 @@ import 'package:lensai/features/geckoview/features/controllers/bottom_sheet.dart
 import 'package:lensai/features/geckoview/features/controllers/overlay_dialog.dart';
 import 'package:lensai/features/geckoview/features/find_in_page/presentation/controllers/find_in_page_visibility.dart';
 import 'package:lensai/features/geckoview/features/find_in_page/presentation/widgets/find_in_page.dart';
+import 'package:lensai/features/geckoview/features/readerview/presentation/widgets/reader_appearance_button.dart';
 import 'package:lensai/features/geckoview/features/readerview/presentation/widgets/reader_button.dart';
 import 'package:lensai/features/kagi/data/entities/modes.dart';
 import 'package:lensai/features/kagi/data/services/session.dart';
@@ -546,7 +549,23 @@ class BrowserScreen extends HookConsumerWidget {
                     SafeArea(
                       child: Stack(
                         children: [
-                          const GeckoView(),
+                          GeckoView(
+                            preInitializationStep: () async {
+                              await ref
+                                  .read(eventServiceProvider)
+                                  .fragmentReadyStateEvents
+                                  .firstWhere((state) => state == true)
+                                  .timeout(
+                                const Duration(seconds: 3),
+                                onTimeout: () {
+                                  logger.e(
+                                    'Browser fragement not reported ready, trying to intitialize anyways',
+                                  );
+                                  return true;
+                                },
+                              );
+                            },
+                          ),
                           Positioned(
                             bottom: 0,
                             left: 0,
@@ -604,6 +623,7 @@ class BrowserScreen extends HookConsumerWidget {
           ),
         ),
       ),
+      floatingActionButton: ReaderAppearanceButton(),
       bottomSheet: (displayedSheet != null)
           ? NotificationListener<DraggableScrollableNotification>(
               onNotification: (notification) {

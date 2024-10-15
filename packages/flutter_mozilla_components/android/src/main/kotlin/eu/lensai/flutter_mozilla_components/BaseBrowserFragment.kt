@@ -68,6 +68,7 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
         _components = GlobalComponents.components
 
         _engineView = createEngine(components)
+        _components?.engineView = _engineView
 
         val engineNativeView = engineView.asView()
         // Set layout parameters

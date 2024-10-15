@@ -2,15 +2,15 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_mozilla_components/src/pigeons/gecko.g.dart';
+import 'package:rxdart/rxdart.dart';
 
 class GeckoReaderableService extends ReaderViewController {
   final ReaderViewEvents _events;
 
-  final _appearanceVisibility = StreamController<bool>.broadcast();
-  final _readerVisibility = StreamController<bool>.broadcast();
+  final _appearanceVisibility = BehaviorSubject<bool>();
+  final _readerVisibility = BehaviorSubject<bool>();
 
   Stream<bool> get appearanceVisibility => _appearanceVisibility.stream;
-  Stream<bool> get readerVisibility => _readerVisibility.stream;
 
   Future<void> toggleReaderView(bool enable) {
     return _events.onToggleReaderView(enable);
@@ -23,11 +23,6 @@ class GeckoReaderableService extends ReaderViewController {
   @override
   void appearanceButtonVisibility(bool visible) {
     _appearanceVisibility.add(visible);
-  }
-
-  @override
-  void readerViewButtonVisibility(bool visible) {
-    _readerVisibility.add(visible);
   }
 
   GeckoReaderableService.setUp({

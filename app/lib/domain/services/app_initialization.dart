@@ -4,9 +4,6 @@ import 'package:exceptions/exceptions.dart';
 import 'package:lensai/features/about/data/repositories/package_info_repository.dart';
 import 'package:lensai/features/bangs/data/models/bang.dart';
 import 'package:lensai/features/bangs/domain/repositories/sync.dart';
-import 'package:lensai/features/kagi/data/services/session.dart';
-import 'package:lensai/features/settings/data/models/settings.dart';
-import 'package:lensai/features/settings/data/repositories/settings_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'app_initialization.g.dart';
@@ -46,27 +43,8 @@ class AppInitializationService extends _$AppInitializationService {
         .syncBangGroups(syncInterval: const Duration(days: 7));
   }
 
-  Future<void> _initIncognito(Settings settings) async {
-    state = Result.success(
-      (
-        initialized: false,
-        stage: 'Enforcing Privacy...',
-        errors: List.empty(),
-      ),
-    );
-
-    if (settings.kagiSession case final String session) {
-      if (session.isNotEmpty) {
-        await ref
-            .read(kagiSessionServiceProvider.notifier)
-            .setKagiSession(session);
-      }
-    }
-  }
-
   Future<void> initialize() async {
     state = await Result.fromAsync(() async {
-      final settings = await ref.read(settingsRepositoryProvider.future);
       final errors = <ErrorMessage>[];
 
       await _initPackageInfo();
@@ -75,8 +53,6 @@ class AppInitializationService extends _$AppInitializationService {
       for (final MapEntry(value: result) in bangSyncResults.entries) {
         result.onFailure(errors.add);
       }
-
-      await _initIncognito(settings);
 
       return (initialized: true, stage: null, errors: errors);
     });

@@ -156,6 +156,135 @@ class _SelectedBangDataProviderElement
   String? get domain => (origin as SelectedBangDataProvider).domain;
 }
 
+String _$availableTabIdsHash() => r'bea231cdf6211fc876b8031b5d72999eae5d7b15';
+
+/// See also [availableTabIds].
+@ProviderFor(availableTabIds)
+const availableTabIdsProvider = AvailableTabIdsFamily();
+
+/// See also [availableTabIds].
+class AvailableTabIdsFamily extends Family<AsyncValue<List<String>>> {
+  /// See also [availableTabIds].
+  const AvailableTabIdsFamily();
+
+  /// See also [availableTabIds].
+  AvailableTabIdsProvider call(
+    String? topicId,
+  ) {
+    return AvailableTabIdsProvider(
+      topicId,
+    );
+  }
+
+  @override
+  AvailableTabIdsProvider getProviderOverride(
+    covariant AvailableTabIdsProvider provider,
+  ) {
+    return call(
+      provider.topicId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'availableTabIdsProvider';
+}
+
+/// See also [availableTabIds].
+class AvailableTabIdsProvider extends AutoDisposeStreamProvider<List<String>> {
+  /// See also [availableTabIds].
+  AvailableTabIdsProvider(
+    String? topicId,
+  ) : this._internal(
+          (ref) => availableTabIds(
+            ref as AvailableTabIdsRef,
+            topicId,
+          ),
+          from: availableTabIdsProvider,
+          name: r'availableTabIdsProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$availableTabIdsHash,
+          dependencies: AvailableTabIdsFamily._dependencies,
+          allTransitiveDependencies:
+              AvailableTabIdsFamily._allTransitiveDependencies,
+          topicId: topicId,
+        );
+
+  AvailableTabIdsProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.topicId,
+  }) : super.internal();
+
+  final String? topicId;
+
+  @override
+  Override overrideWith(
+    Stream<List<String>> Function(AvailableTabIdsRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: AvailableTabIdsProvider._internal(
+        (ref) => create(ref as AvailableTabIdsRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        topicId: topicId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeStreamProviderElement<List<String>> createElement() {
+    return _AvailableTabIdsProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is AvailableTabIdsProvider && other.topicId == topicId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, topicId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin AvailableTabIdsRef on AutoDisposeStreamProviderRef<List<String>> {
+  /// The parameter `topicId` of this provider.
+  String? get topicId;
+}
+
+class _AvailableTabIdsProviderElement
+    extends AutoDisposeStreamProviderElement<List<String>>
+    with AvailableTabIdsRef {
+  _AvailableTabIdsProviderElement(super.provider);
+
+  @override
+  String? get topicId => (origin as AvailableTabIdsProvider).topicId;
+}
+
 String _$selectedBangTriggerHash() =>
     r'b0e12bc95e93d50d04f1c658230cea9f15ff0385';
 

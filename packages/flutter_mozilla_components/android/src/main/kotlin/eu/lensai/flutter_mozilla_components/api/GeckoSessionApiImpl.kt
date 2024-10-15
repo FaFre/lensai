@@ -2,17 +2,35 @@ package eu.lensai.flutter_mozilla_components.api
 
 import android.util.Log
 import eu.lensai.flutter_mozilla_components.GlobalComponents
+import eu.lensai.flutter_mozilla_components.ext.toWebPBytes
 import eu.lensai.flutter_mozilla_components.pigeons.GeckoSessionApi
+import eu.lensai.flutter_mozilla_components.pigeons.GeckoStateEvents
 import eu.lensai.flutter_mozilla_components.pigeons.LoadUrlFlagsValue
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import mozilla.components.browser.state.action.ContentAction
+import mozilla.components.browser.state.selector.findTab
+import mozilla.components.browser.state.selector.selectedTab
 import eu.lensai.flutter_mozilla_components.pigeons.TranslationOptions as PigeonTranslationOptions
 import mozilla.components.browser.state.state.BrowserState
+import mozilla.components.browser.state.store.BrowserStore
+import mozilla.components.browser.thumbnails.storage.ThumbnailStorage
+import mozilla.components.concept.base.images.ImageLoadRequest
 import mozilla.components.concept.engine.EngineSession
+import mozilla.components.concept.engine.EngineView
 import mozilla.components.concept.engine.translate.TranslationOptions
 import mozilla.components.feature.session.SessionUseCases
+import org.mozilla.gecko.util.ThreadUtils.runOnUiThread
 
 class GeckoSessionApiImpl : GeckoSessionApi {
     private val sessionUseCases: SessionUseCases by lazy { GlobalComponents.components!!.sessionUseCases }
+    private val store: BrowserStore by lazy { GlobalComponents.components!!.store }
     private val state: BrowserState by lazy { GlobalComponents.components!!.store.state }
+    private val thumbnailStorage: ThumbnailStorage by lazy { GlobalComponents.components!!.thumbnailStorage }
+    private val events: GeckoStateEvents by lazy { GlobalComponents.components!!.flutterEvents }
+    private val engineView: EngineView? by lazy { GlobalComponents.components!!.engineView }
 
     override fun loadUrl(
         tabId: String?,
@@ -123,5 +141,22 @@ class GeckoSessionApiImpl : GeckoSessionApi {
             tabId = tabId ?: state.selectedTabId,
             lastAccess = lastAccess ?: System.currentTimeMillis()
         )
+    }
+
+    override fun requestScreenshot(callback: (Result<ByteArray?>) -> Unit) {
+        val tab = state.selectedTab
+        if (tab != null) {
+            engineView?.captureThumbnail { bitmap ->
+                if (bitmap != null) {
+                    store.dispatch(ContentAction.UpdateThumbnailAction(tab.id, bitmap))
+                    val compressed = bitmap.toWebPBytes()
+                    callback(Result.success(compressed))
+                } else {
+                    callback(Result.success(null))
+                }
+            }
+        } else {
+            callback(Result.failure(Exception("No selected tab for screenshot")))
+        }
     }
 }

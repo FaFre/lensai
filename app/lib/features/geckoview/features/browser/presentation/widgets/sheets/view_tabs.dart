@@ -1,16 +1,16 @@
 import 'dart:async';
 
-import 'package:fading_scroll/fading_scroll.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/data/models/equatable_iterable.dart';
 import 'package:lensai/features/geckoview/domain/providers/selected_tab.dart';
 import 'package:lensai/features/geckoview/domain/providers/tab_state.dart';
 import 'package:lensai/features/geckoview/domain/repositories/tab.dart';
+import 'package:lensai/features/geckoview/features/browser/domain/providers.dart';
 import 'package:lensai/features/geckoview/features/browser/presentation/dialogs/tab_action.dart';
 import 'package:lensai/features/geckoview/features/browser/presentation/widgets/tab_preview.dart';
 import 'package:lensai/features/geckoview/features/controllers/overlay_dialog.dart';
-import 'package:lensai/features/geckoview/features/topics/domain/providers.dart';
 import 'package:lensai/features/geckoview/features/topics/domain/providers/selected_topic.dart';
 import 'package:lensai/features/geckoview/features/topics/domain/repositories/tab_link.dart';
 import 'package:lensai/features/geckoview/features/topics/presentation/widgets/topic_chips.dart';
@@ -116,135 +116,133 @@ class ViewTabsSheetWidget extends HookConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return FadingScroll(
-      fadingSize: 25,
-      shaderPadding:
-          const EdgeInsets.only(top: _SliverHeaderDelagate._headerSize),
+    return CustomScrollView(
       controller: sheetScrollController,
-      builder: (context, controller) {
-        return CustomScrollView(
-          controller: controller,
-          slivers: [
-            SliverPersistentHeader(
-              pinned: true,
-              delegate: _SliverHeaderDelagate(onClose: onClose),
-            ),
-            HookConsumer(
-              builder: (context, ref, child) {
-                final topic = ref.watch(selectedTopicProvider);
-                final availableTabs = ref.watch(
-                  topicTabIdsProvider(topic)
-                      .select((value) => value.valueOrNull ?? []),
-                );
-                final activeTab = ref.watch(selectedTabProvider);
-
-                final itemHeight = useMemoized(
-                  () => _calculateItemHeight(
-                    screenWidth: MediaQuery.of(context).size.width,
-                    childAspectRatio: 0.75,
-                    horizontalPadding: 4.0,
-                    mainAxisSpacing: 8.0,
-                    crossAxisSpacing: 8.0,
-                    crossAxisCount: 2,
+      slivers: [
+        SliverPersistentHeader(
+          pinned: true,
+          delegate: _SliverHeaderDelagate(onClose: onClose),
+        ),
+        HookConsumer(
+          builder: (context, ref, child) {
+            final topic = ref.watch(selectedTopicProvider);
+            final availableTabs = ref
+                .watch(
+                  availableTabIdsProvider(topic).select(
+                    (value) => EquatableCollection(
+                      value.valueOrNull ?? [],
+                      immutable: true,
+                    ),
                   ),
-                  [MediaQuery.of(context).size.width],
-                );
+                )
+                .collection;
+            final activeTab = ref.watch(selectedTabProvider);
 
-                useEffect(
-                  () {
-                    final index = availableTabs
-                        .indexWhere((webView) => webView == activeTab);
+            final itemHeight = useMemoized(
+              () => _calculateItemHeight(
+                screenWidth: MediaQuery.of(context).size.width,
+                childAspectRatio: 0.75,
+                horizontalPadding: 4.0,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                crossAxisCount: 2,
+              ),
+              [MediaQuery.of(context).size.width],
+            );
 
-                    if (index > -1) {
-                      final reversedIndex = availableTabs.length - 1 - index;
-                      final offset = (reversedIndex ~/ 2) * itemHeight;
+            useEffect(
+              () {
+                final index =
+                    availableTabs.indexWhere((webView) => webView == activeTab);
 
-                      if (offset != controller.offset) {
-                        unawaited(
-                          controller.animateTo(
-                            offset,
-                            duration: const Duration(milliseconds: 200),
-                            curve: Curves.easeInOut,
-                          ),
-                        );
-                      }
-                    }
+                if (index > -1) {
+                  final reversedIndex = availableTabs.length - 1 - index;
+                  final offset = (reversedIndex ~/ 2) * itemHeight;
 
-                    return null;
-                  },
-                  [],
-                );
+                  if (offset != sheetScrollController.offset) {
+                    unawaited(
+                      sheetScrollController.animateTo(
+                        offset,
+                        duration: const Duration(milliseconds: 200),
+                        curve: Curves.easeInOut,
+                      ),
+                    );
+                  }
+                }
 
-                return SliverPadding(
-                  padding: const EdgeInsets.symmetric(horizontal: 4.0),
-                  sliver: SliverGrid.count(
-                    //Sync values for itemHeight calculation _calculateItemHeight
-                    childAspectRatio: 0.75,
-                    mainAxisSpacing: 8.0,
-                    crossAxisSpacing: 8.0,
-                    crossAxisCount: 2,
-                    children: availableTabs.reversed
-                        .map(
-                          (tabId) => Consumer(
-                            key: ValueKey(tabId),
-                            builder: (context, ref, child) {
-                              final tab = ref.watch(tabStateProvider(tabId));
-
-                              return (tab != null)
-                                  ? TabPreview(
-                                      tab: tab,
-                                      isActive: tabId == activeTab,
-                                      onTap: () async {
-                                        if (tabId != activeTab) {
-                                          //Close first to avoid rebuilds
-                                          onClose();
-                                          await ref
-                                              .read(
-                                                tabRepositoryProvider.notifier,
-                                              )
-                                              .selectTab(tab.id);
-                                        } else {
-                                          onClose();
-                                        }
-                                      },
-                                      onLongPress: () {
-                                        ref
-                                            .read(
-                                              overlayDialogControllerProvider
-                                                  .notifier,
-                                            )
-                                            .show(
-                                              TabActionDialog(
-                                                initialTab: tab,
-                                                onDismiss: ref
-                                                    .read(
-                                                      overlayDialogControllerProvider
-                                                          .notifier,
-                                                    )
-                                                    .dismiss,
-                                              ),
-                                            );
-                                      },
-                                      onDelete: () async {
-                                        await ref
-                                            .read(
-                                              tabRepositoryProvider.notifier,
-                                            )
-                                            .closeTab(tab.id);
-                                      },
-                                    )
-                                  : const SizedBox.shrink();
-                            },
-                          ),
-                        )
-                        .toList(),
-                  ),
-                );
+                return null;
               },
-            ),
-          ],
-        );
-      },
+              [availableTabs, activeTab],
+            );
+
+            return SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              sliver: SliverGrid.count(
+                //Sync values for itemHeight calculation _calculateItemHeight
+                childAspectRatio: 0.75,
+                mainAxisSpacing: 8.0,
+                crossAxisSpacing: 8.0,
+                crossAxisCount: 2,
+                children: availableTabs.reversed
+                    .map(
+                      (tabId) => Consumer(
+                        key: ValueKey(tabId),
+                        builder: (context, ref, child) {
+                          final tab = ref.watch(tabStateProvider(tabId));
+
+                          return (tab != null)
+                              ? TabPreview(
+                                  tab: tab,
+                                  isActive: tabId == activeTab,
+                                  onTap: () async {
+                                    if (tabId != activeTab) {
+                                      //Close first to avoid rebuilds
+                                      onClose();
+                                      await ref
+                                          .read(
+                                            tabRepositoryProvider.notifier,
+                                          )
+                                          .selectTab(tab.id);
+                                    } else {
+                                      onClose();
+                                    }
+                                  },
+                                  onLongPress: () {
+                                    ref
+                                        .read(
+                                          overlayDialogControllerProvider
+                                              .notifier,
+                                        )
+                                        .show(
+                                          TabActionDialog(
+                                            initialTab: tab,
+                                            onDismiss: ref
+                                                .read(
+                                                  overlayDialogControllerProvider
+                                                      .notifier,
+                                                )
+                                                .dismiss,
+                                          ),
+                                        );
+                                  },
+                                  onDelete: () async {
+                                    await ref
+                                        .read(
+                                          tabRepositoryProvider.notifier,
+                                        )
+                                        .closeTab(tab.id);
+                                  },
+                                )
+                              : const SizedBox.shrink();
+                        },
+                      ),
+                    )
+                    .toList(),
+              ),
+            );
+          },
+        ),
+      ],
     );
   }
 }

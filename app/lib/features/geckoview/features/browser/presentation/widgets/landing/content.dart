@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:flutter_markdown/flutter_markdown.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:lensai/data/models/equatable_iterable.dart';
 import 'package:lensai/domain/services/app_initialization.dart';
 import 'package:lensai/features/geckoview/domain/repositories/tab.dart';
 import 'package:lensai/features/geckoview/features/browser/presentation/widgets/error_container.dart';
@@ -51,10 +52,16 @@ class LandingContent extends HookConsumerWidget {
               const LandingAction(),
               Consumer(
                 builder: (context, ref, child) {
-                  final errors = ref.watch(
-                    appInitializationServiceProvider
-                        .select((result) => result.valueOrNull?.errors),
-                  );
+                  final errors = ref
+                      .watch(
+                        appInitializationServiceProvider.select(
+                          (result) => EquatableCollection(
+                            result.valueOrNull?.errors,
+                            immutable: false,
+                          ),
+                        ),
+                      )
+                      .collection;
 
                   if (errors == null || errors.isEmpty) {
                     return const SizedBox.shrink();

@@ -17,11 +17,7 @@ abstract class _$SettingsCWProxy {
 
   Settings launchUrlExternal(bool launchUrlExternal);
 
-  Settings enableContentBlocking(bool enableContentBlocking);
-
   Settings blockHttpProtocol(bool blockHttpProtocol);
-
-  Settings enableHostList(Set<HostSource> enableHostList);
 
   Settings themeMode(ThemeMode themeMode);
 
@@ -43,9 +39,7 @@ abstract class _$SettingsCWProxy {
     bool? incognitoMode,
     bool? enableJavascript,
     bool? launchUrlExternal,
-    bool? enableContentBlocking,
     bool? blockHttpProtocol,
-    Set<HostSource>? enableHostList,
     ThemeMode? themeMode,
     KagiTool? quickAction,
     bool? quickActionVoiceInput,
@@ -79,16 +73,8 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
       this(launchUrlExternal: launchUrlExternal);
 
   @override
-  Settings enableContentBlocking(bool enableContentBlocking) =>
-      this(enableContentBlocking: enableContentBlocking);
-
-  @override
   Settings blockHttpProtocol(bool blockHttpProtocol) =>
       this(blockHttpProtocol: blockHttpProtocol);
-
-  @override
-  Settings enableHostList(Set<HostSource> enableHostList) =>
-      this(enableHostList: enableHostList);
 
   @override
   Settings themeMode(ThemeMode themeMode) => this(themeMode: themeMode);
@@ -118,9 +104,7 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
     Object? incognitoMode = const $CopyWithPlaceholder(),
     Object? enableJavascript = const $CopyWithPlaceholder(),
     Object? launchUrlExternal = const $CopyWithPlaceholder(),
-    Object? enableContentBlocking = const $CopyWithPlaceholder(),
     Object? blockHttpProtocol = const $CopyWithPlaceholder(),
-    Object? enableHostList = const $CopyWithPlaceholder(),
     Object? themeMode = const $CopyWithPlaceholder(),
     Object? quickAction = const $CopyWithPlaceholder(),
     Object? quickActionVoiceInput = const $CopyWithPlaceholder(),
@@ -152,22 +136,11 @@ class _$SettingsCWProxyImpl implements _$SettingsCWProxy {
           ? _value.launchUrlExternal
           // ignore: cast_nullable_to_non_nullable
           : launchUrlExternal as bool,
-      enableContentBlocking:
-          enableContentBlocking == const $CopyWithPlaceholder() ||
-                  enableContentBlocking == null
-              ? _value.enableContentBlocking
-              // ignore: cast_nullable_to_non_nullable
-              : enableContentBlocking as bool,
       blockHttpProtocol: blockHttpProtocol == const $CopyWithPlaceholder() ||
               blockHttpProtocol == null
           ? _value.blockHttpProtocol
           // ignore: cast_nullable_to_non_nullable
           : blockHttpProtocol as bool,
-      enableHostList: enableHostList == const $CopyWithPlaceholder() ||
-              enableHostList == null
-          ? _value.enableHostList
-          // ignore: cast_nullable_to_non_nullable
-          : enableHostList as Set<HostSource>,
       themeMode: themeMode == const $CopyWithPlaceholder() || themeMode == null
           ? _value.themeMode
           // ignore: cast_nullable_to_non_nullable

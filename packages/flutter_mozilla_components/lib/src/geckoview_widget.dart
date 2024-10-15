@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +9,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mozilla_components/src/domain/services/gecko_browser.dart';
 
 class GeckoView extends StatelessWidget {
-  const GeckoView({super.key});
+  final FutureOr<void> Function()? preInitializationStep;
+
+  const GeckoView({super.key, this.preInitializationStep});
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +39,7 @@ class GeckoView extends StatelessWidget {
             params.onPlatformViewCreated(value);
 
             SchedulerBinding.instance.addPostFrameCallback((_) async {
+              await preInitializationStep?.call();
               await GeckoBrowserService().showNativeFragment();
             });
           })

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:flutter_mozilla_components/src/pigeons/gecko.g.dart';
+import 'package:rxdart/rxdart.dart';
 
 // Typedefs for record types
 typedef HistoryEvent = ({String tabId, HistoryState history});
@@ -12,74 +13,79 @@ typedef FindResultsEvent = ({String tabId, List<FindResultState> results});
 
 class GeckoEventService extends GeckoStateEvents {
   // Stream controllers
-  final _tabListController = StreamController<List<String>>.broadcast();
-  final _selectedTabController = StreamController<String?>.broadcast();
-  final _tabContentController = StreamController<TabContentState>.broadcast();
-  final _historyController = StreamController<HistoryEvent>.broadcast();
-  final _readerableController = StreamController<ReaderableEvent>.broadcast();
-  final _securityInfoController =
-      StreamController<SecurityInfoEvent>.broadcast();
-  final _iconController = StreamController<IconEvent>.broadcast();
-  final _thumbnailController = StreamController<ThumbnailEvent>.broadcast();
-  final _findResultsController = StreamController<FindResultsEvent>.broadcast();
+  final _fragmentStateSubject = BehaviorSubject.seeded(false);
+  final _tabListSubject = BehaviorSubject<List<String>>();
+  final _selectedTabSubject = BehaviorSubject<String?>();
+  final _tabContentSubject = BehaviorSubject<TabContentState>();
+  final _historySubject = BehaviorSubject<HistoryEvent>();
+  final _readerableSubject = BehaviorSubject<ReaderableEvent>();
+  final _securityInfoSubject = BehaviorSubject<SecurityInfoEvent>();
+  final _iconSubject = BehaviorSubject<IconEvent>();
+  final _thumbnailSubject = BehaviorSubject<ThumbnailEvent>();
+  final _findResultsSubject = BehaviorSubject<FindResultsEvent>();
 
   // Event streams
-  Stream<List<String>> get tabListEvents => _tabListController.stream;
-  Stream<String?> get selectedTabEvents => _selectedTabController.stream;
-  Stream<TabContentState> get tabContentEvents => _tabContentController.stream;
-  Stream<HistoryEvent> get historyEvents => _historyController.stream;
-  Stream<ReaderableEvent> get readerableEvents => _readerableController.stream;
+  Stream<bool> get fragmentReadyStateEvents => _fragmentStateSubject.stream;
+  Stream<List<String>> get tabListEvents => _tabListSubject.stream;
+  Stream<String?> get selectedTabEvents => _selectedTabSubject.stream;
+  Stream<TabContentState> get tabContentEvents => _tabContentSubject.stream;
+  Stream<HistoryEvent> get historyEvents => _historySubject.stream;
+  Stream<ReaderableEvent> get readerableEvents => _readerableSubject.stream;
   Stream<SecurityInfoEvent> get securityInfoEvents =>
-      _securityInfoController.stream;
-  Stream<IconEvent> get iconEvents => _iconController.stream;
-  Stream<ThumbnailEvent> get thumbnailEvents => _thumbnailController.stream;
-  Stream<FindResultsEvent> get findResultsEvent =>
-      _findResultsController.stream;
+      _securityInfoSubject.stream;
+  Stream<IconEvent> get iconEvents => _iconSubject.stream;
+  Stream<ThumbnailEvent> get thumbnailEvents => _thumbnailSubject.stream;
+  Stream<FindResultsEvent> get findResultsEvent => _findResultsSubject.stream;
+
+  @override
+  void onFragmentReadyStateChange(bool state) {
+    _fragmentStateSubject.add(state);
+  }
 
   // Overridden methods
   @override
   void onTabListChange(List<String?> tabIds) {
-    _tabListController.add(tabIds.nonNulls.toList());
+    _tabListSubject.add(tabIds.nonNulls.toList());
   }
 
   @override
   void onSelectedTabChange(String? id) {
-    _selectedTabController.add(id);
+    _selectedTabSubject.add(id);
   }
 
   @override
   void onTabContentStateChange(TabContentState state) {
-    _tabContentController.add(state);
+    _tabContentSubject.add(state);
   }
 
   @override
   void onHistoryStateChange(String id, HistoryState state) {
-    _historyController.add((tabId: id, history: state));
+    _historySubject.add((tabId: id, history: state));
   }
 
   @override
   void onReaderableStateChange(String id, ReaderableState state) {
-    _readerableController.add((tabId: id, readerable: state));
+    _readerableSubject.add((tabId: id, readerable: state));
   }
 
   @override
   void onSecurityInfoStateChange(String id, SecurityInfoState state) {
-    _securityInfoController.add((tabId: id, securityInfo: state));
+    _securityInfoSubject.add((tabId: id, securityInfo: state));
   }
 
   @override
   void onIconChange(String id, Uint8List? bytes) {
-    _iconController.add((tabId: id, bytes: bytes));
+    _iconSubject.add((tabId: id, bytes: bytes));
   }
 
   @override
   void onThumbnailChange(String id, Uint8List? bytes) {
-    _thumbnailController.add((tabId: id, bytes: bytes));
+    _thumbnailSubject.add((tabId: id, bytes: bytes));
   }
 
   @override
   void onFindResults(String id, List<FindResultState?> results) {
-    _findResultsController.add((tabId: id, results: results.nonNulls.toList()));
+    _findResultsSubject.add((tabId: id, results: results.nonNulls.toList()));
   }
 
   GeckoEventService.setUp({
@@ -94,14 +100,14 @@ class GeckoEventService extends GeckoStateEvents {
   }
 
   void dispose() {
-    unawaited(_tabListController.close());
-    unawaited(_selectedTabController.close());
-    unawaited(_tabContentController.close());
-    unawaited(_historyController.close());
-    unawaited(_readerableController.close());
-    unawaited(_securityInfoController.close());
-    unawaited(_iconController.close());
-    unawaited(_thumbnailController.close());
-    unawaited(_findResultsController.close());
+    unawaited(_tabListSubject.close());
+    unawaited(_selectedTabSubject.close());
+    unawaited(_tabContentSubject.close());
+    unawaited(_historySubject.close());
+    unawaited(_readerableSubject.close());
+    unawaited(_securityInfoSubject.close());
+    unawaited(_iconSubject.close());
+    unawaited(_thumbnailSubject.close());
+    unawaited(_findResultsSubject.close());
   }
 }

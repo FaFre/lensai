@@ -17,6 +17,8 @@ import eu.lensai.flutter_mozilla_components.pigeons.ReaderableState
 import eu.lensai.flutter_mozilla_components.pigeons.SecurityInfoState
 import eu.lensai.flutter_mozilla_components.pigeons.SelectionAction
 import eu.lensai.flutter_mozilla_components.pigeons.TabContentState
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
@@ -31,10 +33,12 @@ import mozilla.components.browser.thumbnails.storage.ThumbnailStorage
 import mozilla.components.concept.base.crash.Breadcrumb
 import mozilla.components.concept.engine.DefaultSettings
 import mozilla.components.concept.engine.Engine
+import mozilla.components.concept.engine.EngineView
 import mozilla.components.concept.engine.mediaquery.PreferredColorScheme
 import mozilla.components.concept.fetch.Client
 import mozilla.components.feature.addons.AddonManager
 import mozilla.components.feature.addons.amo.AMOAddonsProvider
+import mozilla.components.feature.addons.logger
 import mozilla.components.feature.addons.migration.DefaultSupportedAddonsChecker
 import mozilla.components.feature.addons.update.DefaultAddonUpdater
 import mozilla.components.feature.app.links.AppLinksInterceptor
@@ -73,7 +77,7 @@ private const val DAY_IN_MINUTES = 24 * 60L
 @Suppress("LargeClass")
 open class DefaultComponents(
     private val applicationContext: Context,
-    private val flutterEvents: GeckoStateEvents,
+    val flutterEvents: GeckoStateEvents,
     val readerViewController: ReaderViewController,
     val selectionAction: SelectionAction,
 ) {
@@ -82,6 +86,8 @@ open class DefaultComponents(
         const val PREF_LAUNCH_EXTERNAL_APP = "sample_browser_launch_external_app"
         const val PREF_GLOBAL_PRIVACY_CONTROL = "sample_browser_global_privacy_control"
     }
+
+    var engineView: EngineView? = null
 
     val preferences: SharedPreferences =
         applicationContext.getSharedPreferences(SAMPLE_BROWSER_PREFERENCES, Context.MODE_PRIVATE)
@@ -140,6 +146,7 @@ open class DefaultComponents(
         FileUploadsDirCleaner { applicationContext.cacheDir }
     }
 
+    @OptIn(FlowPreview::class)
     val store by lazy {
         BrowserStore(
             middleware = listOf(
@@ -156,6 +163,7 @@ open class DefaultComponents(
         ).apply {
             this.flowScoped { flow ->
                 flow.map { state -> state.selectedTabId }
+                    .distinctUntilChanged()
                     .collect { tabId ->
                         flutterEvents.onSelectedTabChange(
                             tabId
@@ -166,8 +174,10 @@ open class DefaultComponents(
             this.flowScoped { flow ->
                 flow.mapNotNull { state -> state.tabs }
                     .filterChanged {
-                        it.content.icon
+                        it.content
                     }
+                    .ifAnyChanged { arrayOf (it.content.icon) }
+                    .debounce { 50 }
                     .collect { tab ->
                         val iconBytes = tab.content.icon?.toWebPBytes()
                         flutterEvents.onIconChange(
@@ -182,6 +192,7 @@ open class DefaultComponents(
                     .filterChanged {
                         it.content.securityInfo
                     }
+                    .debounce { 50 }
                     .collect { tab ->
                         flutterEvents.onSecurityInfoStateChange(
                             tab.id,
@@ -200,10 +211,11 @@ open class DefaultComponents(
                         it.readerState
                     }
                     .ifAnyChanged { arrayOf(
-                        it.readerState.readerable,
-                        it.readerState.active,
-                    )
+                            it.readerState.readerable,
+                            it.readerState.active,
+                        )
                     }
+                    .debounce { 50 }
                     .collect { tab ->
                         flutterEvents.onReaderableStateChange(
                             tab.id,
@@ -226,6 +238,7 @@ open class DefaultComponents(
                         it.content.canGoForward,
                         )
                     }
+                    .debounce { 50 }
                     .collect { tab ->
                         flutterEvents.onHistoryStateChange(
                             tab.id,
@@ -261,8 +274,11 @@ open class DefaultComponents(
                         it.content.private,
                         it.content.fullScreen,
                         it.content.progress,
-                        it.content.loading) }
+                        it.content.loading)
+                    }
+                    .debounce { 50 }
                     .collect { tab ->
+                        logger.info("title: ${tab.content.title} ${tab.content.url}")
                         flutterEvents.onTabContentStateChange(
                             TabContentState(
                                 id = tab.id,
@@ -283,6 +299,7 @@ open class DefaultComponents(
                     .filterChanged {
                         it.content.findResults
                     }
+                    .distinctUntilChanged()
                     .collect { tab ->
                         tab.content.findResults
                         flutterEvents.onFindResults(
@@ -295,6 +312,8 @@ open class DefaultComponents(
                         ) { _ -> }
                     }
             }
+
+            icons.install(engine, this)
 
             WebNotificationFeature(
                 applicationContext,

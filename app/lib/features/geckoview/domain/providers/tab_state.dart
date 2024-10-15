@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:lensai/extensions/image.dart';
 import 'package:lensai/features/geckoview/domain/entities/find_result_state.dart';
@@ -9,6 +10,8 @@ import 'package:lensai/features/geckoview/domain/entities/security_state.dart';
 import 'package:lensai/features/geckoview/domain/entities/tab_state.dart';
 import 'package:lensai/features/geckoview/domain/providers.dart';
 import 'package:lensai/features/geckoview/domain/providers/selected_tab.dart';
+import 'package:lensai/features/geckoview/features/topics/data/database/database.dart';
+import 'package:lensai/features/geckoview/features/topics/data/providers.dart';
 import 'package:lensai/features/geckoview/utils/image_helper.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
@@ -17,6 +20,8 @@ part 'tab_state.g.dart';
 @Riverpod(keepAlive: true)
 class TabStates extends _$TabStates {
   final _tabsService = GeckoTabService();
+
+  late TabDatabase _db;
 
   void _onTabListChange(List<String> tabs) {
     state = {
@@ -166,6 +171,7 @@ class TabStates extends _$TabStates {
   @override
   Map<String, TabState> build() {
     final eventService = ref.watch(eventServiceProvider);
+    _db = ref.watch(tabDatabaseProvider);
 
     final subscriptions = [
       eventService.tabListEvents.listen(_onTabListChange),
@@ -177,6 +183,18 @@ class TabStates extends _$TabStates {
       eventService.readerableEvents.listen(_onReaderableStateChange),
       eventService.findResultsEvent.listen(_onFindResults),
     ];
+
+    ref.listenSelf(
+      (previous, next) async {
+        if (!const DeepCollectionEquality()
+            .equals(previous?.keys.toSet(), next.keys.toSet())) {
+          final ids = next.keys.toList();
+          if (ids.isNotEmpty) {
+            await _db.tabLinkDao.syncTabLinks(retainTabIds: ids);
+          }
+        }
+      },
+    );
 
     ref.onDispose(() {
       for (final sub in subscriptions) {

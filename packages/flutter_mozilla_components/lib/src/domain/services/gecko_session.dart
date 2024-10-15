@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter_mozilla_components/src/data/models/load_url_flags.dart';
 import 'package:flutter_mozilla_components/src/pigeons/gecko.g.dart';
 
@@ -116,6 +118,14 @@ class GeckoSessionService {
 
   Future<void> purgeHistory() {
     return _api.purgeHistory();
+  }
+
+  Future<Uint8List?> requestScreenshot() {
+    if (tabId != null) {
+      throw Exception('Screenshot only allowed for selected (visible) tab.');
+    }
+
+    return _api.requestScreenshot();
   }
 
   Future<void> updateLastAccess({

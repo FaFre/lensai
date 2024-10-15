@@ -142,10 +142,10 @@ class TabLink extends Table with TableInfo<TabLink, TabLinkData> {
       requiredDuringInsert: true,
       $customConstraints: 'PRIMARY KEY NOT NULL');
   late final GeneratedColumn<String> topicId = GeneratedColumn<String>(
-      'topic_id', aliasedName, true,
+      'topic_id', aliasedName, false,
       type: DriftSqlType.string,
-      requiredDuringInsert: false,
-      $customConstraints: 'REFERENCES topic(id)ON DELETE CASCADE');
+      requiredDuringInsert: true,
+      $customConstraints: 'NOT NULL REFERENCES topic(id)ON DELETE CASCADE');
   late final GeneratedColumn<DateTime> timestamp = GeneratedColumn<DateTime>(
       'timestamp', aliasedName, false,
       type: DriftSqlType.dateTime,
@@ -167,7 +167,7 @@ class TabLink extends Table with TableInfo<TabLink, TabLinkData> {
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
       topicId: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}topic_id']),
+          .read(DriftSqlType.string, data['${effectivePrefix}topic_id'])!,
       timestamp: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}timestamp'])!,
     );
@@ -184,16 +184,15 @@ class TabLink extends Table with TableInfo<TabLink, TabLinkData> {
 
 class TabLinkData extends DataClass implements Insertable<TabLinkData> {
   final String id;
-  final String? topicId;
+  final String topicId;
   final DateTime timestamp;
-  const TabLinkData({required this.id, this.topicId, required this.timestamp});
+  const TabLinkData(
+      {required this.id, required this.topicId, required this.timestamp});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
-    if (!nullToAbsent || topicId != null) {
-      map['topic_id'] = Variable<String>(topicId);
-    }
+    map['topic_id'] = Variable<String>(topicId);
     map['timestamp'] = Variable<DateTime>(timestamp);
     return map;
   }
@@ -203,7 +202,7 @@ class TabLinkData extends DataClass implements Insertable<TabLinkData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return TabLinkData(
       id: serializer.fromJson<String>(json['id']),
-      topicId: serializer.fromJson<String?>(json['topic_id']),
+      topicId: serializer.fromJson<String>(json['topic_id']),
       timestamp: serializer.fromJson<DateTime>(json['timestamp']),
     );
   }
@@ -212,18 +211,15 @@ class TabLinkData extends DataClass implements Insertable<TabLinkData> {
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
-      'topic_id': serializer.toJson<String?>(topicId),
+      'topic_id': serializer.toJson<String>(topicId),
       'timestamp': serializer.toJson<DateTime>(timestamp),
     };
   }
 
-  TabLinkData copyWith(
-          {String? id,
-          Value<String?> topicId = const Value.absent(),
-          DateTime? timestamp}) =>
+  TabLinkData copyWith({String? id, String? topicId, DateTime? timestamp}) =>
       TabLinkData(
         id: id ?? this.id,
-        topicId: topicId.present ? topicId.value : this.topicId,
+        topicId: topicId ?? this.topicId,
         timestamp: timestamp ?? this.timestamp,
       );
   TabLinkData copyWithCompanion(TabLinkCompanion data) {
@@ -257,7 +253,7 @@ class TabLinkData extends DataClass implements Insertable<TabLinkData> {
 
 class TabLinkCompanion extends UpdateCompanion<TabLinkData> {
   final Value<String> id;
-  final Value<String?> topicId;
+  final Value<String> topicId;
   final Value<DateTime> timestamp;
   final Value<int> rowid;
   const TabLinkCompanion({
@@ -268,10 +264,11 @@ class TabLinkCompanion extends UpdateCompanion<TabLinkData> {
   });
   TabLinkCompanion.insert({
     required String id,
-    this.topicId = const Value.absent(),
+    required String topicId,
     required DateTime timestamp,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
+        topicId = Value(topicId),
         timestamp = Value(timestamp);
   static Insertable<TabLinkData> custom({
     Expression<String>? id,
@@ -289,7 +286,7 @@ class TabLinkCompanion extends UpdateCompanion<TabLinkData> {
 
   TabLinkCompanion copyWith(
       {Value<String>? id,
-      Value<String?>? topicId,
+      Value<String>? topicId,
       Value<DateTime>? timestamp,
       Value<int>? rowid}) {
     return TabLinkCompanion(
@@ -403,55 +400,102 @@ final class $TopicReferences
   }
 }
 
-class $TopicFilterComposer extends FilterComposer<_$TabDatabase, Topic> {
-  $TopicFilterComposer(super.$state);
-  ColumnFilters<String> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+class $TopicFilterComposer extends Composer<_$TabDatabase, Topic> {
+  $TopicFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnFilters(column));
 
   ColumnWithTypeConverterFilters<Color, Color, int> get color =>
-      $state.composableBuilder(
-          column: $state.table.color,
-          builder: (column, joinBuilders) => ColumnWithTypeConverterFilters(
-              column,
-              joinBuilders: joinBuilders));
+      $composableBuilder(
+          column: $table.color,
+          builder: (column) => ColumnWithTypeConverterFilters(column));
 
-  ComposableFilter tabLinkRefs(
-      ComposableFilter Function($TabLinkFilterComposer f) f) {
-    final $TabLinkFilterComposer composer = $state.composerBuilder(
+  Expression<bool> tabLinkRefs(
+      Expression<bool> Function($TabLinkFilterComposer f) f) {
+    final $TabLinkFilterComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.id,
-        referencedTable: $state.db.tabLink,
+        referencedTable: $db.tabLink,
         getReferencedColumn: (t) => t.topicId,
-        builder: (joinBuilder, parentComposers) => $TabLinkFilterComposer(
-            ComposerState(
-                $state.db, $state.db.tabLink, joinBuilder, parentComposers)));
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $TabLinkFilterComposer(
+              $db: $db,
+              $table: $db.tabLink,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
     return f(composer);
   }
 }
 
-class $TopicOrderingComposer extends OrderingComposer<_$TabDatabase, Topic> {
-  $TopicOrderingComposer(super.$state);
-  ColumnOrderings<String> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+class $TopicOrderingComposer extends Composer<_$TabDatabase, Topic> {
+  $TopicOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<String> get name => $state.composableBuilder(
-      column: $state.table.name,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<String> get name => $composableBuilder(
+      column: $table.name, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<int> get color => $state.composableBuilder(
-      column: $state.table.color,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<int> get color => $composableBuilder(
+      column: $table.color, builder: (column) => ColumnOrderings(column));
+}
+
+class $TopicAnnotationComposer extends Composer<_$TabDatabase, Topic> {
+  $TopicAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<Color, int> get color =>
+      $composableBuilder(column: $table.color, builder: (column) => column);
+
+  Expression<T> tabLinkRefs<T extends Object>(
+      Expression<T> Function($TabLinkAnnotationComposer a) f) {
+    final $TabLinkAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.tabLink,
+        getReferencedColumn: (t) => t.topicId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $TabLinkAnnotationComposer(
+              $db: $db,
+              $table: $db.tabLink,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
 }
 
 class $TopicTableManager extends RootTableManager<
@@ -460,6 +504,7 @@ class $TopicTableManager extends RootTableManager<
     TopicData,
     $TopicFilterComposer,
     $TopicOrderingComposer,
+    $TopicAnnotationComposer,
     $TopicCreateCompanionBuilder,
     $TopicUpdateCompanionBuilder,
     (TopicData, $TopicReferences),
@@ -469,8 +514,12 @@ class $TopicTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer: $TopicFilterComposer(ComposerState(db, table)),
-          orderingComposer: $TopicOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $TopicFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $TopicOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $TopicAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
             Value<String?> name = const Value.absent(),
@@ -528,6 +577,7 @@ typedef $TopicProcessedTableManager = ProcessedTableManager<
     TopicData,
     $TopicFilterComposer,
     $TopicOrderingComposer,
+    $TopicAnnotationComposer,
     $TopicCreateCompanionBuilder,
     $TopicUpdateCompanionBuilder,
     (TopicData, $TopicReferences),
@@ -535,13 +585,13 @@ typedef $TopicProcessedTableManager = ProcessedTableManager<
     PrefetchHooks Function({bool tabLinkRefs})>;
 typedef $TabLinkCreateCompanionBuilder = TabLinkCompanion Function({
   required String id,
-  Value<String?> topicId,
+  required String topicId,
   required DateTime timestamp,
   Value<int> rowid,
 });
 typedef $TabLinkUpdateCompanionBuilder = TabLinkCompanion Function({
   Value<String> id,
-  Value<String?> topicId,
+  Value<String> topicId,
   Value<DateTime> timestamp,
   Value<int> rowid,
 });
@@ -564,53 +614,107 @@ final class $TabLinkReferences
   }
 }
 
-class $TabLinkFilterComposer extends FilterComposer<_$TabDatabase, TabLink> {
-  $TabLinkFilterComposer(super.$state);
-  ColumnFilters<String> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+class $TabLinkFilterComposer extends Composer<_$TabDatabase, TabLink> {
+  $TabLinkFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
 
-  ColumnFilters<DateTime> get timestamp => $state.composableBuilder(
-      column: $state.table.timestamp,
-      builder: (column, joinBuilders) =>
-          ColumnFilters(column, joinBuilders: joinBuilders));
+  ColumnFilters<DateTime> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnFilters(column));
 
   $TopicFilterComposer get topicId {
-    final $TopicFilterComposer composer = $state.composerBuilder(
+    final $TopicFilterComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.topicId,
-        referencedTable: $state.db.topic,
+        referencedTable: $db.topic,
         getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder, parentComposers) => $TopicFilterComposer(
-            ComposerState(
-                $state.db, $state.db.topic, joinBuilder, parentComposers)));
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $TopicFilterComposer(
+              $db: $db,
+              $table: $db.topic,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
     return composer;
   }
 }
 
-class $TabLinkOrderingComposer
-    extends OrderingComposer<_$TabDatabase, TabLink> {
-  $TabLinkOrderingComposer(super.$state);
-  ColumnOrderings<String> get id => $state.composableBuilder(
-      column: $state.table.id,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+class $TabLinkOrderingComposer extends Composer<_$TabDatabase, TabLink> {
+  $TabLinkOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
 
-  ColumnOrderings<DateTime> get timestamp => $state.composableBuilder(
-      column: $state.table.timestamp,
-      builder: (column, joinBuilders) =>
-          ColumnOrderings(column, joinBuilders: joinBuilders));
+  ColumnOrderings<DateTime> get timestamp => $composableBuilder(
+      column: $table.timestamp, builder: (column) => ColumnOrderings(column));
 
   $TopicOrderingComposer get topicId {
-    final $TopicOrderingComposer composer = $state.composerBuilder(
+    final $TopicOrderingComposer composer = $composerBuilder(
         composer: this,
         getCurrentColumn: (t) => t.topicId,
-        referencedTable: $state.db.topic,
+        referencedTable: $db.topic,
         getReferencedColumn: (t) => t.id,
-        builder: (joinBuilder, parentComposers) => $TopicOrderingComposer(
-            ComposerState(
-                $state.db, $state.db.topic, joinBuilder, parentComposers)));
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $TopicOrderingComposer(
+              $db: $db,
+              $table: $db.topic,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $TabLinkAnnotationComposer extends Composer<_$TabDatabase, TabLink> {
+  $TabLinkAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get timestamp =>
+      $composableBuilder(column: $table.timestamp, builder: (column) => column);
+
+  $TopicAnnotationComposer get topicId {
+    final $TopicAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.topicId,
+        referencedTable: $db.topic,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $TopicAnnotationComposer(
+              $db: $db,
+              $table: $db.topic,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
     return composer;
   }
 }
@@ -621,6 +725,7 @@ class $TabLinkTableManager extends RootTableManager<
     TabLinkData,
     $TabLinkFilterComposer,
     $TabLinkOrderingComposer,
+    $TabLinkAnnotationComposer,
     $TabLinkCreateCompanionBuilder,
     $TabLinkUpdateCompanionBuilder,
     (TabLinkData, $TabLinkReferences),
@@ -630,11 +735,15 @@ class $TabLinkTableManager extends RootTableManager<
       : super(TableManagerState(
           db: db,
           table: table,
-          filteringComposer: $TabLinkFilterComposer(ComposerState(db, table)),
-          orderingComposer: $TabLinkOrderingComposer(ComposerState(db, table)),
+          createFilteringComposer: () =>
+              $TabLinkFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $TabLinkOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $TabLinkAnnotationComposer($db: db, $table: table),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
-            Value<String?> topicId = const Value.absent(),
+            Value<String> topicId = const Value.absent(),
             Value<DateTime> timestamp = const Value.absent(),
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -646,7 +755,7 @@ class $TabLinkTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             required String id,
-            Value<String?> topicId = const Value.absent(),
+            required String topicId,
             required DateTime timestamp,
             Value<int> rowid = const Value.absent(),
           }) =>
@@ -666,6 +775,7 @@ class $TabLinkTableManager extends RootTableManager<
               explicitlyWatchedTables: [],
               addJoins: <
                   T extends TableManagerState<
+                      dynamic,
                       dynamic,
                       dynamic,
                       dynamic,
@@ -701,6 +811,7 @@ typedef $TabLinkProcessedTableManager = ProcessedTableManager<
     TabLinkData,
     $TabLinkFilterComposer,
     $TabLinkOrderingComposer,
+    $TabLinkAnnotationComposer,
     $TabLinkCreateCompanionBuilder,
     $TabLinkUpdateCompanionBuilder,
     (TabLinkData, $TabLinkReferences),

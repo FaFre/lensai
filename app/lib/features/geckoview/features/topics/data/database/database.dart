@@ -30,6 +30,8 @@ class TabDatabase extends _$TabDatabase {
               await m.dropColumn(tabLink, 'url');
               await m.dropColumn(tabLink, 'title');
               await m.dropColumn(tabLink, 'screenshot');
+
+              await m.alterTable(TableMigration(tabLink));
             });
           }
 

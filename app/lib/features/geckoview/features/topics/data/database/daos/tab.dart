@@ -7,14 +7,18 @@ part 'tab.g.dart';
 class TabLinkDao extends DatabaseAccessor<TabDatabase> with _$TabLinkDaoMixin {
   TabLinkDao(super.db);
 
-  Selectable<String> topicTabIds(String? topicId) {
+  Selectable<String> topicTabIds(String topicId) {
     final query = selectOnly(db.tabLink)
       ..addColumns([db.tabLink.id])
-      ..where(
-        (topicId == null)
-            ? db.tabLink.topicId.isNull()
-            : db.tabLink.topicId.equals(topicId),
-      )
+      ..where(db.tabLink.topicId.equals(topicId))
+      ..orderBy([OrderingTerm.asc(db.tabLink.id)]);
+
+    return query.map((row) => row.read(db.tabLink.id)!);
+  }
+
+  Selectable<String> allTabIds() {
+    final query = selectOnly(db.tabLink)
+      ..addColumns([db.tabLink.id])
       ..orderBy([OrderingTerm.asc(db.tabLink.id)]);
 
     return query.map((row) => row.read(db.tabLink.id)!);
@@ -25,13 +29,13 @@ class TabLinkDao extends DatabaseAccessor<TabDatabase> with _$TabLinkDaoMixin {
       ..addColumns([db.tabLink.topicId])
       ..where(db.tabLink.id.equals(tabId));
 
-    return query.map((row) => row.read(db.tabLink.id)!);
+    return query.map((row) => row.read(db.tabLink.topicId)!);
   }
 
   Future<void> upsertTabLink(
     String tabId, {
     required DateTime timestamp,
-    Value<String?> topicId = const Value.absent(),
+    required String topicId,
   }) {
     return db.tabLink.insertOne(
       TabLinkCompanion.insert(

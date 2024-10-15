@@ -1,5 +1,3 @@
-import 'package:drift/drift.dart';
-import 'package:lensai/features/geckoview/domain/providers/selected_tab.dart';
 import 'package:lensai/features/geckoview/domain/providers/tab_state.dart';
 import 'package:lensai/features/geckoview/domain/repositories/tab.dart';
 import 'package:lensai/features/geckoview/features/topics/data/database/database.dart';
@@ -15,38 +13,28 @@ class TabLinkRepository extends _$TabLinkRepository {
   @override
   void build() {
     _db = ref.watch(tabDatabaseProvider);
-
-    //Sync existing tabs
-    ref.listen(
-      tabStatesProvider.select((tabs) => tabs.keys.toList()),
-      (previous, next) async {
-        //No empty list to avoid data loss
-        if (next.isNotEmpty) {
-          await _db.tabLinkDao.syncTabLinks(retainTabIds: next);
-        }
-      },
-    );
-
-    ref.listen(
-      selectedTabProvider,
-      (previous, next) async {
-        if (next != null) {
-          await _db.tabLinkDao.touchTabLink(next, timestamp: DateTime.now());
-        }
-      },
-    );
   }
 
-  Future<void> assignTab(String tabId, String? topicId) {
+  Future<void> assignTab(String tabId, String topicId) {
     return _db.tabLinkDao.upsertTabLink(
       tabId,
       timestamp: DateTime.now(),
-      topicId: Value(topicId),
+      topicId: topicId,
     );
   }
 
   Future<void> closeAllTabs(String? topicId) async {
-    final tabIds = await _db.tabLinkDao.topicTabIds(topicId).get();
+    final List<String> tabIds;
+    if (topicId != null) {
+      tabIds = await _db.tabLinkDao.topicTabIds(topicId).get();
+    } else {
+      final openTabs = ref.read(tabStatesProvider).keys.toSet();
+      final assignedTabIds = await _db.tabLinkDao.allTabIds().get();
+
+      tabIds =
+          openTabs.where((tabId) => !assignedTabIds.contains(tabId)).toList();
+    }
+
     if (tabIds.isNotEmpty) {
       await ref.read(tabRepositoryProvider.notifier).closeTabs(tabIds);
     }

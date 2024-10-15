@@ -4,7 +4,6 @@ import 'package:flutter_material_design_icons/flutter_material_design_icons.dart
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/features/geckoview/domain/entities/readerable_state.dart';
 import 'package:lensai/features/geckoview/domain/providers/tab_state.dart';
-import 'package:lensai/features/geckoview/features/readerview/domain/providers/readerable.dart';
 import 'package:lensai/features/geckoview/features/readerview/presentation/controllers/readerable.dart';
 import 'package:lensai/presentation/widgets/animate_gradient_shader.dart';
 
@@ -21,11 +20,6 @@ class ReaderButton extends HookConsumerWidget {
       ),
     );
 
-    final readerButtonVisible = ref.watch(
-      readerButtonVisibilityProvider
-          .select((value) => value.valueOrNull ?? false),
-    );
-
     final icon = useMemoized(
       () => readerabilityState.active
           ? Icon(
@@ -40,7 +34,7 @@ class ReaderButton extends HookConsumerWidget {
     );
 
     return Visibility(
-      visible: readerButtonVisible,
+      visible: readerabilityState.readerable,
       child: Padding(
         padding: const EdgeInsets.symmetric(
           vertical: 15.0,
@@ -48,7 +42,7 @@ class ReaderButton extends HookConsumerWidget {
         ),
         child: readerChanging.when(
           data: (_) => Visibility(
-            visible: readerButtonVisible,
+            visible: readerabilityState.readerable,
             child: InkWell(
               onTap: readerChanging.isLoading
                   ? null
