@@ -31,9 +31,9 @@ class BrowserFragment(private val context: Context) : BaseBrowserFragment(), Use
 
     override fun createEngine(components: Components): EngineView {
         return components.engine.createView(context).apply {
-            selectionActionDelegate = DefaultSelectionActionDelegate(
-                components.selectionAction
-            )
+//            selectionActionDelegate = DefaultSelectionActionDelegate(
+//                components.selectionAction
+//            )
         }
     }
 

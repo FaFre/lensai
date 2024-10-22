@@ -5,16 +5,22 @@ package eu.lensai.flutter_mozilla_components.middleware
 
 import android.graphics.Bitmap
 import android.util.Log
+import eu.lensai.flutter_mozilla_components.GlobalComponents
+import eu.lensai.flutter_mozilla_components.ext.resize
 import eu.lensai.flutter_mozilla_components.ext.toWebPBytes
 import eu.lensai.flutter_mozilla_components.pigeons.GeckoStateEvents
 import mozilla.components.browser.state.action.BrowserAction
 import mozilla.components.browser.state.action.ContentAction
+import mozilla.components.browser.state.action.LastAccessAction
+import mozilla.components.browser.state.action.ReaderAction
+import mozilla.components.browser.state.action.TabListAction
 import mozilla.components.browser.state.state.BrowserState
+import mozilla.components.feature.addons.logger
 import mozilla.components.lib.state.Middleware
 import mozilla.components.lib.state.MiddlewareContext
 import org.mozilla.gecko.util.ThreadUtils.runOnUiThread
 import java.io.ByteArrayOutputStream
-
+import kotlin.reflect.typeOf
 
 
 /**
@@ -30,13 +36,37 @@ class FlutterEventMiddleware(private val flutterEvents: GeckoStateEvents) : Midd
     ) {
         when (action) {
             is ContentAction.UpdateThumbnailAction -> {
-                val bytes = action.thumbnail.toWebPBytes()
+                val resized = action.thumbnail.resize(maxWidth = 640, maxHeight = 480);
+                val bytes = resized.toWebPBytes()
+
                 runOnUiThread {
-                    flutterEvents.onThumbnailChange(action.sessionId, bytes) { _ -> }
+                    flutterEvents.onThumbnailChange(System.currentTimeMillis(), action.sessionId, bytes) { _ -> }
+                }
+            }
+            //UpdateReaderConnectRequiredAction seems to be the only event that is called predictable
+            //after a hot reload
+            is ReaderAction.UpdateReaderConnectRequiredAction -> {
+                if(!GlobalComponents.components!!.engineReportedInitialized) {
+                    runOnUiThread {
+                        flutterEvents.onEngineReadyStateChange(
+                            System.currentTimeMillis(),
+                            true
+                        ) { _ -> }
+                    }
+
+                    GlobalComponents.components!!.engineReportedInitialized = true
+                }
+            }
+            is TabListAction.AddTabAction -> {
+                runOnUiThread {
+                    flutterEvents.onTabAdded(
+                        System.currentTimeMillis(),
+                        action.tab.id
+                    ) { _ -> }
                 }
             }
             else -> {
-                // no-op
+                //logger.debug("Event fired: " + action.javaClass.name)
             }
         }
         next(action)

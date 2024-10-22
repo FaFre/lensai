@@ -1,8 +1,9 @@
 import 'dart:async';
 
+import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:lensai/features/geckoview/domain/providers.dart';
-import 'package:lensai/features/geckoview/features/topics/data/database/database.dart';
-import 'package:lensai/features/geckoview/features/topics/data/providers.dart';
+import 'package:lensai/features/geckoview/features/tabs/data/database/database.dart';
+import 'package:lensai/features/geckoview/features/tabs/data/providers.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'selected_tab.g.dart';
@@ -13,21 +14,29 @@ class SelectedTab extends _$SelectedTab {
 
   @override
   String? build() {
-    _db = ref.watch(tabDatabaseProvider);
-
     final eventSerivce = ref.watch(eventServiceProvider);
 
-    final selectedTabSub = eventSerivce.selectedTabEvents.listen(
-      (tabId) {
-        state = tabId;
+    _db = ref.watch(tabDatabaseProvider);
+
+    ref.listen(
+      fireImmediately: true,
+      engineReadyStateProvider,
+      (previous, next) async {
+        if (next) {
+          await GeckoTabService().syncEvents(onSelectedTabChange: true);
+        }
       },
     );
 
-    ref.listenSelf((previous, next) async {
-      if (next != null) {
-        await _db.tabLinkDao.touchTabLink(next, timestamp: DateTime.now());
-      }
-    });
+    final selectedTabSub = eventSerivce.selectedTabEvents.listen(
+      (tabId) async {
+        state = tabId;
+
+        if (tabId != null) {
+          await _db.tabDao.touchTab(tabId, timestamp: DateTime.now());
+        }
+      },
+    );
 
     ref.onDispose(() {
       unawaited(selectedTabSub.cancel());

@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:collection/collection.dart';
 import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:lensai/extensions/image.dart';
 import 'package:lensai/features/geckoview/domain/entities/find_result_state.dart';
@@ -10,33 +9,25 @@ import 'package:lensai/features/geckoview/domain/entities/security_state.dart';
 import 'package:lensai/features/geckoview/domain/entities/tab_state.dart';
 import 'package:lensai/features/geckoview/domain/providers.dart';
 import 'package:lensai/features/geckoview/domain/providers/selected_tab.dart';
-import 'package:lensai/features/geckoview/features/topics/data/database/database.dart';
-import 'package:lensai/features/geckoview/features/topics/data/providers.dart';
 import 'package:lensai/features/geckoview/utils/image_helper.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:synchronized/synchronized.dart';
 
 part 'tab_state.g.dart';
 
 @Riverpod(keepAlive: true)
 class TabStates extends _$TabStates {
-  final _tabsService = GeckoTabService();
-
-  late TabDatabase _db;
-
-  void _onTabListChange(List<String> tabs) {
-    state = {
-      for (final tabId in tabs) tabId: state[tabId] ?? TabState.$default(tabId),
-    };
-  }
+  final _lock = Lock();
 
   void _onTabContentStateChange(TabContentState contentState) {
     final current =
         state[contentState.id] ?? TabState.$default(contentState.id);
-
     state = {...state}..[contentState.id] = current.copyWith(
         contextId: contentState.contextId,
         url: Uri.parse(contentState.url),
-        title: contentState.title,
+        title: (contentState.title.isNotEmpty)
+            ? contentState.title
+            : current.title,
         progress: contentState.progress,
         isPrivate: contentState.isPrivate,
         isFullScreen: contentState.isFullScreen,
@@ -47,26 +38,24 @@ class TabStates extends _$TabStates {
   Future<void> _onIconChange(IconEvent event) async {
     final IconEvent(:tabId, :bytes) = event;
 
-    final current = state[tabId] ?? TabState.$default(tabId);
-
     final image = (bytes != null)
         ? (await tryDecodeImage(bytes)
             .then((image) async => image?.toEquatable()))
         : null;
 
+    final current = state[tabId] ?? TabState.$default(tabId);
     state = {...state}..[tabId] = current.copyWith.icon(image);
   }
 
   Future<void> _onThumbnailChange(ThumbnailEvent event) async {
     final ThumbnailEvent(:tabId, :bytes) = event;
 
-    final current = state[tabId] ?? TabState.$default(tabId);
-
     final image = (bytes != null)
         ? (await tryDecodeImage(bytes)
             .then((image) async => image?.toEquatable()))
         : null;
 
+    final current = state[tabId] ?? TabState.$default(tabId);
     state = {...state}..[tabId] = current.copyWith.thumbnail(image);
   }
 
@@ -74,7 +63,6 @@ class TabStates extends _$TabStates {
     final SecurityInfoEvent(:tabId, :securityInfo) = event;
 
     final current = state[tabId] ?? TabState.$default(tabId);
-
     state = {...state}..[tabId] = current.copyWith.securityInfoState(
         SecurityState(
           secure: securityInfo.secure,
@@ -88,7 +76,6 @@ class TabStates extends _$TabStates {
     final HistoryEvent(:tabId, :history) = event;
 
     final current = state[tabId] ?? TabState.$default(tabId);
-
     state = {...state}..[tabId] = current.copyWith.historyState(
         HistoryState(
           items: history.items.nonNulls
@@ -108,7 +95,6 @@ class TabStates extends _$TabStates {
     final ReaderableEvent(:tabId, :readerable) = event;
 
     final current = state[tabId] ?? TabState.$default(tabId);
-
     state = {...state}..[tabId] = current.copyWith.readerableState(
         ReaderableState(
           readerable: readerable.readerable,
@@ -117,13 +103,13 @@ class TabStates extends _$TabStates {
       );
   }
 
-  void _onFindResults(FindResultsEvent event) {
+  void _onFindResultsChange(FindResultsEvent event) {
     final FindResultsEvent(:tabId, :results) = event;
 
     if (results.isNotEmpty) {
-      final current = state[tabId] ?? TabState.$default(tabId);
       final result = results.last;
 
+      final current = state[tabId] ?? TabState.$default(tabId);
       state = {...state}..[tabId] = current.copyWith.findResultState(
           FindResultState(
             activeMatchOrdinal: result.activeMatchOrdinal,
@@ -134,64 +120,61 @@ class TabStates extends _$TabStates {
     }
   }
 
-  Future<String> addTab({
-    Uri? url,
-    bool selectTab = true,
-    bool startLoading = true,
-    String? parentId,
-    LoadUrlFlags flags = LoadUrlFlags.NONE,
-    String? contextId,
-    Source source = Internal.newTab,
-    bool private = false,
-    HistoryMetadataKey? historyMetadata,
-    Map<String, String>? additionalHeaders,
-  }) {
-    return _tabsService.addTab(
-      url: url,
-      selectTab: selectTab,
-      startLoading: startLoading,
-      parentId: parentId,
-      flags: flags,
-      contextId: contextId,
-      source: source,
-      private: private,
-      historyMetadata: historyMetadata,
-      additionalHeaders: additionalHeaders,
-    );
-  }
-
-  Future<void> closeTabs(List<String> tabIds) {
-    return _tabsService.removeTabs(ids: tabIds);
-  }
-
-  Future<void> closeTab(String tabIds) {
-    return _tabsService.removeTab(tabId: tabIds);
-  }
-
   @override
   Map<String, TabState> build() {
     final eventService = ref.watch(eventServiceProvider);
-    _db = ref.watch(tabDatabaseProvider);
 
     final subscriptions = [
-      eventService.tabListEvents.listen(_onTabListChange),
-      eventService.tabContentEvents.listen(_onTabContentStateChange),
-      eventService.iconEvents.listen(_onIconChange),
-      eventService.thumbnailEvents.listen(_onThumbnailChange),
-      eventService.securityInfoEvents.listen(_onSecurityInfoStateChange),
-      eventService.historyEvents.listen(_onHistoryStateChange),
-      eventService.readerableEvents.listen(_onReaderableStateChange),
-      eventService.findResultsEvent.listen(_onFindResults),
+      eventService.tabContentEvents.listen(
+        (event) async {
+          await _lock.synchronized(() => _onTabContentStateChange(event));
+        },
+      ),
+      eventService.iconEvents.listen(
+        (event) async {
+          await _lock.synchronized(() => _onIconChange(event));
+        },
+      ),
+      eventService.thumbnailEvents.listen(
+        (event) async {
+          await _lock.synchronized(() => _onThumbnailChange(event));
+        },
+      ),
+      eventService.securityInfoEvents.listen(
+        (event) async {
+          await _lock.synchronized(() => _onSecurityInfoStateChange(event));
+        },
+      ),
+      eventService.historyEvents.listen(
+        (event) async {
+          await _lock.synchronized(() => _onHistoryStateChange(event));
+        },
+      ),
+      eventService.readerableEvents.listen(
+        (event) async {
+          await _lock.synchronized(() => _onReaderableStateChange(event));
+        },
+      ),
+      eventService.findResultsEvent.listen(
+        (event) async {
+          await _lock.synchronized(() => _onFindResultsChange(event));
+        },
+      ),
     ];
 
-    ref.listenSelf(
+    ref.listen(
+      fireImmediately: true,
+      engineReadyStateProvider,
       (previous, next) async {
-        if (!const DeepCollectionEquality()
-            .equals(previous?.keys.toSet(), next.keys.toSet())) {
-          final ids = next.keys.toList();
-          if (ids.isNotEmpty) {
-            await _db.tabLinkDao.syncTabLinks(retainTabIds: ids);
-          }
+        if (next) {
+          await GeckoTabService().syncEvents(
+            onTabContentStateChange: true,
+            onIconChange: true,
+            onThumbnailChange: true,
+            onSecurityInfoStateChange: true,
+            onHistoryStateChange: true,
+            onFindResults: true,
+          );
         }
       },
     );

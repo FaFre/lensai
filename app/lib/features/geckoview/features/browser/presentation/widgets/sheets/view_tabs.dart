@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -11,9 +12,11 @@ import 'package:lensai/features/geckoview/features/browser/domain/providers.dart
 import 'package:lensai/features/geckoview/features/browser/presentation/dialogs/tab_action.dart';
 import 'package:lensai/features/geckoview/features/browser/presentation/widgets/tab_preview.dart';
 import 'package:lensai/features/geckoview/features/controllers/overlay_dialog.dart';
-import 'package:lensai/features/geckoview/features/topics/domain/providers/selected_topic.dart';
-import 'package:lensai/features/geckoview/features/topics/domain/repositories/tab_link.dart';
-import 'package:lensai/features/geckoview/features/topics/presentation/widgets/topic_chips.dart';
+import 'package:lensai/features/geckoview/features/tabs/domain/providers/selected_container.dart';
+import 'package:lensai/features/geckoview/features/tabs/domain/repositories/container.dart';
+import 'package:lensai/features/geckoview/features/tabs/domain/repositories/tab.dart';
+import 'package:lensai/features/geckoview/features/tabs/presentation/widgets/container_chips.dart';
+import 'package:reorderable_grid/reorderable_grid.dart';
 
 class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
   static const _headerSize = 104.0;
@@ -52,10 +55,10 @@ class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
                     ),
                     TextButton.icon(
                       onPressed: () async {
-                        final topic = ref.read(selectedTopicProvider);
+                        final container = ref.read(selectedContainerProvider);
                         await ref
-                            .read(tabLinkRepositoryProvider.notifier)
-                            .closeAllTabs(topic);
+                            .read(tabDataRepositoryProvider.notifier)
+                            .closeAllTabs(container);
 
                         onClose();
                       },
@@ -64,7 +67,7 @@ class _SliverHeaderDelagate extends SliverPersistentHeaderDelegate {
                     ),
                   ],
                 ),
-                TopicChips(),
+                ContainerChips(),
                 const SizedBox(height: 8),
               ],
             ),
@@ -125,14 +128,11 @@ class ViewTabsSheetWidget extends HookConsumerWidget {
         ),
         HookConsumer(
           builder: (context, ref, child) {
-            final topic = ref.watch(selectedTopicProvider);
+            final container = ref.watch(selectedContainerProvider);
             final availableTabs = ref
                 .watch(
-                  availableTabIdsProvider(topic).select(
-                    (value) => EquatableCollection(
-                      value.valueOrNull ?? [],
-                      immutable: true,
-                    ),
+                  availableTabIdsProvider(container).select(
+                    (value) => EquatableCollection(value, immutable: true),
                   ),
                 )
                 .collection;
@@ -156,8 +156,7 @@ class ViewTabsSheetWidget extends HookConsumerWidget {
                     availableTabs.indexWhere((webView) => webView == activeTab);
 
                 if (index > -1) {
-                  final reversedIndex = availableTabs.length - 1 - index;
-                  final offset = (reversedIndex ~/ 2) * itemHeight;
+                  final offset = (index ~/ 2) * itemHeight;
 
                   if (offset != sheetScrollController.offset) {
                     unawaited(
@@ -175,21 +174,15 @@ class ViewTabsSheetWidget extends HookConsumerWidget {
               [availableTabs, activeTab],
             );
 
-            return SliverPadding(
-              padding: const EdgeInsets.symmetric(horizontal: 4.0),
-              sliver: SliverGrid.count(
-                //Sync values for itemHeight calculation _calculateItemHeight
-                childAspectRatio: 0.75,
-                mainAxisSpacing: 8.0,
-                crossAxisSpacing: 8.0,
-                crossAxisCount: 2,
-                children: availableTabs.reversed
-                    .map(
-                      (tabId) => Consumer(
-                        key: ValueKey(tabId),
+            final tabs = useMemoized(
+              () => availableTabs
+                  .mapIndexed(
+                    (index, tabId) => ReorderableGridDelayedDragStartListener(
+                      key: ValueKey(tabId),
+                      index: index,
+                      child: Consumer(
                         builder: (context, ref, child) {
                           final tab = ref.watch(tabStateProvider(tabId));
-
                           return (tab != null)
                               ? TabPreview(
                                   tab: tab,
@@ -207,7 +200,7 @@ class ViewTabsSheetWidget extends HookConsumerWidget {
                                       onClose();
                                     }
                                   },
-                                  onLongPress: () {
+                                  onDoubleTap: () {
                                     ref
                                         .read(
                                           overlayDialogControllerProvider
@@ -236,8 +229,52 @@ class ViewTabsSheetWidget extends HookConsumerWidget {
                               : const SizedBox.shrink();
                         },
                       ),
-                    )
-                    .toList(),
+                    ),
+                  )
+                  .toList(),
+              [availableTabs, activeTab],
+            );
+
+            return SliverPadding(
+              padding: const EdgeInsets.symmetric(horizontal: 4.0),
+              sliver: SliverReorderableGrid(
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  //Sync values for itemHeight calculation _calculateItemHeight
+                  childAspectRatio: 0.75,
+                  mainAxisSpacing: 8.0,
+                  crossAxisSpacing: 8.0,
+                  crossAxisCount: 2,
+                ),
+                itemCount: tabs.length,
+                itemBuilder: (context, index) => tabs[index],
+                onReorder: (oldIndex, newIndex) async {
+                  final containerRepository =
+                      ref.read(containerRepositoryProvider.notifier);
+
+                  final tabId = availableTabs[oldIndex];
+                  final containerId = await ref
+                      .read(tabDataRepositoryProvider.notifier)
+                      .containerTabId(tabId);
+
+                  final String key;
+                  if (newIndex <= 0) {
+                    key = await containerRepository
+                        .getLeadingOrderKey(containerId);
+                  } else if (newIndex >= availableTabs.length - 1) {
+                    key = await containerRepository
+                        .getTrailingOrderKey(containerId);
+                  } else {
+                    final orderAfterIndex = newIndex - 1;
+                    key = await containerRepository.getOrderKeyAfterTab(
+                      availableTabs[orderAfterIndex],
+                      containerId,
+                    );
+                  }
+
+                  await ref
+                      .read(tabDataRepositoryProvider.notifier)
+                      .assignOrderKey(tabId, key);
+                },
               ),
             );
           },

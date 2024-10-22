@@ -9,7 +9,7 @@ import 'package:lensai/features/chat_archive/presentation/screens/detail.dart';
 import 'package:lensai/features/chat_archive/presentation/screens/list.dart';
 import 'package:lensai/features/chat_archive/presentation/screens/search.dart';
 import 'package:lensai/features/geckoview/features/browser/screens/browser.dart';
-import 'package:lensai/features/geckoview/features/topics/presentation/screens/topic_list.dart';
+import 'package:lensai/features/geckoview/features/tabs/presentation/screens/container_list.dart';
 import 'package:lensai/features/settings/presentation/screens/settings.dart';
 
 part 'routes.g.dart';
@@ -42,9 +42,9 @@ part 'routes.g.dart';
         ),
       ],
     ),
-    TypedGoRoute<TopicListRoute>(
-      name: 'TopicsRoute',
-      path: 'topics',
+    TypedGoRoute<ContainerListRoute>(
+      name: 'ContainerListRoute',
+      path: 'containers',
     ),
   ],
 )
@@ -102,10 +102,10 @@ class BangSearchRoute extends GoRouteData {
   }
 }
 
-class TopicListRoute extends GoRouteData {
+class ContainerListRoute extends GoRouteData {
   @override
   Widget build(BuildContext context, GoRouterState state) {
-    return const TopicListScreen();
+    return const ContainerListScreen();
   }
 }
 

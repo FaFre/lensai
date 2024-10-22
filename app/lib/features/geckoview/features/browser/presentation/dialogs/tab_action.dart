@@ -5,8 +5,8 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:lensai/data/models/equatable_iterable.dart';
 import 'package:lensai/features/geckoview/domain/entities/tab_state.dart';
 import 'package:lensai/features/geckoview/domain/providers/tab_state.dart';
-import 'package:lensai/features/geckoview/features/topics/domain/providers.dart';
-import 'package:lensai/features/geckoview/features/topics/domain/repositories/tab_link.dart';
+import 'package:lensai/features/geckoview/features/tabs/domain/providers.dart';
+import 'package:lensai/features/geckoview/features/tabs/domain/repositories/tab.dart';
 
 class TabActionDialog extends HookConsumerWidget {
   final TabState initialTab;
@@ -22,20 +22,21 @@ class TabActionDialog extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final tabState = ref.watch(tabStateProvider(initialTab.id)) ?? initialTab;
-    final tabTopicId = ref.watch(
-      tabTopicIdProvider(initialTab.id).select((value) => value.valueOrNull),
+    final tabContainerId = ref.watch(
+      tabContainerIdProvider(initialTab.id)
+          .select((value) => value.valueOrNull),
     );
 
-    final topics = ref
+    final containers = ref
         .watch(
-          topicsWithCountProvider.select(
+          containersWithCountProvider.select(
             (value) => EquatableCollection(value.valueOrNull, immutable: true),
           ),
         )
         .collection;
 
-    final selectedTopic =
-        topics?.firstWhereOrNull((topic) => topic.id == tabTopicId);
+    final selectedContainer = containers
+        ?.firstWhereOrNull((container) => container.id == tabContainerId);
 
     final expansionController = useExpansionTileController();
 
@@ -68,22 +69,23 @@ class TabActionDialog extends HookConsumerWidget {
               width: double.maxFinite,
               child: ExpansionTile(
                 controller: expansionController,
-                leading: (selectedTopic != null)
-                    ? CircleAvatar(backgroundColor: selectedTopic.color)
+                leading: (selectedContainer != null)
+                    ? CircleAvatar(backgroundColor: selectedContainer.color)
                     : null,
-                title: (selectedTopic != null)
-                    ? Text(selectedTopic.name ?? 'New Topic')
-                    : const Text('Assign a Topic'),
-                children: topics
-                        ?.where((topic) => topic.id != tabTopicId)
+                title: (selectedContainer != null)
+                    ? Text(selectedContainer.name ?? 'New Container')
+                    : const Text('Assign a Container'),
+                children: containers
+                        ?.where((container) => container.id != tabContainerId)
                         .map(
-                          (topic) => ListTile(
-                            leading: CircleAvatar(backgroundColor: topic.color),
-                            title: Text(topic.name ?? 'New Topic'),
+                          (container) => ListTile(
+                            leading:
+                                CircleAvatar(backgroundColor: container.color),
+                            title: Text(container.name ?? 'New Container'),
                             onTap: () async {
                               await ref
-                                  .read(tabLinkRepositoryProvider.notifier)
-                                  .assignTab(initialTab.id, topic.id);
+                                  .read(tabDataRepositoryProvider.notifier)
+                                  .assignContainer(initialTab.id, container.id);
 
                               expansionController.collapse();
                             },

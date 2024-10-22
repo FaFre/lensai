@@ -40,7 +40,9 @@ private class NativeFragmentView(
 
     override fun onFlutterViewAttached(flutterView: View) {
         super.onFlutterViewAttached(flutterView)
-        flutterEvents.onFragmentReadyStateChange(true) { _ -> }
+
+        GlobalComponents.components!!.engineReportedInitialized = false;
+        flutterEvents.onViewReadyStateChange(System.currentTimeMillis(),true) { _ -> }
     }
 
     override fun getView(): View {

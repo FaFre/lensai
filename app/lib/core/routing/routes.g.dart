@@ -47,9 +47,9 @@ RouteBase get $browserRoute => GoRouteData.$route(
           ],
         ),
         GoRouteData.$route(
-          path: 'topics',
-          name: 'TopicsRoute',
-          factory: $TopicListRouteExtension._fromState,
+          path: 'containers',
+          name: 'ContainerListRoute',
+          factory: $ContainerListRouteExtension._fromState,
         ),
       ],
     );
@@ -163,11 +163,12 @@ extension $BangSubCategoryRouteExtension on BangSubCategoryRoute {
   void replace(BuildContext context) => context.replace(location);
 }
 
-extension $TopicListRouteExtension on TopicListRoute {
-  static TopicListRoute _fromState(GoRouterState state) => TopicListRoute();
+extension $ContainerListRouteExtension on ContainerListRoute {
+  static ContainerListRoute _fromState(GoRouterState state) =>
+      ContainerListRoute();
 
   String get location => GoRouteData.$location(
-        '/topics',
+        '/containers',
       );
 
   void go(BuildContext context) => context.go(location);

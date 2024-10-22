@@ -1187,6 +1187,28 @@ class GeckoBrowserApi {
       return;
     }
   }
+
+  Future<void> onTrimMemory(int level) async {
+    final String pigeonVar_channelName = 'dev.flutter.pigeon.flutter_mozilla_components.GeckoBrowserApi.onTrimMemory$pigeonVar_messageChannelSuffix';
+    final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final List<Object?>? pigeonVar_replyList =
+        await pigeonVar_channel.send(<Object?>[level]) as List<Object?>?;
+    if (pigeonVar_replyList == null) {
+      throw _createConnectionError(pigeonVar_channelName);
+    } else if (pigeonVar_replyList.length > 1) {
+      throw PlatformException(
+        code: pigeonVar_replyList[0]! as String,
+        message: pigeonVar_replyList[1] as String?,
+        details: pigeonVar_replyList[2],
+      );
+    } else {
+      return;
+    }
+  }
 }
 
 class GeckoEngineSettingsApi {
@@ -2243,44 +2265,107 @@ class GeckoCookieApi {
 abstract class GeckoStateEvents {
   static const MessageCodec<Object?> pigeonChannelCodec = _PigeonCodec();
 
-  void onFragmentReadyStateChange(bool state);
+  void onViewReadyStateChange(int timestamp, bool state);
 
-  void onTabListChange(List<String> tabIds);
+  void onEngineReadyStateChange(int timestamp, bool state);
 
-  void onSelectedTabChange(String? id);
+  void onTabAdded(int timestamp, String tabId);
 
-  void onTabContentStateChange(TabContentState state);
+  void onTabListChange(int timestamp, List<String> tabIds);
 
-  void onHistoryStateChange(String id, HistoryState state);
+  void onSelectedTabChange(int timestamp, String? id);
 
-  void onReaderableStateChange(String id, ReaderableState state);
+  void onTabContentStateChange(int timestamp, TabContentState state);
 
-  void onSecurityInfoStateChange(String id, SecurityInfoState state);
+  void onHistoryStateChange(int timestamp, String id, HistoryState state);
 
-  void onIconChange(String id, Uint8List? bytes);
+  void onReaderableStateChange(int timestamp, String id, ReaderableState state);
 
-  void onThumbnailChange(String id, Uint8List? bytes);
+  void onSecurityInfoStateChange(int timestamp, String id, SecurityInfoState state);
 
-  void onFindResults(String id, List<FindResultState> results);
+  void onIconChange(int timestamp, String id, Uint8List? bytes);
+
+  void onThumbnailChange(int timestamp, String id, Uint8List? bytes);
+
+  void onFindResults(int timestamp, String id, List<FindResultState> results);
 
   static void setUp(GeckoStateEvents? api, {BinaryMessenger? binaryMessenger, String messageChannelSuffix = '',}) {
     messageChannelSuffix = messageChannelSuffix.isNotEmpty ? '.$messageChannelSuffix' : '';
     {
       final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
-          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onFragmentReadyStateChange$messageChannelSuffix', pigeonChannelCodec,
+          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onViewReadyStateChange$messageChannelSuffix', pigeonChannelCodec,
           binaryMessenger: binaryMessenger);
       if (api == null) {
         pigeonVar_channel.setMessageHandler(null);
       } else {
         pigeonVar_channel.setMessageHandler((Object? message) async {
           assert(message != null,
-          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onFragmentReadyStateChange was null.');
+          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onViewReadyStateChange was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final bool? arg_state = (args[0] as bool?);
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onViewReadyStateChange was null, expected non-null int.');
+          final bool? arg_state = (args[1] as bool?);
           assert(arg_state != null,
-              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onFragmentReadyStateChange was null, expected non-null bool.');
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onViewReadyStateChange was null, expected non-null bool.');
           try {
-            api.onFragmentReadyStateChange(arg_state!);
+            api.onViewReadyStateChange(arg_timestamp!, arg_state!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onEngineReadyStateChange$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onEngineReadyStateChange was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onEngineReadyStateChange was null, expected non-null int.');
+          final bool? arg_state = (args[1] as bool?);
+          assert(arg_state != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onEngineReadyStateChange was null, expected non-null bool.');
+          try {
+            api.onEngineReadyStateChange(arg_timestamp!, arg_state!);
+            return wrapResponse(empty: true);
+          } on PlatformException catch (e) {
+            return wrapResponse(error: e);
+          }          catch (e) {
+            return wrapResponse(error: PlatformException(code: 'error', message: e.toString()));
+          }
+        });
+      }
+    }
+    {
+      final BasicMessageChannel<Object?> pigeonVar_channel = BasicMessageChannel<Object?>(
+          'dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabAdded$messageChannelSuffix', pigeonChannelCodec,
+          binaryMessenger: binaryMessenger);
+      if (api == null) {
+        pigeonVar_channel.setMessageHandler(null);
+      } else {
+        pigeonVar_channel.setMessageHandler((Object? message) async {
+          assert(message != null,
+          'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabAdded was null.');
+          final List<Object?> args = (message as List<Object?>?)!;
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabAdded was null, expected non-null int.');
+          final String? arg_tabId = (args[1] as String?);
+          assert(arg_tabId != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabAdded was null, expected non-null String.');
+          try {
+            api.onTabAdded(arg_timestamp!, arg_tabId!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -2301,11 +2386,14 @@ abstract class GeckoStateEvents {
           assert(message != null,
           'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabListChange was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final List<String>? arg_tabIds = (args[0] as List<Object?>?)?.cast<String>();
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabListChange was null, expected non-null int.');
+          final List<String>? arg_tabIds = (args[1] as List<Object?>?)?.cast<String>();
           assert(arg_tabIds != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabListChange was null, expected non-null List<String>.');
           try {
-            api.onTabListChange(arg_tabIds!);
+            api.onTabListChange(arg_timestamp!, arg_tabIds!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -2326,9 +2414,12 @@ abstract class GeckoStateEvents {
           assert(message != null,
           'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSelectedTabChange was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final String? arg_id = (args[0] as String?);
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSelectedTabChange was null, expected non-null int.');
+          final String? arg_id = (args[1] as String?);
           try {
-            api.onSelectedTabChange(arg_id);
+            api.onSelectedTabChange(arg_timestamp!, arg_id);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -2349,11 +2440,14 @@ abstract class GeckoStateEvents {
           assert(message != null,
           'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabContentStateChange was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final TabContentState? arg_state = (args[0] as TabContentState?);
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabContentStateChange was null, expected non-null int.');
+          final TabContentState? arg_state = (args[1] as TabContentState?);
           assert(arg_state != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabContentStateChange was null, expected non-null TabContentState.');
           try {
-            api.onTabContentStateChange(arg_state!);
+            api.onTabContentStateChange(arg_timestamp!, arg_state!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -2374,14 +2468,17 @@ abstract class GeckoStateEvents {
           assert(message != null,
           'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onHistoryStateChange was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final String? arg_id = (args[0] as String?);
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onHistoryStateChange was null, expected non-null int.');
+          final String? arg_id = (args[1] as String?);
           assert(arg_id != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onHistoryStateChange was null, expected non-null String.');
-          final HistoryState? arg_state = (args[1] as HistoryState?);
+          final HistoryState? arg_state = (args[2] as HistoryState?);
           assert(arg_state != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onHistoryStateChange was null, expected non-null HistoryState.');
           try {
-            api.onHistoryStateChange(arg_id!, arg_state!);
+            api.onHistoryStateChange(arg_timestamp!, arg_id!, arg_state!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -2402,14 +2499,17 @@ abstract class GeckoStateEvents {
           assert(message != null,
           'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onReaderableStateChange was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final String? arg_id = (args[0] as String?);
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onReaderableStateChange was null, expected non-null int.');
+          final String? arg_id = (args[1] as String?);
           assert(arg_id != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onReaderableStateChange was null, expected non-null String.');
-          final ReaderableState? arg_state = (args[1] as ReaderableState?);
+          final ReaderableState? arg_state = (args[2] as ReaderableState?);
           assert(arg_state != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onReaderableStateChange was null, expected non-null ReaderableState.');
           try {
-            api.onReaderableStateChange(arg_id!, arg_state!);
+            api.onReaderableStateChange(arg_timestamp!, arg_id!, arg_state!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -2430,14 +2530,17 @@ abstract class GeckoStateEvents {
           assert(message != null,
           'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSecurityInfoStateChange was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final String? arg_id = (args[0] as String?);
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSecurityInfoStateChange was null, expected non-null int.');
+          final String? arg_id = (args[1] as String?);
           assert(arg_id != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSecurityInfoStateChange was null, expected non-null String.');
-          final SecurityInfoState? arg_state = (args[1] as SecurityInfoState?);
+          final SecurityInfoState? arg_state = (args[2] as SecurityInfoState?);
           assert(arg_state != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSecurityInfoStateChange was null, expected non-null SecurityInfoState.');
           try {
-            api.onSecurityInfoStateChange(arg_id!, arg_state!);
+            api.onSecurityInfoStateChange(arg_timestamp!, arg_id!, arg_state!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -2458,12 +2561,15 @@ abstract class GeckoStateEvents {
           assert(message != null,
           'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onIconChange was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final String? arg_id = (args[0] as String?);
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onIconChange was null, expected non-null int.');
+          final String? arg_id = (args[1] as String?);
           assert(arg_id != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onIconChange was null, expected non-null String.');
-          final Uint8List? arg_bytes = (args[1] as Uint8List?);
+          final Uint8List? arg_bytes = (args[2] as Uint8List?);
           try {
-            api.onIconChange(arg_id!, arg_bytes);
+            api.onIconChange(arg_timestamp!, arg_id!, arg_bytes);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -2484,12 +2590,15 @@ abstract class GeckoStateEvents {
           assert(message != null,
           'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onThumbnailChange was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final String? arg_id = (args[0] as String?);
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onThumbnailChange was null, expected non-null int.');
+          final String? arg_id = (args[1] as String?);
           assert(arg_id != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onThumbnailChange was null, expected non-null String.');
-          final Uint8List? arg_bytes = (args[1] as Uint8List?);
+          final Uint8List? arg_bytes = (args[2] as Uint8List?);
           try {
-            api.onThumbnailChange(arg_id!, arg_bytes);
+            api.onThumbnailChange(arg_timestamp!, arg_id!, arg_bytes);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);
@@ -2510,14 +2619,17 @@ abstract class GeckoStateEvents {
           assert(message != null,
           'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onFindResults was null.');
           final List<Object?> args = (message as List<Object?>?)!;
-          final String? arg_id = (args[0] as String?);
+          final int? arg_timestamp = (args[0] as int?);
+          assert(arg_timestamp != null,
+              'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onFindResults was null, expected non-null int.');
+          final String? arg_id = (args[1] as String?);
           assert(arg_id != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onFindResults was null, expected non-null String.');
-          final List<FindResultState>? arg_results = (args[1] as List<Object?>?)?.cast<FindResultState>();
+          final List<FindResultState>? arg_results = (args[2] as List<Object?>?)?.cast<FindResultState>();
           assert(arg_results != null,
               'Argument for dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onFindResults was null, expected non-null List<FindResultState>.');
           try {
-            api.onFindResults(arg_id!, arg_results!);
+            api.onFindResults(arg_timestamp!, arg_id!, arg_results!);
             return wrapResponse(empty: true);
           } on PlatformException catch (e) {
             return wrapResponse(error: e);

@@ -39,7 +39,8 @@
         android:label="Lensai"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
-        android:usesCleartextTraffic="true">
+        android:usesCleartextTraffic="true"
+        android:enableOnBackInvokedCallback="true">
         <activity android:name="eu.lensai.flutter_mozilla_components.NotificationActivity" android:theme="@style/Theme.AppCompat.Translucent" />
         
         <activity

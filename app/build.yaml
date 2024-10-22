@@ -11,6 +11,10 @@ targets:
             dialect: sqlite
             options:
               version: "3.45"
+              known_functions:
+                lexo_rank_next: "text (int, text null)"
+                lexo_rank_previous: "text (int, text null)"
+                lexo_rank_reorder_after: "text (text null, text null)"
               modules:
                 - json1
                 - fts5

@@ -6,7 +6,7 @@ part of 'tab_session.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$tabSessionHash() => r'25afbead5c1110ca865e48a5009da70eb20d3a28';
+String _$tabSessionHash() => r'29b20f40af01e599ef80e198aec5f093d74efc6a';
 
 /// Copied from Dart SDK
 class _SystemHash {

@@ -6,7 +6,7 @@ part of 'providers.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$eventServiceHash() => r'c36c6d895629002945c7b4eafba8389771e2eb2d';
+String _$eventServiceHash() => r'5aa357fdf0d217677a9a66ecb50417ac18929cad';
 
 /// See also [eventService].
 @ProviderFor(eventService)
@@ -37,5 +37,21 @@ final selectedTabSessionNotifierProvider =
 );
 
 typedef SelectedTabSessionNotifierRef = AutoDisposeProviderRef<TabSession>;
+String _$engineReadyStateHash() => r'c682333e2e07cf0635aa7ae793a2088ca648c950';
+
+/// See also [EngineReadyState].
+@ProviderFor(EngineReadyState)
+final engineReadyStateProvider =
+    NotifierProvider<EngineReadyState, bool>.internal(
+  EngineReadyState.new,
+  name: r'engineReadyStateProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$engineReadyStateHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$EngineReadyState = Notifier<bool>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

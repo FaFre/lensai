@@ -11,14 +11,14 @@ class GeckoTabService {
   GeckoTabService({GeckoTabsApi? api}) : _api = api ?? _apiInstance;
 
   Future<void> syncEvents({
-    bool onSelectedTabChange = true,
-    bool onTabListChange = true,
-    bool onTabContentStateChange = true,
-    bool onIconChange = true,
-    bool onSecurityInfoStateChange = true,
-    bool onHistoryStateChange = true,
-    bool onFindResults = true,
-    bool onThumbnailChange = true,
+    bool onSelectedTabChange = false,
+    bool onTabListChange = false,
+    bool onTabContentStateChange = false,
+    bool onIconChange = false,
+    bool onSecurityInfoStateChange = false,
+    bool onHistoryStateChange = false,
+    bool onFindResults = false,
+    bool onThumbnailChange = false,
   }) {
     return _api.syncEvents(
       onSelectedTabChange: onSelectedTabChange,

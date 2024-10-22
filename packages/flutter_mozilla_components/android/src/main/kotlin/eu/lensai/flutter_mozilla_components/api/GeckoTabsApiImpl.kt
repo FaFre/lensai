@@ -19,7 +19,13 @@ import eu.lensai.flutter_mozilla_components.pigeons.SecurityInfoState
 import eu.lensai.flutter_mozilla_components.pigeons.TabContentState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import mozilla.components.browser.icons.BrowserIcons
+import mozilla.components.browser.icons.IconRequest
 import mozilla.components.browser.session.storage.RecoverableBrowserState
 import mozilla.components.browser.state.action.TabListAction
 import mozilla.components.browser.state.selector.findTab
@@ -43,6 +49,7 @@ class GeckoTabsApiImpl() : GeckoTabsApi {
     private val engine: Engine by lazy { GlobalComponents.components!!.engine }
     private val state: BrowserState by lazy { GlobalComponents.components!!.store.state }
     private val thumbnailStorage: ThumbnailStorage by lazy { GlobalComponents.components!!.thumbnailStorage }
+    private val icons: BrowserIcons by lazy { GlobalComponents.components!!.icons }
     private val events: GeckoStateEvents by lazy { GlobalComponents.components!!.flutterEvents }
 
     private fun restoreSource(source: SourceValue ) : SessionState.Source {
@@ -115,19 +122,27 @@ class GeckoTabsApiImpl() : GeckoTabsApi {
         onFindResults: Boolean,
         onThumbnailChange: Boolean,
     ) {
+        val tabs = state.tabs.map { x -> x.copy() }.toList()
+        val selectedTab = state.selectedTabId
+
         if(onSelectedTabChange) {
             events.onSelectedTabChange(
-                state.selectedTabId
+                System.currentTimeMillis(),
+                selectedTab
             ) { _ -> }
         }
 
         if(onTabListChange) {
-            events.onTabListChange(state.tabs.map {tab -> tab.id}) { _ -> }
+            events.onTabListChange(
+                System.currentTimeMillis(),
+                tabs.map {tab -> tab.id}
+            ) { _ -> }
         }
 
         if(onTabContentStateChange) {
-            state.tabs.forEach { tab ->
+            tabs.forEach { tab ->
                 events.onTabContentStateChange(
+                    System.currentTimeMillis(),
                     TabContentState(
                         id = tab.id,
                         contextId = tab.contextId,
@@ -143,21 +158,35 @@ class GeckoTabsApiImpl() : GeckoTabsApi {
         }
 
         if(onIconChange) {
-            state.tabs.forEach { tab ->
+            tabs.forEach { tab ->
                 if(tab.content.icon != null) {
                     val iconBytes = tab.content.icon?.toWebPBytes()
                     events.onIconChange(
+                        System.currentTimeMillis(),
                         tab.id,
                         iconBytes
                     ) { _ -> }
+                } else {
+                    CoroutineScope(Dispatchers.Default).launch {
+                        val result = icons.loadIcon(IconRequest(url = tab.content.url)).await()
+                        val iconBytes = result.bitmap.toWebPBytes()
+                        runOnUiThread {
+                            events.onIconChange(
+                                System.currentTimeMillis(),
+                                tab.id,
+                                iconBytes
+                            ) { _ -> }
+                        }
+                    }
+
                 }
             }
         }
 
         if(onSecurityInfoStateChange) {
-            state.tabs.forEach { tab ->
-                val iconBytes = tab.content.icon?.toWebPBytes()
+            tabs.forEach { tab ->
                 events.onSecurityInfoStateChange(
+                    System.currentTimeMillis(),
                     tab.id,
                     SecurityInfoState(
                         tab.content.securityInfo.secure,
@@ -169,8 +198,9 @@ class GeckoTabsApiImpl() : GeckoTabsApi {
         }
 
         if(onReaderableStateChange) {
-            state.tabs.forEach { tab ->
+            tabs.forEach { tab ->
                 events.onReaderableStateChange(
+                    System.currentTimeMillis(),
                     tab.id,
                     ReaderableState(
                         tab.readerState.readerable,
@@ -181,8 +211,9 @@ class GeckoTabsApiImpl() : GeckoTabsApi {
         }
 
         if(onHistoryStateChange) {
-            state.tabs.forEach { tab ->
+            tabs.forEach { tab ->
                 events.onHistoryStateChange(
+                    System.currentTimeMillis(),
                     tab.id,
                     HistoryState(
                         items = tab.content.history.items.map { item -> HistoryItem(
@@ -198,8 +229,9 @@ class GeckoTabsApiImpl() : GeckoTabsApi {
         }
 
         if(onFindResults) {
-            state.tabs.forEach { tab ->
+            tabs.forEach { tab ->
                 events.onFindResults(
+                    System.currentTimeMillis(),
                     tab.id,
                     tab.content.findResults.map { result -> FindResultState(
                         activeMatchOrdinal = result.activeMatchOrdinal.toLong(),
@@ -211,13 +243,13 @@ class GeckoTabsApiImpl() : GeckoTabsApi {
         }
 
         if(onThumbnailChange) {
-            state.tabs.forEach { tab ->
+            tabs.forEach { tab ->
                 CoroutineScope(Dispatchers.Default).launch {
                     val bitmap = thumbnailStorage.loadThumbnail(
                         ImageLoadRequest(
                             id = tab.id,
                             //TODO: make this configurable
-                            size = 600,
+                            size = 1024,
                             isPrivate = tab.content.private
                         )
                     ).await()
@@ -225,7 +257,7 @@ class GeckoTabsApiImpl() : GeckoTabsApi {
                     if(bitmap != null) {
                         val bytes = bitmap.toWebPBytes()
                         runOnUiThread {
-                            events.onThumbnailChange(tab.id, bytes) { _ -> }
+                            events.onThumbnailChange(System.currentTimeMillis(), tab.id, bytes) { _ -> }
                         }
                     }
                 }

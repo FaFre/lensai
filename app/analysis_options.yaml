@@ -24,6 +24,7 @@ analyzer:
   plugins:
     - custom_lint
   exclude:
+    - "**.drift"
     - "**.g.dart"
     - "**.swagger.dart"
     - "**.freezed.dart"

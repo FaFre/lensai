@@ -3,6 +3,8 @@ version = "1.0-SNAPSHOT"
 
 buildscript {
     ext.kotlin_version = "1.9.22"
+    ext.mozillaComponentsVersion = '131.0.3'
+
     repositories {
         google()
         mavenCentral()
@@ -56,37 +58,36 @@ android {
     }
 
     dependencies {
-        implementation 'org.mozilla.components:support-utils:131.0b1'
-        implementation 'org.mozilla.components:support-ktx:131.0b1'
-        implementation 'org.mozilla.components:support-webextensions:131.0b1'
-        implementation 'org.mozilla.components:support-locale:131.0b1'
-        implementation 'org.mozilla.components:lib-fetch-httpurlconnection:131.0b1'
-        implementation 'org.mozilla.components:lib-crash:131.0b1'
-        implementation 'org.mozilla.components:lib-publicsuffixlist:131.0b1'
-        implementation 'org.mozilla.components:lib-dataprotect:131.0b1'
-        implementation 'org.mozilla.components:concept-engine:131.0b1'
-        implementation 'org.mozilla.components:concept-fetch:131.0b1'
-        implementation 'org.mozilla.components:browser-engine-gecko:131.0b1'
-        implementation 'org.mozilla.components:browser-state:131.0b1'
-        implementation 'org.mozilla.components:browser-session-storage:131.0b1'
-        implementation 'org.mozilla.components:browser-icons:131.0b1'
-        //implementation 'org.mozilla.components:browser-storage-sync:131.0b1'
-        implementation 'org.mozilla.components:browser-thumbnails:131.0b1'
-        implementation 'org.mozilla.components:feature-addons:131.0b1'
-        implementation 'org.mozilla.components:feature-app-links:131.0b1'
-        implementation 'org.mozilla.components:feature-autofill:131.0b1'
-        implementation 'org.mozilla.components:feature-downloads:131.0b1'
-        implementation 'org.mozilla.components:feature-media:131.0b1'
-        implementation 'org.mozilla.components:feature-tabs:131.0b1'
-        implementation 'org.mozilla.components:feature-prompts:131.0b1'
-        implementation 'org.mozilla.components:feature-session:131.0b1'
-        implementation 'org.mozilla.components:feature-readerview:131.0b1'
-        implementation 'org.mozilla.components:feature-privatemode:131.0b1'
-        implementation 'org.mozilla.components:feature-sitepermissions:131.0b1'
-        implementation 'org.mozilla.components:feature-webcompat:131.0b1'
-        implementation 'org.mozilla.components:feature-webnotifications:131.0b1'
-        implementation 'org.mozilla.components:service-digitalassetlinks:131.0b1'
-        implementation 'org.mozilla.components:ui-widgets:131.0b1'
+        implementation "org.mozilla.components:support-utils:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:support-ktx:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:support-webextensions:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:support-locale:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:lib-fetch-httpurlconnection:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:lib-crash:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:lib-publicsuffixlist:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:lib-dataprotect:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:concept-engine:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:concept-fetch:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:browser-engine-gecko:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:browser-state:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:browser-session-storage:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:browser-icons:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:browser-thumbnails:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-addons:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-app-links:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-autofill:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-downloads:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-media:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-tabs:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-prompts:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-session:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-readerview:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-privatemode:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-sitepermissions:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-webcompat:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:feature-webnotifications:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:service-digitalassetlinks:$mozillaComponentsVersion"
+        implementation "org.mozilla.components:ui-widgets:$mozillaComponentsVersion"
 
         implementation 'androidx.coordinatorlayout:coordinatorlayout:1.2.0'
         implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'

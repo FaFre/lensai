@@ -88,6 +88,7 @@ open class DefaultComponents(
     }
 
     var engineView: EngineView? = null
+    var engineReportedInitialized = false
 
     val preferences: SharedPreferences =
         applicationContext.getSharedPreferences(SAMPLE_BROWSER_PREFERENCES, Context.MODE_PRIVATE)
@@ -166,6 +167,7 @@ open class DefaultComponents(
                     .distinctUntilChanged()
                     .collect { tabId ->
                         flutterEvents.onSelectedTabChange(
+                            System.currentTimeMillis(),
                             tabId
                         ) { _ -> }
                     }
@@ -181,6 +183,7 @@ open class DefaultComponents(
                     .collect { tab ->
                         val iconBytes = tab.content.icon?.toWebPBytes()
                         flutterEvents.onIconChange(
+                            System.currentTimeMillis(),
                             tab.id,
                             iconBytes
                         ) { _ -> }
@@ -195,6 +198,7 @@ open class DefaultComponents(
                     .debounce { 50 }
                     .collect { tab ->
                         flutterEvents.onSecurityInfoStateChange(
+                            System.currentTimeMillis(),
                             tab.id,
                             SecurityInfoState(
                                 tab.content.securityInfo.secure,
@@ -218,6 +222,7 @@ open class DefaultComponents(
                     .debounce { 50 }
                     .collect { tab ->
                         flutterEvents.onReaderableStateChange(
+                            System.currentTimeMillis(),
                             tab.id,
                             ReaderableState(
                                 tab.readerState.readerable,
@@ -241,6 +246,7 @@ open class DefaultComponents(
                     .debounce { 50 }
                     .collect { tab ->
                         flutterEvents.onHistoryStateChange(
+                            System.currentTimeMillis(),
                             tab.id,
                             HistoryState(
                                 items = tab.content.history.items.map { item -> HistoryItem(
@@ -259,7 +265,7 @@ open class DefaultComponents(
                 flow.mapNotNull { state -> state.tabs.map {tab -> tab.id} }
                     .distinctUntilChanged()
                     .collect { tabs ->
-                        flutterEvents.onTabListChange(tabs) { _ -> }
+                        flutterEvents.onTabListChange(System.currentTimeMillis(), tabs) { _ -> }
                     }
             }
 
@@ -280,6 +286,7 @@ open class DefaultComponents(
                     .collect { tab ->
                         logger.info("title: ${tab.content.title} ${tab.content.url}")
                         flutterEvents.onTabContentStateChange(
+                            System.currentTimeMillis(),
                             TabContentState(
                                 id = tab.id,
                                 contextId = tab.contextId,
@@ -303,6 +310,7 @@ open class DefaultComponents(
                     .collect { tab ->
                         tab.content.findResults
                         flutterEvents.onFindResults(
+                            System.currentTimeMillis(),
                             tab.id,
                             tab.content.findResults.map { result -> FindResultState(
                                 activeMatchOrdinal = result.activeMatchOrdinal.toLong(),

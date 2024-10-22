@@ -1,6 +1,11 @@
 import 'dart:async';
 
+import 'package:drift/drift.dart';
 import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
+import 'package:lensai/features/geckoview/domain/providers.dart';
+import 'package:lensai/features/geckoview/features/tabs/data/database/database.dart';
+import 'package:lensai/features/geckoview/features/tabs/data/providers.dart';
+import 'package:lensai/features/geckoview/features/tabs/domain/providers/selected_container.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'tab.g.dart';
@@ -8,6 +13,8 @@ part 'tab.g.dart';
 @Riverpod(keepAlive: true)
 class TabRepository extends _$TabRepository {
   final _tabsService = GeckoTabService();
+
+  late TabDatabase _db;
 
   Future<String> addTab({
     Uri? url,
@@ -48,5 +55,20 @@ class TabRepository extends _$TabRepository {
   }
 
   @override
-  void build() {}
+  void build() {
+    final eventSerivce = ref.watch(eventServiceProvider);
+
+    _db = ref.watch(tabDatabaseProvider);
+
+    final tabAddedSub = eventSerivce.tabAddedStream.listen(
+      (tabId) async {
+        final containerId = ref.read(selectedContainerProvider);
+        await _db.tabDao.upsertTab(tabId, containerId: Value(containerId));
+      },
+    );
+
+    ref.onDispose(() {
+      unawaited(tabAddedSub.cancel());
+    });
+  }
 }

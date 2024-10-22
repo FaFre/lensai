@@ -156,23 +156,23 @@ class _SelectedBangDataProviderElement
   String? get domain => (origin as SelectedBangDataProvider).domain;
 }
 
-String _$availableTabIdsHash() => r'bea231cdf6211fc876b8031b5d72999eae5d7b15';
+String _$availableTabIdsHash() => r'427ea2e58c6bc27e2f16cffb850dc6621875e247';
 
 /// See also [availableTabIds].
 @ProviderFor(availableTabIds)
 const availableTabIdsProvider = AvailableTabIdsFamily();
 
 /// See also [availableTabIds].
-class AvailableTabIdsFamily extends Family<AsyncValue<List<String>>> {
+class AvailableTabIdsFamily extends Family<List<String>> {
   /// See also [availableTabIds].
   const AvailableTabIdsFamily();
 
   /// See also [availableTabIds].
   AvailableTabIdsProvider call(
-    String? topicId,
+    String? containerId,
   ) {
     return AvailableTabIdsProvider(
-      topicId,
+      containerId,
     );
   }
 
@@ -181,7 +181,7 @@ class AvailableTabIdsFamily extends Family<AsyncValue<List<String>>> {
     covariant AvailableTabIdsProvider provider,
   ) {
     return call(
-      provider.topicId,
+      provider.containerId,
     );
   }
 
@@ -201,14 +201,14 @@ class AvailableTabIdsFamily extends Family<AsyncValue<List<String>>> {
 }
 
 /// See also [availableTabIds].
-class AvailableTabIdsProvider extends AutoDisposeStreamProvider<List<String>> {
+class AvailableTabIdsProvider extends AutoDisposeProvider<List<String>> {
   /// See also [availableTabIds].
   AvailableTabIdsProvider(
-    String? topicId,
+    String? containerId,
   ) : this._internal(
           (ref) => availableTabIds(
             ref as AvailableTabIdsRef,
-            topicId,
+            containerId,
           ),
           from: availableTabIdsProvider,
           name: r'availableTabIdsProvider',
@@ -219,7 +219,7 @@ class AvailableTabIdsProvider extends AutoDisposeStreamProvider<List<String>> {
           dependencies: AvailableTabIdsFamily._dependencies,
           allTransitiveDependencies:
               AvailableTabIdsFamily._allTransitiveDependencies,
-          topicId: topicId,
+          containerId: containerId,
         );
 
   AvailableTabIdsProvider._internal(
@@ -229,14 +229,14 @@ class AvailableTabIdsProvider extends AutoDisposeStreamProvider<List<String>> {
     required super.allTransitiveDependencies,
     required super.debugGetCreateSourceHash,
     required super.from,
-    required this.topicId,
+    required this.containerId,
   }) : super.internal();
 
-  final String? topicId;
+  final String? containerId;
 
   @override
   Override overrideWith(
-    Stream<List<String>> Function(AvailableTabIdsRef provider) create,
+    List<String> Function(AvailableTabIdsRef provider) create,
   ) {
     return ProviderOverride(
       origin: this,
@@ -247,42 +247,41 @@ class AvailableTabIdsProvider extends AutoDisposeStreamProvider<List<String>> {
         dependencies: null,
         allTransitiveDependencies: null,
         debugGetCreateSourceHash: null,
-        topicId: topicId,
+        containerId: containerId,
       ),
     );
   }
 
   @override
-  AutoDisposeStreamProviderElement<List<String>> createElement() {
+  AutoDisposeProviderElement<List<String>> createElement() {
     return _AvailableTabIdsProviderElement(this);
   }
 
   @override
   bool operator ==(Object other) {
-    return other is AvailableTabIdsProvider && other.topicId == topicId;
+    return other is AvailableTabIdsProvider && other.containerId == containerId;
   }
 
   @override
   int get hashCode {
     var hash = _SystemHash.combine(0, runtimeType.hashCode);
-    hash = _SystemHash.combine(hash, topicId.hashCode);
+    hash = _SystemHash.combine(hash, containerId.hashCode);
 
     return _SystemHash.finish(hash);
   }
 }
 
-mixin AvailableTabIdsRef on AutoDisposeStreamProviderRef<List<String>> {
-  /// The parameter `topicId` of this provider.
-  String? get topicId;
+mixin AvailableTabIdsRef on AutoDisposeProviderRef<List<String>> {
+  /// The parameter `containerId` of this provider.
+  String? get containerId;
 }
 
 class _AvailableTabIdsProviderElement
-    extends AutoDisposeStreamProviderElement<List<String>>
-    with AvailableTabIdsRef {
+    extends AutoDisposeProviderElement<List<String>> with AvailableTabIdsRef {
   _AvailableTabIdsProviderElement(super.provider);
 
   @override
-  String? get topicId => (origin as AvailableTabIdsProvider).topicId;
+  String? get containerId => (origin as AvailableTabIdsProvider).containerId;
 }
 
 String _$selectedBangTriggerHash() =>

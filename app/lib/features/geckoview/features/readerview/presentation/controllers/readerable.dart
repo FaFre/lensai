@@ -11,6 +11,7 @@ class ReaderableScreenController extends _$ReaderableScreenController {
 
   Future<void> toggleReaderView(bool enable) async {
     state = const AsyncValue.loading();
+
     final eventChange = ref.read(eventServiceProvider).readerableEvents.first;
     final toggle = _service.toggleReaderView(enable);
 

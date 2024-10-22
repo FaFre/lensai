@@ -8,10 +8,34 @@ import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mozilla_components/src/domain/services/gecko_browser.dart';
 
-class GeckoView extends StatelessWidget {
+class GeckoView extends StatefulWidget {
   final FutureOr<void> Function()? preInitializationStep;
 
   const GeckoView({super.key, this.preInitializationStep});
+
+  @override
+  State<GeckoView> createState() => _GeckoViewState();
+}
+
+class _GeckoViewState extends State<GeckoView> {
+  static const platform =
+      MethodChannel('me.movenext.flutter_mozilla_components/trim_memory');
+
+  final browserService = GeckoBrowserService();
+
+  @override
+  void initState() {
+    super.initState();
+    _setupMethodCallHandler();
+  }
+
+  void _setupMethodCallHandler() {
+    platform.setMethodCallHandler((MethodCall call) async {
+      if (call.method == 'onTrimMemory') {
+        await browserService.onTrimMemory(call.arguments as int);
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,8 +63,14 @@ class GeckoView extends StatelessWidget {
             params.onPlatformViewCreated(value);
 
             SchedulerBinding.instance.addPostFrameCallback((_) async {
-              await preInitializationStep?.call();
-              await GeckoBrowserService().showNativeFragment();
+              await widget.preInitializationStep?.call();
+
+              await Future.delayed(
+                //Wait for two more frames just to be sure view has been initialized
+                Duration(milliseconds: ((1000 / 60) * 2).toInt()),
+              ).whenComplete(() async {
+                await browserService.showNativeFragment();
+              });
             });
           })
           // ignore: discarded_futures

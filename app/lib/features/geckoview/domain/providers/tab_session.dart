@@ -33,6 +33,10 @@ class TabSession extends _$TabSession {
     return _sessionService.goForward();
   }
 
+  Future<void> exitFullscreen() {
+    return _sessionService.exitFullscreen();
+  }
+
   Future<Uint8List?> requestScreenshot() {
     return _sessionService.requestScreenshot();
   }

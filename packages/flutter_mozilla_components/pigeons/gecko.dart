@@ -539,6 +539,7 @@ class FindResultState {
 @HostApi()
 abstract class GeckoBrowserApi {
   void showNativeFragment();
+  void onTrimMemory(int level);
 }
 
 @HostApi()
@@ -782,19 +783,26 @@ abstract class GeckoCookieApi {
 
 @FlutterApi()
 abstract class GeckoStateEvents {
-  void onFragmentReadyStateChange(bool state);
+  void onViewReadyStateChange(int timestamp, bool state);
+  void onEngineReadyStateChange(int timestamp, bool state);
 
-  void onTabListChange(List<String> tabIds);
-  void onSelectedTabChange(String? id);
+  void onTabAdded(int timestamp, String tabId);
 
-  void onTabContentStateChange(TabContentState state);
-  void onHistoryStateChange(String id, HistoryState state);
-  void onReaderableStateChange(String id, ReaderableState state);
-  void onSecurityInfoStateChange(String id, SecurityInfoState state);
-  void onIconChange(String id, Uint8List? bytes);
-  void onThumbnailChange(String id, Uint8List? bytes);
+  void onTabListChange(int timestamp, List<String> tabIds);
+  void onSelectedTabChange(int timestamp, String? id);
 
-  void onFindResults(String id, List<FindResultState> results);
+  void onTabContentStateChange(int timestamp, TabContentState state);
+  void onHistoryStateChange(int timestamp, String id, HistoryState state);
+  void onReaderableStateChange(int timestamp, String id, ReaderableState state);
+  void onSecurityInfoStateChange(
+    int timestamp,
+    String id,
+    SecurityInfoState state,
+  );
+  void onIconChange(int timestamp, String id, Uint8List? bytes);
+  void onThumbnailChange(int timestamp, String id, Uint8List? bytes);
+
+  void onFindResults(int timestamp, String id, List<FindResultState> results);
 }
 
 @HostApi()

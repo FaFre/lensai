@@ -229,22 +229,6 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        consumeFlow(components.store) { flow ->
-//            flow.mapNotNull { state -> state.findCustomTabOrSelectedTab(sessionId) }
-//                .ifAnyChanged { tab ->
-//                    arrayOf(
-//                        tab.content.loading,
-//                        tab.content.canGoBack,
-//                        tab.content.canGoForward,
-//                    )
-//                }
-//                .collect {
-//                    binding.toolbar.invalidateActions()
-//                }
-//        }
-    }
-
     @CallSuper
     override fun onBackPressed(): Boolean =
         listOf(sessionFeature).any { it.onBackPressed() }

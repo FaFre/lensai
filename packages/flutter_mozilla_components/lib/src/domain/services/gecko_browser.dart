@@ -10,4 +10,8 @@ class GeckoBrowserService {
   Future<void> showNativeFragment() {
     return _api.showNativeFragment();
   }
+
+  Future<void> onTrimMemory(int level) {
+    return _api.onTrimMemory(level);
+  }
 }

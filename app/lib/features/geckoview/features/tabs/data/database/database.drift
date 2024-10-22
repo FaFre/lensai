@@ -1,0 +1,69 @@
+import 'package:lensai/data/database/converters/color.dart';
+import 'package:lensai/data/database/converters/icon_data.dart';
+import 'package:lensai/features/geckoview/features/tabs/data/models/container_data.dart';
+
+CREATE TABLE container (
+  id TEXT PRIMARY KEY NOT NULL,
+  contextual_identity TEXT,
+  name TEXT,
+  color INTEGER NOT NULL MAPPED BY `const ColorConverter()`,
+  icon TEXT MAPPED BY `const IconDataTypeConverter()`
+) WITH ContainerData;
+
+CREATE TABLE tab ( 
+  id TEXT PRIMARY KEY NOT NULL,
+  container_id TEXT REFERENCES container (id) ON DELETE CASCADE,
+  order_key TEXT NOT NULL,
+  timestamp DATETIME NOT NULL
+);
+
+containersWithCount WITH ContainerDataWithCount:
+  SELECT 
+    container.*, 
+    tab_agg.tab_count
+  FROM container
+  LEFT JOIN (
+    SELECT 
+      container_id, 
+      COUNT(*) AS tab_count, 
+      MAX(timestamp) AS last_updated
+    FROM tab
+    GROUP BY container_id
+  ) AS tab_agg ON container.id = tab_agg.container_id
+  ORDER BY tab_agg.last_updated DESC NULLS FIRST;
+
+leadingOrderKey(:container_id AS TEXT OR NULL, :bucket AS INTEGER):
+  SELECT lexo_rank_previous(
+    :bucket, 
+    (
+      SELECT order_key 
+      FROM tab 
+      WHERE container_id IS :container_id 
+      ORDER BY order_key 
+      LIMIT 1
+    )
+  );
+
+trailingOrderKey(:container_id AS TEXT OR NULL, :bucket AS INTEGER):
+  SELECT lexo_rank_next(
+    :bucket, 
+    (
+      SELECT order_key 
+      FROM tab 
+      WHERE container_id IS :container_id 
+      ORDER BY order_key DESC 
+      LIMIT 1
+    )
+  );
+
+orderKeyAfterTab(:tab_id AS TEXT, :container_id AS TEXT OR NULL):
+  WITH ordered_table AS (
+    SELECT id,
+          order_key,
+          LEAD(order_key) OVER (ORDER BY order_key) AS next_order_key
+    FROM tab 
+    WHERE container_id IS :container_id 
+  )
+  SELECT lexo_rank_reorder_after(order_key, next_order_key)
+  FROM ordered_table
+  WHERE id = :tab_id;

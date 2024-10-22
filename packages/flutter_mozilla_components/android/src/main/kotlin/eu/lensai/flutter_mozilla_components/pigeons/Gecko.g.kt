@@ -1158,6 +1158,7 @@ private open class GeckoPigeonCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface GeckoBrowserApi {
   fun showNativeFragment()
+  fun onTrimMemory(level: Long)
 
   companion object {
     /** The codec used by GeckoBrowserApi. */
@@ -1174,6 +1175,24 @@ interface GeckoBrowserApi {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
               api.showNativeFragment()
+              listOf(null)
+            } catch (exception: Throwable) {
+              wrapError(exception)
+            }
+            reply.reply(wrapped)
+          }
+        } else {
+          channel.setMessageHandler(null)
+        }
+      }
+      run {
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.flutter_mozilla_components.GeckoBrowserApi.onTrimMemory$separatedMessageChannelSuffix", codec)
+        if (api != null) {
+          channel.setMessageHandler { message, reply ->
+            val args = message as List<Any?>
+            val levelArg = args[0] as Long
+            val wrapped: List<Any?> = try {
+              api.onTrimMemory(levelArg)
               listOf(null)
             } catch (exception: Throwable) {
               wrapError(exception)
@@ -2153,12 +2172,12 @@ class GeckoStateEvents(private val binaryMessenger: BinaryMessenger, private val
       GeckoPigeonCodec()
     }
   }
-  fun onFragmentReadyStateChange(stateArg: Boolean, callback: (Result<Unit>) -> Unit)
+  fun onViewReadyStateChange(timestampArg: Long, stateArg: Boolean, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
-    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onFragmentReadyStateChange$separatedMessageChannelSuffix"
+    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onViewReadyStateChange$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(stateArg)) {
+    channel.send(listOf(timestampArg, stateArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -2170,12 +2189,46 @@ class GeckoStateEvents(private val binaryMessenger: BinaryMessenger, private val
       } 
     }
   }
-  fun onTabListChange(tabIdsArg: List<String>, callback: (Result<Unit>) -> Unit)
+  fun onEngineReadyStateChange(timestampArg: Long, stateArg: Boolean, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onEngineReadyStateChange$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(timestampArg, stateArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onTabAdded(timestampArg: Long, tabIdArg: String, callback: (Result<Unit>) -> Unit)
+{
+    val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
+    val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabAdded$separatedMessageChannelSuffix"
+    val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
+    channel.send(listOf(timestampArg, tabIdArg)) {
+      if (it is List<*>) {
+        if (it.size > 1) {
+          callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
+        } else {
+          callback(Result.success(Unit))
+        }
+      } else {
+        callback(Result.failure(createConnectionError(channelName)))
+      } 
+    }
+  }
+  fun onTabListChange(timestampArg: Long, tabIdsArg: List<String>, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabListChange$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(tabIdsArg)) {
+    channel.send(listOf(timestampArg, tabIdsArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -2187,12 +2240,12 @@ class GeckoStateEvents(private val binaryMessenger: BinaryMessenger, private val
       } 
     }
   }
-  fun onSelectedTabChange(idArg: String?, callback: (Result<Unit>) -> Unit)
+  fun onSelectedTabChange(timestampArg: Long, idArg: String?, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSelectedTabChange$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(idArg)) {
+    channel.send(listOf(timestampArg, idArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -2204,12 +2257,12 @@ class GeckoStateEvents(private val binaryMessenger: BinaryMessenger, private val
       } 
     }
   }
-  fun onTabContentStateChange(stateArg: TabContentState, callback: (Result<Unit>) -> Unit)
+  fun onTabContentStateChange(timestampArg: Long, stateArg: TabContentState, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onTabContentStateChange$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(stateArg)) {
+    channel.send(listOf(timestampArg, stateArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -2221,12 +2274,12 @@ class GeckoStateEvents(private val binaryMessenger: BinaryMessenger, private val
       } 
     }
   }
-  fun onHistoryStateChange(idArg: String, stateArg: HistoryState, callback: (Result<Unit>) -> Unit)
+  fun onHistoryStateChange(timestampArg: Long, idArg: String, stateArg: HistoryState, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onHistoryStateChange$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(idArg, stateArg)) {
+    channel.send(listOf(timestampArg, idArg, stateArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -2238,12 +2291,12 @@ class GeckoStateEvents(private val binaryMessenger: BinaryMessenger, private val
       } 
     }
   }
-  fun onReaderableStateChange(idArg: String, stateArg: ReaderableState, callback: (Result<Unit>) -> Unit)
+  fun onReaderableStateChange(timestampArg: Long, idArg: String, stateArg: ReaderableState, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onReaderableStateChange$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(idArg, stateArg)) {
+    channel.send(listOf(timestampArg, idArg, stateArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -2255,12 +2308,12 @@ class GeckoStateEvents(private val binaryMessenger: BinaryMessenger, private val
       } 
     }
   }
-  fun onSecurityInfoStateChange(idArg: String, stateArg: SecurityInfoState, callback: (Result<Unit>) -> Unit)
+  fun onSecurityInfoStateChange(timestampArg: Long, idArg: String, stateArg: SecurityInfoState, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onSecurityInfoStateChange$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(idArg, stateArg)) {
+    channel.send(listOf(timestampArg, idArg, stateArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -2272,12 +2325,12 @@ class GeckoStateEvents(private val binaryMessenger: BinaryMessenger, private val
       } 
     }
   }
-  fun onIconChange(idArg: String, bytesArg: ByteArray?, callback: (Result<Unit>) -> Unit)
+  fun onIconChange(timestampArg: Long, idArg: String, bytesArg: ByteArray?, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onIconChange$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(idArg, bytesArg)) {
+    channel.send(listOf(timestampArg, idArg, bytesArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -2289,12 +2342,12 @@ class GeckoStateEvents(private val binaryMessenger: BinaryMessenger, private val
       } 
     }
   }
-  fun onThumbnailChange(idArg: String, bytesArg: ByteArray?, callback: (Result<Unit>) -> Unit)
+  fun onThumbnailChange(timestampArg: Long, idArg: String, bytesArg: ByteArray?, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onThumbnailChange$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(idArg, bytesArg)) {
+    channel.send(listOf(timestampArg, idArg, bytesArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))
@@ -2306,12 +2359,12 @@ class GeckoStateEvents(private val binaryMessenger: BinaryMessenger, private val
       } 
     }
   }
-  fun onFindResults(idArg: String, resultsArg: List<FindResultState>, callback: (Result<Unit>) -> Unit)
+  fun onFindResults(timestampArg: Long, idArg: String, resultsArg: List<FindResultState>, callback: (Result<Unit>) -> Unit)
 {
     val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
     val channelName = "dev.flutter.pigeon.flutter_mozilla_components.GeckoStateEvents.onFindResults$separatedMessageChannelSuffix"
     val channel = BasicMessageChannel<Any?>(binaryMessenger, channelName, codec)
-    channel.send(listOf(idArg, resultsArg)) {
+    channel.send(listOf(timestampArg, idArg, resultsArg)) {
       if (it is List<*>) {
         if (it.size > 1) {
           callback(Result.failure(FlutterError(it[0] as String, it[1] as String, it[2] as String?)))

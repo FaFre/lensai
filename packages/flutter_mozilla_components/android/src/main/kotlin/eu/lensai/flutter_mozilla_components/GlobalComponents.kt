@@ -84,8 +84,6 @@ object GlobalComponents {
             Logger.error("Failed to initialize web extension support", e)
         }
 
-        newComponents.tabsUseCases.addTab.invoke("https://google.com", selectTab = true)
-
         _components = newComponents
     }
 }

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
-import 'package:lensai/features/geckoview/domain/providers/tab_state.dart';
+import 'package:lensai/features/geckoview/domain/providers/tab_list.dart';
 
 class TabsActionButton extends HookConsumerWidget {
   final bool isActive;
@@ -16,7 +16,7 @@ class TabsActionButton extends HookConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
 
-    final tabCount = ref.watch(tabStatesProvider.select((tabs) => tabs.length));
+    final tabCount = ref.watch(tabListProvider.select((tabs) => tabs.length));
 
     return InkWell(
       onTap: onTap,

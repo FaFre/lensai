@@ -6,14 +6,14 @@ class TabPreview extends StatelessWidget {
   final bool isActive;
 
   final VoidCallback? onTap;
-  final VoidCallback? onLongPress;
+  final VoidCallback? onDoubleTap;
   final VoidCallback? onDelete;
 
   const TabPreview({
     required this.tab,
     required this.isActive,
     this.onTap,
-    this.onLongPress,
+    this.onDoubleTap,
     this.onDelete,
     super.key,
   });
@@ -35,7 +35,7 @@ class TabPreview extends StatelessWidget {
         child: InkWell(
           borderRadius: const BorderRadius.all(Radius.circular(16.0)),
           onTap: onTap,
-          onLongPress: onLongPress,
+          onDoubleTap: onDoubleTap,
           child: Column(
             children: [
               Row(
