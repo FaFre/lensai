@@ -672,6 +672,7 @@ void main() async {
   // native arbiter has committed a profile and `filesystem.activate()` has bound
   // it: a `ProviderScope` opens databases, and the background-fetch headless task
   // would let a second isolate open the same ones from outside the decision.
+  // ignore: riverpod_lint/missing_provider_scope
   runApp(
     StartupPhaseHost(
       onActivated: () async {

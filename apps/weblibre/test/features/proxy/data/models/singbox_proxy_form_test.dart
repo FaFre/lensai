@@ -40,7 +40,8 @@ void main() {
 
       expect(spec.validate(values), isNull);
 
-      final config = jsonDecode(spec.toConfigJson(values));
+      final config =
+          jsonDecode(spec.toConfigJson(values)) as Map<String, dynamic>;
 
       // sing-box rejects a numeric version; it must be the string "5".
       expect(config['version'], '5');

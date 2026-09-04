@@ -187,7 +187,10 @@ class GestureControlService extends _$GestureControlService {
       case GestureAction.previousContainer:
         await _switchContainer(ContainerCycleDirection.previous);
       case GestureAction.toggleReaderMode:
+        // One-shot reads from this keep-alive service take no subscription,
+        // so nothing auto-disposed is pinned by them.
         final readerActive =
+            // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
             ref.read(tabStateProvider(tabId))?.readerableState.active ?? false;
         await ref
             .read(readerableScreenControllerProvider.notifier)
@@ -259,6 +262,7 @@ class GestureControlService extends _$GestureControlService {
     // them would move browsing state the user cannot see.
     if (!ref.read(generalSettingsWithDefaultsProvider).showContainerUi) return;
 
+    // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
     final cycleOrder = ref.read(containerCycleOrderProvider);
     final index = adjacentContainerIndex(
       cycleOrder.map((container) => container?.id).toList(),
@@ -287,10 +291,12 @@ class GestureControlService extends _$GestureControlService {
   /// Adds the current page to bookmarks, or removes it if already bookmarked,
   /// mirroring the contextual toolbar's bookmark toggle button.
   Future<void> _toggleBookmark(String tabId) async {
+    // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
     final tabState = ref.read(tabStateProvider(tabId));
     if (tabState == null) return;
 
     final bookmarkUrl =
+        // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
         ref.read(sandboxSourceUriForTabProvider(tabId: tabId)) ?? tabState.url;
 
     final repository = ref.read(bookmarksRepositoryProvider.notifier);
@@ -371,6 +377,10 @@ bool gestureSiteExcluded(Ref ref) {
   final tabId = ref.watch(selectedTabProvider);
   if (tabId == null) return false;
 
+  // Kept alive on purpose: the native recognizer config has to follow the
+  // selected tab's site even with no gesture UI on screen, and the tab-state
+  // selector it holds open is a cheap projection of the keep-alive state map.
+  // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
   final url = ref.watch(tabStateProvider(tabId).select((state) => state?.url));
   if (url == null) return false;
 

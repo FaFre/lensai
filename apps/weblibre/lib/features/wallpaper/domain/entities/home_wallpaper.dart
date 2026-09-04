@@ -62,6 +62,9 @@ const defaultHomeWallpaperDim = 0.35;
 /// the selected container's own wallpaper or the profile-wide one wins. Nothing
 /// downstream of that needs to know which of the two it got.
 class HomeWallpaper with FastEquatable {
+  // Compared by `file.path` in `hashParameters`: `File` has identity equality,
+  // so two handles on the same wallpaper would otherwise never match.
+  // ignore: fast_equatable_lint/missing_field_in_equatable_props
   final File file;
 
   /// Gaussian sigma in logical pixels; 0 means no blur.

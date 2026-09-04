@@ -169,18 +169,23 @@ class SmallWebDiscoverService {
       ..shuffle(_random);
 
     for (final altConsole in allConsoles.take(10)) {
+      final List<SmallWebItem> candidates;
+
       try {
         final altPages = await _refreshAndGetPages(altConsole);
         final unvisited = altPages
             .where((p) => !recentItemIds.contains(p.id))
             .toList();
-        final candidates = unvisited.isNotEmpty ? unvisited : altPages;
-
-        if (candidates.isNotEmpty) {
-          return _pickAndRecord(candidates, altConsole);
-        }
+        candidates = unvisited.isNotEmpty ? unvisited : altPages;
       } catch (_) {
         // Skip consoles that fail to fetch; continue trying others.
+        continue;
+      }
+
+      // Deliberately outside the try: the catch above is for consoles that fail
+      // to fetch, and recording the pick failing is not that.
+      if (candidates.isNotEmpty) {
+        return _pickAndRecord(candidates, altConsole);
       }
     }
 

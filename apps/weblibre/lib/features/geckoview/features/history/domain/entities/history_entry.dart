@@ -36,6 +36,10 @@ const int historyVisitContainerMatchWindowMs = 5000;
 /// [historyVisitContainerMatchWindowMs]); empty when the visit was uncontained
 /// or predates history-relation recording.
 class HistoryEntry with FastEquatable {
+  // Destructured into `hashParameters` field by field instead of listed here:
+  // `VisitInfo` is a Pigeon class with identity equality, so listing it would
+  // make every rebuilt entry compare unequal.
+  // ignore: fast_equatable_lint/missing_field_in_equatable_props
   /// The underlying Places visit; still used verbatim for opening the page and
   /// for the precise `(url, time)` Places delete.
   final VisitInfo visit;

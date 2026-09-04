@@ -172,15 +172,13 @@ class FeedSearch extends HookConsumerWidget {
                                 maxLines: 3,
                                 overflow: TextOverflow.ellipsis,
                               )
-                            else
-                              (article.summaryPlain != null)
-                                  ? Text(
-                                      article.summaryPlain!,
-                                      style: theme.textTheme.bodySmall,
-                                      maxLines: 3,
-                                      overflow: TextOverflow.ellipsis,
-                                    )
-                                  : const SizedBox.shrink(),
+                            else if (article.summaryPlain != null)
+                              Text(
+                                article.summaryPlain!,
+                                style: theme.textTheme.bodySmall,
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
                             if (articleDate != null)
                               Align(
                                 alignment: Alignment.topRight,

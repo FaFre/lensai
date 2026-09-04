@@ -67,6 +67,10 @@ class CacheRepository extends _$CacheRepository {
 
   var _revision = 0;
 
+  // A side channel rather than provider state on purpose: see the invalidation
+  // stream's doc above — readers re-read on announcement, they do not rebuild
+  // on a state change.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   Stream<IconCacheInvalidation> get iconInvalidations =>
       _iconInvalidations.stream;
 

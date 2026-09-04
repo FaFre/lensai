@@ -35,34 +35,39 @@ class _FixedOrder extends SearchModuleOrder {
 }
 
 void main() {
-  Widget harness({required bool card}) {
-    return ProviderScope(
-      overrides: [
-        searchModuleOrderProvider(
-          ModuleSurface.search,
-        ).overrideWith(_FixedOrder.new),
-      ],
-      child: MaterialApp(
-        home: Scaffold(
-          body: CustomScrollView(
-            slivers: [
-              SearchModuleSection(
-                title: 'A thought for the road',
-                moduleType: SearchModuleType.quote,
-                totalCount: 0,
-                showPagination: false,
-                card: card,
-                // Without a ModuleSurfaceScope the section behaves like the
-                // search screen, which is the surface that pins its headers.
-                surface: ModuleSurface.search,
-                headerLeading: const Icon(Icons.format_quote),
-                contentSliverBuilder:
-                    ({required isCollapsed, required visibleCount}) => [
-                      if (!isCollapsed)
-                        const SliverToBoxAdapter(child: Text('body')),
-                    ],
-              ),
-            ],
+  // The scope is built inside `pumpWidget` rather than returned from here: a
+  // `ProviderScope` handed to it directly is the root one, and only a *scoped*
+  // scope has to declare `dependencies` for the providers it overrides.
+  Future<void> pumpHarness(WidgetTester tester, {required bool card}) {
+    return tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          searchModuleOrderProvider(
+            ModuleSurface.search,
+          ).overrideWith(_FixedOrder.new),
+        ],
+        child: MaterialApp(
+          home: Scaffold(
+            body: CustomScrollView(
+              slivers: [
+                SearchModuleSection(
+                  title: 'A thought for the road',
+                  moduleType: SearchModuleType.quote,
+                  totalCount: 0,
+                  showPagination: false,
+                  card: card,
+                  // Without a ModuleSurfaceScope the section behaves like the
+                  // search screen, which is the surface that pins its headers.
+                  surface: ModuleSurface.search,
+                  headerLeading: const Icon(Icons.format_quote),
+                  contentSliverBuilder:
+                      ({required isCollapsed, required visibleCount}) => [
+                        if (!isCollapsed)
+                          const SliverToBoxAdapter(child: Text('body')),
+                      ],
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -70,7 +75,7 @@ void main() {
   }
 
   testWidgets('a card never pins its header', (tester) async {
-    await tester.pumpWidget(harness(card: true));
+    await pumpHarness(tester, card: true);
 
     expect(find.byType(DecoratedSliver), findsOneWidget);
     // A pinned header would detach from the decoration painted across the
@@ -81,14 +86,14 @@ void main() {
   testWidgets('a plain section still pins on a pinning surface', (
     tester,
   ) async {
-    await tester.pumpWidget(harness(card: false));
+    await pumpHarness(tester, card: false);
 
     expect(find.byType(SliverPinnedHeader), findsOneWidget);
     expect(find.byType(DecoratedSliver), findsNothing);
   });
 
   testWidgets('a card keeps the title, the mark and the body', (tester) async {
-    await tester.pumpWidget(harness(card: true));
+    await pumpHarness(tester, card: true);
 
     // Sentence case, not the list surfaces' uppercase micro-label.
     expect(find.text('A thought for the road'), findsOneWidget);
@@ -97,7 +102,7 @@ void main() {
   });
 
   testWidgets('a card still collapses from its header', (tester) async {
-    await tester.pumpWidget(harness(card: true));
+    await pumpHarness(tester, card: true);
 
     expect(find.text('body'), findsOneWidget);
 

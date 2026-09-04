@@ -55,20 +55,34 @@ abstract class _$EngineSettingsRepository
   }
 }
 
+/// Kept alive like its `generalSettingsWithDefaults` counterpart: it is
+/// a pure projection of the keep-alive repository, so caching it costs a single
+/// derived value and lets keep-alive consumers read it without pinning an
+/// auto-disposed provider.
+
 @ProviderFor(engineSettingsWithDefaults)
 final engineSettingsWithDefaultsProvider =
     EngineSettingsWithDefaultsProvider._();
 
+/// Kept alive like its `generalSettingsWithDefaults` counterpart: it is
+/// a pure projection of the keep-alive repository, so caching it costs a single
+/// derived value and lets keep-alive consumers read it without pinning an
+/// auto-disposed provider.
+
 final class EngineSettingsWithDefaultsProvider
     extends $FunctionalProvider<EngineSettings, EngineSettings, EngineSettings>
     with $Provider<EngineSettings> {
+  /// Kept alive like its `generalSettingsWithDefaults` counterpart: it is
+  /// a pure projection of the keep-alive repository, so caching it costs a single
+  /// derived value and lets keep-alive consumers read it without pinning an
+  /// auto-disposed provider.
   EngineSettingsWithDefaultsProvider._()
     : super(
         from: null,
         argument: null,
         retry: null,
         name: r'engineSettingsWithDefaultsProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -96,4 +110,4 @@ final class EngineSettingsWithDefaultsProvider
 }
 
 String _$engineSettingsWithDefaultsHash() =>
-    r'd47fa79c0ad87a2357de58133585b4f6b097b068';
+    r'bbaa2384ccb02a46e85c8cf787337f6b7490f8b9';

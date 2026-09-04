@@ -64,6 +64,11 @@ class DesktopMode extends _$DesktopMode {
     // landing on a ruled host forces desktop on again, and leaving it reverts
     // to the browser-wide default. Watching only the host keeps in-page
     // navigations (path/query changes) from clobbering a manual override.
+    // The keep-alive/auto-dispose pairing is the point: this notifier outlives
+    // every menu and sheet so the per-site rule is still applied when the tab
+    // navigates with nothing on screen watching it, and the tab-state selector
+    // it holds open is a cheap projection of the keep-alive tab-state map.
+    // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
     ref.listen(tabStateProvider(tabId), (previous, next) {
       // Only a real host is a page whose rule can be applied. A navigation can
       // pass through a hostless URL on its way — `about:blank` shows up as a
@@ -85,6 +90,7 @@ class DesktopMode extends _$DesktopMode {
     // desktop mode it was actually created with natively (GeckoTabsApi seeds
     // new tabs from BrowserState.desktopMode). Read (not watch) so toggling the
     // global default never clobbers an existing tab's per-tab override.
+    // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
     final resolved = _resolveForHost(ref.read(tabStateProvider(tabId))?.url);
 
     // The engine seeds a tab's desktop mode from the browser-wide default at

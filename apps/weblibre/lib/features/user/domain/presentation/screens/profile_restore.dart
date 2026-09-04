@@ -306,10 +306,10 @@ class ProfileRestoreScreen extends HookConsumerWidget {
                   // a different profile from the one the archive was taken from,
                   // so the state that identifies that profile does not come with
                   // it — see `applyCloneParticipantPolicy`.
-                  ListTile(
+                  const ListTile(
                     contentPadding: EdgeInsets.zero,
-                    leading: const Icon(Icons.info_outline),
-                    title: const Text(
+                    leading: Icon(Icons.info_outline),
+                    title: Text(
                       'A new profile starts without WebLibre sign-in',
                     ),
                     subtitle: Text(

@@ -1,3 +1,8 @@
+// The notifier subclasses below are test doubles: recording what a collaborator
+// was asked to do is their whole purpose, and mutable public fields are how the
+// tests read it back.
+// ignore_for_file: riverpod_lint/avoid_public_notifier_properties
+
 import 'dart:async';
 
 import 'package:flutter_singbox_proxy/flutter_singbox_proxy.dart';

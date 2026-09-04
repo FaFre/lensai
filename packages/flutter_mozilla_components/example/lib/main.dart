@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -14,6 +16,16 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
+  /// Receives the native state events, of which [GeckoView] needs the
+  /// view-ready reports to know when it may attach the browser fragment.
+  final _eventService = GeckoEventService.setUp();
+
+  @override
+  void dispose() {
+    unawaited(_eventService.dispose());
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -45,7 +57,13 @@ class MyAppState extends State<MyApp> {
             ),
           ],
         ),
-        body: const SafeArea(child: Center(child: GeckoView())),
+        body: SafeArea(
+          child: Center(
+            child: GeckoView(
+              viewReadyEvents: _eventService.viewReadyStateEvents,
+            ),
+          ),
+        ),
       ),
     );
   }

@@ -1,3 +1,8 @@
+// The notifier subclasses below are test doubles: recording what a collaborator
+// was asked to do is their whole purpose, and mutable public fields are how the
+// tests read it back.
+// ignore_for_file: riverpod_lint/avoid_public_notifier_properties
+
 import 'dart:async';
 import 'dart:ui';
 
@@ -573,35 +578,32 @@ void main() {
   /// Every other test here activates the service correctly, which is precisely
   /// why they all passed while a headless launch blocked forever. This one
   /// pins the activation itself.
-  test(
-    'a service started with `read` alone never opens the gate',
-    () async {
-      final harness = await _harness(
-        containers: [
-          _container(
-            id: 'container-1',
-            contextId: 'context-a',
-            proxyConnectionId: const SingboxProxyConnectionId('profile-1'),
-          ),
-        ],
-        activateWithReadOnly: true,
-      );
+  test('a service started with `read` alone never opens the gate', () async {
+    final harness = await _harness(
+      containers: [
+        _container(
+          id: 'container-1',
+          contextId: 'context-a',
+          proxyConnectionId: const SingboxProxyConnectionId('profile-1'),
+        ),
+      ],
+      activateWithReadOnly: true,
+    );
 
-      await pumpEventQueue();
+    await pumpEventQueue();
 
-      // Not an aspiration — the observed behaviour, pinned. Every input above
-      // is an already-resolved `Stream.value`, so there is nothing left to wait
-      // for, and the gate still reports all five unresolved forever. That is
-      // the whole defect, reproduced without a device.
-      expect(
-        harness.container.read(containerRoutingSnapshotProvider),
-        isNull,
-        reason:
-            'read-only activation leaves the chain inactive; main.dart must '
-            'activate services with listenManual instead',
-      );
-    },
-  );
+    // Not an aspiration — the observed behaviour, pinned. Every input above
+    // is an already-resolved `Stream.value`, so there is nothing left to wait
+    // for, and the gate still reports all five unresolved forever. That is
+    // the whole defect, reproduced without a device.
+    expect(
+      harness.container.read(containerRoutingSnapshotProvider),
+      isNull,
+      reason:
+          'read-only activation leaves the chain inactive; main.dart must '
+          'activate services with listenManual instead',
+    );
+  });
 }
 
 class _Harness {

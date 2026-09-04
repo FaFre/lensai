@@ -190,6 +190,9 @@ class HomeTargetController extends _$HomeTargetController {
           containerSelection: resolveHomeTargetContainer(
             scopeToContainer: scopeToContainer,
             scopedContainer: scopedContainer,
+            // A one-shot read takes no subscription, so this keep-alive
+            // controller does not pin the auto-disposed stream.
+            // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
             selectedContainer: ref.read(selectedContainerDataProvider).value,
           ),
         );

@@ -227,18 +227,18 @@ class _WanderConsoleSheetContent extends StatelessWidget {
                   selectedConsoleUrl: currentConsoleUrl,
                   isLoading: false,
                 )
+              else if (currentConsoleUrl == null)
+                const Center(
+                  child: Text('No console selected yet. Press Discover.'),
+                )
               else
-                currentConsoleUrl == null
-                    ? const Center(
-                        child: Text('No console selected yet. Press Discover.'),
-                      )
-                    : _LinkedConsoleList(
-                        consoleUrl: currentConsoleUrl,
-                        searchQuery: searchQuery,
-                        scrollController: scrollController,
-                        selectedConsoleUrl: currentConsoleUrl,
-                        isLoading: false,
-                      ),
+                _LinkedConsoleList(
+                  consoleUrl: currentConsoleUrl,
+                  searchQuery: searchQuery,
+                  scrollController: scrollController,
+                  selectedConsoleUrl: currentConsoleUrl,
+                  isLoading: false,
+                ),
               Positioned(
                 right: 16,
                 bottom: 16,

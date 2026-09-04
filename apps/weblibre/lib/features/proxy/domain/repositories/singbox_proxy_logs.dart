@@ -68,10 +68,15 @@ class SingboxProxyLogs extends _$SingboxProxyLogs {
   StreamSubscription<SingboxProxyLogMessage>? _singboxSubscription;
   StreamSubscription<TorLogMessage>? _torSubscription;
 
+  // Deliberately outside `state`: routing the buffer through provider state
+  // would notify every listener thousands of times a minute, which is exactly
+  // what the side channel documented above exists to avoid.
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   /// Buffer contents materialized on demand. Lets a freshly mounted screen
   /// paint the backlog in its first frame.
   List<ProxyLogMessage> get snapshot => List.unmodifiable(_buffer);
 
+  // ignore: riverpod_lint/avoid_public_notifier_properties
   /// Ticks whenever [snapshot] would return something new.
   Stream<void> get changes => _changes.stream;
 

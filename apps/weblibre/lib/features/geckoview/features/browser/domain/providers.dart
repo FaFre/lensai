@@ -1316,6 +1316,10 @@ EquatableValue<List<String>?> sequentialTabNavigationOrder(Ref ref) {
 
   final order = <String>[];
   for (final containerId in containerIds) {
+    // Holding these auto-disposed per-container queries open is the documented
+    // price of a cross-container order that must answer a synchronous read at
+    // the moment of the swipe (see above).
+    // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
     final hasTreeData = ref.watch(
       watchTabsWithRootAndDepthProvider(
         containerId,
@@ -1325,6 +1329,7 @@ EquatableValue<List<String>?> sequentialTabNavigationOrder(Ref ref) {
       return EquatableValue(null);
     }
 
+    // ignore: riverpod_lint/only_use_keep_alive_inside_keep_alive
     final visibleItems = ref
         .watch(
           visibleTabListItemsProvider(

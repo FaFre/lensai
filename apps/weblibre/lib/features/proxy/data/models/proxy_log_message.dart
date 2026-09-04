@@ -84,6 +84,9 @@ class ProxyLogMessage with FastEquatable {
   final int timestamp;
   final String? profileId;
 
+  // Derived from `level`, which is already in `hashParameters`; listing it too
+  // would only force the lazy parse on every comparison.
+  // ignore: fast_equatable_lint/missing_field_in_equatable_props
   /// [level] ranked, computed once per line rather than on every filter pass.
   late final ProxyLogSeverity severity = ProxyLogSeverity.parse(level);
 

@@ -274,7 +274,11 @@ class EngineSettingsRepository extends _$EngineSettingsRepository {
   }
 }
 
-@Riverpod()
+/// Kept alive like its `generalSettingsWithDefaults` counterpart: it is
+/// a pure projection of the keep-alive repository, so caching it costs a single
+/// derived value and lets keep-alive consumers read it without pinning an
+/// auto-disposed provider.
+@Riverpod(keepAlive: true)
 EngineSettings engineSettingsWithDefaults(Ref ref) {
   return ref.watch(
     engineSettingsRepositoryProvider.select(
