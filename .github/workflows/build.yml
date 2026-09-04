@@ -166,7 +166,7 @@ jobs:
       - name: Build App Bundle
         if: steps.build-type.outputs.is_prerelease == 'false'
         working-directory: apps/weblibre
-        run: flutter build appbundle --flavor stable --target-platform android-arm,android-arm64 --no-tree-shake-icons
+        run: flutter build appbundle --flavor stable --target-platform android-arm,android-arm64,android-x64 --no-tree-shake-icons
 
       - name: Create github artifact release (Prerelease)
         if: steps.build-type.outputs.is_prerelease == 'true'

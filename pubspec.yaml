@@ -109,22 +109,22 @@ melos:
       run: |
         set -e
         cd apps/weblibre
-        flutter build apk --release --flavor stable --target-platform android-arm,android-arm64 --split-per-abi --no-tree-shake-icons
+        flutter build apk --release --flavor stable --target-platform android-arm,android-arm64,android-x64 --split-per-abi --no-tree-shake-icons
     build-browser-impeller:
       description: Build stable comparison APKs split per ABI with Impeller enabled
       run: |
         set -e
         cd apps/weblibre
-        flutter build apk --release --flavor stableImpeller --target-platform android-arm,android-arm64 --split-per-abi --no-tree-shake-icons
+        flutter build apk --release --flavor stableImpeller --target-platform android-arm,android-arm64,android-x64 --split-per-abi --no-tree-shake-icons
     build-browser-alpha:
       description: Build alpha release APKs split per ABI with the Skia renderer
       run: |
         set -e
         cd apps/weblibre
-        flutter build apk --release --flavor alpha --target-platform android-arm,android-arm64 --split-per-abi --no-tree-shake-icons
+        flutter build apk --release --flavor alpha --target-platform android-arm,android-arm64,android-x64 --split-per-abi --no-tree-shake-icons
     build-browser-alpha-impeller:
       description: Build alpha comparison APKs split per ABI with Impeller enabled
       run: |
         set -e
         cd apps/weblibre
-        flutter build apk --release --flavor alphaImpeller --target-platform android-arm,android-arm64 --split-per-abi --no-tree-shake-icons
+        flutter build apk --release --flavor alphaImpeller --target-platform android-arm,android-arm64,android-x64 --split-per-abi --no-tree-shake-icons
