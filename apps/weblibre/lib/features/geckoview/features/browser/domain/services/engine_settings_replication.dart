@@ -291,30 +291,6 @@ class EngineSettingsReplicationService
             // sole source of truth for the color scheme; see the themeMode listener
             // above. EngineSettings.preferredColorScheme is vestigial and always
             // `system`, so replicating it would clobber the real theme (issue #436).
-            if (previous.value?.cookieBannerHandlingMode !=
-                settings.cookieBannerHandlingMode) {
-              await _service.cookieBannerHandlingMode(
-                settings.cookieBannerHandlingMode,
-              );
-            }
-            if (previous.value?.cookieBannerHandlingModePrivateBrowsing !=
-                settings.cookieBannerHandlingModePrivateBrowsing) {
-              await _service.cookieBannerHandlingModePrivateBrowsing(
-                settings.cookieBannerHandlingModePrivateBrowsing,
-              );
-            }
-            if (previous.value?.cookieBannerHandlingGlobalRules !=
-                settings.cookieBannerHandlingGlobalRules) {
-              await _service.cookieBannerHandlingGlobalRules(
-                settings.cookieBannerHandlingGlobalRules,
-              );
-            }
-            if (previous.value?.cookieBannerHandlingGlobalRulesSubFrames !=
-                settings.cookieBannerHandlingGlobalRulesSubFrames) {
-              await _service.cookieBannerHandlingGlobalRulesSubFrames(
-                settings.cookieBannerHandlingGlobalRulesSubFrames,
-              );
-            }
             if (previous.value?.contentBlocking != settings.contentBlocking) {
               await _service.contentBlocking(settings.contentBlocking);
             }

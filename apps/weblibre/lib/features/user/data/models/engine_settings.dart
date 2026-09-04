@@ -116,18 +116,6 @@ class EngineSettings extends GeckoEngineSettings with FastEquatable {
   @override
   bool get globalPrivacyControlEnabled => super.globalPrivacyControlEnabled!;
   @override
-  CookieBannerHandlingMode get cookieBannerHandlingMode =>
-      super.cookieBannerHandlingMode!;
-  @override
-  CookieBannerHandlingMode get cookieBannerHandlingModePrivateBrowsing =>
-      super.cookieBannerHandlingModePrivateBrowsing!;
-  @override
-  bool get cookieBannerHandlingGlobalRules =>
-      super.cookieBannerHandlingGlobalRules!;
-  @override
-  bool get cookieBannerHandlingGlobalRulesSubFrames =>
-      super.cookieBannerHandlingGlobalRulesSubFrames!;
-  @override
   bool get enterpriseRootsEnabled => super.enterpriseRootsEnabled!;
 
   @override
@@ -239,10 +227,6 @@ class EngineSettings extends GeckoEngineSettings with FastEquatable {
     required super.httpsOnlyMode,
     required super.globalPrivacyControlEnabled,
     required super.preferredColorScheme,
-    required super.cookieBannerHandlingMode,
-    required super.cookieBannerHandlingModePrivateBrowsing,
-    required super.cookieBannerHandlingGlobalRules,
-    required super.cookieBannerHandlingGlobalRulesSubFrames,
     required super.userAgent,
     required super.enterpriseRootsEnabled,
     required this.queryParameterStripping,
@@ -296,10 +280,6 @@ class EngineSettings extends GeckoEngineSettings with FastEquatable {
     HttpsOnlyMode? httpsOnlyMode,
     bool? globalPrivacyControlEnabled,
     ColorScheme? preferredColorScheme,
-    CookieBannerHandlingMode? cookieBannerHandlingMode,
-    CookieBannerHandlingMode? cookieBannerHandlingModePrivateBrowsing,
-    bool? cookieBannerHandlingGlobalRules,
-    bool? cookieBannerHandlingGlobalRulesSubFrames,
     QueryParameterStripping? queryParameterStripping,
     BounceTrackingProtectionMode? bounceTrackingProtectionMode,
     super.userAgent,
@@ -370,15 +350,6 @@ class EngineSettings extends GeckoEngineSettings with FastEquatable {
          httpsOnlyMode: httpsOnlyMode ?? HttpsOnlyMode.enabled,
          globalPrivacyControlEnabled: globalPrivacyControlEnabled ?? true,
          preferredColorScheme: preferredColorScheme ?? ColorScheme.system,
-         cookieBannerHandlingMode:
-             cookieBannerHandlingMode ?? CookieBannerHandlingMode.rejectAll,
-         cookieBannerHandlingModePrivateBrowsing:
-             cookieBannerHandlingModePrivateBrowsing ??
-             CookieBannerHandlingMode.rejectAll,
-         cookieBannerHandlingGlobalRules:
-             cookieBannerHandlingGlobalRules ?? true,
-         cookieBannerHandlingGlobalRulesSubFrames:
-             cookieBannerHandlingGlobalRulesSubFrames ?? true,
          enterpriseRootsEnabled: enterpriseRootsEnabled ?? false,
          fingerprintingProtectionOverrides:
              fingerprintingProtectionOverrides ??
@@ -452,10 +423,6 @@ class EngineSettings extends GeckoEngineSettings with FastEquatable {
     httpsOnlyMode,
     globalPrivacyControlEnabled,
     preferredColorScheme,
-    cookieBannerHandlingMode,
-    cookieBannerHandlingModePrivateBrowsing,
-    cookieBannerHandlingGlobalRules,
-    cookieBannerHandlingGlobalRulesSubFrames,
     userAgent,
     enterpriseRootsEnabled,
     queryParameterStripping,

@@ -138,10 +138,6 @@ class Core(
             // sessions report the correct `prefers-color-scheme` before Flutter
             // (the source of truth) runs. Defaults to System. See issue #436.
             preferredColorScheme = ColorSchemePreference.read(prefs),
-            cookieBannerHandlingMode = EngineSession.CookieBannerHandlingMode.REJECT_ALL,
-            cookieBannerHandlingModePrivateBrowsing = EngineSession.CookieBannerHandlingMode.REJECT_ALL,
-            cookieBannerHandlingGlobalRules = true,
-            cookieBannerHandlingGlobalRulesSubFrames = true,
             downloadDelegate = EngineDownloadDelegate(
                 context = context,
                 downloadLocation = {

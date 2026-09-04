@@ -61,25 +61,6 @@ class EngineSettingsRepository extends _$EngineSettingsRepository {
       ),
       'globalPrivacyControlEnabled': settings['globalPrivacyControlEnabled']
           ?.readAs(DriftSqlType.bool, db.typeMapping),
-      'cookieBannerHandlingMode': settings['cookieBannerHandlingMode']?.readAs(
-        DriftSqlType.string,
-        db.typeMapping,
-      ),
-      'cookieBannerHandlingModePrivateBrowsing':
-          settings['cookieBannerHandlingModePrivateBrowsing']?.readAs(
-            DriftSqlType.string,
-            db.typeMapping,
-          ),
-      'cookieBannerHandlingGlobalRules':
-          settings['cookieBannerHandlingGlobalRules']?.readAs(
-            DriftSqlType.bool,
-            db.typeMapping,
-          ),
-      'cookieBannerHandlingGlobalRulesSubFrames':
-          settings['cookieBannerHandlingGlobalRulesSubFrames']?.readAs(
-            DriftSqlType.bool,
-            db.typeMapping,
-          ),
       'userAgent': settings['userAgent']?.readAs(
         DriftSqlType.string,
         db.typeMapping,

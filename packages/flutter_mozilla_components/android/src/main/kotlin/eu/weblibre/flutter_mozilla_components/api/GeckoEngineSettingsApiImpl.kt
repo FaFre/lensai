@@ -13,7 +13,6 @@ import eu.weblibre.flutter_mozilla_components.feature.ReaderViewAppearanceFeatur
 import eu.weblibre.flutter_mozilla_components.history.HistoryExclusions
 import eu.weblibre.flutter_mozilla_components.pigeons.BounceTrackingProtectionMode as PigeonBounceTrackingProtectionMode
 import eu.weblibre.flutter_mozilla_components.pigeons.ColorScheme
-import eu.weblibre.flutter_mozilla_components.pigeons.CookieBannerHandlingMode
 import eu.weblibre.flutter_mozilla_components.pigeons.CustomCookiePolicy
 import eu.weblibre.flutter_mozilla_components.pigeons.DohSettingsMode
 import eu.weblibre.flutter_mozilla_components.pigeons.GeckoEngineSettings
@@ -213,26 +212,6 @@ class GeckoEngineSettingsApiImpl(
                 ColorScheme.DARK -> PreferredColorScheme.Dark
             }
         }
-        if(settings.cookieBannerHandlingMode != null) {
-            components.core.engineSettings.cookieBannerHandlingMode = when(settings.cookieBannerHandlingMode) {
-                CookieBannerHandlingMode.DISABLED -> EngineSession.CookieBannerHandlingMode.DISABLED
-                CookieBannerHandlingMode.REJECT_ALL -> EngineSession.CookieBannerHandlingMode.REJECT_ALL
-                CookieBannerHandlingMode.REJECT_OR_ACCEPT_ALL -> EngineSession.CookieBannerHandlingMode.REJECT_OR_ACCEPT_ALL
-            }
-        }
-        if(settings.cookieBannerHandlingModePrivateBrowsing != null) {
-            components.core.engineSettings.cookieBannerHandlingModePrivateBrowsing = when(settings.cookieBannerHandlingModePrivateBrowsing) {
-                CookieBannerHandlingMode.DISABLED -> EngineSession.CookieBannerHandlingMode.DISABLED
-                CookieBannerHandlingMode.REJECT_ALL -> EngineSession.CookieBannerHandlingMode.REJECT_ALL
-                CookieBannerHandlingMode.REJECT_OR_ACCEPT_ALL -> EngineSession.CookieBannerHandlingMode.REJECT_OR_ACCEPT_ALL
-            }
-        }
-        if(settings.cookieBannerHandlingGlobalRules != null) {
-            components.core.engineSettings.cookieBannerHandlingGlobalRules = settings.cookieBannerHandlingGlobalRules;
-        }
-        if(settings.cookieBannerHandlingGlobalRulesSubFrames != null) {
-            components.core.engineSettings.cookieBannerHandlingGlobalRulesSubFrames = settings.cookieBannerHandlingGlobalRulesSubFrames;
-        }
         if(settings.userAgent != null) {
             components.core.engineSettings.userAgentString = settings.userAgent;
         }
@@ -342,20 +321,6 @@ class GeckoEngineSettingsApiImpl(
                 ColorSchemePreference.write(components.core.prefs, scheme)
             }
             reloadSession = true
-        }
-        if(settings.cookieBannerHandlingMode != null) {
-            components.core.engine.settings.cookieBannerHandlingMode = components.core.engineSettings.cookieBannerHandlingMode
-            reloadSession = true
-        }
-        if(settings.cookieBannerHandlingModePrivateBrowsing != null) {
-            components.core.engine.settings.cookieBannerHandlingModePrivateBrowsing = components.core.engineSettings.cookieBannerHandlingModePrivateBrowsing
-            reloadSession = true
-        }
-        if(settings.cookieBannerHandlingGlobalRules != null) {
-            components.core.engine.settings.cookieBannerHandlingGlobalRules = components.core.engineSettings.cookieBannerHandlingGlobalRules
-        }
-        if(settings.cookieBannerHandlingGlobalRulesSubFrames != null) {
-            components.core.engine.settings.cookieBannerHandlingGlobalRulesSubFrames = components.core.engineSettings.cookieBannerHandlingGlobalRulesSubFrames
         }
         if(settings.userAgent != null) {
             components.core.engine.settings.userAgentString = components.core.engineSettings.userAgentString

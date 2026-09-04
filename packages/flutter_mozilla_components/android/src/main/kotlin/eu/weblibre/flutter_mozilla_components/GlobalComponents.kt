@@ -53,6 +53,7 @@ import mozilla.components.browser.state.action.RestoreCompleteAction
 import mozilla.components.browser.state.action.TabListAction
 import mozilla.components.browser.state.action.CustomTabListAction
 import mozilla.components.browser.state.selector.findCustomTab
+import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.ExperimentalAndroidComponentsApi
 import mozilla.components.concept.engine.selection.SelectionActionDelegate
 import mozilla.components.concept.engine.preferences.Branch
@@ -522,11 +523,19 @@ object GlobalComponents {
                 WebExtensionSupport.initialize(
                     newComponents.core.engine,
                     newComponents.core.store,
-                    onNewTabOverride = { _, engineSession, url, active ->
+                    // Decides whether an extension popup opens in a private engine
+                    // session, and whether extensions that aren't allowed in private
+                    // browsing are suppressed at all. We have no app-wide browsing
+                    // mode, so the selected tab stands in for it.
+                    isInPrivateBrowsingMode = {
+                        newComponents.core.store.state.selectedTab?.content?.private == true
+                    },
+                    onNewTabOverride = { _, engineSession, url, active, isPrivate ->
                         newComponents.useCases.tabsUseCases.addTab(
                             url,
                             selectTab = active,
-                            engineSession = engineSession
+                            engineSession = engineSession,
+                            private = isPrivate
                         )
                     },
                     onCloseTabOverride = { _, sessionId ->

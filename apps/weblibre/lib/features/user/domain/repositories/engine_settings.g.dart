@@ -34,7 +34,7 @@ final class EngineSettingsRepositoryProvider
 }
 
 String _$engineSettingsRepositoryHash() =>
-    r'4d5ec3e5ca07b2e385a088a8774ca9badd74ca78';
+    r'd6d1677df7f949ca5721d7d17433e40cb0032ac4';
 
 abstract class _$EngineSettingsRepository
     extends $StreamNotifier<EngineSettings> {

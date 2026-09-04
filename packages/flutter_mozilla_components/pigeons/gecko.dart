@@ -990,6 +990,9 @@ enum BounceTrackingProtectionMode {
 
 enum ColorScheme { system, light, dark }
 
+// Dead since AC/Gecko 155 removed cookie banner handling (bug 2058143). Nothing
+// reads these any more; drop them (and the `cookieBannerHandling*` fields of
+// GeckoEngineSettings below)
 enum CookieBannerHandlingMode { disabled, rejectAll, rejectOrAcceptAll }
 
 /// App links behavior mode - controls how external app links are handled

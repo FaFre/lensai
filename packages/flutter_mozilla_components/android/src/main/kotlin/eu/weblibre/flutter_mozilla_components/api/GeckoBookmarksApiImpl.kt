@@ -136,8 +136,7 @@ class GeckoBookmarksApiImpl() : GeckoBookmarksApi {
             withContext(Dispatchers.Main) {
                 components.core.bookmarksStorage.getRecentBookmarks(
                     limit = limit.toInt(),
-                    maxAge = maxAge,
-                    currentTime = currentTime
+                    maxAge = maxAge
                 ).fold(
                     { nodes -> callback(Result.success(nodes.map { it.toPigeonBookmarkNode() })) },
                     { e -> callback(Result.failure(e)) }

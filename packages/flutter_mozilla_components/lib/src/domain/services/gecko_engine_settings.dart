@@ -97,32 +97,6 @@ class GeckoEngineSettingsService {
     );
   }
 
-  Future<void> cookieBannerHandlingMode(CookieBannerHandlingMode state) {
-    return _api.updateRuntimeSettings(
-      GeckoEngineSettings(cookieBannerHandlingMode: state),
-    );
-  }
-
-  Future<void> cookieBannerHandlingModePrivateBrowsing(
-    CookieBannerHandlingMode state,
-  ) {
-    return _api.updateRuntimeSettings(
-      GeckoEngineSettings(cookieBannerHandlingModePrivateBrowsing: state),
-    );
-  }
-
-  Future<void> cookieBannerHandlingGlobalRules(bool state) {
-    return _api.updateRuntimeSettings(
-      GeckoEngineSettings(cookieBannerHandlingGlobalRules: state),
-    );
-  }
-
-  Future<void> cookieBannerHandlingGlobalRulesSubFrames(bool state) {
-    return _api.updateRuntimeSettings(
-      GeckoEngineSettings(cookieBannerHandlingGlobalRulesSubFrames: state),
-    );
-  }
-
   Future<void> contentBlocking(ContentBlocking state) {
     return _api.updateRuntimeSettings(
       GeckoEngineSettings(contentBlocking: state),
