@@ -1605,6 +1605,12 @@ RouteBase get $settingsRoute => GoRouteData.$route(
       factory: $GeneralSettingsRoute._fromState,
     ),
     GoRouteData.$route(
+      path: 'transfer',
+      name: 'SettingsTransferRoute',
+      hasOverriddenOnExit: false,
+      factory: $SettingsTransferRoute._fromState,
+    ),
+    GoRouteData.$route(
       path: 'browsing',
       name: 'BrowsingSettingsRoute',
       hasOverriddenOnExit: false,
@@ -1865,6 +1871,27 @@ mixin $GeneralSettingsRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/settings/general');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $SettingsTransferRoute on GoRouteData {
+  static SettingsTransferRoute _fromState(GoRouterState state) =>
+      const SettingsTransferRoute();
+
+  @override
+  String get location => GoRouteData.$location('/settings/transfer');
 
   @override
   void go(BuildContext context) => context.go(location);

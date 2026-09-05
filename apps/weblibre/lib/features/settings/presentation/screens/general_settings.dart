@@ -136,6 +136,22 @@ const List<SettingsSectionDefinition> generalSettingsSections = [
         ],
         child: _BackupProfileTile(),
       ),
+      SettingsEntryDefinition(
+        title: 'Export & Import Settings',
+        subtitle: 'Move settings to another profile, device, or a bug report',
+        keywords: [
+          'export',
+          'import',
+          'settings',
+          'transfer',
+          'share',
+          'clipboard',
+          'json',
+          'copy',
+          'migrate',
+        ],
+        child: _SettingsTransferTile(),
+      ),
     ],
   ),
   SettingsSectionDefinition(
@@ -183,6 +199,28 @@ class _BackupProfileTile extends HookConsumerWidget {
               ).push(context);
             }
           : null,
+    );
+  }
+}
+
+/// Settings only — the profile backup above it is the whole-profile answer.
+///
+/// Sits next to it because that is where people look for "get my setup onto
+/// the other device", and the two differ in what they carry rather than in
+/// where they live.
+class _SettingsTransferTile extends StatelessWidget {
+  const _SettingsTransferTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(MdiIcons.swapHorizontal),
+      title: const Text('Export & Import Settings'),
+      subtitle: const Text(
+        'Write settings to a file or the clipboard, and read them back',
+      ),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () => const SettingsTransferRoute().push(context),
     );
   }
 }
