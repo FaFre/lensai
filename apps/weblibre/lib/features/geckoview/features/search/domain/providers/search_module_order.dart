@@ -26,6 +26,7 @@ import 'package:riverpod_annotation/experimental/persist.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:weblibre/features/geckoview/features/search/domain/providers/search_modules_view.dart';
 import 'package:weblibre/features/user/data/providers.dart';
+import 'package:weblibre/utils/ordered_layout.dart';
 
 part 'search_module_order.g.dart';
 
@@ -47,46 +48,23 @@ class ModuleOrderEntry with FastEquatable {
 
 /// Reconciles a persisted module order with the surface's current defaults.
 ///
-/// Persisted entries whose module no longer exists on the surface are dropped,
-/// and modules that were added since the order was saved are inserted at their
-/// position in [defaults] rather than appended, so a new module lands where it
-/// was designed to sit instead of at the bottom of the user's list.
-///
-/// Pure and exported so the reconciliation can be tested directly — it runs on
-/// every read of a persisted order, and a regression here silently rewrites
-/// user configuration.
+/// Thin wrapper over [mergeOrderedLayout], which carries the reconciliation
+/// rules (drop modules that no longer exist, insert newly shipped ones at their
+/// designed position rather than the bottom) shared with the browser menu's
+/// layout. Kept as a named function because it is the tested entry point for
+/// this surface.
 List<ModuleOrderEntry> mergeModuleOrderWithDefaults(
   List<ModuleOrderEntry>? persisted,
   List<ModuleSurfaceDefault> defaults,
 ) {
-  List<ModuleOrderEntry> fromDefaults() => defaults
-      .map((d) => ModuleOrderEntry(type: d.type, visible: d.visible))
-      .toList();
-
-  if (persisted == null) {
-    return fromDefaults();
-  }
-
-  final offered = {for (final d in defaults) d.type: d};
-  // Keep persisted entries that are still valid
-  final result = persisted.where((e) => offered.containsKey(e.type)).toList();
-  // Insert any new defaults at their position from the defaults list so newly
-  // introduced modules land where they're meant to (e.g. at the top), instead
-  // of trailing the user's persisted order. They keep the default's own
-  // visibility, so a module can be offered without being switched on for
-  // everyone who already customised this surface.
-  final persistedTypes = result.map((e) => e.type).toSet();
-  for (var i = 0; i < defaults.length; i++) {
-    final entry = defaults[i];
-    if (!persistedTypes.contains(entry.type)) {
-      final insertAt = i.clamp(0, result.length);
-      result.insert(
-        insertAt,
-        ModuleOrderEntry(type: entry.type, visible: entry.visible),
-      );
-    }
-  }
-  return result;
+  return mergeOrderedLayout(
+    persisted: persisted,
+    defaults: defaults,
+    entryKey: (entry) => entry.type,
+    defaultKey: (definition) => definition.type,
+    fromDefault: (definition) =>
+        ModuleOrderEntry(type: definition.type, visible: definition.visible),
+  );
 }
 
 @Riverpod(keepAlive: true)

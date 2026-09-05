@@ -81,10 +81,9 @@ void main() {
 
       final document = decodeSettingsExport(text);
       expect(document.redacted, ['general.unshortenerToken']);
-      expect(
-        service().availableSections(document),
-        {SettingsTransferSection.settings},
-      );
+      expect(service().availableSections(document), {
+        SettingsTransferSection.settings,
+      });
     });
   });
 

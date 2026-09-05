@@ -268,8 +268,10 @@ class SettingsTransferScreen extends HookConsumerWidget {
                   const ListTile(
                     leading: Icon(MdiIcons.fileExportOutline),
                     title: Text('Export'),
-                    subtitle: Text('Write the sections you pick as a file you '
-                        'can read'),
+                    subtitle: Text(
+                      'Write the sections you pick as a file you '
+                      'can read',
+                    ),
                   ),
                   for (final section in SettingsTransferSection.values)
                     CheckboxListTile(
@@ -332,8 +334,10 @@ class SettingsTransferScreen extends HookConsumerWidget {
                   const ListTile(
                     leading: Icon(MdiIcons.fileImportOutline),
                     title: Text('Import'),
-                    subtitle: Text('You choose what to apply after the file is '
-                        'read'),
+                    subtitle: Text(
+                      'You choose what to apply after the file is '
+                      'read',
+                    ),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 4, 16, 16),
