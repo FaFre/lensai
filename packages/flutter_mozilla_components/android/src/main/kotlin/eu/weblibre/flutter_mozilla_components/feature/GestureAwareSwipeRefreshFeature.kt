@@ -9,6 +9,7 @@ import android.view.HapticFeedbackConstants
 import android.view.View
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import eu.weblibre.flutter_mozilla_components.GlobalComponents
+import eu.weblibre.flutter_mozilla_components.widget.ZoomAwareSwipeRefreshLayout
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,10 +27,12 @@ import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifAnyChanged
 /**
  * A gesture-aware variant of Mozilla's `SwipeRefreshFeature`.
  *
- * Behaves exactly like the upstream feature (coordinates a [SwipeRefreshLayout]
- * with the session's loading state and reloads on a pull-down at the top of the
- * page), with one addition: if the same touch sequence was recognized as a
- * configured touch gesture, the reload is suppressed.
+ * Behaves exactly like the upstream feature (coordinates a
+ * [ZoomAwareSwipeRefreshLayout] with the session's loading state and reloads on
+ * a pull-down at the top of the page), with two additions: the reload is
+ * suppressed if the same touch sequence was recognized as a configured touch
+ * gesture, and pull-to-refresh stands down entirely for a stroke the layout
+ * classified as a zoom.
  *
  * Why: the gesture recognizer in `BackGestureFilterFrameLayout` is purely
  * observational (it never consumes events), so a down-leading gesture — e.g.
@@ -49,7 +52,7 @@ import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifAnyChanged
 class GestureAwareSwipeRefreshFeature(
     private val store: BrowserStore,
     private val reloadUrlUseCase: SessionUseCases.ReloadUrlUseCase,
-    private val swipeRefreshLayout: SwipeRefreshLayout,
+    private val swipeRefreshLayout: ZoomAwareSwipeRefreshLayout,
     private val tabId: String? = null,
     private val mainDispatcher: CoroutineDispatcher = Dispatchers.Main,
 ) : LifecycleAwareFeature,
@@ -87,16 +90,25 @@ class GestureAwareSwipeRefreshFeature(
 
     @Suppress("Deprecation")
     override fun canChildScrollUp(parent: SwipeRefreshLayout, child: View?) =
-        if (child is EngineView) {
-            !child.getInputResultDetail().canOverscrollTop()
-        } else {
-            true
+        when {
+            // Report the page as scrolled-down for the whole of a pinch or
+            // quick-scale stroke, which is how this callback says "no pull
+            // here". Keeps the layout from starting a drag on the trailing
+            // single-pointer part of a zoom (see
+            // [ZoomAwareSwipeRefreshLayout.strokeIsZoomGesture]).
+            swipeRefreshLayout.strokeIsZoomGesture -> true
+            child is EngineView -> !child.getInputResultDetail().canOverscrollTop()
+            else -> true
         }
 
     override fun onRefresh() {
-        // A configured touch gesture already handled this stroke; don't also
-        // reload. Retract the throbber the layout showed during the pull.
-        if (GlobalComponents.touchConsumedByGesture) {
+        // A configured touch gesture already handled this stroke, or the stroke
+        // was a zoom; don't also reload. Retract the throbber the layout showed
+        // during the pull. The zoom guard is a second line of defence behind
+        // [canChildScrollUp]: a pull that had already been intercepted before
+        // the second finger landed keeps running in the layout's own
+        // onTouchEvent, which never consults that callback again.
+        if (GlobalComponents.touchConsumedByGesture || swipeRefreshLayout.strokeIsZoomGesture) {
             swipeRefreshLayout.isRefreshing = false
             return
         }

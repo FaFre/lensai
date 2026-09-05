@@ -457,6 +457,14 @@ class _BrowserContentPositioned extends ConsumerWidget {
   final double topAppBarTotalHeight;
   final double bottomAppBarTotalHeight;
 
+  /// Height of the screen the soft keyboard (and the find-in-page bar above it)
+  /// takes from the bottom edge, measured from the window's bottom.
+  ///
+  /// Applied as a real bottom offset so the engine view — and with it Gecko's
+  /// visual viewport — actually shrinks to the visible area. See the note on
+  /// `keyboardViewportInset` in [BrowserScreen].
+  final double keyboardViewportInset;
+
   const _BrowserContentPositioned({
     required this.overlayController,
     required this.pointerMoveEventsController,
@@ -470,6 +478,7 @@ class _BrowserContentPositioned extends ConsumerWidget {
     required this.sideRailTotalWidth,
     required this.topAppBarTotalHeight,
     required this.bottomAppBarTotalHeight,
+    required this.keyboardViewportInset,
   });
 
   @override
@@ -490,10 +499,16 @@ class _BrowserContentPositioned extends ConsumerWidget {
     // (unless toolbar is manually dismissed via swipe gesture).
     // Gated to horizontal positions so the rail (which forces
     // auto-hide off) doesn't reserve a phantom bottom inset.
-    final bottomOffset =
-        (tabBarPosition.isHorizontal && !autoHideTabBar && toolbarVisible)
-        ? bottomAppBarTotalHeight
-        : 0.0;
+    //
+    // Both this and the keyboard inset are measured from the window's bottom
+    // edge, so the browser clears whichever reaches higher — the keyboard is
+    // drawn over the toolbar, not stacked on it.
+    final bottomOffset = math.max(
+      (tabBarPosition.isHorizontal && !autoHideTabBar && toolbarVisible)
+          ? bottomAppBarTotalHeight
+          : 0.0,
+      keyboardViewportInset,
+    );
 
     // For top bar: constrain browser below toolbar when visible
     // to ensure top-of-page content is always accessible
@@ -521,12 +536,13 @@ class _BrowserContentPositioned extends ConsumerWidget {
     // `sheetDisplayed` is likewise excluded here: toggling the safe-area
     // padding on sheet open/close would resize the platform view for content
     // the sheet covers anyway.
-    final applyBottomSafeArea = isRail
-        ? (!tabInFullScreen && !isSmallWebActive)
-        : (!tabInFullScreen &&
-              !isSmallWebActive &&
-              bottomOffset == 0 &&
-              toolbarState == ToolbarVisibility.dismissed);
+    final applyBottomSafeArea =
+        bottomOffset == 0 &&
+        (isRail
+            ? (!tabInFullScreen && !isSmallWebActive)
+            : (!tabInFullScreen &&
+                  !isSmallWebActive &&
+                  toolbarState == ToolbarVisibility.dismissed));
 
     return Positioned(
       left: leftOffset,
@@ -1348,7 +1364,6 @@ class BrowserScreen extends HookConsumerWidget {
     final findInPageHeight = findInPageVisible
         ? FindInPageWidget.findInPageHeight
         : 0.0;
-    final findInPageHeightPx = (findInPageHeight * pixelRatio).round();
 
     // Track dismissed state without triggering full rebuild on every
     // hide/show. Updated via ref.listen below and synced on tab switch.
@@ -1372,12 +1387,6 @@ class BrowserScreen extends HookConsumerWidget {
         : 0.0;
     final stableToolbarHeightPx = (stableToolbarHeight * pixelRatio).round();
 
-    // Compute toolbar visibility for keyboard inset math.
-    // Uses ref.watch via the toolbarDismissed useState to avoid
-    // subscribing to every hide/show toggle.
-    final toolbarVisibleForLayout =
-        sheetDisplayed || (!tabInFullScreen && !toolbarDismissed.value);
-
     final keyboardHeightPx = useState<int?>(null);
 
     useOnStreamChange(
@@ -1396,15 +1405,34 @@ class BrowserScreen extends HookConsumerWidget {
 
     final keyboardVisible = keyboardHeightPx.value != null;
 
-    final bottomLayoutReservedPx = (!autoHideTabBar && toolbarVisibleForLayout)
-        ? (bottomAppBarTotalHeight * pixelRatio).round()
-        : 0;
-    final keyboardViewportHeightPx = keyboardVisible
-        ? math.max(0, keyboardHeightPx.value! - bottomLayoutReservedPx)
-        : 0;
+    // How far up from the window's bottom edge the browser has to stop while
+    // the soft keyboard is up (plus the find-in-page bar, which is drawn over
+    // the page just above it).
+    //
+    // This is a real inset on the platform view, not a dynamic-toolbar height.
+    // Gecko sizes the visual viewport from the view it is given and treats a
+    // dynamic toolbar as chrome that scrolls away, so describing the keyboard
+    // as one leaves the last `keyboardHeight` pixels of every document
+    // unreachable — and leaves Gecko believing a focused input behind the
+    // keyboard is already on screen, so it never scrolls it into view. Shrink
+    // the view instead, which is what a plain `adjustResize` window would do
+    // and what GeckoView's own keyboard handling (`onKeyboardHeight`, fed from
+    // the window insets) expects. See
+    // https://github.com/FaFre/WebLibre/issues/502.
+    //
+    // A sheet is excluded: it covers the page, so a keyboard opened for a field
+    // *in the sheet* has nothing to make room for, and resizing the platform
+    // view under it would cost a reflow and a native surface recreation in the
+    // same frame as the sheet's animation.
+    final keyboardApplies = keyboardVisible && !sheetDisplayed;
+    final keyboardViewportInset = keyboardApplies
+        ? (keyboardHeightPx.value! / pixelRatio) + findInPageHeight
+        : 0.0;
 
-    final effectiveToolbarHeightPx = keyboardVisible
-        ? keyboardViewportHeightPx + findInPageHeightPx
+    // While the keyboard is up the bottom bar sits behind it, not over the
+    // page, so there is no dynamic toolbar overlapping the (now shorter) view.
+    final effectiveToolbarHeightPx = keyboardApplies
+        ? 0
         : stableToolbarHeightPx;
 
     final lastToolbarMaxHeightPx = useRef<int?>(null);
@@ -1547,6 +1575,7 @@ class BrowserScreen extends HookConsumerWidget {
                 sideRailTotalWidth: sideRailTotalWidth,
                 topAppBarTotalHeight: topAppBarTotalHeight,
                 bottomAppBarTotalHeight: bottomAppBarTotalHeight,
+                keyboardViewportInset: keyboardViewportInset,
               ),
 
               // Layer 0.5: System bar tint — fills the status-bar/nav-bar

@@ -28,6 +28,7 @@ import 'package:weblibre/features/sync/domain/entities/sync_repository_state.dar
 import 'package:weblibre/features/sync/domain/repositories/sync.dart';
 import 'package:weblibre/features/web_search/domain/controllers/sandbox_capture_controller.dart';
 import 'package:weblibre/presentation/widgets/failure_widget.dart';
+import 'package:weblibre/presentation/widgets/multi_finger_tap_guard.dart';
 import 'package:weblibre/utils/ui_helper.dart' as ui_helper;
 
 class MainApp extends HookConsumerWidget {
@@ -100,11 +101,13 @@ class MainApp extends HookConsumerWidget {
             return _AppMediaQueryOverrides(
               uiScaleFactor: uiScaleFactor,
               disableAnimations: disableAnimations,
-              child: _SyncEventListener(
-                child: _SandboxCaptureErrorListener(
-                  child: _DownloadStoppedListener(
-                    child: _StrictContainerBlockListener(
-                      child: child ?? const SizedBox.shrink(),
+              child: MultiFingerTapGuard(
+                child: _SyncEventListener(
+                  child: _SandboxCaptureErrorListener(
+                    child: _DownloadStoppedListener(
+                      child: _StrictContainerBlockListener(
+                        child: child ?? const SizedBox.shrink(),
+                      ),
                     ),
                   ),
                 ),

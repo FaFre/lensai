@@ -22,12 +22,12 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <mozilla.components.ui.widgets.VerticalSwipeRefreshLayout
+        <eu.weblibre.flutter_mozilla_components.widget.ZoomAwareSwipeRefreshLayout
             android:id="@+id/swipeToRefresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
             <!-- Inject engine here -->
-        </mozilla.components.ui.widgets.VerticalSwipeRefreshLayout>
+        </eu.weblibre.flutter_mozilla_components.widget.ZoomAwareSwipeRefreshLayout>
 
         <!-- paddingBottom is applied dynamically in ReaderViewIntegration to
              clear the Flutter bottom app bar + system navigation inset under
