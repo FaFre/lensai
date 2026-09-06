@@ -116,6 +116,13 @@ class ConnectionSection extends ConsumerWidget {
             ? 'All through ${proxyConnectionTitle(proxyOptions, routingSettings.regularTabsProxyConnectionId!)}'
             : 'Per container',
         onTap: () async {
+          // Read before the picker opens. The sheet can outlive this row —
+          // the menu behind it closes on a drag or an external navigation —
+          // and a `WidgetRef` throws once its widget is gone.
+          final repository = ref.read(
+            proxyRoutingSettingsRepositoryProvider.notifier,
+          );
+
           final outcome = await showProxyConnectionPicker(
             context,
             title: 'Regular tabs',
@@ -132,22 +139,18 @@ class ConnectionSection extends ConsumerWidget {
             case null:
               break;
             case ProxyPickerCleared() || ProxyPickerDirect():
-              await ref
-                  .read(proxyRoutingSettingsRepositoryProvider.notifier)
-                  .updateSettings(
-                    (current) => current.copyWith(
-                      regularTabsMode: ProxyRegularTabRoutingMode.container,
-                    ),
-                  );
+              await repository.updateSettings(
+                (current) => current.copyWith(
+                  regularTabsMode: ProxyRegularTabRoutingMode.container,
+                ),
+              );
             case ProxyPickerSelected(:final id):
-              await ref
-                  .read(proxyRoutingSettingsRepositoryProvider.notifier)
-                  .updateSettings(
-                    (current) => current.copyWith(
-                      regularTabsMode: ProxyRegularTabRoutingMode.all,
-                      regularTabsProxyConnectionId: id,
-                    ),
-                  );
+              await repository.updateSettings(
+                (current) => current.copyWith(
+                  regularTabsMode: ProxyRegularTabRoutingMode.all,
+                  regularTabsProxyConnectionId: id,
+                ),
+              );
               if (context.mounted) {
                 await ensureProxyStartedForConnection(context, ref, id);
               }
@@ -166,6 +169,10 @@ class ConnectionSection extends ConsumerWidget {
             null => 'Direct',
           },
           onTap: () async {
+            final repository = ref.read(
+              proxyRoutingSettingsRepositoryProvider.notifier,
+            );
+
             final outcome = await showProxyConnectionPicker(
               context,
               title: 'Private tabs',
@@ -182,13 +189,11 @@ class ConnectionSection extends ConsumerWidget {
             };
             if (outcome == null) return;
 
-            await ref
-                .read(proxyRoutingSettingsRepositoryProvider.notifier)
-                .updateSettings(
-                  (current) => current.copyWith(
-                    privateTabsProxyConnectionId: proxyConnectionId,
-                  ),
-                );
+            await repository.updateSettings(
+              (current) => current.copyWith(
+                privateTabsProxyConnectionId: proxyConnectionId,
+              ),
+            );
 
             if (context.mounted) {
               await ensureProxyStartedForConnection(
@@ -219,6 +224,10 @@ class ConnectionSection extends ConsumerWidget {
           },
           onTap: () async {
             final routes = routingSettings.isolationContextRoutes;
+            final repository = ref.read(
+              proxyRoutingSettingsRepositoryProvider.notifier,
+            );
+
             final outcome = await showProxyConnectionPicker(
               context,
               title: 'This isolated tab',
@@ -232,10 +241,6 @@ class ConnectionSection extends ConsumerWidget {
               directSubtitle: 'Bypass the route its container would apply',
             );
             if (outcome == null) return;
-
-            final repository = ref.read(
-              proxyRoutingSettingsRepositoryProvider.notifier,
-            );
 
             switch (outcome) {
               case ProxyPickerCleared():
@@ -268,6 +273,10 @@ class ConnectionSection extends ConsumerWidget {
             null => 'Follows global routing',
           },
           onTap: () async {
+            final containerRepository = ref.read(
+              containerRepositoryProvider.notifier,
+            );
+
             final outcome = await showProxyConnectionPicker(
               context,
               title: container.name ?? 'Container',
@@ -286,22 +295,20 @@ class ConnectionSection extends ConsumerWidget {
             };
 
             try {
-              await ref
-                  .read(containerRepositoryProvider.notifier)
-                  .replaceContainer(
-                    container.copyWith.metadata(
-                      container.metadata
-                          .copyWith(
-                            proxyConnectionId: proxyConnectionId,
-                            // Bypass only applies while no proxy is assigned;
-                            // the snapshot reads the two in that order.
-                            bypassGlobalProxy:
-                                proxyConnectionId == null &&
-                                outcome is ProxyPickerDirect,
-                          )
-                          .sanitized(),
-                    ),
-                  );
+              await containerRepository.replaceContainer(
+                container.copyWith.metadata(
+                  container.metadata
+                      .copyWith(
+                        proxyConnectionId: proxyConnectionId,
+                        // Bypass only applies while no proxy is assigned;
+                        // the snapshot reads the two in that order.
+                        bypassGlobalProxy:
+                            proxyConnectionId == null &&
+                            outcome is ProxyPickerDirect,
+                      )
+                      .sanitized(),
+                ),
+              );
             } catch (error, stackTrace) {
               logger.e(
                 'Failed to change container route from the browser menu',

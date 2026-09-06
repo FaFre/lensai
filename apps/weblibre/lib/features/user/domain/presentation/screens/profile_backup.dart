@@ -169,6 +169,12 @@ class ProfileBackupScreen extends HookConsumerWidget {
                     // deleted — and asking again here costs one call, while
                     // finding out after the restart costs the whole backup.
                     final remembered = ref.read(backupDirectoryUriProvider);
+                    // Held across the picker rather than read after it: the
+                    // folder picker is a different activity, and this screen
+                    // is not guaranteed to still be mounted when it returns.
+                    final backupDirectory = ref.read(
+                      backupDirectoryUriProvider.notifier,
+                    );
                     final usable =
                         remembered != null &&
                         await safTargetIsWritable(remembered);
@@ -179,9 +185,7 @@ class ProfileBackupScreen extends HookConsumerWidget {
                         persistablePermission: true,
                       );
                       if (dir == null) return;
-                      ref
-                          .read(backupDirectoryUriProvider.notifier)
-                          .set(Uri.parse(dir.uri));
+                      backupDirectory.set(Uri.parse(dir.uri));
                     }
 
                     // Confirmed last, after the folder is settled: a

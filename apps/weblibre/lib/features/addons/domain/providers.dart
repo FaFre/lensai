@@ -271,22 +271,37 @@ class AddonList extends _$AddonList {
     await future;
   }
 
-  Future<void> install(AddonInfo addon) async {
+  Future<void> install(AddonInfo addon) =>
+      _install(addon.id, Uri.parse(addon.downloadUrl));
+
+  /// Installs straight from a browse listing, before the add-on exists as an
+  /// [AddonInfo].
+  ///
+  /// Same body as [install] and here rather than in the button that calls it:
+  /// an install runs long enough — a network fetch plus a blocking install
+  /// prompt — for the user to leave the details screen while it is in flight,
+  /// and the busy flag still has to be cleared afterwards. A `WidgetRef` throws
+  /// once its widget is gone, so the flag has to be dropped from something that
+  /// outlives the screen.
+  Future<void> installListing(AddonListing listing) =>
+      _install(listing.id, Uri.parse(listing.downloadUrl));
+
+  Future<void> _install(String addonId, Uri downloadUrl) async {
     final busyIds = ref.read(addonBusyIdsProvider.notifier);
-    busyIds.add(addon.id);
+    busyIds.add(addonId);
 
     try {
-      await _service.installAddon(Uri.parse(addon.downloadUrl));
+      await _service.installAddon(downloadUrl);
 
       if (!ref.mounted) {
         return;
       }
 
-      ref.invalidate(addonDetailsProvider(addon.id));
+      ref.invalidate(addonDetailsProvider(addonId));
       ref.invalidateSelf();
       await future;
     } finally {
-      busyIds.remove(addon.id);
+      busyIds.remove(addonId);
     }
   }
 

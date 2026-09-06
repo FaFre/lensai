@@ -73,6 +73,12 @@ class SettingsTransferScreen extends HookConsumerWidget {
     /// deleted.
     Future<Uri?> resolveTargetFolder() async {
       final remembered = ref.read(settingsExportDirectoryUriProvider);
+      // Held across the picker rather than read after it: the folder picker is
+      // a different activity, and this screen is not guaranteed to still be
+      // mounted when it returns.
+      final exportDirectory = ref.read(
+        settingsExportDirectoryUriProvider.notifier,
+      );
       if (remembered != null && await safTargetIsWritable(remembered)) {
         return remembered;
       }
@@ -84,7 +90,7 @@ class SettingsTransferScreen extends HookConsumerWidget {
       if (picked == null) return null;
 
       final uri = Uri.parse(picked.uri);
-      ref.read(settingsExportDirectoryUriProvider.notifier).set(uri);
+      exportDirectory.set(uri);
 
       return uri;
     }

@@ -27,7 +27,6 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:weblibre/features/addons/domain/providers.dart';
 import 'package:weblibre/features/addons/presentation/widgets/addon_listing_card.dart';
 import 'package:weblibre/features/addons/utils/permissions.dart';
-import 'package:weblibre/features/geckoview/domain/providers.dart';
 import 'package:weblibre/utils/number_format.dart';
 import 'package:weblibre/utils/ui_helper.dart';
 
@@ -206,20 +205,18 @@ class _InstallButton extends ConsumerWidget {
       onPressed: busy
           ? null
           : () async {
-              ref.read(addonBusyIdsProvider.notifier).add(listing.id);
+              // Busy flag and invalidations belong to the provider, not to
+              // this button: leaving the screen mid-install used to reach a
+              // `WidgetRef` whose widget was already gone.
               try {
                 await ref
-                    .read(addonServiceProvider)
-                    .installAddon(Uri.parse(listing.downloadUrl));
-                ref.invalidate(addonListProvider);
-                ref.invalidate(addonDetailsProvider(listing.id));
+                    .read(addonListProvider.notifier)
+                    .installListing(listing);
                 if (!context.mounted) return;
                 showInfoMessage(context, '${listing.name} installed');
               } catch (error) {
                 if (!context.mounted) return;
                 showInfoMessage(context, 'Install failed: $error');
-              } finally {
-                ref.read(addonBusyIdsProvider.notifier).remove(listing.id);
               }
             },
       icon: busy

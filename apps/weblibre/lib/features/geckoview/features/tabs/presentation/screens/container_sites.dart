@@ -145,27 +145,29 @@ class ContainerSitesScreen extends HookConsumerWidget {
                         return;
                       }
 
+                      // Read once up front: the lookups below are database
+                      // round trips, and the screen can be popped while they
+                      // are in flight — a `WidgetRef` throws after that.
+                      final containerRepository = ref.read(
+                        containerRepositoryProvider.notifier,
+                      );
+
                       // Exact-origin duplicate detection — wildcard overlaps
                       // with existing entries are the user's intent and are
                       // not flagged here.
                       final isAssigned =
                           !isWildcardSite(entry) &&
-                          await ref
-                              .read(containerRepositoryProvider.notifier)
-                              .isSiteAssignedToContainer(entry);
+                          await containerRepository.isSiteAssignedToContainer(
+                            entry,
+                          );
 
                       if (!isAssigned) {
                         sites.value = {...sites.value, entry};
                       } else {
-                        final assignedContainerId = await ref
-                            .read(containerRepositoryProvider.notifier)
+                        final assignedContainerId = await containerRepository
                             .siteAssignedContainerId(entry);
                         final assignedContainer = await assignedContainerId
-                            .mapNotNull(
-                              (id) => ref
-                                  .read(containerRepositoryProvider.notifier)
-                                  .getContainerData(id),
-                            );
+                            .mapNotNull(containerRepository.getContainerData);
 
                         if (context.mounted) {
                           ui_helper.showErrorMessage(
