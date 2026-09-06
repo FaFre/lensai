@@ -33,6 +33,7 @@ import eu.weblibre.flutter_mozilla_components.pigeons.QueryParameterStripping
 import eu.weblibre.flutter_mozilla_components.pigeons.ReaderViewController
 import eu.weblibre.flutter_mozilla_components.services.PrivateTabsNotificationService
 import eu.weblibre.flutter_mozilla_components.addons.AddonPrefs
+import eu.weblibre.flutter_mozilla_components.addons.WebExtensionPromptHost
 import eu.weblibre.flutter_mozilla_components.api.GeckoViewportApiImpl
 import eu.weblibre.flutter_mozilla_components.api.GeckoEngineSettingsApiImpl
 import eu.weblibre.flutter_mozilla_components.feature.AppLifecycleFeature
@@ -114,6 +115,10 @@ object GlobalComponents {
         _components?.existingPush?.close()
         _components = null
         currentMode = null
+
+        // After the components, so it releases against the absence rather than
+        // rebinding to the set being torn down.
+        WebExtensionPromptHost.onComponentsChanged()
     }
 
     enum class ComponentsMode {
@@ -442,6 +447,13 @@ object GlobalComponents {
         // Process-scoped and idempotent: it resolves the current components on
         // every callback, so a rebuild must not re-register it.
         AppLifecycleFeature.install()
+
+        // Hand web extension prompts to whichever window is in front. The
+        // activity that is already resumed by now — the main window comes up long
+        // before Dart calls `initialize()` — never reports another resume on its
+        // own, and a rebuild would leave the running feature answering prompts on
+        // the store this call just replaced.
+        WebExtensionPromptHost.onComponentsChanged()
 
         // Hold a window open across startup. Gecko gates its delayed startup —
         // and with it every already-installed extension's background script —

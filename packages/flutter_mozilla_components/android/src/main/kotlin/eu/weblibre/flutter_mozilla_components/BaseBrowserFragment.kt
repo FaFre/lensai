@@ -25,7 +25,6 @@ import androidx.annotation.CallSuper
 import androidx.core.content.edit
 import androidx.fragment.app.Fragment
 import androidx.preference.PreferenceManager
-import eu.weblibre.flutter_mozilla_components.addons.WebExtensionPromptFeature
 import eu.weblibre.flutter_mozilla_components.databinding.FragmentBrowserBinding
 import eu.weblibre.flutter_mozilla_components.ext.EventSequence
 import eu.weblibre.flutter_mozilla_components.ext.getPreferenceKey
@@ -95,7 +94,10 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
     // Native prompt for Custom Tab sessions with no Flutter engine.
     private val nativeAppLinkPromptFeature = ViewBoundFeatureWrapper<NativeAppLinkPromptFeature>()
     private val promptFeature = ViewBoundFeatureWrapper<PromptFeature>()
-    private val webExtensionPromptFeature = ViewBoundFeatureWrapper<WebExtensionPromptFeature>()
+    // Web extension prompts are deliberately *not* bound here: this fragment only
+    // exists once the engine has been painted, so a start that never showed a tab
+    // had nothing to answer an install prompt with. `WebExtensionPromptHost` owns
+    // them against the resumed activity instead.
     private val sitePermissionsFeature = ViewBoundFeatureWrapper<SitePermissionsFeature>()
     private val swipeRefreshFeature = ViewBoundFeatureWrapper<GestureAwareSwipeRefreshFeature>()
     private val secureWindowFeature = ViewBoundFeatureWrapper<SecureWindowFeature>()
@@ -514,18 +516,6 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
                 ),
                 owner = this,
                 view = view,
-            )
-
-            webExtensionPromptFeature.set(
-                feature = WebExtensionPromptFeature(
-                    store = components.core.store,
-                    context = profileContext,
-                    fragmentManager = parentFragmentManager,
-                    addonManager = components.core.addonManager,
-                    addonEvents = components.addonEvents,
-                ),
-                owner = this,
-                view = view
             )
 
             fullScreenFeature.set(

@@ -156,6 +156,9 @@ dependencies {
     implementation 'androidx.activity:activity-ktx:1.13.0'
     implementation 'androidx.paging:paging-runtime-ktx:3.5.0'
     implementation 'androidx.work:work-runtime:2.11.2'
+    // Already on the classpath through work-runtime; declared because this module
+    // contributes its own initializer (WebExtensionPromptInitializer).
+    implementation 'androidx.startup:startup-runtime:1.2.0'
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
     testImplementation("org.mockito:mockito-core:5.23.0")
