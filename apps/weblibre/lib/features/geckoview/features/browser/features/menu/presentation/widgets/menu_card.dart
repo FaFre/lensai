@@ -18,6 +18,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import 'package:flutter/material.dart';
+import 'package:weblibre/features/geckoview/features/browser/features/menu/domain/entities/menu_layout.dart';
 
 /// Vertical gap below a menu section.
 ///
@@ -89,3 +90,17 @@ Widget menuExpansionTheme({
     child: child,
   );
 }
+
+/// Emits the rows an expanding menu row reveals, in the order the user arranged
+/// them, skipping the ones they switched off.
+///
+/// Takes builders rather than widgets so a row that is switched off is never
+/// constructed — Send To Device would otherwise keep watching the account's
+/// devices from inside a list nobody can see.
+List<Widget> orderMenuChildren(
+  List<MenuItemEntry> items,
+  Map<MenuItemType, Widget Function()> children,
+) => [
+  for (final item in items)
+    if (children[item.type] case final build?) build(),
+];

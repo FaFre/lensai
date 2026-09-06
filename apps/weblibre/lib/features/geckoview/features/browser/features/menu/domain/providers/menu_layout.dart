@@ -28,7 +28,8 @@ import 'package:weblibre/features/user/data/providers.dart';
 part 'menu_layout.g.dart';
 
 /// The user's arrangement of the browser menu sheet: which sections appear, in
-/// what order, and how the top-level rows inside each one are ordered.
+/// what order, how the rows inside each one are ordered, and how the rows an
+/// expanding row reveals are ordered.
 ///
 /// One persisted list rather than one per section, so a reorder and the
 /// visibility toggle next to it are a single atomic write, and so the whole
@@ -52,24 +53,37 @@ class MenuLayout extends _$MenuLayout {
     ];
   }
 
-  void reorderItems(MenuSectionType section, int oldIndex, int newIndex) {
-    state = _mapSection(section, (entry) {
-      final items = [...entry.items];
-      final item = items.removeAt(oldIndex);
-      items.insert(newIndex, item);
-      return entry.copyWith(items: items);
+  /// Reorders the rows of [section], or — when [parent] is given — the rows
+  /// that [parent] reveals when it expands.
+  void reorderItems(
+    MenuSectionType section,
+    MenuItemType? parent,
+    int oldIndex,
+    int newIndex,
+  ) {
+    state = _mapSectionItems(section, parent, (items) {
+      final reordered = [...items];
+      final item = reordered.removeAt(oldIndex);
+      reordered.insert(newIndex, item);
+      return reordered;
     });
   }
 
-  void toggleItemVisibility(MenuSectionType section, MenuItemType item) {
-    state = _mapSection(
+  void toggleItemVisibility(
+    MenuSectionType section,
+    MenuItemType? parent,
+    MenuItemType item,
+  ) {
+    state = _mapSectionItems(
       section,
-      (entry) => entry.copyWith(
-        items: [
-          for (final candidate in entry.items)
-            if (candidate.type == item) candidate.toggled() else candidate,
-        ],
-      ),
+      parent,
+      (items) => [
+        for (final candidate in items)
+          if (candidate.type == item)
+            candidate.copyWith(visible: !candidate.visible)
+          else
+            candidate,
+      ],
     );
   }
 
@@ -78,13 +92,33 @@ class MenuLayout extends _$MenuLayout {
     state = mergeMenuLayoutWithDefaults(null);
   }
 
-  List<MenuSectionEntry> _mapSection(
-    MenuSectionType type,
-    MenuSectionEntry Function(MenuSectionEntry entry) update,
+  List<MenuSectionEntry> _mapSectionItems(
+    MenuSectionType section,
+    MenuItemType? parent,
+    List<MenuItemEntry> Function(List<MenuItemEntry> items) update,
   ) => [
-    for (final section in state)
-      if (section.type == type) update(section) else section,
+    for (final entry in state)
+      if (entry.type == section)
+        entry.copyWith(items: _mapItems(entry.items, parent, update))
+      else
+        entry,
   ];
+
+  List<MenuItemEntry> _mapItems(
+    List<MenuItemEntry> items,
+    MenuItemType? parent,
+    List<MenuItemEntry> Function(List<MenuItemEntry> items) update,
+  ) {
+    if (parent == null) return update(items);
+
+    return [
+      for (final item in items)
+        if (item.type == parent)
+          item.copyWith(items: update(item.items))
+        else
+          item,
+    ];
+  }
 
   @override
   List<MenuSectionEntry> build() {
@@ -106,7 +140,7 @@ class MenuLayout extends _$MenuLayout {
             .whereType<MenuSectionEntry>()
             .toList();
 
-        // Merge with defaults to pick up newly added or removed sections/items.
+        // Merge with defaults to pick up newly added or removed sections/rows.
         return mergeMenuLayoutWithDefaults(decoded);
       },
     );
@@ -114,6 +148,19 @@ class MenuLayout extends _$MenuLayout {
     return stateOrNull ?? mergeMenuLayoutWithDefaults(null);
   }
 }
+
+/// Where the sheet is in its arrangement UI: not in it at all, arranging the
+/// sections, arranging the rows of one section, or arranging the rows one of
+/// those reveals.
+///
+/// One state rather than a flag plus local drill-down state, so the sheet can
+/// answer the system back gesture — a back has to unwind these levels one at a
+/// time before the sheet itself is allowed to close.
+typedef MenuReorderState = ({
+  bool active,
+  MenuSectionType? focusedSection,
+  MenuItemType? focusedItem,
+});
 
 /// Whether the sheet is currently showing its arrangement UI instead of the
 /// menu.
@@ -123,9 +170,47 @@ class MenuLayout extends _$MenuLayout {
 /// what a modal that is dismissed by tapping outside has to do.
 @Riverpod()
 class MenuReorderMode extends _$MenuReorderMode {
-  void activate() => state = true;
-  void deactivate() => state = false;
+  void activate() =>
+      state = (active: true, focusedSection: null, focusedItem: null);
+
+  void deactivate() =>
+      state = (active: false, focusedSection: null, focusedItem: null);
+
+  void focusSection(MenuSectionType section) =>
+      state = (active: true, focusedSection: section, focusedItem: null);
+
+  void focusItem(MenuItemType item) => state = (
+    active: true,
+    focusedSection: state.focusedSection,
+    focusedItem: item,
+  );
+
+  /// Steps back one level. Returns false once there is nothing left to step
+  /// back to, which is the sheet's cue to let itself be dismissed.
+  bool stepBack() {
+    if (state.focusedItem != null) {
+      state = (
+        active: true,
+        focusedSection: state.focusedSection,
+        focusedItem: null,
+      );
+      return true;
+    }
+
+    if (state.focusedSection != null) {
+      activate();
+      return true;
+    }
+
+    if (state.active) {
+      deactivate();
+      return true;
+    }
+
+    return false;
+  }
 
   @override
-  bool build() => false;
+  MenuReorderState build() =>
+      (active: false, focusedSection: null, focusedItem: null);
 }

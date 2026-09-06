@@ -10,12 +10,16 @@ MenuItemEntry _$MenuItemEntryFromJson(Map<String, dynamic> json) =>
     MenuItemEntry(
       type: $enumDecode(_$MenuItemTypeEnumMap, json['type']),
       visible: json['visible'] as bool,
+      items: json['items'] == null
+          ? const []
+          : menuItemEntriesFromJson(json['items']),
     );
 
 Map<String, dynamic> _$MenuItemEntryToJson(MenuItemEntry instance) =>
     <String, dynamic>{
       'type': _$MenuItemTypeEnumMap[instance.type]!,
       'visible': instance.visible,
+      'items': instance.items.map((e) => e.toJson()).toList(),
     };
 
 const _$MenuItemTypeEnumMap = {
@@ -28,10 +32,28 @@ const _$MenuItemTypeEnumMap = {
   MenuItemType.addToHomeScreen: 'addToHomeScreen',
   MenuItemType.openInApp: 'openInApp',
   MenuItemType.containers: 'containers',
+  MenuItemType.manageContainers: 'manageContainers',
+  MenuItemType.assignContainer: 'assignContainer',
+  MenuItemType.assignUrlToContainer: 'assignUrlToContainer',
+  MenuItemType.unassignUrlFromContainer: 'unassignUrlFromContainer',
+  MenuItemType.unassignContainer: 'unassignContainer',
   MenuItemType.share: 'share',
+  MenuItemType.copyAddress: 'copyAddress',
+  MenuItemType.shareScreenshot: 'shareScreenshot',
+  MenuItemType.shareLink: 'shareLink',
+  MenuItemType.sendToDevice: 'sendToDevice',
+  MenuItemType.showQrCode: 'showQrCode',
   MenuItemType.moreDisclosure: 'moreDisclosure',
   MenuItemType.cloneTab: 'cloneTab',
+  MenuItemType.cloneRegularTab: 'cloneRegularTab',
+  MenuItemType.clonePrivateTab: 'clonePrivateTab',
+  MenuItemType.cloneIsolatedTab: 'cloneIsolatedTab',
   MenuItemType.export: 'export',
+  MenuItemType.copyAsMarkdown: 'copyAsMarkdown',
+  MenuItemType.exportAsMarkdown: 'exportAsMarkdown',
+  MenuItemType.exportAsPdf: 'exportAsPdf',
+  MenuItemType.exportAsPng: 'exportAsPng',
+  MenuItemType.printPage: 'printPage',
   MenuItemType.pinTopSite: 'pinTopSite',
   MenuItemType.fetchFeeds: 'fetchFeeds',
   MenuItemType.history: 'history',
@@ -51,7 +73,9 @@ MenuSectionEntry _$MenuSectionEntryFromJson(Map<String, dynamic> json) =>
     MenuSectionEntry(
       type: $enumDecode(_$MenuSectionTypeEnumMap, json['type']),
       visible: json['visible'] as bool,
-      items: menuItemEntriesFromJson(json['items']),
+      items: json['items'] == null
+          ? const []
+          : menuItemEntriesFromJson(json['items']),
     );
 
 Map<String, dynamic> _$MenuSectionEntryToJson(MenuSectionEntry instance) =>

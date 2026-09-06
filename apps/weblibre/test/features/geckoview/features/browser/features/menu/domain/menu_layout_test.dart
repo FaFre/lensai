@@ -53,9 +53,12 @@ void main() {
     });
 
     test('places every item in exactly one section', () {
+      List<MenuItemType> flatten(List<MenuItemDefault> items) => [
+        for (final item in items) ...[item.type, ...flatten(item.items)],
+      ];
+
       final placed = [
-        for (final section in menuLayoutDefaults)
-          for (final item in section.items) item.type,
+        for (final section in menuLayoutDefaults) ...flatten(section.items),
       ];
 
       // A [MenuItemType] that no section claims can never be rendered, and one
@@ -67,11 +70,12 @@ void main() {
     test('starts every section and item switched on', () {
       // The shipped menu is the layout users see before they touch anything,
       // so nothing may default to hidden without the sheet changing too.
+      bool allOn(List<MenuItemDefault> items) =>
+          items.every((item) => item.visible && allOn(item.items));
+
       expect(menuLayoutDefaults.every((section) => section.visible), isTrue);
       expect(
-        menuLayoutDefaults.every(
-          (section) => section.items.every((item) => item.visible),
-        ),
+        menuLayoutDefaults.every((section) => allOn(section.items)),
         isTrue,
       );
     });
@@ -97,9 +101,9 @@ void main() {
 
     test('preserves a reordered section list and its visibility', () {
       const defaults = <MenuSectionDefault>[
-        (type: MenuSectionType.quickToggles, visible: true, items: []),
-        (type: MenuSectionType.quickLinks, visible: true, items: []),
-        (type: MenuSectionType.profile, visible: true, items: []),
+        MenuSectionDefault(MenuSectionType.quickToggles),
+        MenuSectionDefault(MenuSectionType.quickLinks),
+        MenuSectionDefault(MenuSectionType.profile),
       ];
       final persisted = [
         _section(MenuSectionType.quickLinks),
@@ -118,13 +122,12 @@ void main() {
 
     test('preserves a reordered item list inside a section', () {
       const defaults = <MenuSectionDefault>[
-        (
-          type: MenuSectionType.quickLinks,
-          visible: true,
+        MenuSectionDefault(
+          MenuSectionType.quickLinks,
           items: [
-            (type: MenuItemType.history, visible: true),
-            (type: MenuItemType.bookmarks, visible: true),
-            (type: MenuItemType.downloads, visible: true),
+            MenuItemDefault(MenuItemType.history),
+            MenuItemDefault(MenuItemType.bookmarks),
+            MenuItemDefault(MenuItemType.downloads),
           ],
         ),
       ];
@@ -146,7 +149,7 @@ void main() {
         MenuItemType.history,
         MenuItemType.bookmarks,
       ]);
-      expect(merged.single.visibleItems, [
+      expect(merged.single.visibleItemTypes, [
         MenuItemType.downloads,
         MenuItemType.history,
       ]);
@@ -154,10 +157,9 @@ void main() {
 
     test('drops sections and items that are no longer offered', () {
       const defaults = <MenuSectionDefault>[
-        (
-          type: MenuSectionType.quickLinks,
-          visible: true,
-          items: [(type: MenuItemType.history, visible: true)],
+        MenuSectionDefault(
+          MenuSectionType.quickLinks,
+          items: [MenuItemDefault(MenuItemType.history)],
         ),
       ];
       final persisted = [
@@ -178,9 +180,9 @@ void main() {
 
     test('inserts a newly offered section at its designed position', () {
       const defaults = <MenuSectionDefault>[
-        (type: MenuSectionType.quickToggles, visible: true, items: []),
-        (type: MenuSectionType.pageActions, visible: false, items: []),
-        (type: MenuSectionType.quickLinks, visible: true, items: []),
+        MenuSectionDefault(MenuSectionType.quickToggles),
+        MenuSectionDefault(MenuSectionType.pageActions, visible: false),
+        MenuSectionDefault(MenuSectionType.quickLinks),
       ];
       // Saved before pageActions existed, and reordered since.
       final persisted = [
@@ -207,13 +209,12 @@ void main() {
 
     test('inserts a newly offered item at its designed position', () {
       const defaults = <MenuSectionDefault>[
-        (
-          type: MenuSectionType.pageActions,
-          visible: true,
+        MenuSectionDefault(
+          MenuSectionType.pageActions,
           items: [
-            (type: MenuItemType.addBookmark, visible: true),
-            (type: MenuItemType.findInPage, visible: true),
-            (type: MenuItemType.translatePage, visible: false),
+            MenuItemDefault(MenuItemType.addBookmark),
+            MenuItemDefault(MenuItemType.findInPage),
+            MenuItemDefault(MenuItemType.translatePage, visible: false),
           ],
         ),
       ];
@@ -234,18 +235,95 @@ void main() {
         MenuItemType.addBookmark,
         MenuItemType.translatePage,
       ]);
-      expect(merged.single.visibleItems, [
+      expect(merged.single.visibleItemTypes, [
         MenuItemType.findInPage,
         MenuItemType.addBookmark,
       ]);
     });
 
+    test('preserves a reordered list of the rows a row reveals', () {
+      const defaults = [
+        MenuSectionDefault(
+          MenuSectionType.tabActions,
+          items: [
+            MenuItemDefault(
+              MenuItemType.share,
+              items: [
+                MenuItemDefault(MenuItemType.copyAddress),
+                MenuItemDefault(MenuItemType.shareLink),
+                MenuItemDefault(MenuItemType.showQrCode),
+              ],
+            ),
+          ],
+        ),
+      ];
+      final persisted = [
+        _section(
+          MenuSectionType.tabActions,
+          items: [
+            MenuItemEntry(
+              type: MenuItemType.share,
+              visible: true,
+              items: [
+                _item(MenuItemType.showQrCode),
+                _item(MenuItemType.copyAddress),
+                _item(MenuItemType.shareLink, visible: false),
+              ],
+            ),
+          ],
+        ),
+      ];
+
+      final merged = mergeMenuLayoutWithDefaults(persisted, defaults);
+      final share = merged.single.items.single;
+
+      expect(share.items.map((item) => item.type), [
+        MenuItemType.showQrCode,
+        MenuItemType.copyAddress,
+        MenuItemType.shareLink,
+      ]);
+      expect(share.visibleItems.map((item) => item.type), [
+        MenuItemType.showQrCode,
+        MenuItemType.copyAddress,
+      ]);
+    });
+
+    test('fills in the rows of a row persisted before it had any', () {
+      const defaults = [
+        MenuSectionDefault(
+          MenuSectionType.tabActions,
+          items: [
+            MenuItemDefault(
+              MenuItemType.export,
+              items: [
+                MenuItemDefault(MenuItemType.exportAsPdf),
+                MenuItemDefault(MenuItemType.printPage),
+              ],
+            ),
+          ],
+        ),
+      ];
+      // Saved by a build where Export was a leaf.
+      final persisted = [
+        _section(
+          MenuSectionType.tabActions,
+          items: [_item(MenuItemType.export)],
+        ),
+      ];
+
+      final merged = mergeMenuLayoutWithDefaults(persisted, defaults);
+
+      expect(merged.single.items.single.items.map((item) => item.type), [
+        MenuItemType.exportAsPdf,
+        MenuItemType.printPage,
+      ]);
+    });
+
     test('gives a section persisted without items the offered ones', () {
       const defaults = <MenuSectionDefault>[
-        (
-          type: MenuSectionType.about,
-          visible: true,
-          items: [(type: MenuItemType.about, visible: true)],
+        MenuSectionDefault(
+          MenuSectionType.about,
+          items: [MenuItemDefault(MenuItemType.about)],
         ),
       ];
 
@@ -271,6 +349,23 @@ void main() {
         MenuItemType.bookmarks,
       ]);
       expect(decoded.last.visible, isFalse);
+    });
+
+    test('keeps the rows nested under a row', () {
+      final decoded = menuItemEntriesFromJson([
+        {
+          'type': 'share',
+          'visible': true,
+          'items': [
+            {'type': 'showQrCode', 'visible': true},
+            {'type': 'a_retired_row', 'visible': true},
+          ],
+        },
+      ]);
+
+      expect(decoded.single.items.map((item) => item.type), [
+        MenuItemType.showQrCode,
+      ]);
     });
 
     test('reads anything that is not a list as no arrangement', () {

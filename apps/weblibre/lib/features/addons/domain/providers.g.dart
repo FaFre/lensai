@@ -739,7 +739,7 @@ final class AddonListProvider
   AddonList create() => AddonList();
 }
 
-String _$addonListHash() => r'1e60b0b04702e6ed6143ccf19d9e4140d1a1deec';
+String _$addonListHash() => r'96459b04639f15ebee8a1f11807dfcf856c360f6';
 
 abstract class _$AddonList extends $AsyncNotifier<List<AddonInfo>> {
   FutureOr<List<AddonInfo>> build();

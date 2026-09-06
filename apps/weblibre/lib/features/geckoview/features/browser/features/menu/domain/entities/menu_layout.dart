@@ -66,13 +66,14 @@ enum MenuSectionType {
   };
 }
 
-/// A top-level entry inside a [MenuSectionType].
+/// A row inside a [MenuSectionType], or inside a row that expands.
 ///
-/// Only rows the sheet itself lays out are listed here. Anything a row reveals
-/// once opened — the destinations under Share, the entries under Export, the
-/// installed extensions — belongs to that row and is not separately arrangeable:
-/// those lists are built from live data, and pinning an order onto them would
-/// persist configuration for things that come and go.
+/// The rows a section lays out itself are arrangeable at both levels: Share can
+/// be moved within Tab Actions, and the destinations under Share can be moved
+/// within Share. What stays fixed is anything built from live data — the
+/// installed extensions, the proxies a route names, the devices under Send To
+/// Device — because pinning an order onto a list that comes and go leaves
+/// configuration behind for things that no longer exist.
 enum MenuItemType {
   // Quick toggles
   desktopMode,
@@ -88,14 +89,36 @@ enum MenuItemType {
 
   // Tab actions
   containers,
+  manageContainers,
+  assignContainer,
+  assignUrlToContainer,
+  unassignUrlFromContainer,
+  unassignContainer,
+
   share,
+  copyAddress,
+  shareScreenshot,
+  shareLink,
+  sendToDevice,
+  showQrCode,
 
   /// Not a row of its own: the point in Tab Actions where the rest folds away
-  /// behind a "More" tile. Switch it off to show the whole section flat, or
+  /// behind a "More" row. Switch it off to show the whole section flat, or
   /// drag it to choose how much stays visible.
   moreDisclosure,
+
   cloneTab,
+  cloneRegularTab,
+  clonePrivateTab,
+  cloneIsolatedTab,
+
   export,
+  copyAsMarkdown,
+  exportAsMarkdown,
+  exportAsPdf,
+  exportAsPng,
+  printPage,
+
   pinTopSite,
   fetchFeeds,
 
@@ -126,10 +149,28 @@ enum MenuItemType {
     addToHomeScreen => 'Add to Home Screen',
     openInApp => 'Open in App',
     containers => 'Containers',
+    manageContainers => 'Manage Containers',
+    assignContainer => 'Assign Container',
+    assignUrlToContainer => 'Assign URL to Container',
+    unassignUrlFromContainer => 'Unassign URL from Container',
+    unassignContainer => 'Unassign Container',
     share => 'Share',
+    copyAddress => 'Copy Address',
+    shareScreenshot => 'Share Screenshot',
+    shareLink => 'Share Link',
+    sendToDevice => 'Send To Device',
+    showQrCode => 'Show QR Code',
     moreDisclosure => 'More',
     cloneTab => 'Clone Tab',
+    cloneRegularTab => 'Regular',
+    clonePrivateTab => 'Private',
+    cloneIsolatedTab => 'Isolated',
     export => 'Export',
+    copyAsMarkdown => 'Copy as Markdown',
+    exportAsMarkdown => 'Export as Markdown',
+    exportAsPdf => 'Export as PDF',
+    exportAsPng => 'Export as PNG',
+    printPage => 'Print',
     pinTopSite => 'Pin to Shortcuts',
     fetchFeeds => 'Fetch Feeds',
     history => 'History',
@@ -149,88 +190,137 @@ enum MenuItemType {
   /// obvious from the name alone.
   String? get description => switch (this) {
     moreDisclosure => 'Folds everything below it behind a "More" row',
+    sendToDevice => 'The devices themselves come from your account',
     _ => null,
   };
 }
 
-/// One item slot in a section's defaults: which item, and whether it starts on.
-typedef MenuItemDefault = ({MenuItemType type, bool visible});
+/// One row slot in the defaults: which row, whether it starts on, and the rows
+/// it reveals when it expands.
+///
+/// A class rather than a record because it nests inside itself, which a
+/// record typedef cannot express.
+class MenuItemDefault {
+  final MenuItemType type;
+  final bool visible;
+  final List<MenuItemDefault> items;
 
-/// One section slot in the menu's defaults.
-typedef MenuSectionDefault = ({
-  MenuSectionType type,
-  bool visible,
-  List<MenuItemDefault> items,
-});
+  const MenuItemDefault(
+    this.type, {
+    this.visible = true,
+    this.items = const [],
+  });
+}
+
+/// One section slot in the defaults.
+class MenuSectionDefault {
+  final MenuSectionType type;
+  final bool visible;
+  final List<MenuItemDefault> items;
+
+  const MenuSectionDefault(
+    this.type, {
+    this.visible = true,
+    this.items = const [],
+  });
+}
 
 /// The shipped menu, in shipped order.
 ///
 /// This is the layout every profile starts from and the one "Reset" returns to,
 /// so it has to keep matching what the sheet renders when nothing is persisted.
-/// A section that lays its own contents out from live data (Extensions,
-/// Connection) offers no items.
+/// A section or row that lays its own contents out from live data (Extensions,
+/// Connection, Send To Device) offers nothing to arrange beneath it.
 const List<MenuSectionDefault> menuLayoutDefaults = [
-  (
-    type: MenuSectionType.quickToggles,
-    visible: true,
+  MenuSectionDefault(
+    MenuSectionType.quickToggles,
     items: [
-      (type: MenuItemType.desktopMode, visible: true),
-      (type: MenuItemType.readerMode, visible: true),
-      (type: MenuItemType.gestures, visible: true),
+      MenuItemDefault(MenuItemType.desktopMode),
+      MenuItemDefault(MenuItemType.readerMode),
+      MenuItemDefault(MenuItemType.gestures),
     ],
   ),
-  (
-    type: MenuSectionType.pageActions,
-    visible: true,
+  MenuSectionDefault(
+    MenuSectionType.pageActions,
     items: [
-      (type: MenuItemType.addBookmark, visible: true),
-      (type: MenuItemType.findInPage, visible: true),
-      (type: MenuItemType.translatePage, visible: true),
-      (type: MenuItemType.addToHomeScreen, visible: true),
-      (type: MenuItemType.openInApp, visible: true),
+      MenuItemDefault(MenuItemType.addBookmark),
+      MenuItemDefault(MenuItemType.findInPage),
+      MenuItemDefault(MenuItemType.translatePage),
+      MenuItemDefault(MenuItemType.addToHomeScreen),
+      MenuItemDefault(MenuItemType.openInApp),
     ],
   ),
-  (type: MenuSectionType.extensions, visible: true, items: []),
-  (
-    type: MenuSectionType.tabActions,
-    visible: true,
+  MenuSectionDefault(MenuSectionType.extensions),
+  MenuSectionDefault(
+    MenuSectionType.tabActions,
     items: [
-      (type: MenuItemType.containers, visible: true),
-      (type: MenuItemType.share, visible: true),
-      (type: MenuItemType.moreDisclosure, visible: true),
-      (type: MenuItemType.cloneTab, visible: true),
-      (type: MenuItemType.export, visible: true),
-      (type: MenuItemType.pinTopSite, visible: true),
-      (type: MenuItemType.fetchFeeds, visible: true),
+      MenuItemDefault(
+        MenuItemType.containers,
+        items: [
+          MenuItemDefault(MenuItemType.manageContainers),
+          MenuItemDefault(MenuItemType.assignContainer),
+          MenuItemDefault(MenuItemType.assignUrlToContainer),
+          MenuItemDefault(MenuItemType.unassignUrlFromContainer),
+          MenuItemDefault(MenuItemType.unassignContainer),
+        ],
+      ),
+      MenuItemDefault(
+        MenuItemType.share,
+        items: [
+          MenuItemDefault(MenuItemType.copyAddress),
+          MenuItemDefault(MenuItemType.shareScreenshot),
+          MenuItemDefault(MenuItemType.shareLink),
+          MenuItemDefault(MenuItemType.sendToDevice),
+          MenuItemDefault(MenuItemType.showQrCode),
+        ],
+      ),
+      MenuItemDefault(MenuItemType.moreDisclosure),
+      MenuItemDefault(
+        MenuItemType.cloneTab,
+        items: [
+          MenuItemDefault(MenuItemType.cloneRegularTab),
+          MenuItemDefault(MenuItemType.clonePrivateTab),
+          MenuItemDefault(MenuItemType.cloneIsolatedTab),
+        ],
+      ),
+      MenuItemDefault(
+        MenuItemType.export,
+        items: [
+          MenuItemDefault(MenuItemType.copyAsMarkdown),
+          MenuItemDefault(MenuItemType.exportAsMarkdown),
+          MenuItemDefault(MenuItemType.exportAsPdf),
+          MenuItemDefault(MenuItemType.exportAsPng),
+          MenuItemDefault(MenuItemType.printPage),
+        ],
+      ),
+      MenuItemDefault(MenuItemType.pinTopSite),
+      MenuItemDefault(MenuItemType.fetchFeeds),
     ],
   ),
-  (
-    type: MenuSectionType.quickLinks,
-    visible: true,
+  MenuSectionDefault(
+    MenuSectionType.quickLinks,
     items: [
-      (type: MenuItemType.history, visible: true),
-      (type: MenuItemType.bookmarks, visible: true),
-      (type: MenuItemType.downloads, visible: true),
-      (type: MenuItemType.bangs, visible: true),
-      (type: MenuItemType.feeds, visible: true),
-      (type: MenuItemType.smallWeb, visible: true),
+      MenuItemDefault(MenuItemType.history),
+      MenuItemDefault(MenuItemType.bookmarks),
+      MenuItemDefault(MenuItemType.downloads),
+      MenuItemDefault(MenuItemType.bangs),
+      MenuItemDefault(MenuItemType.feeds),
+      MenuItemDefault(MenuItemType.smallWeb),
     ],
   ),
-  (type: MenuSectionType.connection, visible: true, items: []),
-  (
-    type: MenuSectionType.profile,
-    visible: true,
+  MenuSectionDefault(MenuSectionType.connection),
+  MenuSectionDefault(
+    MenuSectionType.profile,
     items: [
-      (type: MenuItemType.profileSwitch, visible: true),
-      (type: MenuItemType.syncNow, visible: true),
-      (type: MenuItemType.appSettings, visible: true),
-      (type: MenuItemType.quitBrowser, visible: true),
+      MenuItemDefault(MenuItemType.profileSwitch),
+      MenuItemDefault(MenuItemType.syncNow),
+      MenuItemDefault(MenuItemType.appSettings),
+      MenuItemDefault(MenuItemType.quitBrowser),
     ],
   ),
-  (
-    type: MenuSectionType.about,
-    visible: true,
-    items: [(type: MenuItemType.about, visible: true)],
+  MenuSectionDefault(
+    MenuSectionType.about,
+    items: [MenuItemDefault(MenuItemType.about)],
   ),
 ];
 
@@ -239,17 +329,37 @@ class MenuItemEntry with FastEquatable {
   final MenuItemType type;
   final bool visible;
 
-  MenuItemEntry({required this.type, required this.visible});
+  /// The arrangement of the rows this one reveals when it expands. Empty for a
+  /// row that expands into nothing, or into live data.
+  @JsonKey(fromJson: menuItemEntriesFromJson)
+  final List<MenuItemEntry> items;
+
+  MenuItemEntry({
+    required this.type,
+    required this.visible,
+    this.items = const [],
+  });
 
   factory MenuItemEntry.fromJson(Map<String, dynamic> json) =>
       _$MenuItemEntryFromJson(json);
 
   Map<String, dynamic> toJson() => _$MenuItemEntryToJson(this);
 
-  MenuItemEntry toggled() => MenuItemEntry(type: type, visible: !visible);
+  MenuItemEntry copyWith({bool? visible, List<MenuItemEntry>? items}) =>
+      MenuItemEntry(
+        type: type,
+        visible: visible ?? this.visible,
+        items: items ?? this.items,
+      );
+
+  /// The rows under this one that the user kept, in their order.
+  List<MenuItemEntry> get visibleItems => [
+    for (final item in items)
+      if (item.visible) item,
+  ];
 
   @override
-  List<Object?> get hashParameters => [type, visible];
+  List<Object?> get hashParameters => [type, visible, items];
 }
 
 @JsonSerializable()
@@ -257,14 +367,14 @@ class MenuSectionEntry with FastEquatable {
   final MenuSectionType type;
   final bool visible;
 
-  /// The section's own arrangement. Empty for sections that offer no items.
+  /// The section's own arrangement. Empty for sections that offer no rows.
   @JsonKey(fromJson: menuItemEntriesFromJson)
   final List<MenuItemEntry> items;
 
   MenuSectionEntry({
     required this.type,
     required this.visible,
-    required this.items,
+    this.items = const [],
   });
 
   factory MenuSectionEntry.fromJson(Map<String, dynamic> json) =>
@@ -279,19 +389,24 @@ class MenuSectionEntry with FastEquatable {
         items: items ?? this.items,
       );
 
-  /// The visible items, in the user's order. What the section renders from.
-  List<MenuItemType> get visibleItems => [
+  /// The rows the user kept, in their order.
+  List<MenuItemEntry> get visibleItems => [
     for (final item in items)
-      if (item.visible) item.type,
+      if (item.visible) item,
+  ];
+
+  /// The rows the user kept, for a section whose rows never expand.
+  List<MenuItemType> get visibleItemTypes => [
+    for (final item in visibleItems) item.type,
   ];
 
   @override
   List<Object?> get hashParameters => [type, visible, items];
 }
 
-/// Drops item entries that no longer decode instead of failing the section they
-/// sit in — one retired [MenuItemType] must not cost the user the rest of their
-/// arrangement.
+/// Drops item entries that no longer decode instead of failing the section or
+/// row they sit in — one retired [MenuItemType] must not cost the user the rest
+/// of their arrangement.
 List<MenuItemEntry> menuItemEntriesFromJson(Object? json) {
   if (json is! List) return const [];
 
@@ -309,8 +424,9 @@ List<MenuItemEntry> menuItemEntriesFromJson(Object? json) {
 }
 
 /// Reconciles a persisted menu layout with what the app currently offers, at
-/// both levels: sections against [defaults], then each surviving section's
-/// items against that section's own defaults.
+/// every level: sections against [defaults], each surviving section's rows
+/// against that section's own defaults, and each surviving row's rows against
+/// its own.
 ///
 /// Pure and exported so the reconciliation can be tested directly — it runs on
 /// every read of the persisted layout, and a regression here silently rewrites
@@ -327,22 +443,28 @@ List<MenuSectionEntry> mergeMenuLayoutWithDefaults(
     fromDefault: (definition) => MenuSectionEntry(
       type: definition.type,
       visible: definition.visible,
-      items: _itemsFromDefaults(definition.items),
+      items: _mergeItems(null, definition.items),
     ),
-    reconcile: (entry, definition) => entry.copyWith(
-      items: mergeOrderedLayout(
-        persisted: entry.items,
-        defaults: definition.items,
-        entryKey: (item) => item.type,
-        defaultKey: (item) => item.type,
-        fromDefault: (item) =>
-            MenuItemEntry(type: item.type, visible: item.visible),
-      ),
-    ),
+    reconcile: (entry, definition) =>
+        entry.copyWith(items: _mergeItems(entry.items, definition.items)),
   );
 }
 
-List<MenuItemEntry> _itemsFromDefaults(List<MenuItemDefault> items) => [
-  for (final item in items)
-    MenuItemEntry(type: item.type, visible: item.visible),
-];
+List<MenuItemEntry> _mergeItems(
+  List<MenuItemEntry>? persisted,
+  List<MenuItemDefault> defaults,
+) {
+  return mergeOrderedLayout(
+    persisted: persisted,
+    defaults: defaults,
+    entryKey: (entry) => entry.type,
+    defaultKey: (definition) => definition.type,
+    fromDefault: (definition) => MenuItemEntry(
+      type: definition.type,
+      visible: definition.visible,
+      items: _mergeItems(null, definition.items),
+    ),
+    reconcile: (entry, definition) =>
+        entry.copyWith(items: _mergeItems(entry.items, definition.items)),
+  );
+}

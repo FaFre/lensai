@@ -1950,13 +1950,19 @@ class _Browser extends HookConsumerWidget {
                   return false;
                 }
 
-                // Dismiss modal routes (e.g. showModalBottomSheet)
+                // Dismiss modal routes (e.g. showModalBottomSheet).
+                // maybePop rather than pop: this listener runs ahead of the
+                // navigator, so popping outright would skip the PopScope of
+                // whatever is on top — a modal that handles back itself (the
+                // menu sheet's arrangement UI, a dialog that blocks back while
+                // it works) would be closed instead of being asked. Either way
+                // the gesture belongs to that modal, so it counts as handled.
                 final rootNavigator = Navigator.of(
                   context,
                   rootNavigator: true,
                 );
                 if (rootNavigator.canPop()) {
-                  rootNavigator.pop();
+                  await rootNavigator.maybePop();
                   return true;
                 }
 

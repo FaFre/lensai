@@ -18,7 +18,6 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import 'package:flutter/material.dart';
-import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:nullability/nullability.dart';
 import 'package:weblibre/features/geckoview/features/browser/features/menu/domain/entities/menu_layout.dart';
@@ -26,11 +25,11 @@ import 'package:weblibre/features/geckoview/features/browser/features/menu/domai
 
 /// Replaces the menu's content while the user is arranging it.
 ///
-/// Two levels rather than one nested list: sections first, then the rows of one
-/// section at a time. A reorderable list inside a reorderable list makes both
-/// drags ambiguous the moment they overlap, and the drill-down also gives the
-/// row list somewhere to explain itself.
-class MenuReorderView extends HookConsumerWidget {
+/// One level at a time rather than one nested list: sections, then the rows of
+/// one section, then the rows one of those reveals. A reorderable list inside a
+/// reorderable list makes both drags ambiguous the moment they overlap, and the
+/// drill-down also gives each list somewhere to explain itself.
+class MenuReorderView extends ConsumerWidget {
   const MenuReorderView({super.key});
 
   @override
@@ -38,66 +37,91 @@ class MenuReorderView extends HookConsumerWidget {
     final sections = ref.watch(menuLayoutProvider);
     final notifier = ref.read(menuLayoutProvider.notifier);
 
-    final focusedSection = useState<MenuSectionType?>(null);
-    final focused = focusedSection.value == null
+    final reorderMode = ref.watch(menuReorderModeProvider);
+    final reorderNotifier = ref.read(menuReorderModeProvider.notifier);
+
+    final section = reorderMode.focusedSection.mapNotNull(
+      (type) => sections.firstWhere((section) => section.type == type),
+    );
+    final item = section == null
         ? null
-        : sections.firstWhere(
-            (section) => section.type == focusedSection.value,
+        : reorderMode.focusedItem.mapNotNull(
+            (type) => section.items.firstWhere((entry) => entry.type == type),
           );
+
+    // Whichever list is in front: the sections, one section's rows, or the rows
+    // under one of those.
+    final entries = item?.items ?? section?.items;
 
     return SliverMainAxisGroup(
       slivers: [
         SliverToBoxAdapter(
           child: _Header(
-            title: focused?.type.label ?? 'Customize Menu',
-            subtitle: focused == null
-                ? 'Drag to reorder. Switch a section off to hide it from the menu.'
-                : 'Drag to reorder the rows in this section.',
-            onBack: focused == null ? null : () => focusedSection.value = null,
-            onDone: () =>
-                ref.read(menuReorderModeProvider.notifier).deactivate(),
-            onReset: focused == null ? notifier.resetToDefaults : null,
+            title: item?.type.label ?? section?.type.label ?? 'Customize Menu',
+            subtitle: switch ((section, item)) {
+              (null, _) =>
+                'Drag to reorder. Switch a section off to hide it from the menu.',
+              (_, null) => 'Drag to reorder the rows in this section.',
+              _ => 'Drag to reorder the rows this one opens.',
+            },
+            onBack: section == null ? null : reorderNotifier.stepBack,
+            onDone: reorderNotifier.deactivate,
+            onReset: section == null ? notifier.resetToDefaults : null,
           ),
         ),
-        if (focused == null)
+        if (entries == null)
           SliverReorderableList(
             itemCount: sections.length,
             onReorderItem: notifier.reorderSections,
             itemBuilder: (context, index) {
-              final section = sections[index];
+              final entry = sections[index];
 
               return _ReorderRow(
-                key: ValueKey(section.type),
+                key: ValueKey(entry.type),
                 index: index,
-                label: section.type.label,
-                subtitle: section.items.isEmpty
-                    ? null
-                    : '${section.items.where((item) => item.visible).length} of ${section.items.length} rows shown',
-                visible: section.visible,
+                label: entry.type.label,
+                subtitle: _shownSummary(entry.items, 'rows'),
+                visible: entry.visible,
                 onToggleVisibility: () =>
-                    notifier.toggleSectionVisibility(section.type),
-                onTap: section.items.isEmpty
+                    notifier.toggleSectionVisibility(entry.type),
+                onTap: entry.items.isEmpty
                     ? null
-                    : () => focusedSection.value = section.type,
+                    : () => reorderNotifier.focusSection(entry.type),
               );
             },
           )
         else
           SliverReorderableList(
-            itemCount: focused.items.length,
-            onReorderItem: (oldIndex, newIndex) =>
-                notifier.reorderItems(focused.type, oldIndex, newIndex),
+            itemCount: entries.length,
+            onReorderItem: (oldIndex, newIndex) => notifier.reorderItems(
+              section!.type,
+              item?.type,
+              oldIndex,
+              newIndex,
+            ),
             itemBuilder: (context, index) {
-              final item = focused.items[index];
+              final entry = entries[index];
 
               return _ReorderRow(
-                key: ValueKey(item.type),
+                key: ValueKey(entry.type),
                 index: index,
-                label: item.type.label,
-                subtitle: item.type.description,
-                visible: item.visible,
-                onToggleVisibility: () =>
-                    notifier.toggleItemVisibility(focused.type, item.type),
+                label: entry.type.label,
+                subtitle:
+                    entry.type.description ??
+                    _shownSummary(entry.items, 'rows'),
+                visible: entry.visible,
+                onToggleVisibility: () => notifier.toggleItemVisibility(
+                  section!.type,
+                  item?.type,
+                  entry.type,
+                ),
+                // Only one level of nesting is offered, so a row reached from a
+                // row never drills further even when it opens a list of its own
+                // — those lists are live data (the devices under Send To
+                // Device, the extensions under Extensions).
+                onTap: entry.items.isEmpty || item != null
+                    ? null
+                    : () => reorderNotifier.focusItem(entry.type),
               );
             },
           ),
@@ -105,6 +129,13 @@ class MenuReorderView extends HookConsumerWidget {
       ],
     );
   }
+}
+
+String? _shownSummary(List<MenuItemEntry> items, String noun) {
+  if (items.isEmpty) return null;
+
+  final shown = items.where((item) => item.visible).length;
+  return '$shown of ${items.length} $noun shown';
 }
 
 class _Header extends StatelessWidget {

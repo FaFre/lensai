@@ -9,7 +9,8 @@ part of 'menu_layout.dart';
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
 /// The user's arrangement of the browser menu sheet: which sections appear, in
-/// what order, and how the top-level rows inside each one are ordered.
+/// what order, how the rows inside each one are ordered, and how the rows an
+/// expanding row reveals are ordered.
 ///
 /// One persisted list rather than one per section, so a reorder and the
 /// visibility toggle next to it are a single atomic write, and so the whole
@@ -19,7 +20,8 @@ part of 'menu_layout.dart';
 final menuLayoutProvider = MenuLayoutProvider._();
 
 /// The user's arrangement of the browser menu sheet: which sections appear, in
-/// what order, and how the top-level rows inside each one are ordered.
+/// what order, how the rows inside each one are ordered, and how the rows an
+/// expanding row reveals are ordered.
 ///
 /// One persisted list rather than one per section, so a reorder and the
 /// visibility toggle next to it are a single atomic write, and so the whole
@@ -27,7 +29,8 @@ final menuLayoutProvider = MenuLayoutProvider._();
 final class MenuLayoutProvider
     extends $NotifierProvider<MenuLayout, List<MenuSectionEntry>> {
   /// The user's arrangement of the browser menu sheet: which sections appear, in
-  /// what order, and how the top-level rows inside each one are ordered.
+  /// what order, how the rows inside each one are ordered, and how the rows an
+  /// expanding row reveals are ordered.
   ///
   /// One persisted list rather than one per section, so a reorder and the
   /// visibility toggle next to it are a single atomic write, and so the whole
@@ -59,10 +62,11 @@ final class MenuLayoutProvider
   }
 }
 
-String _$menuLayoutHash() => r'cf0b622c5ac02aa7bff9289b5da256a97c0134c8';
+String _$menuLayoutHash() => r'f21d2e659c250cd70ccfcecabc82f8be155c7d4e';
 
 /// The user's arrangement of the browser menu sheet: which sections appear, in
-/// what order, and how the top-level rows inside each one are ordered.
+/// what order, how the rows inside each one are ordered, and how the rows an
+/// expanding row reveals are ordered.
 ///
 /// One persisted list rather than one per section, so a reorder and the
 /// visibility toggle next to it are a single atomic write, and so the whole
@@ -104,7 +108,7 @@ final menuReorderModeProvider = MenuReorderModeProvider._();
 /// the menu while arranging and opening it again returns to the menu, which is
 /// what a modal that is dismissed by tapping outside has to do.
 final class MenuReorderModeProvider
-    extends $NotifierProvider<MenuReorderMode, bool> {
+    extends $NotifierProvider<MenuReorderMode, MenuReorderState> {
   /// Whether the sheet is currently showing its arrangement UI instead of the
   /// menu.
   ///
@@ -130,15 +134,15 @@ final class MenuReorderModeProvider
   MenuReorderMode create() => MenuReorderMode();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(bool value) {
+  Override overrideWithValue(MenuReorderState value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<bool>(value),
+      providerOverride: $SyncValueProvider<MenuReorderState>(value),
     );
   }
 }
 
-String _$menuReorderModeHash() => r'ccb01dcf9e6cb2acfab1a4d5ecbe1bac98218b67';
+String _$menuReorderModeHash() => r'fc7652fcd1123b6023336bfccd386cf9b08701ee';
 
 /// Whether the sheet is currently showing its arrangement UI instead of the
 /// menu.
@@ -147,17 +151,17 @@ String _$menuReorderModeHash() => r'ccb01dcf9e6cb2acfab1a4d5ecbe1bac98218b67';
 /// the menu while arranging and opening it again returns to the menu, which is
 /// what a modal that is dismissed by tapping outside has to do.
 
-abstract class _$MenuReorderMode extends $Notifier<bool> {
-  bool build();
+abstract class _$MenuReorderMode extends $Notifier<MenuReorderState> {
+  MenuReorderState build();
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
-    final ref = this.ref as $Ref<bool, bool>;
+    final ref = this.ref as $Ref<MenuReorderState, MenuReorderState>;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<bool, bool>,
-              bool,
+              AnyNotifier<MenuReorderState, MenuReorderState>,
+              MenuReorderState,
               Object?,
               Object?
             >;

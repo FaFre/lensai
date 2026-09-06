@@ -50,26 +50,35 @@ Future<void> showBrowserMenuSheet(BuildContext context) {
 /// would make a hidden Connection section keep watching the proxy runtime and a
 /// hidden Extensions section keep watching the installed add-ons every time the
 /// menu opens.
-Map<MenuSectionType, Widget Function(List<MenuItemType> items)>
+Map<MenuSectionType, Widget Function(MenuSectionEntry section)>
 _buildSectionBuilders(String? selectedTabId) {
   return {
     // The sections that act on a page only exist while one is in front. Left
     // out of the map rather than rendered empty, so their place in the user's
     // order is remembered without leaving a gap on the home screen.
     if (selectedTabId case final tabId?) ...{
-      MenuSectionType.quickToggles: (items) =>
-          QuickTogglesSection(selectedTabId: tabId, items: items),
-      MenuSectionType.pageActions: (items) =>
-          PageActionsSection(selectedTabId: tabId, items: items),
-      MenuSectionType.tabActions: (items) =>
-          TabActionsSection(selectedTabId: tabId, items: items),
+      MenuSectionType.quickToggles: (section) => QuickTogglesSection(
+        selectedTabId: tabId,
+        items: section.visibleItemTypes,
+      ),
+      MenuSectionType.pageActions: (section) => PageActionsSection(
+        selectedTabId: tabId,
+        items: section.visibleItemTypes,
+      ),
+      // The only section whose rows open rows of their own, so the only one
+      // handed the entries rather than just their types.
+      MenuSectionType.tabActions: (section) =>
+          TabActionsSection(selectedTabId: tabId, items: section.visibleItems),
     },
     MenuSectionType.extensions: (_) => const ExtensionsSection(),
-    MenuSectionType.quickLinks: (items) => QuickLinksSection(items: items),
+    MenuSectionType.quickLinks: (section) =>
+        QuickLinksSection(items: section.visibleItemTypes),
     MenuSectionType.connection: (_) =>
         ConnectionSection(selectedTabId: selectedTabId),
-    MenuSectionType.profile: (items) => ProfileSection(items: items),
-    MenuSectionType.about: (items) => AboutSection(items: items),
+    MenuSectionType.profile: (section) =>
+        ProfileSection(items: section.visibleItemTypes),
+    MenuSectionType.about: (section) =>
+        AboutSection(items: section.visibleItemTypes),
   };
 }
 
@@ -80,60 +89,73 @@ class _BrowserMenuSheet extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final colorScheme = Theme.of(context).colorScheme;
     final selectedTabId = ref.watch(selectedTabProvider);
-    final isReordering = ref.watch(menuReorderModeProvider);
+    final reorderMode = ref.watch(menuReorderModeProvider);
+    final isReordering = reorderMode.active;
 
-    return DraggableScrollableSheet(
-      initialChildSize: 0.85,
-      minChildSize: 0.4,
-      maxChildSize: 0.95,
-      expand: false,
-      builder: (context, scrollController) {
-        return Column(
-          children: [
-            // Drag handle
-            Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              height: 4,
-              width: 40,
-              decoration: BoxDecoration(
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-
-            Expanded(
-              child: CustomScrollView(
-                controller: scrollController,
-                slivers: isReordering
-                    ? const [MenuReorderView()]
-                    : [
-                        SliverPadding(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 8,
-                          ),
-                          sliver: _MenuSections(selectedTabId: selectedTabId),
-                        ),
-                      ],
-              ),
-            ),
-
-            // Persistent navigation row at the bottom. Chrome rather than a
-            // section, so it stays out of the way while the menu is being
-            // arranged.
-            if (selectedTabId != null && !isReordering) ...[
-              const Divider(height: 1),
-              Padding(
-                padding: EdgeInsets.only(
-                  bottom: MediaQuery.of(context).padding.bottom,
-                  top: 8,
-                ),
-                child: MenuNavigationRow(selectedTabId: selectedTabId),
-              ),
-            ],
-          ],
-        );
+    // The arrangement UI is navigation inside the sheet, so the system back
+    // gesture has to unwind it a level at a time — out of a section, then out
+    // of arranging — before the sheet itself is allowed to close. Dragging the
+    // sheet down still dismisses it outright, which keeps a way out that does
+    // not depend on stepping back through the levels.
+    return PopScope(
+      canPop: !isReordering,
+      onPopInvokedWithResult: (didPop, _) {
+        if (didPop) return;
+        ref.read(menuReorderModeProvider.notifier).stepBack();
       },
+      child: DraggableScrollableSheet(
+        initialChildSize: 0.85,
+        minChildSize: 0.4,
+        maxChildSize: 0.95,
+        expand: false,
+        builder: (context, scrollController) {
+          return Column(
+            children: [
+              // Drag handle
+              Container(
+                margin: const EdgeInsets.only(top: 12, bottom: 8),
+                height: 4,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+
+              Expanded(
+                child: CustomScrollView(
+                  controller: scrollController,
+                  slivers: isReordering
+                      ? const [MenuReorderView()]
+                      : [
+                          SliverPadding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            sliver: _MenuSections(selectedTabId: selectedTabId),
+                          ),
+                        ],
+                ),
+              ),
+
+              // Persistent navigation row at the bottom. Chrome rather than a
+              // section, so it stays out of the way while the menu is being
+              // arranged.
+              if (selectedTabId != null && !isReordering) ...[
+                const Divider(height: 1),
+                Padding(
+                  padding: EdgeInsets.only(
+                    bottom: MediaQuery.of(context).padding.bottom,
+                    top: 8,
+                  ),
+                  child: MenuNavigationRow(selectedTabId: selectedTabId),
+                ),
+              ],
+            ],
+          );
+        },
+      ),
     );
   }
 }
@@ -152,8 +174,7 @@ class _MenuSections extends ConsumerWidget {
       children: [
         for (final section in layout)
           if (section.visible)
-            if (builders[section.type] case final build?)
-              build(section.visibleItems),
+            if (builders[section.type] case final build?) build(section),
         const _CustomizeMenuButton(),
       ],
     );

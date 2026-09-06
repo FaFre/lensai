@@ -68,7 +68,7 @@ import 'package:weblibre/utils/ui_helper.dart' as ui_helper;
 /// user-configurable.
 class TabActionsSection extends HookConsumerWidget {
   final String selectedTabId;
-  final List<MenuItemType> items;
+  final List<MenuItemEntry> items;
 
   const TabActionsSection({
     super.key,
@@ -87,15 +87,17 @@ class TabActionsSection extends HookConsumerWidget {
 
     final applicable = [
       for (final item in items)
-        if (item != MenuItemType.containers || showContainerUi) item,
+        if (item.type != MenuItemType.containers || showContainerUi) item,
     ];
 
-    final markerIndex = applicable.indexOf(MenuItemType.moreDisclosure);
+    final markerIndex = applicable.indexWhere(
+      (item) => item.type == MenuItemType.moreDisclosure,
+    );
     final upfront = markerIndex == -1
         ? applicable
         : applicable.sublist(0, markerIndex);
     final folded = markerIndex == -1
-        ? const <MenuItemType>[]
+        ? const <MenuItemEntry>[]
         : applicable.sublist(markerIndex + 1);
 
     return buildMenuCard(
@@ -108,7 +110,7 @@ class TabActionsSection extends HookConsumerWidget {
           ListTile(
             leading: const Icon(Icons.more_horiz),
             title: Text(MenuItemType.moreDisclosure.label),
-            subtitle: Text(folded.map((item) => item.label).join(', ')),
+            subtitle: Text(folded.map((item) => item.type.label).join(', ')),
             trailing: const Icon(Icons.expand_more),
             onTap: () => showMore.value = true,
           )
@@ -118,13 +120,23 @@ class TabActionsSection extends HookConsumerWidget {
     );
   }
 
-  Widget _buildItem(MenuItemType item) => switch (item) {
+  Widget _buildItem(MenuItemEntry item) => switch (item.type) {
     MenuItemType.containers => _ContainerExpansion(
       selectedTabId: selectedTabId,
+      items: item.visibleItems,
     ),
-    MenuItemType.share => _ShareExpansion(selectedTabId: selectedTabId),
-    MenuItemType.cloneTab => _CloneTabExpansion(selectedTabId: selectedTabId),
-    MenuItemType.export => _ExportExpansion(selectedTabId: selectedTabId),
+    MenuItemType.share => _ShareExpansion(
+      selectedTabId: selectedTabId,
+      items: item.visibleItems,
+    ),
+    MenuItemType.cloneTab => _CloneTabExpansion(
+      selectedTabId: selectedTabId,
+      items: item.visibleItems,
+    ),
+    MenuItemType.export => _ExportExpansion(
+      selectedTabId: selectedTabId,
+      items: item.visibleItems,
+    ),
     MenuItemType.pinTopSite => _PinTopSiteTile(selectedTabId: selectedTabId),
     MenuItemType.fetchFeeds => _FetchFeedsTile(selectedTabId: selectedTabId),
     _ => const SizedBox.shrink(),
@@ -133,8 +145,9 @@ class TabActionsSection extends HookConsumerWidget {
 
 class _ContainerExpansion extends ConsumerWidget {
   final String selectedTabId;
+  final List<MenuItemEntry> items;
 
-  const _ContainerExpansion({required this.selectedTabId});
+  const _ContainerExpansion({required this.selectedTabId, required this.items});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -143,8 +156,8 @@ class _ContainerExpansion extends ConsumerWidget {
       child: ExpansionTile(
         leading: const Icon(MdiIcons.folder),
         title: const Text('Containers'),
-        children: [
-          buildMenuSubTile(
+        children: orderMenuChildren(items, {
+          MenuItemType.manageContainers: () => buildMenuSubTile(
             'Manage Containers',
             icon: MdiIcons.folder,
             onTap: () async {
@@ -152,9 +165,7 @@ class _ContainerExpansion extends ConsumerWidget {
               await const ContainerListRoute().push(context);
             },
           ),
-
-          // Assign Container
-          buildMenuSubTile(
+          MenuItemType.assignContainer: () => buildMenuSubTile(
             'Assign Container',
             icon: MdiIcons.folderArrowUpDownOutline,
             onTap: () async {
@@ -185,91 +196,95 @@ class _ContainerExpansion extends ConsumerWidget {
               if (context.mounted) Navigator.pop(context);
             },
           ),
+          MenuItemType.assignUrlToContainer: () =>
+              ContainerRelationUnassignedVisibility(
+                child: buildMenuSubTile(
+                  'Assign URL to Container',
+                  icon: MdiIcons.webPlus,
+                  onTap: () async {
+                    final selection = await const ContainerSelectionRoute()
+                        .push<ContainerSelectionResult?>(context);
 
-          // URL relation (conditional)
-          ContainerRelationUnassignedVisibility(
-            child: buildMenuSubTile(
-              'Assign URL to Container',
-              icon: MdiIcons.webPlus,
-              onTap: () async {
-                final selection = await const ContainerSelectionRoute()
-                    .push<ContainerSelectionResult?>(context);
+                    if (selection case ContainerSelectionSelected(
+                      :final containerId,
+                    )) {
+                      final containerData = await ref
+                          .read(containerRepositoryProvider.notifier)
+                          .getContainerData(containerId);
 
-                if (selection case ContainerSelectionSelected(
-                  :final containerId,
-                )) {
-                  final containerData = await ref
-                      .read(containerRepositoryProvider.notifier)
-                      .getContainerData(containerId);
+                      if (containerData != null) {
+                        final tabState = ref.read(
+                          tabStateProvider(selectedTabId),
+                        );
+                        final origin = tabState?.url.origin.mapNotNull(
+                          Uri.parse,
+                        );
 
-                  if (containerData != null) {
+                        if (origin != null) {
+                          await ref
+                              .read(containerRepositoryProvider.notifier)
+                              .replaceContainer(
+                                containerData.copyWith.metadata(
+                                  containerData.metadata.copyWith.assignedSites(
+                                    [
+                                      ...?containerData.metadata.assignedSites,
+                                      origin,
+                                    ],
+                                  ),
+                                ),
+                              );
+                        }
+                      }
+                    }
+
+                    if (context.mounted) Navigator.pop(context);
+                  },
+                ),
+              ),
+          MenuItemType.unassignUrlFromContainer: () =>
+              ContainerRelationAssignedVisibility(
+                child: buildMenuSubTile(
+                  'Unassign URL from Container',
+                  icon: MdiIcons.webMinus,
+                  onTap: () async {
                     final tabState = ref.read(tabStateProvider(selectedTabId));
                     final origin = tabState?.url.origin.mapNotNull(Uri.parse);
 
                     if (origin != null) {
-                      await ref
+                      final containerId = await ref
                           .read(containerRepositoryProvider.notifier)
-                          .replaceContainer(
-                            containerData.copyWith.metadata(
-                              containerData.metadata.copyWith.assignedSites([
-                                ...?containerData.metadata.assignedSites,
-                                origin,
-                              ]),
-                            ),
-                          );
+                          .siteAssignedContainerId(origin);
+
+                      if (containerId != null) {
+                        final containerData = await ref
+                            .read(containerRepositoryProvider.notifier)
+                            .getContainerData(containerId);
+
+                        if (containerData != null) {
+                          final updatedSites = containerData
+                              .metadata
+                              .assignedSites
+                              ?.where((site) => site != origin)
+                              .toList();
+
+                          await ref
+                              .read(containerRepositoryProvider.notifier)
+                              .replaceContainer(
+                                containerData.copyWith.metadata(
+                                  containerData.metadata.copyWith.assignedSites(
+                                    updatedSites,
+                                  ),
+                                ),
+                              );
+                        }
+                      }
                     }
-                  }
-                }
 
-                if (context.mounted) Navigator.pop(context);
-              },
-            ),
-          ),
-
-          // Unassign URL relation (conditional)
-          ContainerRelationAssignedVisibility(
-            child: buildMenuSubTile(
-              'Unassign URL from Container',
-              icon: MdiIcons.webMinus,
-              onTap: () async {
-                final tabState = ref.read(tabStateProvider(selectedTabId));
-                final origin = tabState?.url.origin.mapNotNull(Uri.parse);
-
-                if (origin != null) {
-                  final containerId = await ref
-                      .read(containerRepositoryProvider.notifier)
-                      .siteAssignedContainerId(origin);
-
-                  if (containerId != null) {
-                    final containerData = await ref
-                        .read(containerRepositoryProvider.notifier)
-                        .getContainerData(containerId);
-
-                    if (containerData != null) {
-                      final updatedSites = containerData.metadata.assignedSites
-                          ?.where((site) => site != origin)
-                          .toList();
-
-                      await ref
-                          .read(containerRepositoryProvider.notifier)
-                          .replaceContainer(
-                            containerData.copyWith.metadata(
-                              containerData.metadata.copyWith.assignedSites(
-                                updatedSites,
-                              ),
-                            ),
-                          );
-                    }
-                  }
-                }
-
-                if (context.mounted) Navigator.pop(context);
-              },
-            ),
-          ),
-
-          // Unassign Container (conditional)
-          ContainerAssignedVisibility(
+                    if (context.mounted) Navigator.pop(context);
+                  },
+                ),
+              ),
+          MenuItemType.unassignContainer: () => ContainerAssignedVisibility(
             tabId: selectedTabId,
             child: buildMenuSubTile(
               'Unassign Container',
@@ -283,7 +298,7 @@ class _ContainerExpansion extends ConsumerWidget {
               },
             ),
           ),
-        ],
+        }),
       ),
     );
   }
@@ -291,8 +306,9 @@ class _ContainerExpansion extends ConsumerWidget {
 
 class _ShareExpansion extends HookConsumerWidget {
   final String selectedTabId;
+  final List<MenuItemEntry> items;
 
-  const _ShareExpansion({required this.selectedTabId});
+  const _ShareExpansion({required this.selectedTabId, required this.items});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -359,73 +375,66 @@ class _ShareExpansion extends HookConsumerWidget {
               onClean: applyCleanUrl,
               onApplySelectedRemovals: applySelectedTrackingRemovals,
             ),
+          ...orderMenuChildren(items, {
+            MenuItemType.copyAddress: () => buildMenuSubTile(
+              'Copy Address',
+              icon: MdiIcons.contentCopy,
+              trailing: cleanedTrailing,
+              onTap: () async {
+                await Clipboard.setData(
+                  ClipboardData(text: effectiveUrl.toString()),
+                );
+                if (context.mounted) Navigator.pop(context);
+              },
+            ),
+            MenuItemType.shareScreenshot: () => buildMenuSubTile(
+              'Share Screenshot',
+              icon: Icons.mobile_screen_share,
+              onTap: () async {
+                final screenshot = await ref
+                    .read(selectedTabSessionProvider)
+                    .requestScreenshot();
 
-          // Copy Address
-          buildMenuSubTile(
-            'Copy Address',
-            icon: MdiIcons.contentCopy,
-            trailing: cleanedTrailing,
-            onTap: () async {
-              await Clipboard.setData(
-                ClipboardData(text: effectiveUrl.toString()),
-              );
-              if (context.mounted) Navigator.pop(context);
-            },
-          ),
+                final ts = ref.read(tabStateProvider(selectedTabId))!;
 
-          // Share Screenshot
-          buildMenuSubTile(
-            'Share Screenshot',
-            icon: Icons.mobile_screen_share,
-            onTap: () async {
-              final screenshot = await ref
-                  .read(selectedTabSessionProvider)
-                  .requestScreenshot();
+                if (screenshot != null) {
+                  final png = await encodeScreenshotAsPng(screenshot);
 
-              final ts = ref.read(tabStateProvider(selectedTabId))!;
+                  if (png != null) {
+                    final file = XFile.fromData(png, mimeType: 'image/png');
 
-              if (screenshot != null) {
-                final png = await encodeScreenshotAsPng(screenshot);
-
-                if (png != null) {
-                  final file = XFile.fromData(png, mimeType: 'image/png');
-
-                  await SharePlus.instance.share(
-                    ShareParams(files: [file], subject: ts.titleOrAuthority),
-                  );
+                    await SharePlus.instance.share(
+                      ShareParams(files: [file], subject: ts.titleOrAuthority),
+                    );
+                  }
                 }
-              }
 
-              if (context.mounted) Navigator.pop(context);
-            },
-          ),
-
-          // Share Link
-          buildMenuSubTile(
-            'Share Link',
-            icon: Icons.share,
-            trailing: cleanedTrailing,
-            onTap: () async {
-              await SharePlus.instance.share(ShareParams(uri: effectiveUrl));
-              if (context.mounted) Navigator.pop(context);
-            },
-          ),
-
-          // Send To Device (conditional)
-          _SendToDeviceExpansion(selectedTabId: selectedTabId),
-
-          // Show QR Code
-          buildMenuSubTile(
-            'Show QR Code',
-            icon: Icons.qr_code,
-            trailing: cleanedTrailing,
-            onTap: () async {
-              if (context.mounted) {
-                Navigator.pop(context);
-                await showQrCode(context, effectiveUrl.toString());
-              }
-            },
-          ),
+                if (context.mounted) Navigator.pop(context);
+              },
+            ),
+            MenuItemType.shareLink: () => buildMenuSubTile(
+              'Share Link',
+              icon: Icons.share,
+              trailing: cleanedTrailing,
+              onTap: () async {
+                await SharePlus.instance.share(ShareParams(uri: effectiveUrl));
+                if (context.mounted) Navigator.pop(context);
+              },
+            ),
+            MenuItemType.sendToDevice: () =>
+                _SendToDeviceExpansion(selectedTabId: selectedTabId),
+            MenuItemType.showQrCode: () => buildMenuSubTile(
+              'Show QR Code',
+              icon: Icons.qr_code,
+              trailing: cleanedTrailing,
+              onTap: () async {
+                if (context.mounted) {
+                  Navigator.pop(context);
+                  await showQrCode(context, effectiveUrl.toString());
+                }
+              },
+            ),
+          }),
         ],
       ),
     );
@@ -558,8 +567,9 @@ class _SendToDeviceExpansion extends ConsumerWidget {
 
 class _CloneTabExpansion extends ConsumerWidget {
   final String selectedTabId;
+  final List<MenuItemEntry> items;
 
-  const _CloneTabExpansion({required this.selectedTabId});
+  const _CloneTabExpansion({required this.selectedTabId, required this.items});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -571,8 +581,8 @@ class _CloneTabExpansion extends ConsumerWidget {
       child: ExpansionTile(
         leading: const Icon(MdiIcons.contentDuplicate),
         title: const Text('Clone Tab'),
-        children: [
-          buildMenuSubTile(
+        children: orderMenuChildren(items, {
+          MenuItemType.cloneRegularTab: () => buildMenuSubTile(
             'Regular',
             icon: MdiIcons.tab,
             onTap: () async {
@@ -611,7 +621,7 @@ class _CloneTabExpansion extends ConsumerWidget {
               }
             },
           ),
-          buildMenuSubTile(
+          MenuItemType.clonePrivateTab: () => buildMenuSubTile(
             'Private',
             icon: MdiIcons.dominoMask,
             iconColor: appColors.privateTabPurple,
@@ -652,7 +662,7 @@ class _CloneTabExpansion extends ConsumerWidget {
             },
           ),
           if (settings.showIsolatedTabUi)
-            buildMenuSubTile(
+            MenuItemType.cloneIsolatedTab: () => buildMenuSubTile(
               'Isolated',
               icon: MdiIcons.snowflake,
               iconColor: appColors.isolatedTabTeal,
@@ -684,7 +694,7 @@ class _CloneTabExpansion extends ConsumerWidget {
                 }
               },
             ),
-        ],
+        }),
       ),
     );
   }
@@ -692,8 +702,9 @@ class _CloneTabExpansion extends ConsumerWidget {
 
 class _ExportExpansion extends ConsumerWidget {
   final String selectedTabId;
+  final List<MenuItemEntry> items;
 
-  const _ExportExpansion({required this.selectedTabId});
+  const _ExportExpansion({required this.selectedTabId, required this.items});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -702,9 +713,8 @@ class _ExportExpansion extends ConsumerWidget {
       child: ExpansionTile(
         leading: const Icon(MdiIcons.fileExport),
         title: const Text('Export'),
-        children: [
-          // Copy as Markdown
-          buildMenuSubTile(
+        children: orderMenuChildren(items, {
+          MenuItemType.copyAsMarkdown: () => buildMenuSubTile(
             'Copy as Markdown',
             // ignore: deprecated_member_use
             icon: MdiIcons.languageMarkdownOutline,
@@ -723,9 +733,7 @@ class _ExportExpansion extends ConsumerWidget {
               }, const Text('Copy as Markdown'));
             },
           ),
-
-          // Export as Markdown
-          buildMenuSubTile(
+          MenuItemType.exportAsMarkdown: () => buildMenuSubTile(
             'Export as Markdown',
             // ignore: deprecated_member_use
             icon: MdiIcons.languageMarkdown,
@@ -743,9 +751,7 @@ class _ExportExpansion extends ConsumerWidget {
               }, const Text('Export as Markdown'));
             },
           ),
-
-          // Export as PDF
-          buildMenuSubTile(
+          MenuItemType.exportAsPdf: () => buildMenuSubTile(
             'Export as PDF',
             icon: MdiIcons.filePdfBox,
             onTap: () async {
@@ -755,9 +761,7 @@ class _ExportExpansion extends ConsumerWidget {
               if (context.mounted) Navigator.pop(context);
             },
           ),
-
-          // Export as PNG
-          buildMenuSubTile(
+          MenuItemType.exportAsPng: () => buildMenuSubTile(
             'Export as PNG',
             icon: MdiIcons.fileImage,
             onTap: () async {
@@ -783,9 +787,7 @@ class _ExportExpansion extends ConsumerWidget {
               if (context.mounted) Navigator.pop(context);
             },
           ),
-
-          // Print
-          buildMenuSubTile(
+          MenuItemType.printPage: () => buildMenuSubTile(
             'Print',
             icon: MdiIcons.printer,
             onTap: () async {
@@ -801,7 +803,7 @@ class _ExportExpansion extends ConsumerWidget {
               if (context.mounted) Navigator.pop(context);
             },
           ),
-        ],
+        }),
       ),
     );
   }
