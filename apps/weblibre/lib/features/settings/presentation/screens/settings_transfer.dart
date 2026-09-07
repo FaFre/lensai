@@ -448,10 +448,7 @@ class SettingsTransferScreen extends HookConsumerWidget {
                 // account sync carries them yet.
                 Text(
                   'Web search preferences, home and new-tab layout, menu '
-                  'order and pinned add-ons stay on this device. Saved '
-                  'credentials are stripped out — but a token buried in a '
-                  'custom URL cannot be told apart from the URL, so read the '
-                  'file before you share it.',
+                  'order and pinned add-ons stay on this device',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
