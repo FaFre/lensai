@@ -58,41 +58,25 @@ class BangSyncRepository extends _$BangSyncRepository {
     });
   }
 
-  static Future<Result<void>> _fetchAndSyncBundled({
-    required BangDataSourceService sourceService,
+  /// Imports one bundled group, given its already-loaded asset text.
+  ///
+  /// Runs entirely off the main isolate — see [syncBundledBangGroup] for why the
+  /// asset is read by the caller rather than here.
+  static Future<void> _syncBundledPayload({
     required BangDatabase db,
     required BangGroup group,
+    required String assetJson,
+    required DateTime sourceDate,
   }) async {
-    if (group.bundled == null) {
-      return Result.failure(
-        const ErrorMessage(source: 'BangSync', message: 'Not bundled'),
-      );
-    }
+    final bangs = parseBundledBangs(assetJson, group);
 
-    final lastSync = await db.syncDao
-        .getLastSyncOfGroup(group)
-        .getSingleOrNull();
-
-    final sourceDate = await sourceService.getBundledBangDate(
-      'assets/bangs/last_sync.txt',
+    await db.syncDao.syncBangs(
+      group: group,
+      remoteBangs: bangs,
+      syncTime: sourceDate,
     );
-
-    if (lastSync != null &&
-        (sourceDate == lastSync ||
-            sourceDate.difference(lastSync).isNegative)) {
-      return Result.success(null);
-    }
-
-    final result = await sourceService.getBundledBangs(group.bundled!, group);
-    return result.flatMapAsync((remoteBangs) async {
-      await db.syncDao.syncBangs(
-        group: group,
-        remoteBangs: remoteBangs,
-        syncTime: sourceDate,
-      );
-      await db.definitionsDrift.optimizeBangFtsIndex();
-      await db.definitionsDrift.optimizeTriggerFtsIndex();
-    });
+    await db.definitionsDrift.optimizeBangFtsIndex();
+    await db.definitionsDrift.optimizeTriggerFtsIndex();
   }
 
   Future<Result<void>> syncRemoteBangGroup(
@@ -133,18 +117,59 @@ class BangSyncRepository extends _$BangSyncRepository {
     }
   }
 
+  /// Imports the bundled copy of [group] when the shipped assets are newer than
+  /// what this profile already holds.
+  ///
+  /// This runs on every launch, and on the launch after an app update it has
+  /// real work to do: the main group is ~2.2 MB of JSON and ~10 900 rows. That
+  /// used to be decoded, mapped and diffed on the main isolate while the startup
+  /// spinner was up. Now only the two cheap reads happen here — the stored sync
+  /// date, and (when a sync is actually due) the asset text, which `rootBundle`
+  /// can only be asked for on the main isolate — and everything expensive runs
+  /// in the isolate `computeWithDatabase` opens, the way the remote path already
+  /// did.
   Future<Result<void>> syncBundledBangGroup(BangGroup group) async {
+    final bundled = group.bundled;
+    if (bundled == null) {
+      return Result.failure(
+        const ErrorMessage(source: 'BangSync', message: 'Not bundled'),
+      );
+    }
+
     try {
       final db = ref.read(bangDatabaseProvider);
+      final sourceService = ref.read(bangDataSourceServiceProvider.notifier);
 
-      final result = await _fetchAndSyncBundled(
-        sourceService: ref.read(bangDataSourceServiceProvider.notifier),
-        db: db,
-        group: group,
+      final lastSync = await db.syncDao
+          .getLastSyncOfGroup(group)
+          .getSingleOrNull();
+
+      final sourceDate = await sourceService.getBundledBangDate(
+        'assets/bangs/last_sync.txt',
       );
 
-      //Throw if necessary
-      return result;
+      // The usual answer, and the reason this check stays out of the isolate:
+      // nothing shipped is newer than what is stored, so no asset is read and
+      // no isolate is spawned.
+      if (lastSync != null &&
+          (sourceDate == lastSync ||
+              sourceDate.difference(lastSync).isNegative)) {
+        return Result.success(null);
+      }
+
+      final assetJson = await sourceService.loadBundledBangJson(bundled);
+
+      await db.computeWithDatabase(
+        connect: BangDatabase.new,
+        computation: (db) => _syncBundledPayload(
+          db: db,
+          group: group,
+          assetJson: assetJson,
+          sourceDate: sourceDate,
+        ),
+      );
+
+      return Result.success(null);
     } catch (e) {
       return Result.failure(
         ErrorMessage(
@@ -170,14 +195,18 @@ class BangSyncRepository extends _$BangSyncRepository {
     //Default to all sources
     groups ??= BangGroup.values.where((e) => e.bundled != null).toSet();
 
-    //Run isolated operations
-    final futures = groups.map(
-      (source) => syncBundledBangGroup(
-        source,
-      ).then((result) => MapEntry(source, result)),
-    );
+    // Sequential, deliberately. Each group that actually needs importing opens
+    // its own isolate through `computeWithDatabase`, and `Future.wait` would
+    // start all of them at once — three isolates competing for CPU during the
+    // engine bring-up they were just moved alongside. They gain nothing from
+    // overlapping: drift funnels every one of them onto the same background
+    // executor, so the writes serialise regardless.
+    final results = <BangGroup, Result<void>>{};
+    for (final group in groups) {
+      results[group] = await syncBundledBangGroup(group);
+    }
 
-    return Map.fromEntries(await Future.wait(futures));
+    return results;
   }
 
   @override

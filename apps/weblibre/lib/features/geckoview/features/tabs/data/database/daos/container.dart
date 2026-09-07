@@ -24,9 +24,11 @@ import 'package:drift/drift.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/database/daos/container.drift.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/database/database.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/database/definitions.drift.dart';
+import 'package:weblibre/features/geckoview/features/tabs/data/database/projections/tab_summary.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/entities/tab_mode.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/models/container_data.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/models/site_assignment.dart';
+import 'package:weblibre/features/geckoview/features/tabs/data/models/tab_summary.dart';
 
 @DriftAccessor()
 class ContainerDao extends DatabaseAccessor<TabDatabase>
@@ -139,16 +141,20 @@ class ContainerDao extends DatabaseAccessor<TabDatabase>
     return query.map((row) => row.read(db.tab.id)!);
   }
 
-  Selectable<TabData> getContainerTabsData(String? containerId) {
-    final query = db.tab.select()
+  /// Every tab of one container, in render order.
+  ///
+  /// A [TabSummary] rather than a `TabData`: this is watched as a stream, so it
+  /// re-runs on every write to `tab`, and no consumer reads a content column.
+  Selectable<TabSummary> getContainerTabsData(String? containerId) {
+    final query = selectTabSummaries(this, db.tab)
       ..where(
-        (t) => (containerId != null)
-            ? t.containerId.equals(containerId)
-            : t.containerId.isNull(),
+        (containerId != null)
+            ? db.tab.containerId.equals(containerId)
+            : db.tab.containerId.isNull(),
       )
-      ..orderBy([(t) => OrderingTerm.asc(t.orderKey)]);
+      ..orderBy([OrderingTerm.asc(db.tab.orderKey)]);
 
-    return query;
+    return query.map((row) => readTabSummary(row, db.tab));
   }
 
   SingleSelectable<String> generateLeadingOrderKey(

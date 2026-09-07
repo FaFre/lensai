@@ -1,0 +1,1396 @@
+{
+  "_meta": {
+    "description": "This file contains a serialized version of schema entities for drift.",
+    "version": "1.3.0"
+  },
+  "options": {
+    "store_date_time_values_as_text": false
+  },
+  "entities": [
+    {
+      "id": 0,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "container",
+        "was_declared_in_moor": true,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "PRIMARY KEY NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              "primary-key"
+            ]
+          },
+          {
+            "name": "name",
+            "getter_name": "name",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "color",
+            "getter_name": "color",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const ColorConverter()",
+              "dart_type_name": "Color"
+            }
+          },
+          {
+            "name": "order_key",
+            "getter_name": "orderKey",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "is_pinned",
+            "getter_name": "isPinned",
+            "moor_type": "bool",
+            "nullable": false,
+            "customConstraints": "NOT NULL DEFAULT 0",
+            "default_dart": "const CustomExpression('0')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "metadata",
+            "getter_name": "metadata",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const ContainerMetadataConverter()",
+              "dart_type_name": "ContainerMetadata"
+            }
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": []
+      }
+    },
+    {
+      "id": 1,
+      "references": [
+        0
+      ],
+      "type": "table",
+      "data": {
+        "name": "tab",
+        "was_declared_in_moor": true,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "PRIMARY KEY NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              "primary-key"
+            ]
+          },
+          {
+            "name": "source",
+            "getter_name": "source",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumIndexConverter<TabSource>(TabSource.values)",
+              "dart_type_name": "TabSource"
+            }
+          },
+          {
+            "name": "parent_id",
+            "getter_name": "parentId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "REFERENCES tab(id)ON DELETE SET NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "tab",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "setNull"
+                }
+              }
+            ]
+          },
+          {
+            "name": "container_id",
+            "getter_name": "containerId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "REFERENCES container(id)ON DELETE CASCADE",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "container",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          },
+          {
+            "name": "order_key",
+            "getter_name": "orderKey",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "url",
+            "getter_name": "url",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const UriConverterNullable()",
+              "dart_type_name": "Uri?"
+            }
+          },
+          {
+            "name": "title",
+            "getter_name": "title",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "tab_mode",
+            "getter_name": "tabMode",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": "NOT NULL DEFAULT 0",
+            "default_dart": "const CustomExpression('0')",
+            "default_client_dart": null,
+            "dsl_features": [],
+            "type_converter": {
+              "dart_expr": "const EnumIndexConverter<TabModeDbValue>(TabModeDbValue.values)",
+              "dart_type_name": "TabModeDbValue"
+            }
+          },
+          {
+            "name": "isolation_context_id",
+            "getter_name": "isolationContextId",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "is_pinned",
+            "getter_name": "isPinned",
+            "moor_type": "bool",
+            "nullable": false,
+            "customConstraints": "NOT NULL DEFAULT 0",
+            "default_dart": "const CustomExpression('0')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "is_probably_readerable",
+            "getter_name": "isProbablyReaderable",
+            "moor_type": "bool",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "extracted_content_markdown",
+            "getter_name": "extractedContentMarkdown",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "extracted_content_plain",
+            "getter_name": "extractedContentPlain",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "full_content_markdown",
+            "getter_name": "fullContentMarkdown",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "full_content_plain",
+            "getter_name": "fullContentPlain",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "timestamp",
+            "getter_name": "timestamp",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "content_hash",
+            "getter_name": "contentHash",
+            "moor_type": "int",
+            "nullable": true,
+            "customConstraints": "GENERATED ALWAYS AS (generate_content_hash(title, extracted_content_plain, full_content_plain)) VIRTUAL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "generated_as": {
+                  "dart_expression": {
+                    "elements": [
+                      "const ",
+                      {
+                        "lexeme": "CustomExpression",
+                        "import_uri": "package:drift/drift.dart"
+                      },
+                      "('generate_content_hash(title, extracted_content_plain, full_content_plain)')"
+                    ]
+                  },
+                  "stored": false
+                }
+              }
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [
+          "CHECK((tab_mode = 2 AND isolation_context_id IS NOT NULL)OR(tab_mode != 2 AND isolation_context_id IS NULL))"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "closed_tab_tombstone",
+        "was_declared_in_moor": true,
+        "columns": [
+          {
+            "name": "tab_id",
+            "getter_name": "tabId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "PRIMARY KEY NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              "primary-key"
+            ]
+          },
+          {
+            "name": "closed_at",
+            "getter_name": "closedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": []
+      }
+    },
+    {
+      "id": 3,
+      "references": [
+        1
+      ],
+      "type": "index",
+      "data": {
+        "on": 1,
+        "name": "idx_tab_parent_container",
+        "sql": "CREATE INDEX idx_tab_parent_container ON tab(parent_id, container_id);",
+        "unique": false,
+        "columns": []
+      }
+    },
+    {
+      "id": 4,
+      "references": [
+        1
+      ],
+      "type": "index",
+      "data": {
+        "on": 1,
+        "name": "idx_tab_timestamp",
+        "sql": "CREATE INDEX idx_tab_timestamp ON tab(timestamp DESC, id DESC);",
+        "unique": false,
+        "columns": []
+      }
+    },
+    {
+      "id": 5,
+      "references": [
+        1
+      ],
+      "type": "index",
+      "data": {
+        "on": 1,
+        "name": "idx_tab_container_order",
+        "sql": "CREATE INDEX idx_tab_container_order ON tab(container_id, order_key);",
+        "unique": false,
+        "columns": []
+      }
+    },
+    {
+      "id": 6,
+      "references": [
+        1
+      ],
+      "type": "table",
+      "data": {
+        "name": "capture_tab",
+        "was_declared_in_moor": true,
+        "columns": [
+          {
+            "name": "tab_id",
+            "getter_name": "tabId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL PRIMARY KEY REFERENCES tab(id)ON DELETE CASCADE",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              "primary-key",
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "tab",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          },
+          {
+            "name": "capture_id",
+            "getter_name": "captureId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "source_url",
+            "getter_name": "sourceUrl",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "status",
+            "getter_name": "status",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL DEFAULT 'pending'",
+            "default_dart": "const CustomExpression('\\'pending\\'')",
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "created_at",
+            "getter_name": "createdAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": []
+      }
+    },
+    {
+      "id": 7,
+      "references": [
+        6
+      ],
+      "type": "index",
+      "data": {
+        "on": 6,
+        "name": "idx_capture_tab_capture_id",
+        "sql": "CREATE INDEX idx_capture_tab_capture_id ON capture_tab(capture_id);",
+        "unique": false,
+        "columns": []
+      }
+    },
+    {
+      "id": 8,
+      "references": [
+        1
+      ],
+      "type": "table",
+      "data": {
+        "name": "tab_fts",
+        "was_declared_in_moor": true,
+        "columns": [
+          {
+            "name": "title",
+            "getter_name": "title",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "url",
+            "getter_name": "url",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "extracted_content_plain",
+            "getter_name": "extractedContentPlain",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "full_content_plain",
+            "getter_name": "fullContentPlain",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": true,
+        "create_virtual_stmt": "CREATE VIRTUAL TABLE \"tab_fts\" USING fts5(title, url, extracted_content_plain, full_content_plain, content=tab, tokenize=\"trigram\")",
+        "without_rowid": false,
+        "constraints": []
+      }
+    },
+    {
+      "id": 9,
+      "references": [
+        1
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 1,
+        "references_in_body": [
+          1
+        ],
+        "name": "tab_maintain_parent_chain_on_delete",
+        "sql": "CREATE TRIGGER tab_maintain_parent_chain_on_delete BEFORE DELETE ON tab BEGIN\n  -- Update all children of the deleted row to point to its parent (grandparent)\n  -- Only if the grandparent exists, otherwise set to NULL\n  UPDATE tab\n  SET parent_id = CASE\n    WHEN OLD.parent_id IS NOT NULL AND\n         EXISTS(SELECT 1 FROM tab WHERE id = OLD.parent_id)\n    THEN OLD.parent_id\n    ELSE NULL\n  END\n  WHERE parent_id = OLD.id;\nEND;"
+      }
+    },
+    {
+      "id": 10,
+      "references": [
+        1,
+        8
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 1,
+        "references_in_body": [
+          1,
+          8
+        ],
+        "name": "tab_after_insert",
+        "sql": "CREATE TRIGGER tab_after_insert AFTER INSERT ON tab BEGIN\n  INSERT INTO \n    tab_fts(rowid, title, url, extracted_content_plain, full_content_plain) \n    VALUES (new.rowid, new.title, new.url, new.extracted_content_plain, new.full_content_plain);\nEND;"
+      }
+    },
+    {
+      "id": 11,
+      "references": [
+        1,
+        8
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 1,
+        "references_in_body": [
+          1,
+          8
+        ],
+        "name": "tab_after_delete",
+        "sql": "CREATE TRIGGER tab_after_delete AFTER DELETE ON tab BEGIN\n  INSERT INTO \n    tab_fts(tab_fts, rowid, title, url, extracted_content_plain, full_content_plain) \n    VALUES('delete', old.rowid, old.title, old.url, old.extracted_content_plain, old.full_content_plain);\nEND;"
+      }
+    },
+    {
+      "id": 12,
+      "references": [
+        1,
+        8
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 1,
+        "references_in_body": [
+          1,
+          8
+        ],
+        "name": "tab_after_update",
+        "sql": "CREATE TRIGGER tab_after_update AFTER UPDATE OF\n  title, url, extracted_content_plain, full_content_plain\nON tab\nWHEN OLD.content_hash IS NOT NEW.content_hash\n   OR OLD.url IS NOT NEW.url\nBEGIN\n  INSERT INTO\n    tab_fts(tab_fts, rowid, title, url, extracted_content_plain, full_content_plain)\n    VALUES('delete', old.rowid, old.title, old.url, old.extracted_content_plain, old.full_content_plain);\n  INSERT INTO\n    tab_fts(rowid, title, url, extracted_content_plain, full_content_plain)\n    VALUES (new.rowid, new.title, new.url, new.extracted_content_plain, new.full_content_plain);\nEND;"
+      }
+    },
+    {
+      "id": 13,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "local_index_setting",
+        "was_declared_in_moor": true,
+        "columns": [
+          {
+            "name": "key",
+            "getter_name": "key",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "PRIMARY KEY NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              "primary-key"
+            ]
+          },
+          {
+            "name": "value",
+            "getter_name": "value",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": [],
+        "strict": true
+      }
+    },
+    {
+      "id": 14,
+      "references": [],
+      "type": "table",
+      "data": {
+        "name": "history",
+        "was_declared_in_moor": true,
+        "columns": [
+          {
+            "name": "url_canonical",
+            "getter_name": "urlCanonical",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "PRIMARY KEY NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              "primary-key"
+            ]
+          },
+          {
+            "name": "url_host",
+            "getter_name": "urlHost",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "url_path",
+            "getter_name": "urlPath",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "title",
+            "getter_name": "title",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "is_probably_readerable",
+            "getter_name": "isProbablyReaderable",
+            "moor_type": "bool",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "extracted_content_markdown",
+            "getter_name": "extractedContentMarkdown",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "extracted_content_plain",
+            "getter_name": "extractedContentPlain",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "full_content_markdown",
+            "getter_name": "fullContentMarkdown",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "full_content_plain",
+            "getter_name": "fullContentPlain",
+            "moor_type": "string",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "content_hash",
+            "getter_name": "contentHash",
+            "moor_type": "int",
+            "nullable": true,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "observed_at",
+            "getter_name": "observedAt",
+            "moor_type": "dateTime",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "observed_count",
+            "getter_name": "observedCount",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": "NOT NULL DEFAULT 1",
+            "default_dart": "const CustomExpression('1')",
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": []
+      }
+    },
+    {
+      "id": 15,
+      "references": [
+        14
+      ],
+      "type": "index",
+      "data": {
+        "on": 14,
+        "name": "idx_history_host",
+        "sql": "CREATE INDEX idx_history_host ON history(url_host);",
+        "unique": false,
+        "columns": []
+      }
+    },
+    {
+      "id": 16,
+      "references": [
+        14
+      ],
+      "type": "index",
+      "data": {
+        "on": 14,
+        "name": "idx_history_observed",
+        "sql": "CREATE INDEX idx_history_observed ON history(observed_at DESC);",
+        "unique": false,
+        "columns": []
+      }
+    },
+    {
+      "id": 17,
+      "references": [
+        14
+      ],
+      "type": "table",
+      "data": {
+        "name": "history_fts",
+        "was_declared_in_moor": true,
+        "columns": [
+          {
+            "name": "title",
+            "getter_name": "title",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "url_host",
+            "getter_name": "urlHost",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "url_path",
+            "getter_name": "urlPath",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "extracted_content_plain",
+            "getter_name": "extractedContentPlain",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "full_content_plain",
+            "getter_name": "fullContentPlain",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          }
+        ],
+        "is_virtual": true,
+        "create_virtual_stmt": "CREATE VIRTUAL TABLE \"history_fts\" USING fts5(title, url_host, url_path, extracted_content_plain, full_content_plain, content=history, tokenize=\"trigram\")",
+        "without_rowid": false,
+        "constraints": []
+      }
+    },
+    {
+      "id": 18,
+      "references": [
+        14,
+        17
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 14,
+        "references_in_body": [
+          14,
+          17
+        ],
+        "name": "history_after_insert",
+        "sql": "CREATE TRIGGER history_after_insert AFTER INSERT ON history BEGIN\n  INSERT INTO\n    history_fts(rowid, title, url_host, url_path, extracted_content_plain, full_content_plain)\n    VALUES (new.rowid, new.title, new.url_host, new.url_path, new.extracted_content_plain, new.full_content_plain);\nEND;"
+      }
+    },
+    {
+      "id": 19,
+      "references": [
+        14,
+        17
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 14,
+        "references_in_body": [
+          14,
+          17
+        ],
+        "name": "history_after_delete",
+        "sql": "CREATE TRIGGER history_after_delete AFTER DELETE ON history BEGIN\n  INSERT INTO\n    history_fts(history_fts, rowid, title, url_host, url_path, extracted_content_plain, full_content_plain)\n    VALUES('delete', old.rowid, old.title, old.url_host, old.url_path, old.extracted_content_plain, old.full_content_plain);\nEND;"
+      }
+    },
+    {
+      "id": 20,
+      "references": [
+        14,
+        17
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 14,
+        "references_in_body": [
+          14,
+          17
+        ],
+        "name": "history_after_update",
+        "sql": "CREATE TRIGGER history_after_update AFTER UPDATE OF\n  title, url_host, url_path, extracted_content_plain, full_content_plain\nON history BEGIN\n  INSERT INTO\n    history_fts(history_fts, rowid, title, url_host, url_path, extracted_content_plain, full_content_plain)\n    VALUES('delete', old.rowid, old.title, old.url_host, old.url_path, old.extracted_content_plain, old.full_content_plain);\n  INSERT INTO\n    history_fts(rowid, title, url_host, url_path, extracted_content_plain, full_content_plain)\n    VALUES (new.rowid, new.title, new.url_host, new.url_path, new.extracted_content_plain, new.full_content_plain);\nEND;"
+      }
+    },
+    {
+      "id": 21,
+      "references": [
+        1,
+        13,
+        0,
+        14
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 1,
+        "references_in_body": [
+          1,
+          13,
+          0,
+          14
+        ],
+        "name": "tab_to_history_on_insert",
+        "sql": "CREATE TRIGGER tab_to_history_on_insert AFTER INSERT ON tab\nWHEN NEW.url IS NOT NULL\n AND url_indexable(CAST(NEW.url AS TEXT)) = 1\n AND (SELECT value FROM local_index_setting WHERE \"key\" = 'enabled') = 1\n AND (NEW.tab_mode != 1\n      OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)\n AND NOT EXISTS (\n   SELECT 1 FROM container\n   WHERE container.id = NEW.container_id\n     AND (json_extract(container.metadata, '$.excludeFromIndex') = 1\n          OR json_extract(container.metadata, '$.excludeFromHistory') = 1)\n )\nBEGIN\n  INSERT INTO history (\n    url_canonical, url_host, url_path, title, is_probably_readerable,\n    extracted_content_markdown, extracted_content_plain,\n    full_content_markdown, full_content_plain,\n    content_hash, observed_at, observed_count\n  ) VALUES (\n    url_canonical(CAST(NEW.url AS TEXT)),\n    url_host(CAST(NEW.url AS TEXT)),\n    url_path(CAST(NEW.url AS TEXT)),\n    NEW.title,\n    NEW.is_probably_readerable,\n    NEW.extracted_content_markdown,\n    NEW.extracted_content_plain,\n    NEW.full_content_markdown,\n    NEW.full_content_plain,\n    NEW.content_hash,\n    strftime('%s','now') * 1000,\n    1\n  )\n  ON CONFLICT(url_canonical) DO UPDATE SET\n    title                       = COALESCE(excluded.title, history.title),\n    is_probably_readerable      = excluded.is_probably_readerable,\n    extracted_content_markdown  = excluded.extracted_content_markdown,\n    extracted_content_plain     = excluded.extracted_content_plain,\n    full_content_markdown       = excluded.full_content_markdown,\n    full_content_plain          = excluded.full_content_plain,\n    content_hash                = excluded.content_hash,\n    observed_at                 = excluded.observed_at,\n    observed_count              = history.observed_count + 1\n  WHERE history.content_hash IS NOT excluded.content_hash;\nEND;"
+      }
+    },
+    {
+      "id": 22,
+      "references": [
+        1,
+        13,
+        0,
+        14
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 1,
+        "references_in_body": [
+          1,
+          13,
+          0,
+          14
+        ],
+        "name": "tab_to_history_on_update",
+        "sql": "CREATE TRIGGER tab_to_history_on_update AFTER UPDATE OF\n  title, url, extracted_content_plain, extracted_content_markdown,\n  full_content_plain, full_content_markdown, is_probably_readerable\nON tab\nWHEN NEW.url IS NOT NULL\n AND url_indexable(CAST(NEW.url AS TEXT)) = 1\n AND (OLD.content_hash IS NOT NEW.content_hash\n      OR OLD.url IS NOT NEW.url)\n AND (SELECT value FROM local_index_setting WHERE \"key\" = 'enabled') = 1\n AND (NEW.tab_mode != 1\n      OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)\n AND NOT EXISTS (\n   SELECT 1 FROM container\n   WHERE container.id = NEW.container_id\n     AND (json_extract(container.metadata, '$.excludeFromIndex') = 1\n          OR json_extract(container.metadata, '$.excludeFromHistory') = 1)\n )\nBEGIN\n  INSERT INTO history (\n    url_canonical, url_host, url_path, title, is_probably_readerable,\n    extracted_content_markdown, extracted_content_plain,\n    full_content_markdown, full_content_plain,\n    content_hash, observed_at, observed_count\n  ) VALUES (\n    url_canonical(CAST(NEW.url AS TEXT)),\n    url_host(CAST(NEW.url AS TEXT)),\n    url_path(CAST(NEW.url AS TEXT)),\n    NEW.title,\n    NEW.is_probably_readerable,\n    NEW.extracted_content_markdown,\n    NEW.extracted_content_plain,\n    NEW.full_content_markdown,\n    NEW.full_content_plain,\n    NEW.content_hash,\n    strftime('%s','now') * 1000,\n    1\n  )\n  ON CONFLICT(url_canonical) DO UPDATE SET\n    title                       = COALESCE(excluded.title, history.title),\n    is_probably_readerable      = excluded.is_probably_readerable,\n    extracted_content_markdown  = excluded.extracted_content_markdown,\n    extracted_content_plain     = excluded.extracted_content_plain,\n    full_content_markdown       = excluded.full_content_markdown,\n    full_content_plain          = excluded.full_content_plain,\n    content_hash                = excluded.content_hash,\n    observed_at                 = excluded.observed_at,\n    observed_count              = history.observed_count + 1\n  WHERE history.content_hash IS NOT excluded.content_hash;\nEND;"
+      }
+    },
+    {
+      "id": 23,
+      "references": [
+        1,
+        13,
+        14,
+        0
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 1,
+        "references_in_body": [
+          1,
+          13,
+          14,
+          0
+        ],
+        "name": "tab_to_history_on_container_update",
+        "sql": "CREATE TRIGGER tab_to_history_on_container_update AFTER UPDATE OF container_id\nON tab\nWHEN NEW.url IS NOT NULL\n AND url_indexable(CAST(NEW.url AS TEXT)) = 1\n AND (SELECT value FROM local_index_setting WHERE \"key\" = 'enabled') = 1\nBEGIN\n  DELETE FROM history\n  WHERE url_canonical = url_canonical(CAST(NEW.url AS TEXT))\n    AND NOT EXISTS (\n      SELECT 1\n      FROM tab AS candidate\n      WHERE candidate.url IS NOT NULL\n        AND url_indexable(CAST(candidate.url AS TEXT)) = 1\n        AND url_canonical(CAST(candidate.url AS TEXT)) = history.url_canonical\n        AND (candidate.tab_mode != 1\n             OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)\n        AND NOT EXISTS (\n          SELECT 1 FROM container\n          WHERE container.id = candidate.container_id\n            AND (json_extract(container.metadata, '$.excludeFromIndex') = 1\n                 OR json_extract(container.metadata, '$.excludeFromHistory') = 1)\n        )\n    );\n\n  INSERT INTO history (\n    url_canonical, url_host, url_path, title, is_probably_readerable,\n    extracted_content_markdown, extracted_content_plain,\n    full_content_markdown, full_content_plain,\n    content_hash, observed_at, observed_count\n  )\n  SELECT\n    url_canonical(CAST(candidate.url AS TEXT)),\n    url_host(CAST(candidate.url AS TEXT)),\n    url_path(CAST(candidate.url AS TEXT)),\n    candidate.title,\n    candidate.is_probably_readerable,\n    candidate.extracted_content_markdown,\n    candidate.extracted_content_plain,\n    candidate.full_content_markdown,\n    candidate.full_content_plain,\n    candidate.content_hash,\n    strftime('%s','now') * 1000,\n    1\n  FROM tab AS candidate\n  WHERE candidate.url IS NOT NULL\n    AND url_indexable(CAST(candidate.url AS TEXT)) = 1\n    AND url_canonical(CAST(candidate.url AS TEXT)) = url_canonical(CAST(NEW.url AS TEXT))\n    AND (candidate.tab_mode != 1\n         OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)\n    AND NOT EXISTS (\n      SELECT 1 FROM container\n      WHERE container.id = candidate.container_id\n        AND (json_extract(container.metadata, '$.excludeFromIndex') = 1\n             OR json_extract(container.metadata, '$.excludeFromHistory') = 1)\n    )\n  ORDER BY candidate.timestamp DESC, candidate.rowid DESC\n  LIMIT 1\n  ON CONFLICT(url_canonical) DO UPDATE SET\n    title                       = COALESCE(excluded.title, history.title),\n    is_probably_readerable      = excluded.is_probably_readerable,\n    extracted_content_markdown  = excluded.extracted_content_markdown,\n    extracted_content_plain     = excluded.extracted_content_plain,\n    full_content_markdown       = excluded.full_content_markdown,\n    full_content_plain          = excluded.full_content_plain,\n    content_hash                = excluded.content_hash,\n    observed_at                 = excluded.observed_at,\n    observed_count              = history.observed_count + 1;\nEND;"
+      }
+    },
+    {
+      "id": 24,
+      "references": [
+        0,
+        13,
+        14,
+        1
+      ],
+      "type": "trigger",
+      "data": {
+        "on": 0,
+        "references_in_body": [
+          0,
+          13,
+          14,
+          1
+        ],
+        "name": "container_to_history_on_metadata_update",
+        "sql": "CREATE TRIGGER container_to_history_on_metadata_update AFTER UPDATE OF metadata\nON container\nWHEN COALESCE(json_extract(OLD.metadata, '$.excludeFromIndex') = 1\n              OR json_extract(OLD.metadata, '$.excludeFromHistory') = 1, 0)\n     != COALESCE(json_extract(NEW.metadata, '$.excludeFromIndex') = 1\n                 OR json_extract(NEW.metadata, '$.excludeFromHistory') = 1, 0)\n AND (SELECT value FROM local_index_setting WHERE \"key\" = 'enabled') = 1\nBEGIN\n  DELETE FROM history\n  WHERE url_canonical IN (\n      SELECT DISTINCT url_canonical(CAST(affected.url AS TEXT))\n      FROM tab AS affected\n      WHERE affected.container_id = NEW.id\n        AND affected.url IS NOT NULL\n        AND url_indexable(CAST(affected.url AS TEXT)) = 1\n    )\n    AND NOT EXISTS (\n      SELECT 1\n      FROM tab AS candidate\n      WHERE candidate.url IS NOT NULL\n        AND url_indexable(CAST(candidate.url AS TEXT)) = 1\n        AND url_canonical(CAST(candidate.url AS TEXT)) = history.url_canonical\n        AND (candidate.tab_mode != 1\n             OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)\n        AND NOT EXISTS (\n          SELECT 1 FROM container\n          WHERE container.id = candidate.container_id\n            AND (json_extract(container.metadata, '$.excludeFromIndex') = 1\n                 OR json_extract(container.metadata, '$.excludeFromHistory') = 1)\n        )\n    );\n\n  INSERT INTO history (\n    url_canonical, url_host, url_path, title, is_probably_readerable,\n    extracted_content_markdown, extracted_content_plain,\n    full_content_markdown, full_content_plain,\n    content_hash, observed_at, observed_count\n  )\n  SELECT\n    url_canonical(CAST(candidate.url AS TEXT)),\n    url_host(CAST(candidate.url AS TEXT)),\n    url_path(CAST(candidate.url AS TEXT)),\n    candidate.title,\n    candidate.is_probably_readerable,\n    candidate.extracted_content_markdown,\n    candidate.extracted_content_plain,\n    candidate.full_content_markdown,\n    candidate.full_content_plain,\n    candidate.content_hash,\n    strftime('%s','now') * 1000,\n    1\n  FROM tab AS candidate\n  WHERE candidate.url IS NOT NULL\n    AND url_indexable(CAST(candidate.url AS TEXT)) = 1\n    AND url_canonical(CAST(candidate.url AS TEXT)) IN (\n      SELECT DISTINCT url_canonical(CAST(affected.url AS TEXT))\n      FROM tab AS affected\n      WHERE affected.container_id = NEW.id\n        AND affected.url IS NOT NULL\n        AND url_indexable(CAST(affected.url AS TEXT)) = 1\n    )\n    AND (candidate.tab_mode != 1\n         OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)\n    AND NOT EXISTS (\n      SELECT 1 FROM container\n      WHERE container.id = candidate.container_id\n        AND (json_extract(container.metadata, '$.excludeFromIndex') = 1\n             OR json_extract(container.metadata, '$.excludeFromHistory') = 1)\n    )\n    AND NOT EXISTS (\n      SELECT 1\n      FROM tab AS newer\n      WHERE newer.url IS NOT NULL\n        AND url_indexable(CAST(newer.url AS TEXT)) = 1\n        AND url_canonical(CAST(newer.url AS TEXT)) = url_canonical(CAST(candidate.url AS TEXT))\n        AND (newer.tab_mode != 1\n             OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)\n        AND NOT EXISTS (\n          SELECT 1 FROM container\n          WHERE container.id = newer.container_id\n            AND (json_extract(container.metadata, '$.excludeFromIndex') = 1\n                 OR json_extract(container.metadata, '$.excludeFromHistory') = 1)\n        )\n        AND (\n          newer.timestamp > candidate.timestamp\n          OR (newer.timestamp = candidate.timestamp AND newer.rowid > candidate.rowid)\n        )\n    )\n  ON CONFLICT(url_canonical) DO UPDATE SET\n    title                       = COALESCE(excluded.title, history.title),\n    is_probably_readerable      = excluded.is_probably_readerable,\n    extracted_content_markdown  = excluded.extracted_content_markdown,\n    extracted_content_plain     = excluded.extracted_content_plain,\n    full_content_markdown       = excluded.full_content_markdown,\n    full_content_plain          = excluded.full_content_plain,\n    content_hash                = excluded.content_hash,\n    observed_at                 = excluded.observed_at,\n    observed_count              = history.observed_count + 1;\nEND;"
+      }
+    },
+    {
+      "id": 25,
+      "references": [
+        0
+      ],
+      "type": "table",
+      "data": {
+        "name": "visit_container",
+        "was_declared_in_moor": true,
+        "columns": [
+          {
+            "name": "id",
+            "getter_name": "id",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": "NOT NULL PRIMARY KEY AUTOINCREMENT",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              "auto-increment"
+            ]
+          },
+          {
+            "name": "raw_url",
+            "getter_name": "rawUrl",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "url_canonical",
+            "getter_name": "urlCanonical",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "visit_time",
+            "getter_name": "visitTime",
+            "moor_type": "int",
+            "nullable": false,
+            "customConstraints": "NOT NULL",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": []
+          },
+          {
+            "name": "container_id",
+            "getter_name": "containerId",
+            "moor_type": "string",
+            "nullable": false,
+            "customConstraints": "NOT NULL REFERENCES container(id)ON DELETE CASCADE",
+            "default_dart": null,
+            "default_client_dart": null,
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "container",
+                    "column": "id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "cascade"
+                }
+              }
+            ]
+          }
+        ],
+        "is_virtual": false,
+        "without_rowid": false,
+        "constraints": []
+      }
+    },
+    {
+      "id": 26,
+      "references": [
+        25
+      ],
+      "type": "index",
+      "data": {
+        "on": 25,
+        "name": "idx_vc_canonical",
+        "sql": "CREATE INDEX idx_vc_canonical ON visit_container(url_canonical, visit_time);",
+        "unique": false,
+        "columns": []
+      }
+    },
+    {
+      "id": 27,
+      "references": [
+        25
+      ],
+      "type": "index",
+      "data": {
+        "on": 25,
+        "name": "idx_vc_container",
+        "sql": "CREATE INDEX idx_vc_container ON visit_container(container_id, visit_time DESC);",
+        "unique": false,
+        "columns": []
+      }
+    }
+  ],
+  "fixed_sql": [
+    {
+      "name": "container",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"container\" (\"id\" TEXT PRIMARY KEY NOT NULL, \"name\" TEXT, \"color\" INTEGER NOT NULL, \"order_key\" TEXT NOT NULL, \"is_pinned\" INTEGER NOT NULL DEFAULT 0, \"metadata\" TEXT);"
+        }
+      ]
+    },
+    {
+      "name": "tab",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"tab\" (\"id\" TEXT PRIMARY KEY NOT NULL, \"source\" INTEGER NOT NULL, \"parent_id\" TEXT REFERENCES tab(id)ON DELETE SET NULL, \"container_id\" TEXT REFERENCES container(id)ON DELETE CASCADE, \"order_key\" TEXT NOT NULL, \"url\" TEXT, \"title\" TEXT, \"tab_mode\" INTEGER NOT NULL DEFAULT 0, \"isolation_context_id\" TEXT, \"is_pinned\" INTEGER NOT NULL DEFAULT 0, \"is_probably_readerable\" INTEGER, \"extracted_content_markdown\" TEXT, \"extracted_content_plain\" TEXT, \"full_content_markdown\" TEXT, \"full_content_plain\" TEXT, \"timestamp\" INTEGER NOT NULL, \"content_hash\" INTEGER GENERATED ALWAYS AS (generate_content_hash(title, extracted_content_plain, full_content_plain)) VIRTUAL, CHECK((tab_mode = 2 AND isolation_context_id IS NOT NULL)OR(tab_mode != 2 AND isolation_context_id IS NULL)));"
+        }
+      ]
+    },
+    {
+      "name": "closed_tab_tombstone",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"closed_tab_tombstone\" (\"tab_id\" TEXT PRIMARY KEY NOT NULL, \"closed_at\" INTEGER NOT NULL);"
+        }
+      ]
+    },
+    {
+      "name": "idx_tab_parent_container",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_tab_parent_container ON tab (parent_id, container_id)"
+        }
+      ]
+    },
+    {
+      "name": "idx_tab_timestamp",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_tab_timestamp ON tab (timestamp DESC, id DESC)"
+        }
+      ]
+    },
+    {
+      "name": "idx_tab_container_order",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_tab_container_order ON tab (container_id, order_key)"
+        }
+      ]
+    },
+    {
+      "name": "capture_tab",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"capture_tab\" (\"tab_id\" TEXT NOT NULL PRIMARY KEY REFERENCES tab(id)ON DELETE CASCADE, \"capture_id\" TEXT NOT NULL, \"source_url\" TEXT NOT NULL, \"status\" TEXT NOT NULL DEFAULT 'pending', \"created_at\" INTEGER NOT NULL);"
+        }
+      ]
+    },
+    {
+      "name": "idx_capture_tab_capture_id",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_capture_tab_capture_id ON capture_tab (capture_id)"
+        }
+      ]
+    },
+    {
+      "name": "tab_fts",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE VIRTUAL TABLE IF NOT EXISTS \"tab_fts\" USING fts5(title, url, extracted_content_plain, full_content_plain, content=tab, tokenize=\"trigram\");"
+        }
+      ]
+    },
+    {
+      "name": "tab_maintain_parent_chain_on_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER tab_maintain_parent_chain_on_delete BEFORE DELETE ON tab BEGIN UPDATE tab SET parent_id = CASE WHEN OLD.parent_id IS NOT NULL AND EXISTS (SELECT 1 FROM tab WHERE id = OLD.parent_id) THEN OLD.parent_id ELSE NULL END WHERE parent_id = OLD.id;END"
+        }
+      ]
+    },
+    {
+      "name": "tab_after_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER tab_after_insert AFTER INSERT ON tab BEGIN INSERT INTO tab_fts (\"rowid\", title, url, extracted_content_plain, full_content_plain) VALUES (new.\"rowid\", new.title, new.url, new.extracted_content_plain, new.full_content_plain);END"
+        }
+      ]
+    },
+    {
+      "name": "tab_after_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER tab_after_delete AFTER DELETE ON tab BEGIN INSERT INTO tab_fts (tab_fts, \"rowid\", title, url, extracted_content_plain, full_content_plain) VALUES ('delete', old.\"rowid\", old.title, old.url, old.extracted_content_plain, old.full_content_plain);END"
+        }
+      ]
+    },
+    {
+      "name": "tab_after_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER tab_after_update AFTER UPDATE OF title, url, extracted_content_plain, full_content_plain ON tab WHEN OLD.content_hash IS NOT NEW.content_hash OR OLD.url IS NOT NEW.url BEGIN INSERT INTO tab_fts (tab_fts, \"rowid\", title, url, extracted_content_plain, full_content_plain) VALUES ('delete', old.\"rowid\", old.title, old.url, old.extracted_content_plain, old.full_content_plain);INSERT INTO tab_fts (\"rowid\", title, url, extracted_content_plain, full_content_plain) VALUES (new.\"rowid\", new.title, new.url, new.extracted_content_plain, new.full_content_plain);END"
+        }
+      ]
+    },
+    {
+      "name": "local_index_setting",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"local_index_setting\" (\"key\" TEXT PRIMARY KEY NOT NULL, \"value\" INTEGER NOT NULL) STRICT;"
+        }
+      ]
+    },
+    {
+      "name": "history",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"history\" (\"url_canonical\" TEXT PRIMARY KEY NOT NULL, \"url_host\" TEXT NOT NULL, \"url_path\" TEXT, \"title\" TEXT, \"is_probably_readerable\" INTEGER, \"extracted_content_markdown\" TEXT, \"extracted_content_plain\" TEXT, \"full_content_markdown\" TEXT, \"full_content_plain\" TEXT, \"content_hash\" INTEGER, \"observed_at\" INTEGER NOT NULL, \"observed_count\" INTEGER NOT NULL DEFAULT 1);"
+        }
+      ]
+    },
+    {
+      "name": "idx_history_host",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_history_host ON history (url_host)"
+        }
+      ]
+    },
+    {
+      "name": "idx_history_observed",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_history_observed ON history (observed_at DESC)"
+        }
+      ]
+    },
+    {
+      "name": "history_fts",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE VIRTUAL TABLE IF NOT EXISTS \"history_fts\" USING fts5(title, url_host, url_path, extracted_content_plain, full_content_plain, content=history, tokenize=\"trigram\");"
+        }
+      ]
+    },
+    {
+      "name": "history_after_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER history_after_insert AFTER INSERT ON history BEGIN INSERT INTO history_fts (\"rowid\", title, url_host, url_path, extracted_content_plain, full_content_plain) VALUES (new.\"rowid\", new.title, new.url_host, new.url_path, new.extracted_content_plain, new.full_content_plain);END"
+        }
+      ]
+    },
+    {
+      "name": "history_after_delete",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER history_after_delete AFTER DELETE ON history BEGIN INSERT INTO history_fts (history_fts, \"rowid\", title, url_host, url_path, extracted_content_plain, full_content_plain) VALUES ('delete', old.\"rowid\", old.title, old.url_host, old.url_path, old.extracted_content_plain, old.full_content_plain);END"
+        }
+      ]
+    },
+    {
+      "name": "history_after_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER history_after_update AFTER UPDATE OF title, url_host, url_path, extracted_content_plain, full_content_plain ON history BEGIN INSERT INTO history_fts (history_fts, \"rowid\", title, url_host, url_path, extracted_content_plain, full_content_plain) VALUES ('delete', old.\"rowid\", old.title, old.url_host, old.url_path, old.extracted_content_plain, old.full_content_plain);INSERT INTO history_fts (\"rowid\", title, url_host, url_path, extracted_content_plain, full_content_plain) VALUES (new.\"rowid\", new.title, new.url_host, new.url_path, new.extracted_content_plain, new.full_content_plain);END"
+        }
+      ]
+    },
+    {
+      "name": "tab_to_history_on_insert",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER tab_to_history_on_insert AFTER INSERT ON tab WHEN NEW.url IS NOT NULL AND url_indexable(CAST(NEW.url AS TEXT)) = 1 AND (SELECT value FROM local_index_setting WHERE \"key\" = 'enabled') = 1 AND(NEW.tab_mode != 1 OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)AND NOT EXISTS (SELECT 1 FROM container WHERE container.id = NEW.container_id AND(json_extract(container.metadata, '$.excludeFromIndex') = 1 OR json_extract(container.metadata, '$.excludeFromHistory') = 1)) BEGIN INSERT INTO history (url_canonical, url_host, url_path, title, is_probably_readerable, extracted_content_markdown, extracted_content_plain, full_content_markdown, full_content_plain, content_hash, observed_at, observed_count) VALUES (url_canonical(CAST(NEW.url AS TEXT)), url_host(CAST(NEW.url AS TEXT)), url_path(CAST(NEW.url AS TEXT)), NEW.title, NEW.is_probably_readerable, NEW.extracted_content_markdown, NEW.extracted_content_plain, NEW.full_content_markdown, NEW.full_content_plain, NEW.content_hash, strftime('%s', 'now') * 1000, 1) ON CONFLICT (url_canonical) DO UPDATE SET title = COALESCE(excluded.title, history.title), is_probably_readerable = excluded.is_probably_readerable, extracted_content_markdown = excluded.extracted_content_markdown, extracted_content_plain = excluded.extracted_content_plain, full_content_markdown = excluded.full_content_markdown, full_content_plain = excluded.full_content_plain, content_hash = excluded.content_hash, observed_at = excluded.observed_at, observed_count = history.observed_count + 1 WHERE history.content_hash IS NOT excluded.content_hash;END"
+        }
+      ]
+    },
+    {
+      "name": "tab_to_history_on_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER tab_to_history_on_update AFTER UPDATE OF title, url, extracted_content_plain, extracted_content_markdown, full_content_plain, full_content_markdown, is_probably_readerable ON tab WHEN NEW.url IS NOT NULL AND url_indexable(CAST(NEW.url AS TEXT)) = 1 AND(OLD.content_hash IS NOT NEW.content_hash OR OLD.url IS NOT NEW.url)AND (SELECT value FROM local_index_setting WHERE \"key\" = 'enabled') = 1 AND(NEW.tab_mode != 1 OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)AND NOT EXISTS (SELECT 1 FROM container WHERE container.id = NEW.container_id AND(json_extract(container.metadata, '$.excludeFromIndex') = 1 OR json_extract(container.metadata, '$.excludeFromHistory') = 1)) BEGIN INSERT INTO history (url_canonical, url_host, url_path, title, is_probably_readerable, extracted_content_markdown, extracted_content_plain, full_content_markdown, full_content_plain, content_hash, observed_at, observed_count) VALUES (url_canonical(CAST(NEW.url AS TEXT)), url_host(CAST(NEW.url AS TEXT)), url_path(CAST(NEW.url AS TEXT)), NEW.title, NEW.is_probably_readerable, NEW.extracted_content_markdown, NEW.extracted_content_plain, NEW.full_content_markdown, NEW.full_content_plain, NEW.content_hash, strftime('%s', 'now') * 1000, 1) ON CONFLICT (url_canonical) DO UPDATE SET title = COALESCE(excluded.title, history.title), is_probably_readerable = excluded.is_probably_readerable, extracted_content_markdown = excluded.extracted_content_markdown, extracted_content_plain = excluded.extracted_content_plain, full_content_markdown = excluded.full_content_markdown, full_content_plain = excluded.full_content_plain, content_hash = excluded.content_hash, observed_at = excluded.observed_at, observed_count = history.observed_count + 1 WHERE history.content_hash IS NOT excluded.content_hash;END"
+        }
+      ]
+    },
+    {
+      "name": "tab_to_history_on_container_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER tab_to_history_on_container_update AFTER UPDATE OF container_id ON tab WHEN NEW.url IS NOT NULL AND url_indexable(CAST(NEW.url AS TEXT)) = 1 AND (SELECT value FROM local_index_setting WHERE \"key\" = 'enabled') = 1 BEGIN DELETE FROM history WHERE url_canonical = url_canonical(CAST(NEW.url AS TEXT)) AND NOT EXISTS (SELECT 1 FROM tab AS candidate WHERE candidate.url IS NOT NULL AND url_indexable(CAST(candidate.url AS TEXT)) = 1 AND url_canonical(CAST(candidate.url AS TEXT)) = history.url_canonical AND(candidate.tab_mode != 1 OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)AND NOT EXISTS (SELECT 1 FROM container WHERE container.id = candidate.container_id AND(json_extract(container.metadata, '$.excludeFromIndex') = 1 OR json_extract(container.metadata, '$.excludeFromHistory') = 1)));INSERT INTO history (url_canonical, url_host, url_path, title, is_probably_readerable, extracted_content_markdown, extracted_content_plain, full_content_markdown, full_content_plain, content_hash, observed_at, observed_count) SELECT url_canonical(CAST(candidate.url AS TEXT)), url_host(CAST(candidate.url AS TEXT)), url_path(CAST(candidate.url AS TEXT)), candidate.title, candidate.is_probably_readerable, candidate.extracted_content_markdown, candidate.extracted_content_plain, candidate.full_content_markdown, candidate.full_content_plain, candidate.content_hash, strftime('%s', 'now') * 1000, 1 FROM tab AS candidate WHERE candidate.url IS NOT NULL AND url_indexable(CAST(candidate.url AS TEXT)) = 1 AND url_canonical(CAST(candidate.url AS TEXT)) = url_canonical(CAST(NEW.url AS TEXT)) AND(candidate.tab_mode != 1 OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)AND NOT EXISTS (SELECT 1 FROM container WHERE container.id = candidate.container_id AND(json_extract(container.metadata, '$.excludeFromIndex') = 1 OR json_extract(container.metadata, '$.excludeFromHistory') = 1)) ORDER BY candidate.timestamp DESC, candidate.\"rowid\" DESC LIMIT 1 ON CONFLICT (url_canonical) DO UPDATE SET title = COALESCE(excluded.title, history.title), is_probably_readerable = excluded.is_probably_readerable, extracted_content_markdown = excluded.extracted_content_markdown, extracted_content_plain = excluded.extracted_content_plain, full_content_markdown = excluded.full_content_markdown, full_content_plain = excluded.full_content_plain, content_hash = excluded.content_hash, observed_at = excluded.observed_at, observed_count = history.observed_count + 1;END"
+        }
+      ]
+    },
+    {
+      "name": "container_to_history_on_metadata_update",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TRIGGER container_to_history_on_metadata_update AFTER UPDATE OF metadata ON container WHEN COALESCE(json_extract(OLD.metadata, '$.excludeFromIndex') = 1 OR json_extract(OLD.metadata, '$.excludeFromHistory') = 1, 0) != COALESCE(json_extract(NEW.metadata, '$.excludeFromIndex') = 1 OR json_extract(NEW.metadata, '$.excludeFromHistory') = 1, 0) AND (SELECT value FROM local_index_setting WHERE \"key\" = 'enabled') = 1 BEGIN DELETE FROM history WHERE url_canonical IN (SELECT DISTINCT url_canonical(CAST(affected.url AS TEXT)) FROM tab AS affected WHERE affected.container_id = NEW.id AND affected.url IS NOT NULL AND url_indexable(CAST(affected.url AS TEXT)) = 1) AND NOT EXISTS (SELECT 1 FROM tab AS candidate WHERE candidate.url IS NOT NULL AND url_indexable(CAST(candidate.url AS TEXT)) = 1 AND url_canonical(CAST(candidate.url AS TEXT)) = history.url_canonical AND(candidate.tab_mode != 1 OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)AND NOT EXISTS (SELECT 1 FROM container WHERE container.id = candidate.container_id AND(json_extract(container.metadata, '$.excludeFromIndex') = 1 OR json_extract(container.metadata, '$.excludeFromHistory') = 1)));INSERT INTO history (url_canonical, url_host, url_path, title, is_probably_readerable, extracted_content_markdown, extracted_content_plain, full_content_markdown, full_content_plain, content_hash, observed_at, observed_count) SELECT url_canonical(CAST(candidate.url AS TEXT)), url_host(CAST(candidate.url AS TEXT)), url_path(CAST(candidate.url AS TEXT)), candidate.title, candidate.is_probably_readerable, candidate.extracted_content_markdown, candidate.extracted_content_plain, candidate.full_content_markdown, candidate.full_content_plain, candidate.content_hash, strftime('%s', 'now') * 1000, 1 FROM tab AS candidate WHERE candidate.url IS NOT NULL AND url_indexable(CAST(candidate.url AS TEXT)) = 1 AND url_canonical(CAST(candidate.url AS TEXT)) IN (SELECT DISTINCT url_canonical(CAST(affected.url AS TEXT)) FROM tab AS affected WHERE affected.container_id = NEW.id AND affected.url IS NOT NULL AND url_indexable(CAST(affected.url AS TEXT)) = 1) AND(candidate.tab_mode != 1 OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)AND NOT EXISTS (SELECT 1 FROM container WHERE container.id = candidate.container_id AND(json_extract(container.metadata, '$.excludeFromIndex') = 1 OR json_extract(container.metadata, '$.excludeFromHistory') = 1)) AND NOT EXISTS (SELECT 1 FROM tab AS newer WHERE newer.url IS NOT NULL AND url_indexable(CAST(newer.url AS TEXT)) = 1 AND url_canonical(CAST(newer.url AS TEXT)) = url_canonical(CAST(candidate.url AS TEXT)) AND(newer.tab_mode != 1 OR (SELECT value FROM local_index_setting WHERE \"key\" = 'index_private') = 1)AND NOT EXISTS (SELECT 1 FROM container WHERE container.id = newer.container_id AND(json_extract(container.metadata, '$.excludeFromIndex') = 1 OR json_extract(container.metadata, '$.excludeFromHistory') = 1)) AND(newer.timestamp > candidate.timestamp OR(newer.timestamp = candidate.timestamp AND newer.\"rowid\" > candidate.\"rowid\"))) ON CONFLICT (url_canonical) DO UPDATE SET title = COALESCE(excluded.title, history.title), is_probably_readerable = excluded.is_probably_readerable, extracted_content_markdown = excluded.extracted_content_markdown, extracted_content_plain = excluded.extracted_content_plain, full_content_markdown = excluded.full_content_markdown, full_content_plain = excluded.full_content_plain, content_hash = excluded.content_hash, observed_at = excluded.observed_at, observed_count = history.observed_count + 1;END"
+        }
+      ]
+    },
+    {
+      "name": "visit_container",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE TABLE IF NOT EXISTS \"visit_container\" (\"id\" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, \"raw_url\" TEXT NOT NULL, \"url_canonical\" TEXT NOT NULL, \"visit_time\" INTEGER NOT NULL, \"container_id\" TEXT NOT NULL REFERENCES container(id)ON DELETE CASCADE);"
+        }
+      ]
+    },
+    {
+      "name": "idx_vc_canonical",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_vc_canonical ON visit_container (url_canonical, visit_time)"
+        }
+      ]
+    },
+    {
+      "name": "idx_vc_container",
+      "sql": [
+        {
+          "dialect": "sqlite",
+          "sql": "CREATE INDEX idx_vc_container ON visit_container (container_id, visit_time DESC)"
+        }
+      ]
+    }
+  ]
+}

@@ -48,4 +48,4 @@ final class SitesDatabaseProvider
   }
 }
 
-String _$sitesDatabaseHash() => r'ac11ab9c1da876c18460cd762237698c01b0ec62';
+String _$sitesDatabaseHash() => r'99726c41978dd1f247ea5c8e4ef1ad59d082fda1';

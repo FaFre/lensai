@@ -52,6 +52,26 @@ fetch() {
   return 1
 }
 
+# Clears temp files a previous run left in an asset directory.
+#
+# Asset directories are declared with a trailing slash in pubspec.yaml, so every
+# file in them is bundled into the APK, and a stale `bangs.json.tmp.*` was riding
+# along at 1.2 MB. Every path through fetch() already moves or removes its own
+# temp file; the one that cannot is an abort in the middle of curl, and this is
+# what collects those on the next run.
+sweep_stale_temp_files() {
+  local swept=0
+
+  while IFS= read -r -d '' stale; do
+    rm -f "$stale"
+    log "Removed stale temp asset: ${stale#"$REPO_ROOT/"}"
+    swept=$((swept + 1))
+  done < <(find "$REPO_ROOT/apps/weblibre/assets" -type f -name '*.tmp.*' -print0)
+
+  [ "$swept" -gt 0 ] && log "Swept $swept stale temp asset(s)."
+  return 0
+}
+
 # ── asset groups ─────────────────────────────────────────────────────────────
 
 update_bangs() {
@@ -148,6 +168,8 @@ if [ ${#SELECTED_GROUPS[@]} -eq 0 ]; then
 fi
 
 FAILURES=0
+
+sweep_stale_temp_files
 
 for group in "${SELECTED_GROUPS[@]}"; do
   case "$group" in

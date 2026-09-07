@@ -43,7 +43,6 @@ import 'package:hooks_riverpod/misc.dart' show ProviderListenable;
 import 'package:logger/logger.dart';
 import 'package:material_color_utilities/material_color_utilities.dart';
 import 'package:nullability/nullability.dart';
-import 'package:privacypass_client/privacypass_client.dart';
 import 'package:weblibre/core/design/app_colors.dart';
 import 'package:weblibre/core/error_observer.dart';
 import 'package:weblibre/core/filesystem.dart';
@@ -51,6 +50,7 @@ import 'package:weblibre/core/logger.dart';
 import 'package:weblibre/core/providers/app_state.dart';
 import 'package:weblibre/core/providers/defaults.dart';
 import 'package:weblibre/core/providers/router.dart';
+import 'package:weblibre/core/rust_lib.dart';
 import 'package:weblibre/core/secure_storage/secure_storage_migration.dart';
 import 'package:weblibre/domain/services/app_initialization.dart';
 import 'package:weblibre/domain/services/display_mode.dart';
@@ -270,14 +270,48 @@ class _MainWidget extends HookConsumerWidget {
     );
 
     useOnInitialization(() async {
-      await CountryCodes.init();
+      // Starts the profile-local initialization work — intl symbols, package
+      // info, the bundled bang import — so it runs alongside the engine bring-up
+      // below instead of after it. `initialize()` further down awaits these same
+      // futures, so the UI still mounts only once all of it is done; what changes
+      // is that the two long stretches of a cold start overlap.
+      ref.read(appInitializationServiceProvider.notifier).prewarm();
 
-      final engineSettings = await ref
-          .read(engineSettingsRepositoryProvider.notifier)
-          .fetchSettings();
-      final generalSettings = await ref
-          .read(generalSettingsRepositoryProvider.notifier)
-          .fetchSettings();
+      // Claims this profile's pre-qualification secure records. Started here and
+      // awaited before `initialize()` below, which is what gates the UI: it used
+      // to live *inside* that call, so it completed before anything could read a
+      // profile-scoped secret, and a proxy started in a window where it had not
+      // would miss an unclaimed legacy credential. Overlapping the engine keeps
+      // that guarantee without putting the secure-storage enumeration — which
+      // decrypts every record — back on the critical path.
+      //
+      // `ignore()` because nothing listens until the await below, and the engine
+      // bring-up sits in between; the migration swallows its own failures anyway.
+      final secureStorageClaim = migrateSecureStorageForActiveProfile(
+        ref.read(singboxProxyProfilesRepositoryProvider.notifier),
+      )..ignore();
+
+      // Independent of each other, and all three are needed before the engine
+      // starts, so they run together rather than queueing: two database reads
+      // and a platform round-trip.
+      //
+      // Started then awaited one by one, rather than through `.wait`: that
+      // collects failures into a `ParallelWaitError`, so a settings read that
+      // throws would be logged with a stack pointing at the join instead of at
+      // the read. `ignore()` covers the gap between starting and awaiting, where
+      // a rejection would otherwise be reported as unhandled.
+      final countryCodes = CountryCodes.init()..ignore();
+      final engineSettingsFuture =
+          ref.read(engineSettingsRepositoryProvider.notifier).fetchSettings()
+            ..ignore();
+      final generalSettingsFuture =
+          ref.read(generalSettingsRepositoryProvider.notifier).fetchSettings()
+            ..ignore();
+
+      await countryCodes;
+      final engineSettings = await engineSettingsFuture;
+      final generalSettings = await generalSettingsFuture;
+
       final startupUBlockFilterListsPref =
           engineSettings.ublockFilterListSettings.enabled
           ? jsonEncode(
@@ -437,6 +471,10 @@ class _MainWidget extends HookConsumerWidget {
       _activateService(ref, searchHistoryCleanupServiceProvider);
 
       try {
+        // Before `initialize()`, because that is what flips `initialized: true`
+        // and lets the router mount.
+        await secureStorageClaim;
+
         await ref.read(appInitializationServiceProvider.notifier).initialize();
 
         Future<void> preloadUrlCleanerCatalog() async {
@@ -466,12 +504,8 @@ class _MainWidget extends HookConsumerWidget {
         // background; failures are logged and ignored.
         unawaited(ref.read(localIndexPrunerProvider.notifier).prune());
 
-        // Claim this profile's pre-qualification secure records before anything
-        // reads them — the account handler below reads one of them, and until this
-        // has run the legacy unqualified copy is still what is on disk.
-        await migrateSecureStorageForActiveProfile(
-          ref.read(singboxProxyProfilesRepositoryProvider.notifier),
-        );
+        // The secure-storage claim the account handler depends on completed
+        // above, before the UI was allowed to mount.
 
         // Activate account callback deep link handler
         _activateService(ref, accountCallbackHandlerProvider);
@@ -647,7 +681,9 @@ void main() async {
     return true;
   };
 
-  await RustLib.init();
+  // Started, not awaited: nothing before the first frame uses it. See
+  // `ensureRustLibInitialized`.
+  unawaited(ensureRustLibInitialized());
 
   if (kDebugMode) {
     final serviceProtocolInfo = await Service.getInfo();

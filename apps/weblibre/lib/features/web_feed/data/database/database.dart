@@ -18,17 +18,19 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import 'package:drift/drift.dart';
+import 'package:drift/internal/versioned_schema.dart';
 import 'package:drift_dev/api/migrations_native.dart';
 import 'package:flutter/foundation.dart';
 import 'package:weblibre/features/search/domain/fts_tokenizer.dart';
 import 'package:weblibre/features/web_feed/data/database/daos/article.dart';
 import 'package:weblibre/features/web_feed/data/database/daos/feed.dart';
 import 'package:weblibre/features/web_feed/data/database/database.drift.dart';
+import 'package:weblibre/features/web_feed/data/database/database.steps.dart';
 
 @DriftDatabase(include: {'definitions.drift'}, daos: [ArticleDao, FeedDao])
 class FeedDatabase extends $FeedDatabase with TrigramQueryBuilderMixin {
   @override
-  final int schemaVersion = 1;
+  final int schemaVersion = 2;
 
   @override
   final int ftsTokenLimit = 10;
@@ -47,7 +49,34 @@ class FeedDatabase extends $FeedDatabase with TrigramQueryBuilderMixin {
       await customStatement('PRAGMA foreign_keys = ON;');
       await definitionsDrift.optimizeFtsIndex();
     },
+    onUpgrade: (m, from, to) async {
+      // https://drift.simonbinder.eu/Migrations/api/#general-tips
+      await customStatement('PRAGMA foreign_keys = OFF');
+
+      await transaction(
+        () => VersionedSchema.runMigrationSteps(
+          migrator: m,
+          from: from,
+          to: to,
+          steps: _upgrade,
+        ),
+      );
+
+      await customStatement('PRAGMA foreign_keys = ON');
+    },
   );
 
   FeedDatabase(super.e);
+
+  static final _upgrade = migrationSteps(
+    from1To2: (m, schema) async {
+      // The body-free list projection.
+      await m.create(schema.articleListView);
+
+      // `article_after_update` is now scoped to the FTS columns and guarded on
+      // them changing. Recreate; see definitions.drift.
+      await m.drop(schema.articleAfterUpdate);
+      await m.create(schema.articleAfterUpdate);
+    },
+  );
 }

@@ -23,6 +23,7 @@ import 'dart:math';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:search_client/search_client.dart';
 import 'package:uuid/uuid.dart';
+import 'package:weblibre/core/rust_lib.dart';
 import 'package:weblibre/features/account/domain/repositories/account_auth.dart';
 import 'package:weblibre/features/search_credits/data/token_stash.dart';
 import 'package:weblibre/features/search_credits/domain/providers.dart';
@@ -135,6 +136,10 @@ class SearchTokenIssuanceController extends _$SearchTokenIssuanceController {
     required String idempotencyKey,
     required int count,
   }) async {
+    // The Privacy Pass Rust library is loaded lazily rather than before the
+    // first frame; this is the only path that needs it.
+    await ensureRustLibInitialized();
+
     final issuance = ref.read(issuanceClientProvider);
     // Fetch the public key explicitly so we can tag the stash rows that
     // `issueAndStash` will write with the exact key version the issuer

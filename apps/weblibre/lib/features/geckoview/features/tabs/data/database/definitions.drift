@@ -60,6 +60,24 @@ CREATE TABLE closed_tab_tombstone(
 -- degrade to per-row scans on large containers.
 CREATE INDEX idx_tab_parent_container ON tab(parent_id, container_id);
 
+-- `getTabsFifo` / `getContainerTabsFifo` order by `timestamp DESC LIMIT n`, and
+-- the FIFO query is a live stream re-run on every write to `tab` (`touchTab`
+-- fires on each tab switch). Without this index SQLite scans the whole table and
+-- pushes every row through a sorter to find the newest few.
+--
+-- `id` is the second column so the order is total. Drift stores DATETIME as unix
+-- *seconds*, so two tabs touched in the same second tie on `timestamp` alone —
+-- and `resumeLatestContainerTab` takes `LIMIT 1` off this, so a tie decided by
+-- whatever the storage layer happened to return is a coin flip over which tab
+-- the user lands on. Matching the query's `ORDER BY timestamp DESC, id DESC`
+-- keeps the walk index-only rather than falling back to a sorter for the ties.
+CREATE INDEX idx_tab_timestamp ON tab(timestamp DESC, id DESC);
+
+-- `getContainerTabsData` and `containerScopeSiblings` filter on `container_id`
+-- and order by `order_key`. `idx_tab_parent_container` cannot serve either:
+-- `container_id` is not its leftmost column.
+CREATE INDEX idx_tab_container_order ON tab(container_id, order_key);
+
 CREATE TABLE capture_tab (
   tab_id TEXT NOT NULL PRIMARY KEY REFERENCES tab (id) ON DELETE CASCADE,
   capture_id TEXT NOT NULL,

@@ -48,4 +48,4 @@ final class QuotesDatabaseProvider
   }
 }
 
-String _$quotesDatabaseHash() => r'4f30fb578102516febbd6c56ca53051dd34e84bb';
+String _$quotesDatabaseHash() => r'5db0b656fea66f417d09f93bb88a10803424d33a';

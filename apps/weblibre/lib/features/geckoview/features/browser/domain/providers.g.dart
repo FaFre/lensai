@@ -481,7 +481,7 @@ final class PendingRestoreTabIdsProvider
 }
 
 String _$pendingRestoreTabIdsHash() =>
-    r'a7c1639478ebed7d887d9b1d1296757d829dcc6b';
+    r'aec6faa53b47530f855aa765e694b06f62e05df3';
 
 @ProviderFor(fifoTabStates)
 final fifoTabStatesProvider = FifoTabStatesProvider._();
@@ -533,7 +533,7 @@ final class FifoTabStatesProvider
   }
 }
 
-String _$fifoTabStatesHash() => r'a512f96119561096b9cc7d6920e82da6d460ce68';
+String _$fifoTabStatesHash() => r'c53752d54062be5b6514c7dba04553717cc421b2';
 
 @ProviderFor(selectedContainerTabStatesWithContainer)
 final selectedContainerTabStatesWithContainerProvider =
@@ -588,7 +588,7 @@ final class SelectedContainerTabStatesWithContainerProvider
 }
 
 String _$selectedContainerTabStatesWithContainerHash() =>
-    r'dc0a972179813671331c798f40a6a5083b684e67';
+    r'fa0704da36c068fa4585175807d9da7cbee0b70e';
 
 @ProviderFor(quickTabSwitcherTabStates)
 final quickTabSwitcherTabStatesProvider = QuickTabSwitcherTabStatesFamily._();

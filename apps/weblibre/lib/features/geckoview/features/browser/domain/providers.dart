@@ -42,6 +42,7 @@ import 'package:weblibre/features/geckoview/features/tabs/data/entities/containe
 import 'package:weblibre/features/geckoview/features/tabs/data/entities/tab_entity.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/entities/tab_mode.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/models/container_data.dart';
+import 'package:weblibre/features/geckoview/features/tabs/data/models/tab_summary.dart';
 import 'package:weblibre/features/geckoview/features/tabs/domain/providers.dart';
 import 'package:weblibre/features/geckoview/features/tabs/domain/providers/selected_container.dart';
 import 'package:weblibre/features/geckoview/features/tabs/domain/repositories/gecko_inference.dart';
@@ -183,7 +184,7 @@ EquatableValue<Map<String, TabState>> containerTabStates(
 /// native session restore hasn't delivered yet. `TabIcon` falls back to the
 /// URL-cached favicon when [TabState.icon] is null, so placeholder chips
 /// still render with proper icons and titles.
-TabState _placeholderTabState(TabData tab) {
+TabState _placeholderTabState(TabSummary tab) {
   return TabState.$default(tab.id).copyWith(
     url: tab.url ?? TabState.defaultUrl,
     title: tab.title ?? '',
@@ -197,7 +198,7 @@ TabState _placeholderTabState(TabData tab) {
 
 /// Whether [tab] may be shown as a pre-restore placeholder. Private tabs are
 /// never session-restored, so their rows must not produce dangling chips.
-bool _canShowAsPlaceholder(TabData tab) =>
+bool _canShowAsPlaceholder(TabSummary tab) =>
     tab.tabMode != TabModeDbValue.private;
 
 /// Ids of DB-cached tabs whose native state hasn't arrived yet. Empty once
@@ -215,7 +216,7 @@ EquatableValue<Set<String>> pendingRestoreTabIds(Ref ref) {
   );
   final dbTabs =
       ref.watch(watchTabsFifoProvider.select((value) => value.value)) ??
-      const <TabData>[];
+      const <TabSummary>[];
 
   return EquatableValue({
     for (final tab in dbTabs)
@@ -239,7 +240,7 @@ EquatableValue<List<TabStateWithContainer>> fifoTabStates(Ref ref) {
   final tabStates = ref.watch(tabStatesProvider);
   final placeholdersActive = !ref.watch(browserRestoreCompleteProvider);
 
-  TabState? stateFor(TabData tab) =>
+  TabState? stateFor(TabSummary tab) =>
       tabStates[tab.id] ??
       (placeholdersActive && _canShowAsPlaceholder(tab)
           ? _placeholderTabState(tab)
@@ -281,8 +282,8 @@ selectedContainerTabStatesWithContainer(Ref ref) {
                 filter.containerId,
               ).select((value) => value.value),
             ) ??
-            const <TabData>[]
-      : const <TabData>[];
+            const <TabSummary>[]
+      : const <TabSummary>[];
   final sortedTabs = placeholdersActive
       ? [
           for (final tab in selectedContainerTabsData)
@@ -297,7 +298,7 @@ selectedContainerTabStatesWithContainer(Ref ref) {
         );
   final tabDataById = placeholdersActive
       ? {for (final tab in selectedContainerTabsData) tab.id: tab}
-      : const <String, TabData>{};
+      : const <String, TabSummary>{};
 
   TabState? stateForEntity(String tabId) {
     final state = tabStates[tabId];

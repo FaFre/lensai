@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
+import 'package:weblibre/core/asset_database.dart';
 import 'package:weblibre/core/maintenance/backup_manifest.dart';
 import 'package:weblibre/core/maintenance/backup_operation.dart';
 import 'package:weblibre/core/maintenance/maintenance_lease.dart';
@@ -196,6 +197,20 @@ void main() {
       expect(BackupExclusions.isExcluded('cache/gecko/entry'), isTrue);
       expect(BackupExclusions.isExcluded('databases/quotes.db'), isTrue);
       expect(BackupExclusions.isExcluded('databases/sites.db'), isTrue);
+
+      // The install stamps go with their databases. `isExcluded` matches a
+      // path or a directory prefix, so `databases/sites.db` does not cover
+      // `databases/sites.db.asset` — they have to be named, and without that
+      // an archive carried a stamp for a database the same manifest declares
+      // excluded and reseeded.
+      expect(
+        BackupExclusions.isExcluded('databases/quotes.db$assetStampSuffix'),
+        isTrue,
+      );
+      expect(
+        BackupExclusions.isExcluded('databases/sites.db$assetStampSuffix'),
+        isTrue,
+      );
 
       expect(BackupExclusions.isExcluded('databases/tab.db'), isFalse);
       // Not a prefix match on the name: only the exact asset databases go.

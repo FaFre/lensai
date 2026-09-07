@@ -16,6 +16,7 @@ abstract class $FeedDatabase extends i0.GeneratedDatabase {
   late final i1.Feed feed = i1.Feed(this);
   late final i1.Article article = i1.Article(this);
   late final i1.ArticleView articleView = i1.ArticleView(this);
+  late final i1.ArticleListView articleListView = i1.ArticleListView(this);
   late final i1.ArticleFts articleFts = i1.ArticleFts(this);
   late final i2.ArticleDao articleDao = i2.ArticleDao(this as i3.FeedDatabase);
   late final i4.FeedDao feedDao = i4.FeedDao(this as i3.FeedDatabase);
@@ -30,6 +31,7 @@ abstract class $FeedDatabase extends i0.GeneratedDatabase {
     feed,
     article,
     articleView,
+    articleListView,
     i1.articleFeedId,
     articleFts,
     i1.articleAfterInsert,

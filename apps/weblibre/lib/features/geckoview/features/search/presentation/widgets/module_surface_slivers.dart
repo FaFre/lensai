@@ -33,7 +33,7 @@ import 'package:weblibre/features/geckoview/features/search/presentation/widgets
 import 'package:weblibre/features/geckoview/features/search/presentation/widgets/empty_state/top_sites_section.dart';
 import 'package:weblibre/features/geckoview/features/search/presentation/widgets/search_module_reorder_view.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/models/container_data.dart';
-import 'package:weblibre/features/web_feed/data/models/feed_article.dart';
+import 'package:weblibre/features/web_feed/data/models/feed_article_summary.dart';
 
 /// How a host opens the things its modules surface.
 ///
@@ -45,7 +45,7 @@ import 'package:weblibre/features/web_feed/data/models/feed_article.dart';
 class ModuleSurfaceCallbacks {
   final void Function(Uri uri) onUriSelected;
   final void Function(String tabId) onTabSelected;
-  final void Function(FeedArticle article) onArticleSelected;
+  final void Function(FeedArticleSummary article) onArticleSelected;
   final void Function(ContainerDataWithCount container) onContainerSelected;
 
   /// Present only on surfaces that own a live text field. Modules that write

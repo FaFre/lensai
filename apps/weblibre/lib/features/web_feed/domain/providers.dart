@@ -24,6 +24,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:weblibre/features/web_feed/data/database/definitions.drift.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_article.dart';
+import 'package:weblibre/features/web_feed/data/models/feed_article_summary.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_parse_result.dart';
 import 'package:weblibre/features/web_feed/data/providers.dart';
 import 'package:weblibre/features/web_feed/domain/providers/article_filter.dart';
@@ -34,7 +35,7 @@ part 'providers.g.dart';
 
 @Riverpod()
 class ArticleSearch extends _$ArticleSearch {
-  late StreamController<List<FeedArticle>> _streamController;
+  late StreamController<List<FeedArticleSummary>> _streamController;
 
   Future<void> search(
     String input, {
@@ -67,7 +68,7 @@ class ArticleSearch extends _$ArticleSearch {
   }
 
   @override
-  Stream<List<FeedArticle>> build(Uri? feedId) {
+  Stream<List<FeedArticleSummary>> build(Uri? feedId) {
     _streamController = StreamController();
 
     ref.onDispose(() async {
@@ -96,7 +97,7 @@ Stream<FeedData?> feedData(Ref ref, Uri? feedId) {
 }
 
 @Riverpod()
-Stream<List<FeedArticle>> feedArticleList(Ref ref, Uri? feedId) {
+Stream<List<FeedArticleListEntry>> feedArticleList(Ref ref, Uri? feedId) {
   final repository = ref.watch(feedRepositoryProvider.notifier);
   return repository.watchFeedArticles(feedId);
 }
@@ -121,7 +122,7 @@ class FilteredArticleList extends _$FilteredArticleList {
   }
 
   @override
-  AsyncValue<List<FeedArticle>> build(Uri? feedId) {
+  AsyncValue<List<FeedArticleSummary>> build(Uri? feedId) {
     final filterTags = ref.watch(articleFilterProvider);
 
     final articlesAsync = _hasSearch

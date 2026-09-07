@@ -20,6 +20,7 @@
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:weblibre/features/web_feed/data/database/definitions.drift.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_article.dart';
+import 'package:weblibre/features/web_feed/data/models/feed_article_summary.dart';
 import 'package:weblibre/features/web_feed/data/providers.dart';
 
 part 'feed_repository.g.dart';
@@ -75,7 +76,7 @@ class FeedRepository extends _$FeedRepository {
         .watchSingleOrNull();
   }
 
-  Stream<List<FeedArticle>> watchFeedArticles(Uri? feedId) {
+  Stream<List<FeedArticleListEntry>> watchFeedArticles(Uri? feedId) {
     return ref
         .read(feedDatabaseProvider)
         .articleDao

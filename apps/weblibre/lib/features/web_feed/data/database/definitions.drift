@@ -4,6 +4,7 @@ import 'package:weblibre/features/web_feed/data/database/converters/feed_authors
 import 'package:weblibre/features/web_feed/data/database/converters/feed_categories.dart';
 import 'package:weblibre/features/web_feed/data/database/converters/feed_links.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_article.dart';
+import 'package:weblibre/features/web_feed/data/models/feed_article_summary.dart';
 
 CREATE TABLE feed (
   url TEXT PRIMARY KEY NOT NULL MAPPED BY `const UriConverter()`,
@@ -45,6 +46,34 @@ CREATE VIEW article_view WITH FeedArticle AS
   INNER JOIN
     feed f on f.url = a.feed_id;
 
+-- `article_view` without the five columns that hold the article body.
+--
+-- Article rows carry the full HTML, markdown and plain text of the entry, and
+-- the article *list* renders none of it: the card shows the title, the authors,
+-- the tags, the dates and the short `summaryPlain` preview. The list is watched
+-- as a stream, so it re-runs on every write to `article` — and marking one
+-- article read is such a write. Reading the bodies of every article of a feed to
+-- redraw a list that never shows them is the whole cost this view removes.
+CREATE VIEW article_list_view WITH FeedArticleListEntry AS
+  SELECT
+    a.id,
+    a.feed_id,
+    a.fetched,
+    a.created,
+    a.updated,
+    a.last_read,
+    a.title,
+    a.authors,
+    a.tags,
+    a.links,
+    a.summaryPlain,
+    f.icon,
+    f.site_link
+  FROM
+    article a
+  INNER JOIN
+    feed f on f.url = a.feed_id;
+
 CREATE INDEX article_feed_id ON article (feed_id);
 
 CREATE VIRTUAL TABLE article_fts 
@@ -67,7 +96,20 @@ CREATE TRIGGER article_after_delete AFTER DELETE ON article BEGIN
     article_fts(article_fts, rowid, title, summaryPlain, contentPlain) 
     VALUES('delete', old.rowid, old.title, old.summaryPlain, old.contentPlain);
 END;
-CREATE TRIGGER article_after_update AFTER UPDATE ON article BEGIN
+-- Scoped to the indexed columns, and guarded on them actually changing — the
+-- same shape `tab_after_update` uses, and for the same reason. A trigram index
+-- over an article body is expensive to rebuild, and the unscoped version
+-- rebuilt it for writes that touched no indexed column at all: `last_read` is
+-- stamped every time the user opens an article, and `upsertArticles` rewrites
+-- the content columns with identical values whenever a feed re-serves an
+-- unchanged entry.
+CREATE TRIGGER article_after_update AFTER UPDATE OF
+  title, summaryPlain, contentPlain
+ON article
+WHEN OLD.title IS NOT NEW.title
+   OR OLD.summaryPlain IS NOT NEW.summaryPlain
+   OR OLD.contentPlain IS NOT NEW.contentPlain
+BEGIN
   INSERT INTO 
     article_fts(article_fts, rowid, title, summaryPlain, contentPlain) 
     VALUES('delete', old.rowid, old.title, old.summaryPlain, old.contentPlain);

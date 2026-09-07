@@ -21,7 +21,7 @@ import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:weblibre/features/geckoview/features/browser/domain/providers.dart';
 import 'package:weblibre/features/geckoview/features/history/domain/repositories/history.dart';
-import 'package:weblibre/features/web_feed/data/models/feed_article.dart';
+import 'package:weblibre/features/web_feed/data/models/feed_article_summary.dart';
 import 'package:weblibre/features/web_feed/domain/providers.dart';
 
 part 'empty_state_content.g.dart';
@@ -55,7 +55,7 @@ Future<List<VisitInfo>> searchEmptyRecentHistory(
 }
 
 @Riverpod()
-AsyncValue<List<FeedArticle>> searchEmptyRecentFeedArticles(
+AsyncValue<List<FeedArticleSummary>> searchEmptyRecentFeedArticles(
   Ref ref, {
   int count = 25,
 }) {

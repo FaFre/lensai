@@ -41,7 +41,7 @@ final class FeedRepositoryProvider
   }
 }
 
-String _$feedRepositoryHash() => r'805cc26890b0d43576a1eab0ecb5851b6649d7b7';
+String _$feedRepositoryHash() => r'faf48a0541bb108de85698495f5063c503a08434';
 
 abstract class _$FeedRepository extends $Notifier<void> {
   void build();

@@ -23,8 +23,8 @@ import 'package:nullability/nullability.dart';
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:weblibre/core/routing/routes.dart';
 import 'package:weblibre/extensions/uri.dart';
-import 'package:weblibre/features/web_feed/data/models/feed_article.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_article_query_result.dart';
+import 'package:weblibre/features/web_feed/data/models/feed_article_summary.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_link.dart';
 import 'package:weblibre/features/web_feed/domain/providers/article_filter.dart';
 import 'package:weblibre/features/web_feed/domain/repositories/feed_repository.dart';
@@ -39,7 +39,7 @@ class FeedArticleCard extends HookConsumerWidget {
   static const _matchPrefix = '***';
   static const _matchSuffix = '***';
 
-  final FeedArticle article;
+  final FeedArticleSummary article;
 
   const FeedArticleCard({super.key, required this.article});
 

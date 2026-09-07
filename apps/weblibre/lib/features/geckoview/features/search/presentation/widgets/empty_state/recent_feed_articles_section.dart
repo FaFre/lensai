@@ -24,14 +24,14 @@ import 'package:weblibre/extensions/uri.dart';
 import 'package:weblibre/features/geckoview/features/search/domain/providers/empty_state_content.dart';
 import 'package:weblibre/features/geckoview/features/search/domain/providers/search_modules_view.dart';
 import 'package:weblibre/features/geckoview/features/search/presentation/widgets/search_modules/search_module_section.dart';
-import 'package:weblibre/features/web_feed/data/models/feed_article.dart';
+import 'package:weblibre/features/web_feed/data/models/feed_article_summary.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_link.dart';
 import 'package:weblibre/features/web_feed/extensions/atom.dart';
 import 'package:weblibre/features/web_feed/extensions/feed_article.dart';
 import 'package:weblibre/presentation/widgets/url_icon.dart';
 
 class RecentFeedArticlesSection extends ConsumerWidget {
-  final void Function(FeedArticle article) onArticleSelected;
+  final void Function(FeedArticleSummary article) onArticleSelected;
 
   const RecentFeedArticlesSection({super.key, required this.onArticleSelected});
 

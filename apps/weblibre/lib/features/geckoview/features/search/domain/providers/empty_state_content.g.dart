@@ -173,11 +173,11 @@ final searchEmptyRecentFeedArticlesProvider =
 final class SearchEmptyRecentFeedArticlesProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<FeedArticle>>,
-          AsyncValue<List<FeedArticle>>,
-          AsyncValue<List<FeedArticle>>
+          AsyncValue<List<FeedArticleSummary>>,
+          AsyncValue<List<FeedArticleSummary>>,
+          AsyncValue<List<FeedArticleSummary>>
         >
-    with $Provider<AsyncValue<List<FeedArticle>>> {
+    with $Provider<AsyncValue<List<FeedArticleSummary>>> {
   SearchEmptyRecentFeedArticlesProvider._({
     required SearchEmptyRecentFeedArticlesFamily super.from,
     required int super.argument,
@@ -201,23 +201,22 @@ final class SearchEmptyRecentFeedArticlesProvider
 
   @$internal
   @override
-  $ProviderElement<AsyncValue<List<FeedArticle>>> $createElement(
+  $ProviderElement<AsyncValue<List<FeedArticleSummary>>> $createElement(
     $ProviderPointer pointer,
   ) => $ProviderElement(pointer);
 
   @override
-  AsyncValue<List<FeedArticle>> create(Ref ref) {
+  AsyncValue<List<FeedArticleSummary>> create(Ref ref) {
     final argument = this.argument as int;
     return searchEmptyRecentFeedArticles(ref, count: argument);
   }
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(AsyncValue<List<FeedArticle>> value) {
+  Override overrideWithValue(AsyncValue<List<FeedArticleSummary>> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<AsyncValue<List<FeedArticle>>>(
-        value,
-      ),
+      providerOverride:
+          $SyncValueProvider<AsyncValue<List<FeedArticleSummary>>>(value),
     );
   }
 
@@ -234,10 +233,10 @@ final class SearchEmptyRecentFeedArticlesProvider
 }
 
 String _$searchEmptyRecentFeedArticlesHash() =>
-    r'ee6ac7336d58b78c6c9295cdbb8aeeca9a91c2ad';
+    r'd9ddafc69ce226342bc63126dd6e1fd9d82d2d9a';
 
 final class SearchEmptyRecentFeedArticlesFamily extends $Family
-    with $FunctionalFamilyOverride<AsyncValue<List<FeedArticle>>, int> {
+    with $FunctionalFamilyOverride<AsyncValue<List<FeedArticleSummary>>, int> {
   SearchEmptyRecentFeedArticlesFamily._()
     : super(
         retry: null,

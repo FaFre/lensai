@@ -75,6 +75,19 @@ import 'package:weblibre/utils/ui_helper.dart';
 
 class BrowserView extends StatefulHookConsumerWidget {
   final Duration screenshotPeriod;
+
+  /// How stale a thumbnail may get while nothing is interacting with the page.
+  ///
+  /// The interaction check in [_BrowserViewState._timerTick] cannot see a page
+  /// that changes on its own — a video, a CSS animation, a JS clock, a live
+  /// feed — so this is the backstop that keeps such a tab's thumbnail from
+  /// freezing at whatever it showed when the user last touched it. Several
+  /// times [screenshotPeriod], because the whole point is that an idle article
+  /// stops being re-rendered every ten seconds — but only a few, because a tab
+  /// tray is a common entry point and a visibly stale preview of a video or a
+  /// dashboard is the cost of getting this wrong in the other direction.
+  final Duration maxThumbnailAge;
+
   final Duration suggestionTimeout;
   final Future<void> Function()? postInitializationStep;
   final StreamSink<Offset>? pointerMoveEventSink;
@@ -82,6 +95,7 @@ class BrowserView extends StatefulHookConsumerWidget {
   const BrowserView({
     super.key,
     this.screenshotPeriod = const Duration(seconds: 10),
+    this.maxThumbnailAge = const Duration(seconds: 30),
     this.suggestionTimeout = const Duration(seconds: 30),
     this.postInitializationStep,
     this.pointerMoveEventSink,
@@ -105,6 +119,26 @@ class _BrowserViewState extends ConsumerState<BrowserView>
   DateTime _lastPointerEvent = DateTime(0);
   Offset _accumulatedDelta = Offset.zero;
 
+  /// Whether anything has happened to the page since the last thumbnail was
+  /// captured.
+  ///
+  /// A render-to-bitmap of a page nobody has touched produces the thumbnail that
+  /// is already stored, so the periodic capture used to spend a Gecko off-screen
+  /// render plus a 720px decode every [BrowserView.screenshotPeriod] for the
+  /// whole time a tab sat open on an article. Set on the events that can change
+  /// what a thumbnail would show — a load finishing, a touch, a tab becoming
+  /// selected — and cleared once a capture has been asked for.
+  ///
+  /// Starts `true` so the first tick after the timer arms still captures.
+  bool _pageDirtySinceCapture = true;
+
+  /// When the last capture was asked for, or `null` if none has been.
+  ///
+  /// Pairs with [_pageDirtySinceCapture]: interaction is what makes a capture
+  /// worth doing promptly, and this is what makes one happen anyway for a page
+  /// that changes without being touched.
+  DateTime? _lastCaptureRequest;
+
   Future<void> _timerTick(Timer timer) async {
     // Skip the (expensive) Gecko render-to-bitmap while a full-cover route
     // (settings, tab tray, search, …) occludes the browser. The screenshot
@@ -125,6 +159,24 @@ class _BrowserViewState extends ConsumerState<BrowserView>
     if (ref.read(bottomSheetControllerProvider) != null) {
       return;
     }
+
+    // Nothing has touched the page, so a capture would mostly reproduce the
+    // stored thumbnail — but "mostly" is not "always": a video, an animation or
+    // a JS-driven page changes with no input at all, and the interaction flag
+    // cannot see that. So the flag only decides whether to capture *promptly*;
+    // [BrowserView.maxThumbnailAge] still forces one through. The timer is left
+    // running either way.
+    final lastCapture = _lastCaptureRequest;
+    final isStale =
+        lastCapture == null ||
+        DateTime.now().difference(lastCapture) >= widget.maxThumbnailAge;
+
+    if (!_pageDirtySinceCapture && !isStale) {
+      return;
+    }
+
+    _pageDirtySinceCapture = false;
+    _lastCaptureRequest = DateTime.now();
 
     await ref
         .read(selectedTabSessionProvider)
@@ -231,14 +283,19 @@ class _BrowserViewState extends ConsumerState<BrowserView>
 
     return Listener(
       behavior: HitTestBehavior.translucent,
-      onPointerUp: (widget.pointerMoveEventSink != null)
-          ? (_) {
-              if (_accumulatedDelta != Offset.zero) {
-                widget.pointerMoveEventSink!.add(_accumulatedDelta);
-                _accumulatedDelta = Offset.zero;
-              }
-            }
-          : null,
+      // A touch is the cheapest available proxy for "the page may look
+      // different now" — it covers scrolling, tapping a disclosure, dismissing a
+      // banner. Marked on down rather than on move so a tap counts too.
+      onPointerDown: (_) => _pageDirtySinceCapture = true,
+      onPointerUp: (_) {
+        _pageDirtySinceCapture = true;
+
+        if (widget.pointerMoveEventSink != null &&
+            _accumulatedDelta != Offset.zero) {
+          widget.pointerMoveEventSink!.add(_accumulatedDelta);
+          _accumulatedDelta = Offset.zero;
+        }
+      },
       onPointerMove: (widget.pointerMoveEventSink != null)
           ? (event) {
               if (event.down) {
@@ -397,6 +454,10 @@ class _BrowserViewState extends ConsumerState<BrowserView>
         ),
       ),
       (previous, next) {
+        // Any of these means the next tick has something new to capture: a
+        // different tab, or this one having just finished loading.
+        _pageDirtySinceCapture = true;
+
         if (previous?.tabId != next.tabId ||
             next.isLoading == true ||
             next.isFullScreen == true) {

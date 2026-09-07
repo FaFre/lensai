@@ -1877,5 +1877,15 @@ class DatabaseAtV8 extends GeneratedDatabase {
     idxSearchTokensReservedAt,
   ];
   @override
+  StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'toolbar_button_configs',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('toolbar_button_configs', kind: UpdateKind.update)],
+    ),
+  ]);
+  @override
   int get schemaVersion => 8;
 }

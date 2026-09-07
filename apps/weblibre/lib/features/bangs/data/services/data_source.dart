@@ -63,20 +63,30 @@ class BangDataSourceService extends _$BangDataSourceService {
     return DateTime.parse(content.trim()).toLocal();
   }
 
-  Future<Result<List<Bang>>> getBundledBangs(String path, BangGroup? group) {
-    return Result.fromAsync(() async {
-      final content = await rootBundle.loadString(path);
-      final json = jsonDecode(content) as List;
+  /// Reads a bundled bang asset without decoding it.
+  ///
+  /// Split from the decode on purpose: `rootBundle` is only reachable from the
+  /// isolate that owns the `ServicesBinding`, while decoding and mapping the
+  /// ~2.2 MB main group is exactly the work that must not happen there. Hand the
+  /// result to [parseBundledBangs] inside a background isolate.
+  Future<String> loadBundledBangJson(String path) =>
+      rootBundle.loadString(path);
+}
 
-      return json.map((e) {
-        var bang = Bang.fromJson(e as Map<String, dynamic>);
+/// Decodes the text of a bundled bang asset.
+///
+/// A top-level function so it can run in a background isolate; takes no
+/// services and touches no bindings.
+List<Bang> parseBundledBangs(String assetJson, BangGroup? group) {
+  final json = jsonDecode(assetJson) as List;
 
-        if (group != null) {
-          bang = bang.copyWith.group(group);
-        }
+  return json.map((e) {
+    var bang = Bang.fromJson(e as Map<String, dynamic>);
 
-        return bang;
-      }).toList();
-    });
-  }
+    if (group != null) {
+      bang = bang.copyWith.group(group);
+    }
+
+    return bang;
+  }).toList();
 }

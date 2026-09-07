@@ -4196,6 +4196,14 @@ i0.Index get idxTabParentContainer => i0.Index(
   'idx_tab_parent_container',
   'CREATE INDEX idx_tab_parent_container ON tab (parent_id, container_id)',
 );
+i0.Index get idxTabTimestamp => i0.Index(
+  'idx_tab_timestamp',
+  'CREATE INDEX idx_tab_timestamp ON tab (timestamp DESC, id DESC)',
+);
+i0.Index get idxTabContainerOrder => i0.Index(
+  'idx_tab_container_order',
+  'CREATE INDEX idx_tab_container_order ON tab (container_id, order_key)',
+);
 
 class CaptureTab extends i0.Table
     with i0.TableInfo<CaptureTab, i3.CaptureTabData> {

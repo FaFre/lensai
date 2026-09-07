@@ -27,6 +27,7 @@ import 'package:weblibre/features/geckoview/features/browser/presentation/contro
 import 'package:weblibre/features/geckoview/features/tabs/data/database/definitions.drift.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/entities/tab_mode.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/models/container_data.dart';
+import 'package:weblibre/features/geckoview/features/tabs/data/models/tab_summary.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/providers.dart';
 import 'package:weblibre/features/geckoview/features/tabs/domain/entities/tab_parent_change.dart';
 
@@ -307,7 +308,7 @@ class TabDataRepository extends _$TabDataRepository {
         .getSingleOrNull();
   }
 
-  Future<List<TabData>> getContainerTabsData(String? containerId) {
+  Future<List<TabSummary>> getContainerTabsData(String? containerId) {
     return ref
         .read(tabDatabaseProvider)
         .containerDao

@@ -47,7 +47,7 @@ final class SearchTokenIssuanceControllerProvider
 }
 
 String _$searchTokenIssuanceControllerHash() =>
-    r'fa821704ab80a12f4649b78bf50060acfd4b5544';
+    r'4ec1b90ba827e555f0bac509af0e4d395b8e47c5';
 
 abstract class _$SearchTokenIssuanceController
     extends $Notifier<SearchTokenIssuanceState> {

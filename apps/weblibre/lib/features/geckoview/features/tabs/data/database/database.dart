@@ -41,7 +41,7 @@ import 'package:weblibre/features/search/domain/fts_tokenizer.dart';
 )
 class TabDatabase extends $TabDatabase with TrigramQueryBuilderMixin {
   @override
-  final int schemaVersion = 16;
+  final int schemaVersion = 17;
 
   @override
   final int ftsTokenLimit = 10;
@@ -283,6 +283,16 @@ class TabDatabase extends $TabDatabase with TrigramQueryBuilderMixin {
       final database = m.database as TabDatabase;
       await database.definitionsDrift.evictExcludedHistoryPages();
       await database.definitionsDrift.reindexAfterExcludedHistoryEviction();
+    },
+    from16To17: (m, schema) async {
+      // Two indexes only. `getTabsFifo` ordered by `timestamp DESC LIMIT n`
+      // with nothing to walk, so SQLite scanned every row of `tab` and pushed
+      // it through a sorter — and that query is a live stream re-run on every
+      // write to the table. `getContainerTabsData` had the same problem for
+      // `container_id` + `order_key`, which `idx_tab_parent_container` cannot
+      // serve because `container_id` is not its leftmost column.
+      await m.create(schema.idxTabTimestamp);
+      await m.create(schema.idxTabContainerOrder);
     },
   );
 }

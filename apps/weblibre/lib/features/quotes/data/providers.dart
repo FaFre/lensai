@@ -21,9 +21,9 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:flutter/services.dart' show rootBundle;
 import 'package:path/path.dart' as p;
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:weblibre/core/asset_database.dart';
 import 'package:weblibre/core/database_registry.dart';
 import 'package:weblibre/core/filesystem.dart';
 import 'package:weblibre/features/quotes/data/database/database.dart';
@@ -37,17 +37,11 @@ const _quotesDbFileName = 'quotes.db';
 QuotesDatabase quotesDatabase(Ref ref) {
   final db = QuotesDatabase(
     LazyDatabase(() async {
-      final file = File(
-        p.join(filesystem.profileDatabasesDir.path, _quotesDbFileName),
-      );
-
-      await file.parent.create(recursive: true);
-
-      final blob = await rootBundle.load(_quotesAssetPath);
-      final buffer = blob.buffer;
-      await file.writeAsBytes(
-        buffer.asUint8List(blob.offsetInBytes, blob.lengthInBytes),
-        flush: true,
+      final file = await installAssetDatabase(
+        assetPath: _quotesAssetPath,
+        target: File(
+          p.join(filesystem.profileDatabasesDir.path, _quotesDbFileName),
+        ),
       );
 
       return NativeDatabase.createInBackground(file);

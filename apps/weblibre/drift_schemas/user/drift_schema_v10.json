@@ -352,7 +352,19 @@
             "customConstraints": "REFERENCES toolbar_button_configs(button_id)ON DELETE SET NULL",
             "default_dart": null,
             "default_client_dart": null,
-            "dsl_features": []
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "toolbar_button_configs",
+                    "column": "button_id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "setNull"
+                }
+              }
+            ]
           }
         ],
         "is_virtual": false,
@@ -422,7 +434,19 @@
             "customConstraints": "REFERENCES quick_switcher_button_configs(button_id)ON DELETE SET NULL",
             "default_dart": null,
             "default_client_dart": null,
-            "dsl_features": []
+            "dsl_features": [
+              {
+                "foreign_key": {
+                  "to": {
+                    "table": "quick_switcher_button_configs",
+                    "column": "button_id"
+                  },
+                  "initially_deferred": false,
+                  "on_update": null,
+                  "on_delete": "setNull"
+                }
+              }
+            ]
           }
         ],
         "is_virtual": false,

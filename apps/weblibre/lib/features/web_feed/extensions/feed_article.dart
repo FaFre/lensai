@@ -18,11 +18,11 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import 'package:nullability/nullability.dart';
-import 'package:weblibre/features/web_feed/data/models/feed_article.dart';
+import 'package:weblibre/features/web_feed/data/models/feed_article_summary.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_link.dart';
 import 'package:weblibre/features/web_feed/extensions/atom.dart';
 
-extension FeedArticleX on FeedArticle {
+extension FeedArticleX on FeedArticleSummary {
   String get displayTitle =>
       title ??
       links

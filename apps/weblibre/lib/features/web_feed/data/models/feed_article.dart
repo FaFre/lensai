@@ -22,6 +22,7 @@ import 'package:drift/drift.dart';
 import 'package:fast_equatable/fast_equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weblibre/features/web_feed/data/database/definitions.drift.dart';
+import 'package:weblibre/features/web_feed/data/models/feed_article_summary.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_author.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_category.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_link.dart';
@@ -30,26 +31,41 @@ part 'feed_article.g.dart';
 
 @JsonSerializable()
 @CopyWith()
-class FeedArticle with FastEquatable implements Insertable<FeedArticle> {
+class FeedArticle
+    with FastEquatable
+    implements Insertable<FeedArticle>, FeedArticleSummary {
+  @override
   final String id;
+  @override
   final Uri feedId;
+  @override
   final DateTime fetched;
+  @override
   final DateTime? created;
+  @override
   final DateTime? updated;
+  @override
   final DateTime? lastRead;
+  @override
   final String? title;
+  @override
   final List<FeedAuthor>? authors;
+  @override
   final List<FeedCategory>? tags;
+  @override
   final List<FeedLink>? links;
   final String? summaryHtml;
   final String? summaryMarkdown;
+  @override
   final String? summaryPlain;
   final String? contentHtml;
   final String? contentMarkdown;
   final String? contentPlain;
 
   //Derived by view from feed table, should not get inserted
+  @override
   final Uri? icon;
+  @override
   final Uri? siteLink;
 
   FeedArticle({

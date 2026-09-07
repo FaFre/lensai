@@ -15,9 +15,11 @@ import 'package:weblibre/features/web_feed/data/models/feed_article.dart' as i7;
 import 'package:weblibre/features/web_feed/data/models/feed_link.dart' as i8;
 import 'package:weblibre/features/web_feed/data/database/converters/feed_links.dart'
     as i9;
-import 'package:drift/internal/modular.dart' as i10;
+import 'package:weblibre/features/web_feed/data/models/feed_article_summary.dart'
+    as i10;
+import 'package:drift/internal/modular.dart' as i11;
 import 'package:weblibre/features/web_feed/data/models/feed_article_query_result.dart'
-    as i11;
+    as i12;
 
 typedef $FeedCreateCompanionBuilder =
     i1.FeedCompanion Function({
@@ -51,7 +53,7 @@ final class $FeedReferences
   static i0.MultiTypedResultKey<i1.Article, List<i7.FeedArticle>>
   _articleRefsTable(i0.GeneratedDatabase db) =>
       i0.MultiTypedResultKey.fromTable(
-        i10.ReadDatabaseContainer(db).resultSet<i1.Article>('article'),
+        i11.ReadDatabaseContainer(db).resultSet<i1.Article>('article'),
         aliasName: 'feed__url__article__feed_id',
       );
 
@@ -59,7 +61,7 @@ final class $FeedReferences
     final manager = i1
         .$ArticleTableManager(
           $_db,
-          i10.ReadDatabaseContainer($_db).resultSet<i1.Article>('article'),
+          i11.ReadDatabaseContainer($_db).resultSet<i1.Article>('article'),
         )
         .filter((f) => f.feedId.url.sqlEquals($_itemColumn<String>('url')!));
 
@@ -137,7 +139,7 @@ class $FeedFilterComposer extends i0.Composer<i0.GeneratedDatabase, i1.Feed> {
     final i1.$ArticleFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.url,
-      referencedTable: i10.ReadDatabaseContainer(
+      referencedTable: i11.ReadDatabaseContainer(
         $db,
       ).resultSet<i1.Article>('article'),
       getReferencedColumn: (t) => t.feedId,
@@ -148,7 +150,7 @@ class $FeedFilterComposer extends i0.Composer<i0.GeneratedDatabase, i1.Feed> {
             $removeJoinBuilderFromRootComposer,
           }) => i1.$ArticleFilterComposer(
             $db: $db,
-            $table: i10.ReadDatabaseContainer(
+            $table: i11.ReadDatabaseContainer(
               $db,
             ).resultSet<i1.Article>('article'),
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
@@ -255,7 +257,7 @@ class $FeedAnnotationComposer
     final i1.$ArticleAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.url,
-      referencedTable: i10.ReadDatabaseContainer(
+      referencedTable: i11.ReadDatabaseContainer(
         $db,
       ).resultSet<i1.Article>('article'),
       getReferencedColumn: (t) => t.feedId,
@@ -266,7 +268,7 @@ class $FeedAnnotationComposer
             $removeJoinBuilderFromRootComposer,
           }) => i1.$ArticleAnnotationComposer(
             $db: $db,
-            $table: i10.ReadDatabaseContainer(
+            $table: i11.ReadDatabaseContainer(
               $db,
             ).resultSet<i1.Article>('article'),
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
@@ -361,7 +363,7 @@ class $FeedTableManager
               db: db,
               explicitlyWatchedTables: [
                 if (articleRefs)
-                  i10.ReadDatabaseContainer(
+                  i11.ReadDatabaseContainer(
                     db,
                   ).resultSet<i1.Article>('article'),
               ],
@@ -451,7 +453,7 @@ final class $ArticleReferences
   $ArticleReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static i1.Feed _feedIdTable(i0.GeneratedDatabase db) =>
-      i10.ReadDatabaseContainer(
+      i11.ReadDatabaseContainer(
         db,
       ).resultSet<i1.Feed>('feed').createAlias('article__feed_id__feed__url');
 
@@ -461,7 +463,7 @@ final class $ArticleReferences
     final manager = i1
         .$FeedTableManager(
           $_db,
-          i10.ReadDatabaseContainer($_db).resultSet<i1.Feed>('feed'),
+          i11.ReadDatabaseContainer($_db).resultSet<i1.Feed>('feed'),
         )
         .filter((f) => f.url.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_feedIdTable($_db));
@@ -575,7 +577,7 @@ class $ArticleFilterComposer
     final i1.$FeedFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.feedId,
-      referencedTable: i10.ReadDatabaseContainer(
+      referencedTable: i11.ReadDatabaseContainer(
         $db,
       ).resultSet<i1.Feed>('feed'),
       getReferencedColumn: (t) => t.url,
@@ -586,7 +588,7 @@ class $ArticleFilterComposer
             $removeJoinBuilderFromRootComposer,
           }) => i1.$FeedFilterComposer(
             $db: $db,
-            $table: i10.ReadDatabaseContainer($db).resultSet<i1.Feed>('feed'),
+            $table: i11.ReadDatabaseContainer($db).resultSet<i1.Feed>('feed'),
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -685,7 +687,7 @@ class $ArticleOrderingComposer
     final i1.$FeedOrderingComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.feedId,
-      referencedTable: i10.ReadDatabaseContainer(
+      referencedTable: i11.ReadDatabaseContainer(
         $db,
       ).resultSet<i1.Feed>('feed'),
       getReferencedColumn: (t) => t.url,
@@ -696,7 +698,7 @@ class $ArticleOrderingComposer
             $removeJoinBuilderFromRootComposer,
           }) => i1.$FeedOrderingComposer(
             $db: $db,
-            $table: i10.ReadDatabaseContainer($db).resultSet<i1.Feed>('feed'),
+            $table: i11.ReadDatabaseContainer($db).resultSet<i1.Feed>('feed'),
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -779,7 +781,7 @@ class $ArticleAnnotationComposer
     final i1.$FeedAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.feedId,
-      referencedTable: i10.ReadDatabaseContainer(
+      referencedTable: i11.ReadDatabaseContainer(
         $db,
       ).resultSet<i1.Feed>('feed'),
       getReferencedColumn: (t) => t.url,
@@ -790,7 +792,7 @@ class $ArticleAnnotationComposer
             $removeJoinBuilderFromRootComposer,
           }) => i1.$FeedAnnotationComposer(
             $db: $db,
-            $table: i10.ReadDatabaseContainer($db).resultSet<i1.Feed>('feed'),
+            $table: i11.ReadDatabaseContainer($db).resultSet<i1.Feed>('feed'),
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2371,6 +2373,214 @@ class ArticleView extends i0.ViewInfo<i1.ArticleView, i7.FeedArticle>
   Set<String> get readTables => const {'article', 'feed'};
 }
 
+class ArticleListView
+    extends i0.ViewInfo<i1.ArticleListView, i10.FeedArticleListEntry>
+    implements i0.HasResultSet {
+  final String? _alias;
+  @override
+  final i0.GeneratedDatabase attachedDatabase;
+  ArticleListView(this.attachedDatabase, [this._alias]);
+  @override
+  List<i0.GeneratedColumn> get $columns => [
+    id,
+    feedId,
+    fetched,
+    created,
+    updated,
+    lastRead,
+    title,
+    authors,
+    tags,
+    links,
+    summaryPlain,
+    icon,
+    siteLink,
+  ];
+  @override
+  String get aliasedName => _alias ?? entityName;
+  @override
+  String get entityName => 'article_list_view';
+  @override
+  Map<i0.SqlDialect, String> get createViewStatements => {
+    i0.SqlDialect.sqlite:
+        'CREATE VIEW article_list_view AS SELECT a.id, a.feed_id, a.fetched, a.created, a.updated, a.last_read, a.title, a.authors, a.tags, a.links, a.summaryPlain, f.icon, f.site_link FROM article AS a INNER JOIN feed AS f ON f.url = a.feed_id',
+  };
+  @override
+  ArticleListView get asDslTable => this;
+  @override
+  i10.FeedArticleListEntry map(
+    Map<String, dynamic> data, {
+    String? tablePrefix,
+  }) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return i10.FeedArticleListEntry(
+      id: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      feedId: i1.Article.$converterfeedId.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string,
+          data['${effectivePrefix}feed_id'],
+        )!,
+      ),
+      fetched: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.dateTime,
+        data['${effectivePrefix}fetched'],
+      )!,
+      created: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.dateTime,
+        data['${effectivePrefix}created'],
+      ),
+      updated: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.dateTime,
+        data['${effectivePrefix}updated'],
+      ),
+      lastRead: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.dateTime,
+        data['${effectivePrefix}last_read'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      ),
+      authors: i1.Article.$converterauthorsn.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string,
+          data['${effectivePrefix}authors'],
+        ),
+      ),
+      tags: i1.Article.$convertertagsn.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string,
+          data['${effectivePrefix}tags'],
+        ),
+      ),
+      links: i1.Article.$converterlinksn.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string,
+          data['${effectivePrefix}links'],
+        ),
+      ),
+      summaryPlain: attachedDatabase.typeMapping.read(
+        i0.DriftSqlType.string,
+        data['${effectivePrefix}summaryPlain'],
+      ),
+      icon: i1.Feed.$convertericon.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string,
+          data['${effectivePrefix}icon'],
+        ),
+      ),
+      siteLink: i1.Feed.$convertersiteLink.fromSql(
+        attachedDatabase.typeMapping.read(
+          i0.DriftSqlType.string,
+          data['${effectivePrefix}site_link'],
+        ),
+      ),
+    );
+  }
+
+  late final i0.GeneratedColumn<String> id = i0.GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumnWithTypeConverter<Uri, String> feedId =
+      i0.GeneratedColumn<String>(
+        'feed_id',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.string,
+      ).withConverter<Uri>(i1.Article.$converterfeedId);
+  late final i0.GeneratedColumn<DateTime> fetched =
+      i0.GeneratedColumn<DateTime>(
+        'fetched',
+        aliasedName,
+        false,
+        type: i0.DriftSqlType.dateTime,
+      );
+  late final i0.GeneratedColumn<DateTime> created =
+      i0.GeneratedColumn<DateTime>(
+        'created',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.dateTime,
+      );
+  late final i0.GeneratedColumn<DateTime> updated =
+      i0.GeneratedColumn<DateTime>(
+        'updated',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.dateTime,
+      );
+  late final i0.GeneratedColumn<DateTime> lastRead =
+      i0.GeneratedColumn<DateTime>(
+        'last_read',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.dateTime,
+      );
+  late final i0.GeneratedColumn<String> title = i0.GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  );
+  late final i0.GeneratedColumnWithTypeConverter<List<i2.FeedAuthor>?, String>
+  authors = i0.GeneratedColumn<String>(
+    'authors',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  ).withConverter<List<i2.FeedAuthor>?>(i1.Article.$converterauthorsn);
+  late final i0.GeneratedColumnWithTypeConverter<List<i3.FeedCategory>?, String>
+  tags = i0.GeneratedColumn<String>(
+    'tags',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  ).withConverter<List<i3.FeedCategory>?>(i1.Article.$convertertagsn);
+  late final i0.GeneratedColumnWithTypeConverter<List<i8.FeedLink>?, String>
+  links = i0.GeneratedColumn<String>(
+    'links',
+    aliasedName,
+    true,
+    type: i0.DriftSqlType.string,
+  ).withConverter<List<i8.FeedLink>?>(i1.Article.$converterlinksn);
+  late final i0.GeneratedColumn<String> summaryPlain =
+      i0.GeneratedColumn<String>(
+        'summaryPlain',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+      );
+  late final i0.GeneratedColumnWithTypeConverter<Uri?, String> icon =
+      i0.GeneratedColumn<String>(
+        'icon',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+      ).withConverter<Uri?>(i1.Feed.$convertericon);
+  late final i0.GeneratedColumnWithTypeConverter<Uri?, String> siteLink =
+      i0.GeneratedColumn<String>(
+        'site_link',
+        aliasedName,
+        true,
+        type: i0.DriftSqlType.string,
+      ).withConverter<Uri?>(i1.Feed.$convertersiteLink);
+  @override
+  ArticleListView createAlias(String alias) {
+    return ArticleListView(attachedDatabase, alias);
+  }
+
+  @override
+  i0.Query? get query => null;
+  @override
+  Set<String> get readTables => const {'article', 'feed'};
+}
+
 i0.Index get articleFeedId => i0.Index(
   'article_feed_id',
   'CREATE INDEX article_feed_id ON article (feed_id)',
@@ -2617,11 +2827,11 @@ i0.Trigger get articleAfterDelete => i0.Trigger(
   'article_after_delete',
 );
 i0.Trigger get articleAfterUpdate => i0.Trigger(
-  'CREATE TRIGGER article_after_update AFTER UPDATE ON article BEGIN INSERT INTO article_fts (article_fts, "rowid", title, summaryPlain, contentPlain) VALUES (\'delete\', old."rowid", old.title, old.summaryPlain, old.contentPlain);INSERT INTO article_fts ("rowid", title, summaryPlain, contentPlain) VALUES (new."rowid", new.title, new.summaryPlain, new.contentPlain);END',
+  'CREATE TRIGGER article_after_update AFTER UPDATE OF title, summaryPlain, contentPlain ON article WHEN OLD.title IS NOT NEW.title OR OLD.summaryPlain IS NOT NEW.summaryPlain OR OLD.contentPlain IS NOT NEW.contentPlain BEGIN INSERT INTO article_fts (article_fts, "rowid", title, summaryPlain, contentPlain) VALUES (\'delete\', old."rowid", old.title, old.summaryPlain, old.contentPlain);INSERT INTO article_fts ("rowid", title, summaryPlain, contentPlain) VALUES (new."rowid", new.title, new.summaryPlain, new.contentPlain);END',
   'article_after_update',
 );
 
-class DefinitionsDrift extends i10.ModularAccessor {
+class DefinitionsDrift extends i11.ModularAccessor {
   DefinitionsDrift(i0.GeneratedDatabase db) : super(db);
   Future<int> optimizeFtsIndex() {
     return customInsert(
@@ -2631,7 +2841,7 @@ class DefinitionsDrift extends i10.ModularAccessor {
     );
   }
 
-  i0.Selectable<i11.FeedArticleQueryResult> queryArticlesBasic({
+  i0.Selectable<i12.FeedArticleQueryResult> queryArticlesBasic({
     required String query,
     String? feedId,
     required int limit,
@@ -2645,7 +2855,7 @@ class DefinitionsDrift extends i10.ModularAccessor {
       ],
       readsFrom: {feed, articleFts, article},
     ).map(
-      (i0.QueryRow row) => i11.FeedArticleQueryResult(
+      (i0.QueryRow row) => i12.FeedArticleQueryResult(
         id: row.read<String>('id'),
         feedId: i1.Article.$converterfeedId.fromSql(
           row.read<String>('feed_id'),
@@ -2679,7 +2889,7 @@ class DefinitionsDrift extends i10.ModularAccessor {
     );
   }
 
-  i0.Selectable<i11.FeedArticleQueryResult> queryArticlesFullContent({
+  i0.Selectable<i12.FeedArticleQueryResult> queryArticlesFullContent({
     required String beforeMatch,
     required String afterMatch,
     required String ellipsis,
@@ -2701,7 +2911,7 @@ class DefinitionsDrift extends i10.ModularAccessor {
       ],
       readsFrom: {feed, articleFts, article},
     ).map(
-      (i0.QueryRow row) => i11.FeedArticleQueryResult(
+      (i0.QueryRow row) => i12.FeedArticleQueryResult(
         id: row.read<String>('id'),
         feedId: i1.Article.$converterfeedId.fromSql(
           row.read<String>('feed_id'),
@@ -2738,12 +2948,12 @@ class DefinitionsDrift extends i10.ModularAccessor {
     );
   }
 
-  i1.ArticleFts get articleFts => i10.ReadDatabaseContainer(
+  i1.ArticleFts get articleFts => i11.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.ArticleFts>('article_fts');
-  i1.Article get article => i10.ReadDatabaseContainer(
+  i1.Article get article => i11.ReadDatabaseContainer(
     attachedDatabase,
   ).resultSet<i1.Article>('article');
   i1.Feed get feed =>
-      i10.ReadDatabaseContainer(attachedDatabase).resultSet<i1.Feed>('feed');
+      i11.ReadDatabaseContainer(attachedDatabase).resultSet<i1.Feed>('feed');
 }

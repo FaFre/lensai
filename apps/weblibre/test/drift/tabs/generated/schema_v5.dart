@@ -1269,6 +1269,13 @@ class DatabaseAtV5 extends GeneratedDatabase {
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
     WritePropagation(
       on: TableUpdateQuery.onTableName(
+        'tab',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('tab', kind: UpdateKind.update)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
         'container',
         limitUpdateKind: UpdateKind.delete,
       ),

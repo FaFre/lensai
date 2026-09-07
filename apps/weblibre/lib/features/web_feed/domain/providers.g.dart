@@ -13,7 +13,7 @@ part of 'providers.dart';
 final articleSearchProvider = ArticleSearchFamily._();
 
 final class ArticleSearchProvider
-    extends $StreamNotifierProvider<ArticleSearch, List<FeedArticle>> {
+    extends $StreamNotifierProvider<ArticleSearch, List<FeedArticleSummary>> {
   ArticleSearchProvider._({
     required ArticleSearchFamily super.from,
     required Uri? super.argument,
@@ -50,15 +50,15 @@ final class ArticleSearchProvider
   }
 }
 
-String _$articleSearchHash() => r'48ed3baa560c0e731626f79a8f6ff3dab1e9bc95';
+String _$articleSearchHash() => r'341fba801fe7ea7d01cb637329d27b9ff11d66f0';
 
 final class ArticleSearchFamily extends $Family
     with
         $ClassFamilyOverride<
           ArticleSearch,
-          AsyncValue<List<FeedArticle>>,
-          List<FeedArticle>,
-          Stream<List<FeedArticle>>,
+          AsyncValue<List<FeedArticleSummary>>,
+          List<FeedArticleSummary>,
+          Stream<List<FeedArticleSummary>>,
           Uri?
         > {
   ArticleSearchFamily._()
@@ -77,21 +77,29 @@ final class ArticleSearchFamily extends $Family
   String toString() => r'articleSearchProvider';
 }
 
-abstract class _$ArticleSearch extends $StreamNotifier<List<FeedArticle>> {
+abstract class _$ArticleSearch
+    extends $StreamNotifier<List<FeedArticleSummary>> {
   late final _$args = ref.$arg as Uri?;
   Uri? get feedId => _$args;
 
-  Stream<List<FeedArticle>> build(Uri? feedId);
+  Stream<List<FeedArticleSummary>> build(Uri? feedId);
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
     final ref =
-        this.ref as $Ref<AsyncValue<List<FeedArticle>>, List<FeedArticle>>;
+        this.ref
+            as $Ref<
+              AsyncValue<List<FeedArticleSummary>>,
+              List<FeedArticleSummary>
+            >;
     final element =
         ref.element
             as $ClassProviderElement<
-              AnyNotifier<AsyncValue<List<FeedArticle>>, List<FeedArticle>>,
-              AsyncValue<List<FeedArticle>>,
+              AnyNotifier<
+                AsyncValue<List<FeedArticleSummary>>,
+                List<FeedArticleSummary>
+              >,
+              AsyncValue<List<FeedArticleSummary>>,
               Object?,
               Object?
             >;
@@ -214,13 +222,13 @@ final feedArticleListProvider = FeedArticleListFamily._();
 final class FeedArticleListProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<FeedArticle>>,
-          List<FeedArticle>,
-          Stream<List<FeedArticle>>
+          AsyncValue<List<FeedArticleListEntry>>,
+          List<FeedArticleListEntry>,
+          Stream<List<FeedArticleListEntry>>
         >
     with
-        $FutureModifier<List<FeedArticle>>,
-        $StreamProvider<List<FeedArticle>> {
+        $FutureModifier<List<FeedArticleListEntry>>,
+        $StreamProvider<List<FeedArticleListEntry>> {
   FeedArticleListProvider._({
     required FeedArticleListFamily super.from,
     required Uri? super.argument,
@@ -244,12 +252,12 @@ final class FeedArticleListProvider
 
   @$internal
   @override
-  $StreamProviderElement<List<FeedArticle>> $createElement(
+  $StreamProviderElement<List<FeedArticleListEntry>> $createElement(
     $ProviderPointer pointer,
   ) => $StreamProviderElement(pointer);
 
   @override
-  Stream<List<FeedArticle>> create(Ref ref) {
+  Stream<List<FeedArticleListEntry>> create(Ref ref) {
     final argument = this.argument as Uri?;
     return feedArticleList(ref, argument);
   }
@@ -265,10 +273,10 @@ final class FeedArticleListProvider
   }
 }
 
-String _$feedArticleListHash() => r'45d585cc9f59ad48a0d1d6fbcf802b1c7de7f6bc';
+String _$feedArticleListHash() => r'8161be00fd61b16b9b9ff7900fafcfb0d36c5657';
 
 final class FeedArticleListFamily extends $Family
-    with $FunctionalFamilyOverride<Stream<List<FeedArticle>>, Uri?> {
+    with $FunctionalFamilyOverride<Stream<List<FeedArticleListEntry>>, Uri?> {
   FeedArticleListFamily._()
     : super(
         retry: null,
@@ -290,7 +298,10 @@ final filteredArticleListProvider = FilteredArticleListFamily._();
 
 final class FilteredArticleListProvider
     extends
-        $NotifierProvider<FilteredArticleList, AsyncValue<List<FeedArticle>>> {
+        $NotifierProvider<
+          FilteredArticleList,
+          AsyncValue<List<FeedArticleSummary>>
+        > {
   FilteredArticleListProvider._({
     required FilteredArticleListFamily super.from,
     required Uri? super.argument,
@@ -317,12 +328,11 @@ final class FilteredArticleListProvider
   FilteredArticleList create() => FilteredArticleList();
 
   /// {@macro riverpod.override_with_value}
-  Override overrideWithValue(AsyncValue<List<FeedArticle>> value) {
+  Override overrideWithValue(AsyncValue<List<FeedArticleSummary>> value) {
     return $ProviderOverride(
       origin: this,
-      providerOverride: $SyncValueProvider<AsyncValue<List<FeedArticle>>>(
-        value,
-      ),
+      providerOverride:
+          $SyncValueProvider<AsyncValue<List<FeedArticleSummary>>>(value),
     );
   }
 
@@ -338,15 +348,15 @@ final class FilteredArticleListProvider
 }
 
 String _$filteredArticleListHash() =>
-    r'a691c3c6aa722dd85ee4980e6c48721a8025f1d8';
+    r'54f0ca33749da334e025adda09547dc72f0c4e98';
 
 final class FilteredArticleListFamily extends $Family
     with
         $ClassFamilyOverride<
           FilteredArticleList,
-          AsyncValue<List<FeedArticle>>,
-          AsyncValue<List<FeedArticle>>,
-          AsyncValue<List<FeedArticle>>,
+          AsyncValue<List<FeedArticleSummary>>,
+          AsyncValue<List<FeedArticleSummary>>,
+          AsyncValue<List<FeedArticleSummary>>,
           Uri?
         > {
   FilteredArticleListFamily._()
@@ -366,28 +376,28 @@ final class FilteredArticleListFamily extends $Family
 }
 
 abstract class _$FilteredArticleList
-    extends $Notifier<AsyncValue<List<FeedArticle>>> {
+    extends $Notifier<AsyncValue<List<FeedArticleSummary>>> {
   late final _$args = ref.$arg as Uri?;
   Uri? get feedId => _$args;
 
-  AsyncValue<List<FeedArticle>> build(Uri? feedId);
+  AsyncValue<List<FeedArticleSummary>> build(Uri? feedId);
   @$mustCallSuper
   @override
   WhenComplete runBuild() {
     final ref =
         this.ref
             as $Ref<
-              AsyncValue<List<FeedArticle>>,
-              AsyncValue<List<FeedArticle>>
+              AsyncValue<List<FeedArticleSummary>>,
+              AsyncValue<List<FeedArticleSummary>>
             >;
     final element =
         ref.element
             as $ClassProviderElement<
               AnyNotifier<
-                AsyncValue<List<FeedArticle>>,
-                AsyncValue<List<FeedArticle>>
+                AsyncValue<List<FeedArticleSummary>>,
+                AsyncValue<List<FeedArticleSummary>>
               >,
-              AsyncValue<List<FeedArticle>>,
+              AsyncValue<List<FeedArticleSummary>>,
               Object?,
               Object?
             >;

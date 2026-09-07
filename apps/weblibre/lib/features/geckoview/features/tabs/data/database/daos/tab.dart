@@ -27,10 +27,12 @@ import 'package:weblibre/features/geckoview/domain/entities/states/tab.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/database/daos/tab.drift.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/database/database.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/database/definitions.drift.dart';
+import 'package:weblibre/features/geckoview/features/tabs/data/database/projections/tab_summary.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/entities/tab_mode.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/entities/tab_source.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/models/container_data.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/models/tab_query_result.dart';
+import 'package:weblibre/features/geckoview/features/tabs/data/models/tab_summary.dart';
 import 'package:weblibre/features/geckoview/features/tabs/domain/entities/tab_parent_change.dart';
 
 class SyncTabsResult {
@@ -69,10 +71,33 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
   UpdateStatement<Tab, TabData> _updateByIdStatement(String id) =>
       db.tab.update()..where((t) => t.id.equals(id));
 
-  Selectable<TabData> allTabData() => db.tab.select();
-
+  /// The full row, page text included. Only for the one caller that renders
+  /// stored content ([showContentSelectionDialog]); everything that lists or
+  /// watches tabs wants [TabSummary] instead — see that class for why.
   SingleOrNullSelectable<TabData> getTabDataById(String id) =>
       db.tab.select()..where((t) => t.id.equals(id));
+
+  /// A `selectOnly` over [tabSummaryColumns], mapped to [TabSummary].
+  ///
+  /// [refine] adds the `where`/`orderBy`/`limit` — a callback rather than a
+  /// cascade on the return value, because mapping has to come last.
+  JoinedSelectStatement<Tab, TabData> _tabSummaryQuery(
+    void Function(JoinedSelectStatement<Tab, TabData> query) refine,
+  ) {
+    final query = selectTabSummaries(this, db.tab);
+    refine(query);
+    return query;
+  }
+
+  Selectable<TabSummary> _tabSummaries(
+    void Function(JoinedSelectStatement<Tab, TabData> query) refine,
+  ) => _tabSummaryQuery(refine).map((row) => readTabSummary(row, db.tab));
+
+  /// [getTabDataById] without the content columns.
+  SingleOrNullSelectable<TabSummary> getTabSummaryById(String id) =>
+      _tabSummaryQuery(
+        (q) => q..where(db.tab.id.equals(id)),
+      ).map((row) => readTabSummary(row, db.tab));
 
   SingleOrNullSelectable<TabMode> getTabMode(String tabId) {
     final query = selectOnly(db.tab)
@@ -117,42 +142,50 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
   /// [excludedTabIds] skips tabs that are on their way out: tab rows are only
   /// deleted after the next selection has been made, so a tab being closed is
   /// still present here — and, having just been active, sorts first.
-  Selectable<TabData> getTabsFifo({
+  Selectable<TabSummary> getTabsFifo({
     int limit = 25,
     Set<String> excludedTabIds = const {},
   }) {
-    final query = select(db.tab)
-      ..limit(limit)
-      ..orderBy([(t) => OrderingTerm.desc(t.timestamp)]);
+    return _tabSummaries((query) {
+      query
+        ..limit(limit)
+        ..orderBy([
+          OrderingTerm.desc(db.tab.timestamp),
+          // Total order, and the reason is in `idx_tab_timestamp`: timestamps
+          // have one-second resolution, so ties are ordinary.
+          OrderingTerm.desc(db.tab.id),
+        ]);
 
-    if (excludedTabIds.isNotEmpty) {
-      query.where((t) => t.id.isNotIn(excludedTabIds));
-    }
-
-    return query;
+      if (excludedTabIds.isNotEmpty) {
+        query.where(db.tab.id.isNotIn(excludedTabIds));
+      }
+    });
   }
 
   /// As [getTabsFifo], restricted to one container. A null [containerId] is the
   /// unassigned container, not "any container".
-  Selectable<TabData> getContainerTabsFifo(
+  Selectable<TabSummary> getContainerTabsFifo(
     String? containerId, {
     int limit = 25,
     Set<String> excludedTabIds = const {},
   }) {
-    final query = select(db.tab)
-      ..where(
-        (t) => containerId != null
-            ? t.containerId.equals(containerId)
-            : t.containerId.isNull(),
-      )
-      ..limit(limit)
-      ..orderBy([(t) => OrderingTerm.desc(t.timestamp)]);
+    return _tabSummaries((query) {
+      query
+        ..where(
+          containerId != null
+              ? db.tab.containerId.equals(containerId)
+              : db.tab.containerId.isNull(),
+        )
+        ..limit(limit)
+        ..orderBy([
+          OrderingTerm.desc(db.tab.timestamp),
+          OrderingTerm.desc(db.tab.id),
+        ]);
 
-    if (excludedTabIds.isNotEmpty) {
-      query.where((t) => t.id.isNotIn(excludedTabIds));
-    }
-
-    return query;
+      if (excludedTabIds.isNotEmpty) {
+        query.where(db.tab.id.isNotIn(excludedTabIds));
+      }
+    });
   }
 
   SingleOrNullSelectable<String?> getTabContainerId(String tabId) {
@@ -163,10 +196,16 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
     return query.map((row) => row.read(db.tab.containerId));
   }
 
+  /// Only the container is read, so only the container's columns are selected —
+  /// driving this off `select(db.tab)` would pull the tab's page text along with
+  /// it for nothing.
   SingleOrNullSelectable<ContainerData?> getTabContainerData(String tabId) {
-    final query = select(db.tab).join([
-      innerJoin(db.container, db.container.id.equalsExp(db.tab.containerId)),
-    ])..where(db.tab.id.equals(tabId));
+    final query = selectOnly(db.tab)
+      ..addColumns(db.container.$columns)
+      ..join([
+        innerJoin(db.container, db.container.id.equalsExp(db.tab.containerId)),
+      ])
+      ..where(db.tab.id.equals(tabId));
 
     return query.map((row) => row.readTableOrNull(db.container));
   }
@@ -588,11 +627,11 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
       ];
 
       final anchors = anchorIds.isEmpty
-          ? const <String, TabData>{}
+          ? const <String, TabSummary>{}
           : {
-              for (final tab in await (select(
-                db.tab,
-              )..where((t) => t.id.isIn(anchorIds))).get())
+              for (final tab in await _tabSummaries(
+                (q) => q..where(db.tab.id.isIn(anchorIds)),
+              ).get())
                 tab.id: tab,
             };
 
@@ -633,7 +672,7 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
         case TabParentToSpecific(:final parentTabId):
           final parent =
               anchors[parentTabId] ??
-              await getTabDataById(parentTabId).getSingleOrNull();
+              await getTabSummaryById(parentTabId).getSingleOrNull();
           if (parent != null) {
             parentValue = Value(parentTabId);
             containerValue = Value(parent.containerId);
@@ -755,11 +794,11 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
       // them as an atomic block. We must compute anchors BEFORE writing
       // the new parent_id, otherwise `getLastChildTabId(newParentId)`
       // would pick up the moving root itself as a sibling.
-      final subtreeRows =
-          await (select(db.tab)
-                ..where((t) => t.id.isIn(movingSubtreeIds))
-                ..orderBy([(t) => OrderingTerm.asc(t.orderKey)]))
-              .get();
+      final subtreeRows = await _tabSummaries(
+        (q) => q
+          ..where(db.tab.id.isIn(movingSubtreeIds))
+          ..orderBy([OrderingTerm.asc(db.tab.orderKey)]),
+      ).get();
       final orderedIds = subtreeRows.map((r) => r.id).toList();
       if (orderedIds.isEmpty) {
         return true;
@@ -776,7 +815,7 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
             ).getSingleOrNull();
       final anchorId = lastSiblingSubtreeId ?? lastSiblingId ?? newParentId;
 
-      final anchorRow = await getTabDataById(anchorId).getSingleOrNull();
+      final anchorRow = await getTabSummaryById(anchorId).getSingleOrNull();
       if (anchorRow == null) {
         return false;
       }
@@ -786,19 +825,20 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
       // order_key strictly greater than the anchor. Skipping subtree members
       // keeps the moved block compact even when the subtree's old keys
       // sat near the anchor in storage.
-      final nextRow =
-          await (select(db.tab)
-                ..where((t) {
-                  final containerEq = targetContainerId != null
-                      ? t.containerId.equals(targetContainerId)
-                      : t.containerId.isNull();
-                  return containerEq &
-                      t.orderKey.isBiggerThanValue(anchorRow.orderKey) &
-                      t.id.isNotIn(movingSubtreeIds);
-                })
-                ..orderBy([(t) => OrderingTerm.asc(t.orderKey)])
-                ..limit(1))
-              .getSingleOrNull();
+      final nextRow = await _tabSummaries((q) {
+        final containerEq = targetContainerId != null
+            ? db.tab.containerId.equals(targetContainerId)
+            : db.tab.containerId.isNull();
+
+        q
+          ..where(
+            containerEq &
+                db.tab.orderKey.isBiggerThanValue(anchorRow.orderKey) &
+                db.tab.id.isNotIn(movingSubtreeIds),
+          )
+          ..orderBy([OrderingTerm.asc(db.tab.orderKey)])
+          ..limit(1);
+      }).getSingleOrNull();
       final nextRank = nextRow == null
           ? null
           : LexoRank.parse(nextRow.orderKey);
@@ -962,11 +1002,11 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
           : null;
 
       final subtreeIds = await _collectContainerSubtreeIds(tabId);
-      final subtreeRows =
-          await (select(db.tab)
-                ..where((t) => t.id.isIn(subtreeIds))
-                ..orderBy([(t) => OrderingTerm.asc(t.orderKey)]))
-              .get();
+      final subtreeRows = await _tabSummaries(
+        (q) => q
+          ..where(db.tab.id.isIn(subtreeIds))
+          ..orderBy([OrderingTerm.asc(db.tab.orderKey)]),
+      ).get();
       final movingTabIds = subtreeRows.map((r) => r.id).toList();
 
       await reorderTabs(
@@ -1075,34 +1115,34 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
     }
 
     return db.transaction(() async {
-      final closingTabs = await (select(
-        db.tab,
-      )..where((t) => t.id.isIn(closingIds))).get();
+      final closingTabs = await _tabSummaries(
+        (q) => q..where(db.tab.id.isIn(closingIds)),
+      ).get();
 
       if (closingTabs.isEmpty) {
         return;
       }
 
-      final directChildren =
-          await (select(db.tab)
-                ..where((t) => t.parentId.isIn(closingIds))
-                ..orderBy([(t) => OrderingTerm.asc(t.orderKey)]))
-              .get();
+      final directChildren = await _tabSummaries(
+        (q) => q
+          ..where(db.tab.parentId.isIn(closingIds))
+          ..orderBy([OrderingTerm.asc(db.tab.orderKey)]),
+      ).get();
 
       final closingTabById = {for (final tab in closingTabs) tab.id: tab};
-      final childrenByParent = <String, List<TabData>>{};
+      final childrenByParent = <String, List<TabSummary>>{};
       for (final child in directChildren) {
         final parentId = child.parentId;
         if (parentId == null) continue;
         childrenByParent.putIfAbsent(parentId, () => []).add(child);
       }
 
-      final promotedBoundaryCache = <String, List<TabData>>{};
-      List<TabData> promotedBoundaryChildren(String closingTabId) {
+      final promotedBoundaryCache = <String, List<TabSummary>>{};
+      List<TabSummary> promotedBoundaryChildren(String closingTabId) {
         return promotedBoundaryCache.putIfAbsent(closingTabId, () {
-          final result = <TabData>[];
+          final result = <TabSummary>[];
           for (final child
-              in childrenByParent[closingTabId] ?? const <TabData>[]) {
+              in childrenByParent[closingTabId] ?? const <TabSummary>[]) {
             if (closingIds.contains(child.id)) {
               result.addAll(promotedBoundaryChildren(child.id));
             } else {
@@ -1127,7 +1167,7 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
               closingParentIds,
             ).get().then(Map.fromEntries);
 
-      String? renderedParentId(TabData tab) {
+      String? renderedParentId(TabSummary tab) {
         final parentId = tab.parentId;
         if (parentId == null) {
           return null;
@@ -1150,7 +1190,7 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
 
       final closingTabsByScope = groupBy(
         representativeClosingTabs,
-        (TabData tab) =>
+        (TabSummary tab) =>
             (containerId: tab.containerId, parentId: renderedParentId(tab)),
       );
 
@@ -1177,7 +1217,7 @@ class TabDao extends DatabaseAccessor<TabDatabase> with $TabDaoMixin {
         var closingIndex = 0;
         var survivorIndex = 0;
         LexoRank? previousRank;
-        final pendingChildren = <TabData>[];
+        final pendingChildren = <TabSummary>[];
 
         Future<void> assignPendingChildren(LexoRank? nextRank) async {
           if (pendingChildren.isEmpty) {

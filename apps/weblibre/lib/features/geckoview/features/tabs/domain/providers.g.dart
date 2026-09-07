@@ -295,11 +295,11 @@ final watchTabsFifoProvider = WatchTabsFifoProvider._();
 final class WatchTabsFifoProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<TabData>>,
-          List<TabData>,
-          Stream<List<TabData>>
+          AsyncValue<List<TabSummary>>,
+          List<TabSummary>,
+          Stream<List<TabSummary>>
         >
-    with $FutureModifier<List<TabData>>, $StreamProvider<List<TabData>> {
+    with $FutureModifier<List<TabSummary>>, $StreamProvider<List<TabSummary>> {
   WatchTabsFifoProvider._()
     : super(
         from: null,
@@ -316,17 +316,17 @@ final class WatchTabsFifoProvider
 
   @$internal
   @override
-  $StreamProviderElement<List<TabData>> $createElement(
+  $StreamProviderElement<List<TabSummary>> $createElement(
     $ProviderPointer pointer,
   ) => $StreamProviderElement(pointer);
 
   @override
-  Stream<List<TabData>> create(Ref ref) {
+  Stream<List<TabSummary>> create(Ref ref) {
     return watchTabsFifo(ref);
   }
 }
 
-String _$watchTabsFifoHash() => r'9bb8729fd0c3e31b36c11ca31d6264eefd357bd9';
+String _$watchTabsFifoHash() => r'ce84a120f37fe08a1cc193c561e64acd44c949cd';
 
 @ProviderFor(containerTabCount)
 final containerTabCountProvider = ContainerTabCountFamily._();
@@ -561,13 +561,37 @@ final class WatchTabsWithRootAndDepthFamily extends $Family
   String toString() => r'watchTabsWithRootAndDepthProvider';
 }
 
+/// One tab's row, watched — without its page text.
+///
+/// A [TabSummary]: this is a `.watch()`, so it re-runs on every write to `tab`
+/// for as long as the tab menu or the parent picker is open, and both consumers
+/// read only `parentId` and `containerId`. The wide row would drag that tab's
+/// stored content (and the `content_hash` UDF) through on every tick.
+
 @ProviderFor(watchTabDbData)
 final watchTabDbDataProvider = WatchTabDbDataFamily._();
 
+/// One tab's row, watched — without its page text.
+///
+/// A [TabSummary]: this is a `.watch()`, so it re-runs on every write to `tab`
+/// for as long as the tab menu or the parent picker is open, and both consumers
+/// read only `parentId` and `containerId`. The wide row would drag that tab's
+/// stored content (and the `content_hash` UDF) through on every tick.
+
 final class WatchTabDbDataProvider
     extends
-        $FunctionalProvider<AsyncValue<TabData?>, TabData?, Stream<TabData?>>
-    with $FutureModifier<TabData?>, $StreamProvider<TabData?> {
+        $FunctionalProvider<
+          AsyncValue<TabSummary?>,
+          TabSummary?,
+          Stream<TabSummary?>
+        >
+    with $FutureModifier<TabSummary?>, $StreamProvider<TabSummary?> {
+  /// One tab's row, watched — without its page text.
+  ///
+  /// A [TabSummary]: this is a `.watch()`, so it re-runs on every write to `tab`
+  /// for as long as the tab menu or the parent picker is open, and both consumers
+  /// read only `parentId` and `containerId`. The wide row would drag that tab's
+  /// stored content (and the `content_hash` UDF) through on every tick.
   WatchTabDbDataProvider._({
     required WatchTabDbDataFamily super.from,
     required String super.argument,
@@ -591,11 +615,12 @@ final class WatchTabDbDataProvider
 
   @$internal
   @override
-  $StreamProviderElement<TabData?> $createElement($ProviderPointer pointer) =>
-      $StreamProviderElement(pointer);
+  $StreamProviderElement<TabSummary?> $createElement(
+    $ProviderPointer pointer,
+  ) => $StreamProviderElement(pointer);
 
   @override
-  Stream<TabData?> create(Ref ref) {
+  Stream<TabSummary?> create(Ref ref) {
     final argument = this.argument as String;
     return watchTabDbData(ref, argument);
   }
@@ -611,10 +636,17 @@ final class WatchTabDbDataProvider
   }
 }
 
-String _$watchTabDbDataHash() => r'90d9f479d9d6c5475185b0490089ea67edff7894';
+String _$watchTabDbDataHash() => r'3e3c7221b4ef73616f995c362f823128e88984e2';
+
+/// One tab's row, watched — without its page text.
+///
+/// A [TabSummary]: this is a `.watch()`, so it re-runs on every write to `tab`
+/// for as long as the tab menu or the parent picker is open, and both consumers
+/// read only `parentId` and `containerId`. The wide row would drag that tab's
+/// stored content (and the `content_hash` UDF) through on every tick.
 
 final class WatchTabDbDataFamily extends $Family
-    with $FunctionalFamilyOverride<Stream<TabData?>, String> {
+    with $FunctionalFamilyOverride<Stream<TabSummary?>, String> {
   WatchTabDbDataFamily._()
     : super(
         retry: null,
@@ -623,6 +655,13 @@ final class WatchTabDbDataFamily extends $Family
         $allTransitiveDependencies: null,
         isAutoDispose: true,
       );
+
+  /// One tab's row, watched — without its page text.
+  ///
+  /// A [TabSummary]: this is a `.watch()`, so it re-runs on every write to `tab`
+  /// for as long as the tab menu or the parent picker is open, and both consumers
+  /// read only `parentId` and `containerId`. The wide row would drag that tab's
+  /// stored content (and the `content_hash` UDF) through on every tick.
 
   WatchTabDbDataProvider call(String tabId) =>
       WatchTabDbDataProvider._(argument: tabId, from: this);
@@ -715,11 +754,11 @@ final watchContainerTabsDataProvider = WatchContainerTabsDataFamily._();
 final class WatchContainerTabsDataProvider
     extends
         $FunctionalProvider<
-          AsyncValue<List<TabData>>,
-          List<TabData>,
-          Stream<List<TabData>>
+          AsyncValue<List<TabSummary>>,
+          List<TabSummary>,
+          Stream<List<TabSummary>>
         >
-    with $FutureModifier<List<TabData>>, $StreamProvider<List<TabData>> {
+    with $FutureModifier<List<TabSummary>>, $StreamProvider<List<TabSummary>> {
   WatchContainerTabsDataProvider._({
     required WatchContainerTabsDataFamily super.from,
     required String? super.argument,
@@ -743,12 +782,12 @@ final class WatchContainerTabsDataProvider
 
   @$internal
   @override
-  $StreamProviderElement<List<TabData>> $createElement(
+  $StreamProviderElement<List<TabSummary>> $createElement(
     $ProviderPointer pointer,
   ) => $StreamProviderElement(pointer);
 
   @override
-  Stream<List<TabData>> create(Ref ref) {
+  Stream<List<TabSummary>> create(Ref ref) {
     final argument = this.argument as String?;
     return watchContainerTabsData(ref, argument);
   }
@@ -766,10 +805,10 @@ final class WatchContainerTabsDataProvider
 }
 
 String _$watchContainerTabsDataHash() =>
-    r'4edbb3029f4ffb6181396d81d8076e0395ec2481';
+    r'23f2867b1805333256176f42f9af37071593c3d2';
 
 final class WatchContainerTabsDataFamily extends $Family
-    with $FunctionalFamilyOverride<Stream<List<TabData>>, String?> {
+    with $FunctionalFamilyOverride<Stream<List<TabSummary>>, String?> {
   WatchContainerTabsDataFamily._()
     : super(
         retry: null,

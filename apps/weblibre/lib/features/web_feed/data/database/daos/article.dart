@@ -23,13 +23,16 @@ import 'package:weblibre/features/web_feed/data/database/database.dart';
 import 'package:weblibre/features/web_feed/data/database/definitions.drift.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_article.dart';
 import 'package:weblibre/features/web_feed/data/models/feed_article_query_result.dart';
+import 'package:weblibre/features/web_feed/data/models/feed_article_summary.dart';
 
 @DriftAccessor()
 class ArticleDao extends DatabaseAccessor<FeedDatabase> with $ArticleDaoMixin {
   ArticleDao(super.attachedDatabase);
 
-  Selectable<FeedArticle> getFeedArticles(Uri? url) {
-    final select = db.articleView.select();
+  /// The feed's articles, newest first — without their bodies. See
+  /// `article_list_view`.
+  Selectable<FeedArticleListEntry> getFeedArticles(Uri? url) {
+    final select = db.articleListView.select();
 
     if (url != null) {
       select.where((article) => article.feedId.equalsValue(url));

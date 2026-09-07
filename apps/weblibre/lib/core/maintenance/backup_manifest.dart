@@ -18,6 +18,7 @@ import 'package:copy_with_extension/copy_with_extension.dart';
 import 'package:fast_equatable/fast_equatable.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:path/path.dart' as p;
+import 'package:weblibre/core/asset_database.dart';
 import 'package:weblibre/core/maintenance/participant_category.dart';
 import 'package:weblibre/core/startup/models/json_read.dart';
 
@@ -88,6 +89,20 @@ abstract final class BackupExclusions {
     BackupExclusion(
       path: 'databases/sites.db',
       reason: 'Read-only asset database, reseeded from the bundled asset',
+      recreatedOnRestore: true,
+    ),
+    // The stamps have to be named separately: `isExcluded` matches a path or a
+    // directory prefix, and `databases/sites.db.asset` is neither of those
+    // relative to `databases/sites.db`. Without these the archive would carry a
+    // stamp for a database the same manifest declares excluded.
+    BackupExclusion(
+      path: 'databases/quotes.db$assetStampSuffix',
+      reason: 'Install stamp for an excluded asset database',
+      recreatedOnRestore: true,
+    ),
+    BackupExclusion(
+      path: 'databases/sites.db$assetStampSuffix',
+      reason: 'Install stamp for an excluded asset database',
       recreatedOnRestore: true,
     ),
   ];

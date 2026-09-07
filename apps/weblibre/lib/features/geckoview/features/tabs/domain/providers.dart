@@ -27,6 +27,7 @@ import 'package:weblibre/features/geckoview/features/tabs/data/database/definiti
 import 'package:weblibre/features/geckoview/features/tabs/data/entities/container_filter.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/models/container_data.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/models/site_assignment.dart';
+import 'package:weblibre/features/geckoview/features/tabs/data/models/tab_summary.dart';
 import 'package:weblibre/features/geckoview/features/tabs/data/providers.dart';
 import 'package:weblibre/features/search/util/tokenized_filter.dart';
 
@@ -91,7 +92,7 @@ Stream<List<String>> watchContainerTabIds(
 }
 
 @Riverpod(keepAlive: true)
-Stream<List<TabData>> watchTabsFifo(Ref ref) {
+Stream<List<TabSummary>> watchTabsFifo(Ref ref) {
   final db = ref.watch(tabDatabaseProvider);
 
   return db.tabDao.getTabsFifo().watch();
@@ -136,10 +137,16 @@ Stream<List<TabsWithRootAndDepthResult>> watchTabsWithRootAndDepth(
       .watch();
 }
 
+/// One tab's row, watched — without its page text.
+///
+/// A [TabSummary]: this is a `.watch()`, so it re-runs on every write to `tab`
+/// for as long as the tab menu or the parent picker is open, and both consumers
+/// read only `parentId` and `containerId`. The wide row would drag that tab's
+/// stored content (and the `content_hash` UDF) through on every tick.
 @Riverpod()
-Stream<TabData?> watchTabDbData(Ref ref, String tabId) {
+Stream<TabSummary?> watchTabDbData(Ref ref, String tabId) {
   final db = ref.watch(tabDatabaseProvider);
-  return db.tabDao.getTabDataById(tabId).watchSingleOrNull();
+  return db.tabDao.getTabSummaryById(tabId).watchSingleOrNull();
 }
 
 @Riverpod()
@@ -155,7 +162,7 @@ Stream<Map<String, String?>> watchTabDescendants(Ref ref, String tabId) {
 }
 
 @Riverpod()
-Stream<List<TabData>> watchContainerTabsData(Ref ref, String? containerId) {
+Stream<List<TabSummary>> watchContainerTabsData(Ref ref, String? containerId) {
   final db = ref.watch(tabDatabaseProvider);
   return db.containerDao.getContainerTabsData(containerId).watch();
 }
