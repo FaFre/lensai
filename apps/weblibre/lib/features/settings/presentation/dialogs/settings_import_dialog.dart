@@ -111,8 +111,8 @@ class _SettingsImportDialog extends HookWidget {
             if (selected.value.contains(SettingsTransferSection.settings)) ...[
               const SizedBox(height: 12),
               Text(
-                'Credentials such as API tokens are never written to an '
-                'export, so the ones on this device are kept.',
+                'Saved credentials and your wallpaper image are not carried '
+                'by an export — this device keeps its own.',
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: theme.colorScheme.onSurfaceVariant,
                 ),

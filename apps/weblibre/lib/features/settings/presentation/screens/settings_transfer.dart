@@ -40,6 +40,99 @@ import 'package:weblibre/utils/ui_helper.dart';
 /// so other apps — a file manager, a mail client, a bug tracker — recognise it.
 const _exportMimeType = 'application/json';
 
+/// Writes [bytes] into [target] and returns the name the file ended up with.
+///
+/// The same two-step publication a profile backup uses: a `.partial` name
+/// first, its size checked against what was sent, and only then the rename that
+/// claims the real one. `writeFileBytes` creates the destination before it
+/// writes to it and leaves it there if the write dies half way, so without this
+/// a full volume produces a truncated export wearing a finished file's name —
+/// which is worse than no export at all, because it will be imported one day.
+Future<String> _publishExport({
+  required Uri target,
+  required String fileName,
+  required Uint8List bytes,
+}) async {
+  final util = SafUtil();
+
+  final partial = await SafStream().writeFileBytes(
+    target.toString(),
+    '$fileName$partialArchiveSuffix',
+    _exportMimeType,
+    bytes,
+    overwrite: true,
+  );
+
+  // SAF may hand back a different name than the one asked for, so the returned
+  // uri is the only reliable handle on what was actually created.
+  final partialUri = partial.uri.toString();
+
+  try {
+    final stat = await util.stat(partialUri, false);
+    if (stat == null) {
+      throw const BackupPublicationFailure(
+        'The written export could not be found afterwards',
+      );
+    }
+
+    if (stat.length != bytes.length) {
+      throw BackupPublicationFailure(
+        'Wrote ${bytes.length} bytes but the destination holds ${stat.length}',
+      );
+    }
+
+    final finished = await util.rename(partialUri, false, fileName);
+
+    return finished.name;
+  } catch (_) {
+    try {
+      await util.delete(partialUri, false);
+    } catch (error, stackTrace) {
+      logger.w(
+        'Could not remove a partial export',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+    rethrow;
+  }
+}
+
+/// Whether the export folder is still a folder that can be written to.
+///
+/// Asked only after a write has already failed, to tell "the folder is gone"
+/// apart from "the write did not work this time" — the first is worth
+/// forgetting the folder over, the second is not.
+Future<bool> _targetIsStillThere(Uri target) async {
+  try {
+    final util = SafUtil();
+
+    // Deliberately not `safTargetIsWritable`, which answers false for a folder
+    // it merely could not ask about — it is built for deciding whether to try,
+    // where caution means "no". Here the same false would throw away a folder
+    // that is fine, so the two questions are asked separately and only a real
+    // answer counts.
+    final permitted = await util.hasPersistedPermission(
+      target.toString(),
+      checkRead: true,
+      checkWrite: true,
+    );
+    if (!permitted) return false;
+
+    return await util.exists(target.toString(), true);
+  } catch (error, stackTrace) {
+    logger.w(
+      'Could not check the export folder',
+      error: error,
+      stackTrace: stackTrace,
+    );
+    // Unknown is not gone. Keeping a folder that might be fine costs one error
+    // message; dropping one that was fine costs the user a folder picker every
+    // time the disk is briefly full.
+    return true;
+  }
+}
+
 class SettingsTransferScreen extends HookConsumerWidget {
   const SettingsTransferScreen({super.key});
 
@@ -51,6 +144,13 @@ class SettingsTransferScreen extends HookConsumerWidget {
       SettingsTransferSection.values.toSet(),
     );
     final busy = useState(false);
+
+    // Held across the folder picker rather than read after it: the picker is a
+    // different activity, and this screen is not guaranteed to still be mounted
+    // when it returns.
+    final exportDirectory = ref.read(
+      settingsExportDirectoryUriProvider.notifier,
+    );
 
     Future<String> buildExport() {
       final info = ref.read(packageInfoProvider).value;
@@ -73,12 +173,6 @@ class SettingsTransferScreen extends HookConsumerWidget {
     /// deleted.
     Future<Uri?> resolveTargetFolder() async {
       final remembered = ref.read(settingsExportDirectoryUriProvider);
-      // Held across the picker rather than read after it: the folder picker is
-      // a different activity, and this screen is not guaranteed to still be
-      // mounted when it returns.
-      final exportDirectory = ref.read(
-        settingsExportDirectoryUriProvider.notifier,
-      );
       if (remembered != null && await safTargetIsWritable(remembered)) {
         return remembered;
       }
@@ -95,25 +189,58 @@ class SettingsTransferScreen extends HookConsumerWidget {
       return uri;
     }
 
+    /// Lets the user move exports somewhere else without having to make one
+    /// fail first.
+    Future<void> chooseExportFolder() async {
+      final picked = await SafUtil().pickDirectory(
+        writePermission: true,
+        persistablePermission: true,
+      );
+      if (picked == null) return;
+
+      exportDirectory.set(Uri.parse(picked.uri));
+
+      if (!context.mounted) return;
+      showInfoMessage(context, 'Exports will be saved to ${picked.name}');
+    }
+
     Future<void> exportToFile() async {
       busy.value = true;
+      var targetForgotten = false;
+
       try {
         final text = await buildExport();
 
         final target = await resolveTargetFolder();
         if (target == null) return;
 
-        final written = await SafStream().writeFileBytes(
-          target.toString(),
-          settingsExportFileName(DateTime.now()),
-          _exportMimeType,
-          Uint8List.fromList(utf8.encode(text)),
-        );
+        final String written;
+        try {
+          written = await _publishExport(
+            target: target,
+            fileName: settingsExportFileName(DateTime.now()),
+            bytes: Uint8List.fromList(utf8.encode(text)),
+          );
+        } catch (_) {
+          // The grant outlives the folder: a target that was deleted, or lives
+          // on a volume that is gone, still answers "yes, you may write here",
+          // so `safTargetIsWritable` keeps handing back the same dead uri and
+          // every export fails the same way with no picker in sight.
+          //
+          // But a full disk fails here too, and forgetting a perfectly good
+          // folder over that is a worse answer than the error. So the target is
+          // asked whether it still exists before it is given up on.
+          if (!await _targetIsStillThere(target)) {
+            exportDirectory.set(null);
+            targetForgotten = true;
+          }
+          rethrow;
+        }
 
         if (!context.mounted) return;
         // The name SAF actually created, which is not always the one asked
         // for — a second export in the same second gets a suffix.
-        showInfoMessage(context, 'Saved as ${written.fileName}');
+        showInfoMessage(context, 'Saved as $written');
       } catch (error, stackTrace) {
         logger.e(
           'Failed to export settings to a file',
@@ -121,7 +248,13 @@ class SettingsTransferScreen extends HookConsumerWidget {
           stackTrace: stackTrace,
         );
         if (context.mounted) {
-          showErrorMessage(context, 'Could not save the export: $error');
+          showErrorMessage(
+            context,
+            targetForgotten
+                ? 'The export folder is no longer there. Choose one again and '
+                      'retry.'
+                : 'Could not save the export: $error',
+          );
         }
       } finally {
         busy.value = false;
@@ -185,6 +318,18 @@ class SettingsTransferScreen extends HookConsumerWidget {
 
         if (!context.mounted) return;
         showInfoMessage(context, 'Settings imported');
+      } on SettingsImportPartialFailure catch (error, stackTrace) {
+        logger.e(
+          'Settings import applied only some sections',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        if (context.mounted) {
+          // Deliberately not "the import failed": part of it did not, and a
+          // user told otherwise would go looking for settings that are already
+          // replaced.
+          showErrorMessage(context, error.message, persist: true);
+        }
       } catch (error, stackTrace) {
         logger.e(
           'Failed to import settings',
@@ -192,7 +337,12 @@ class SettingsTransferScreen extends HookConsumerWidget {
           stackTrace: stackTrace,
         );
         if (context.mounted) {
-          showErrorMessage(context, 'Could not import the settings: $error');
+          showErrorMessage(
+            context,
+            error is SettingsExportFormatException
+                ? error.message
+                : 'Could not import the settings: $error',
+          );
         }
       } finally {
         busy.value = false;
@@ -241,6 +391,19 @@ class SettingsTransferScreen extends HookConsumerWidget {
         }
 
         await applyImport(text);
+      } catch (error, stackTrace) {
+        // The file path has always had this. Without it here, anything the
+        // decoder does not turn into a SettingsExportFormatException — a
+        // clipboard full of something else entirely — leaves the button
+        // callback with an unhandled exception and the user with no message.
+        logger.e(
+          'Failed to import settings from the clipboard',
+          error: error,
+          stackTrace: stackTrace,
+        );
+        if (context.mounted) {
+          showErrorMessage(context, 'Could not read the clipboard: $error');
+        }
       } finally {
         busy.value = false;
       }
@@ -248,17 +411,52 @@ class SettingsTransferScreen extends HookConsumerWidget {
 
     return SettingsCustomScrollScaffold(
       title: 'Export & Import',
+      actions: [
+        MenuAnchor(
+          menuChildren: [
+            MenuItemButton(
+              onPressed: busy.value ? null : chooseExportFolder,
+              child: const Text('Change export folder'),
+            ),
+          ],
+          builder: (context, controller, child) => IconButton(
+            icon: const Icon(Icons.more_vert),
+            onPressed: () =>
+                controller.isOpen ? controller.close() : controller.open(),
+          ),
+        ),
+      ],
       slivers: [
         SliverToBoxAdapter(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-            child: Text(
-              'Move settings between profiles or devices, or attach them to a '
-              'bug report. This carries settings only — no tabs, history, '
-              'bookmarks or logins. For those, back up the whole profile.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              spacing: 12,
+              children: [
+                Text(
+                  'Move settings between profiles or devices, or attach them '
+                  'to a bug report. This carries settings only — no tabs, '
+                  'history, bookmarks or logins. For those, back up the whole '
+                  'profile.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+                // Said out loud rather than discovered: these live outside the
+                // settings repositories an export reads, so neither this nor
+                // account sync carries them yet.
+                Text(
+                  'Web search preferences, home and new-tab layout, menu '
+                  'order and pinned add-ons stay on this device. Saved '
+                  'credentials are stripped out — but a token buried in a '
+                  'custom URL cannot be told apart from the URL, so read the '
+                  'file before you share it.',
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
             ),
           ),
         ),
