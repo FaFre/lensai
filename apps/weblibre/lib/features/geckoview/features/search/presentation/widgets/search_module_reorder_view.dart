@@ -40,9 +40,32 @@ class SearchModuleReorderView extends ConsumerWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: Text(
-                    'Customize Sections',
-                    style: Theme.of(context).textTheme.titleSmall,
+                  child: Semantics(
+                    header: true,
+                    child: Text(
+                      'Customize Sections',
+                      style: Theme.of(context).textTheme.titleMedium,
+                    ),
+                  ),
+                ),
+                // The only way back to the shipped layout for a surface with
+                // no settings screen of its own — the search results page is
+                // reachable from here and nowhere else.
+                MenuAnchor(
+                  menuChildren: [
+                    MenuItemButton(
+                      leadingIcon: const Icon(Icons.restore),
+                      onPressed: ref
+                          .read(searchModuleOrderProvider(surface).notifier)
+                          .resetToDefaults,
+                      child: const Text('Reset to Defaults'),
+                    ),
+                  ],
+                  builder: (context, controller, child) => IconButton(
+                    icon: const Icon(Icons.more_vert),
+                    onPressed: () => controller.isOpen
+                        ? controller.close()
+                        : controller.open(),
                   ),
                 ),
                 TextButton(

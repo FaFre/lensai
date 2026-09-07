@@ -48,7 +48,10 @@ class ToolbarLayoutSettingsScreen extends HookConsumerWidget {
         SliverPadding(
           padding: const EdgeInsets.fromLTRB(16, 20, 16, 20),
           sliver: SliverToBoxAdapter(
-            child: ToolbarLayoutContent(query: search.rawQuery),
+            child: ToolbarLayoutContent(
+              query: search.rawQuery,
+              extraSections: menuLayoutSettingsSections,
+            ),
           ),
         ),
       ],

@@ -149,19 +149,69 @@ const List<SettingsSectionDefinition> toolbarLayoutSettingsSections = [
   ),
 ];
 
+/// The browser menu's own arrangement entry.
+///
+/// Kept out of [toolbarLayoutSettingsSections] because onboarding renders those
+/// too, and arranging the menu is not a first-run decision. Offered to the
+/// settings screen as [ToolbarLayoutContent.extraSections] so it takes part in
+/// the same filtering — a row rendered beside the filtered list would survive a
+/// query that empties the list, leaving a match sitting above "No settings
+/// match".
+const List<SettingsSectionDefinition> menuLayoutSettingsSections = [
+  SettingsSectionDefinition(
+    title: 'Menu',
+    keywords: ['three dot', 'overflow'],
+    entries: [
+      SettingsEntryDefinition(
+        title: 'Customize Menu',
+        subtitle:
+            'Choose and order the sections and rows of the three-dot menu',
+        keywords: ['sections', 'rows', 'reorder'],
+        child: _CustomizeMenuTile(),
+      ),
+    ],
+  ),
+];
+
 class ToolbarLayoutContent extends StatelessWidget {
   final String query;
 
-  const ToolbarLayoutContent({super.key, this.query = ''});
+  /// Sections shown after the toolbar's own, filtered by the same [query].
+  final List<SettingsSectionDefinition> extraSections;
+
+  const ToolbarLayoutContent({
+    super.key,
+    this.query = '',
+    this.extraSections = const [],
+  });
 
   @override
   Widget build(BuildContext context) {
     final filteredSections = filterSettingsSections(
-      sections: toolbarLayoutSettingsSections,
+      sections: [...toolbarLayoutSettingsSections, ...extraSections],
       query: query,
     );
 
     return SettingsSectionList(sections: filteredSections, query: query);
+  }
+}
+
+class _CustomizeMenuTile extends StatelessWidget {
+  const _CustomizeMenuTile();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      leading: const Icon(Icons.tune),
+      title: const Text('Customize Menu'),
+      subtitle: const Text(
+        'Choose and order the sections and rows of the three-dot menu',
+      ),
+      trailing: const Icon(Icons.chevron_right),
+      onTap: () async {
+        await const MenuLayoutSettingsRoute().push(context);
+      },
+    );
   }
 }
 

@@ -122,6 +122,14 @@ class _BrowserMenuSheet extends ConsumerWidget {
                 ),
               ),
 
+              // Pinned above the scrolling list: "Done" and the back arrow
+              // are the only ways out of the arrangement UI, and a long
+              // section's rows would otherwise carry them off screen.
+              if (isReordering) ...[
+                const MenuReorderHeader(),
+                const Divider(height: 1),
+              ],
+
               Expanded(
                 child: CustomScrollView(
                   controller: scrollController,

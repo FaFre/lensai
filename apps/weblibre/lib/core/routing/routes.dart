@@ -85,6 +85,7 @@ import 'package:weblibre/features/settings/presentation/screens/fingerprint_sett
 import 'package:weblibre/features/settings/presentation/screens/general_settings.dart';
 import 'package:weblibre/features/settings/presentation/screens/home_settings.dart';
 import 'package:weblibre/features/settings/presentation/screens/locale_settings.dart';
+import 'package:weblibre/features/settings/presentation/screens/menu_layout_settings.dart';
 import 'package:weblibre/features/settings/presentation/screens/module_surface_settings.dart';
 import 'package:weblibre/features/settings/presentation/screens/privacy_security_settings.dart';
 import 'package:weblibre/features/settings/presentation/screens/proxy_settings.dart';
@@ -118,10 +119,10 @@ import 'package:weblibre/features/web_feed/presentation/screens/feed_list.dart';
 import 'package:weblibre/features/web_feed/presentation/select_feed_dialog.dart';
 import 'package:weblibre/features/web_push/presentation/screens/web_push_settings.dart';
 
+part 'routes.addons.dart';
 part 'routes.bangs.dart';
 part 'routes.bookmarks.dart';
 part 'routes.browser.dart';
-part 'routes.addons.dart';
 part 'routes.feeds.dart';
 part 'routes.g.dart';
 part 'routes.history.dart';

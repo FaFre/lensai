@@ -20,7 +20,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -46,7 +45,7 @@ class QuickLinksSection extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final links = [
       for (final item in items)
-        if (_iconFor(item) case final icon?) (item: item, icon: icon),
+        if (_destinations.contains(item)) item,
     ];
 
     if (links.isEmpty) return const SizedBox.shrink();
@@ -68,8 +67,8 @@ class QuickLinksSection extends ConsumerWidget {
                   width: width,
                   child: _QuickLinkTile(
                     icon: link.icon,
-                    label: link.item.label,
-                    onTap: () => _open(context, ref, link.item),
+                    label: link.label,
+                    onTap: () => _open(context, ref, link),
                   ),
                 ),
             ],
@@ -79,14 +78,15 @@ class QuickLinksSection extends ConsumerWidget {
     );
   }
 
-  static IconData? _iconFor(MenuItemType item) => switch (item) {
-    MenuItemType.history => Icons.history,
-    MenuItemType.bookmarks => MdiIcons.bookmarkMultiple,
-    MenuItemType.downloads => MdiIcons.fileDownload,
-    MenuItemType.bangs => MdiIcons.exclamationThick,
-    MenuItemType.feeds => Icons.rss_feed,
-    MenuItemType.smallWeb => Icons.explore,
-    _ => null,
+  /// The rows this grid knows how to open. Their icons and labels come from
+  /// [MenuItemType] itself, so the grid and the arrangement UI cannot drift.
+  static const _destinations = {
+    MenuItemType.history,
+    MenuItemType.bookmarks,
+    MenuItemType.downloads,
+    MenuItemType.bangs,
+    MenuItemType.feeds,
+    MenuItemType.smallWeb,
   };
 
   Future<void> _open(

@@ -18,6 +18,8 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 import 'package:fast_equatable/fast_equatable.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:json_annotation/json_annotation.dart';
 import 'package:weblibre/utils/ordered_layout.dart';
 
@@ -63,6 +65,19 @@ enum MenuSectionType {
     connection => 'Connection',
     profile => 'Profile & App',
     about => 'About',
+  };
+
+  /// Identity icon for the arrangement UI. The sheet itself draws no section
+  /// headers, so this exists only to make the section list scannable.
+  IconData get icon => switch (this) {
+    quickToggles => MdiIcons.toggleSwitchOutline,
+    pageActions => MdiIcons.fileDocumentOutline,
+    extensions => MdiIcons.puzzle,
+    tabActions => MdiIcons.tab,
+    quickLinks => MdiIcons.viewGridOutline,
+    connection => MdiIcons.shieldOutline,
+    profile => Icons.person,
+    about => Icons.info,
   };
 }
 
@@ -184,6 +199,61 @@ enum MenuItemType {
     appSettings => 'Settings',
     quitBrowser => 'Quit Browser',
     about => 'About',
+  };
+
+  /// Identity icon for the arrangement UI.
+  ///
+  /// One fixed icon per row, where the row itself may draw a different one for
+  /// its current state — Reader and Pin to Shortcuts both flip theirs. Keeping
+  /// this static is the point: a list you are rearranging should not change
+  /// under you because the page finished loading.
+  IconData get icon => switch (this) {
+    desktopMode => MdiIcons.monitor,
+    readerMode => MdiIcons.bookOpenOutline,
+    gestures => MdiIcons.gestureSwipe,
+    addBookmark => MdiIcons.bookmarkPlus,
+    findInPage => Icons.search,
+    translatePage => Icons.translate,
+    addToHomeScreen => Icons.add_to_home_screen,
+    openInApp => Icons.open_in_new,
+    containers => MdiIcons.folder,
+    manageContainers => MdiIcons.folder,
+    assignContainer => MdiIcons.folderArrowUpDownOutline,
+    assignUrlToContainer => MdiIcons.webPlus,
+    unassignUrlFromContainer => MdiIcons.webMinus,
+    unassignContainer => MdiIcons.folderCancelOutline,
+    share => Icons.share,
+    copyAddress => MdiIcons.contentCopy,
+    shareScreenshot => Icons.mobile_screen_share,
+    shareLink => Icons.share,
+    sendToDevice => Icons.send_outlined,
+    showQrCode => Icons.qr_code,
+    moreDisclosure => Icons.more_horiz,
+    cloneTab => MdiIcons.contentDuplicate,
+    cloneRegularTab => MdiIcons.tab,
+    clonePrivateTab => MdiIcons.dominoMask,
+    cloneIsolatedTab => MdiIcons.snowflake,
+    export => MdiIcons.fileExport,
+    // ignore: deprecated_member_use
+    copyAsMarkdown => MdiIcons.languageMarkdownOutline,
+    // ignore: deprecated_member_use
+    exportAsMarkdown => MdiIcons.languageMarkdown,
+    exportAsPdf => MdiIcons.filePdfBox,
+    exportAsPng => MdiIcons.fileImage,
+    printPage => MdiIcons.printer,
+    pinTopSite => MdiIcons.pin,
+    fetchFeeds => Icons.rss_feed,
+    history => Icons.history,
+    bookmarks => MdiIcons.bookmarkMultiple,
+    downloads => MdiIcons.fileDownload,
+    bangs => MdiIcons.exclamationThick,
+    feeds => Icons.rss_feed,
+    smallWeb => Icons.explore,
+    profileSwitch => Icons.person,
+    syncNow => Icons.sync,
+    appSettings => Icons.settings,
+    quitBrowser => MdiIcons.power,
+    about => Icons.info,
   };
 
   /// Shown under the label while arranging, for rows whose behaviour is not

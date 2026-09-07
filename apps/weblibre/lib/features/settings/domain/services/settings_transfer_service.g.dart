@@ -17,9 +17,17 @@ part of 'settings_transfer_service.dart';
 /// clipboard on the other end, so the two paths cannot drift apart in what
 /// they consider a setting.
 ///
-/// The one thing it adds is redaction, which sync does not need: sync's
-/// documents are encrypted with a key only the user's devices hold, while
-/// these are written to be read.
+/// What it adds on top is everything that follows from the file being
+/// *readable* and portable, which sync's encrypted per-user blobs are not:
+/// credentials and profile-local references are scrubbed on the way out and
+/// taken from the device on the way in, and a file that did not come from here
+/// is refused before any of it is applied.
+///
+/// A caveat the UI has to keep saying out loud: these are the same units sync
+/// moves, so settings persisted outside those repositories — search language
+/// and region, home and new-tab module order, menu layout — are not carried by
+/// either path. Adding them belongs in `SettingsSyncPayload`, so that sync and
+/// this gain them together.
 
 @ProviderFor(SettingsTransferService)
 final settingsTransferServiceProvider = SettingsTransferServiceProvider._();
@@ -33,9 +41,17 @@ final settingsTransferServiceProvider = SettingsTransferServiceProvider._();
 /// clipboard on the other end, so the two paths cannot drift apart in what
 /// they consider a setting.
 ///
-/// The one thing it adds is redaction, which sync does not need: sync's
-/// documents are encrypted with a key only the user's devices hold, while
-/// these are written to be read.
+/// What it adds on top is everything that follows from the file being
+/// *readable* and portable, which sync's encrypted per-user blobs are not:
+/// credentials and profile-local references are scrubbed on the way out and
+/// taken from the device on the way in, and a file that did not come from here
+/// is refused before any of it is applied.
+///
+/// A caveat the UI has to keep saying out loud: these are the same units sync
+/// moves, so settings persisted outside those repositories — search language
+/// and region, home and new-tab module order, menu layout — are not carried by
+/// either path. Adding them belongs in `SettingsSyncPayload`, so that sync and
+/// this gain them together.
 final class SettingsTransferServiceProvider
     extends $NotifierProvider<SettingsTransferService, void> {
   /// Reads and writes settings as a plain file, next to — and independent of —
@@ -47,9 +63,17 @@ final class SettingsTransferServiceProvider
   /// clipboard on the other end, so the two paths cannot drift apart in what
   /// they consider a setting.
   ///
-  /// The one thing it adds is redaction, which sync does not need: sync's
-  /// documents are encrypted with a key only the user's devices hold, while
-  /// these are written to be read.
+  /// What it adds on top is everything that follows from the file being
+  /// *readable* and portable, which sync's encrypted per-user blobs are not:
+  /// credentials and profile-local references are scrubbed on the way out and
+  /// taken from the device on the way in, and a file that did not come from here
+  /// is refused before any of it is applied.
+  ///
+  /// A caveat the UI has to keep saying out loud: these are the same units sync
+  /// moves, so settings persisted outside those repositories — search language
+  /// and region, home and new-tab module order, menu layout — are not carried by
+  /// either path. Adding them belongs in `SettingsSyncPayload`, so that sync and
+  /// this gain them together.
   SettingsTransferServiceProvider._()
     : super(
         from: null,
@@ -78,7 +102,7 @@ final class SettingsTransferServiceProvider
 }
 
 String _$settingsTransferServiceHash() =>
-    r'cb4eac1f14b6a834171e5b951e14c94f3bd9eca1';
+    r'ebb8e84f06a95fabd7a2b31557201962fbe57cad';
 
 /// Reads and writes settings as a plain file, next to — and independent of —
 /// account sync.
@@ -89,9 +113,17 @@ String _$settingsTransferServiceHash() =>
 /// clipboard on the other end, so the two paths cannot drift apart in what
 /// they consider a setting.
 ///
-/// The one thing it adds is redaction, which sync does not need: sync's
-/// documents are encrypted with a key only the user's devices hold, while
-/// these are written to be read.
+/// What it adds on top is everything that follows from the file being
+/// *readable* and portable, which sync's encrypted per-user blobs are not:
+/// credentials and profile-local references are scrubbed on the way out and
+/// taken from the device on the way in, and a file that did not come from here
+/// is refused before any of it is applied.
+///
+/// A caveat the UI has to keep saying out loud: these are the same units sync
+/// moves, so settings persisted outside those repositories — search language
+/// and region, home and new-tab module order, menu layout — are not carried by
+/// either path. Adding them belongs in `SettingsSyncPayload`, so that sync and
+/// this gain them together.
 
 abstract class _$SettingsTransferService extends $Notifier<void> {
   void build();

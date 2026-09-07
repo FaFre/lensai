@@ -1793,6 +1793,12 @@ RouteBase get $settingsRoute => GoRouteData.$route(
       factory: $ContextualToolbarSettingsRoute._fromState,
     ),
     GoRouteData.$route(
+      path: 'menu_layout',
+      name: 'MenuLayoutSettingsRoute',
+      hasOverriddenOnExit: false,
+      factory: $MenuLayoutSettingsRoute._fromState,
+    ),
+    GoRouteData.$route(
       path: 'quick_switcher_toolbar',
       name: 'QuickSwitcherToolbarSettingsRoute',
       hasOverriddenOnExit: false,
@@ -2527,6 +2533,27 @@ mixin $ContextualToolbarSettingsRoute on GoRouteData {
 
   @override
   String get location => GoRouteData.$location('/settings/contextual_toolbar');
+
+  @override
+  void go(BuildContext context) => context.go(location);
+
+  @override
+  Future<T?> push<T>(BuildContext context) => context.push<T>(location);
+
+  @override
+  void pushReplacement(BuildContext context) =>
+      context.pushReplacement(location);
+
+  @override
+  void replace(BuildContext context) => context.replace(location);
+}
+
+mixin $MenuLayoutSettingsRoute on GoRouteData {
+  static MenuLayoutSettingsRoute _fromState(GoRouterState state) =>
+      const MenuLayoutSettingsRoute();
+
+  @override
+  String get location => GoRouteData.$location('/settings/menu_layout');
 
   @override
   void go(BuildContext context) => context.go(location);

@@ -144,7 +144,10 @@ _CategoryGroups _buildCategories() {
       subtitle: 'Tab bar, toolbar, quick switcher, tab view',
       icon: MdiIcons.viewDashboardOutline,
       keywords: const ['contextual toolbar', 'quick tab switcher'],
-      sections: toolbarLayoutSettingsSections,
+      sections: [
+        ...toolbarLayoutSettingsSections,
+        ...menuLayoutSettingsSections,
+      ],
       onTap: (context) => ToolbarLayoutSettingsRoute().push(context),
     ),
     _SettingsCategoryDefinition(

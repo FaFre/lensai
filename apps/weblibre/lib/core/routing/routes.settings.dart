@@ -138,6 +138,10 @@ part of 'routes.dart';
       name: 'ContextualToolbarSettingsRoute',
       path: 'contextual_toolbar',
     ),
+    TypedGoRoute<MenuLayoutSettingsRoute>(
+      name: 'MenuLayoutSettingsRoute',
+      path: 'menu_layout',
+    ),
     TypedGoRoute<QuickSwitcherToolbarSettingsRoute>(
       name: 'QuickSwitcherToolbarSettingsRoute',
       path: 'quick_switcher_toolbar',
@@ -433,6 +437,16 @@ class ContextualToolbarSettingsRoute extends GoRouteData
   @override
   Widget build(BuildContext context, GoRouterState state) {
     return const ContextualToolbarSettingsScreen();
+  }
+}
+
+class MenuLayoutSettingsRoute extends GoRouteData
+    with $MenuLayoutSettingsRoute {
+  const MenuLayoutSettingsRoute();
+
+  @override
+  Widget build(BuildContext context, GoRouterState state) {
+    return const MenuLayoutSettingsScreen();
   }
 }
 
