@@ -26,6 +26,7 @@ import 'package:weblibre/core/design/app_colors.dart';
 import 'package:weblibre/features/onboarding/domain/entities/onboarding_mode.dart';
 import 'package:weblibre/features/onboarding/domain/providers.dart';
 import 'package:weblibre/presentation/widgets/browser_page.dart';
+import 'package:weblibre/presentation/widgets/pointer_scrollable_sheet.dart';
 
 class WelcomePage extends ConsumerWidget {
   final bool isReturningUser;
@@ -384,7 +385,7 @@ class _EulaCheckbox extends StatelessWidget {
       context: context,
       isScrollControlled: true,
       useSafeArea: true,
-      builder: (context) => DraggableScrollableSheet(
+      builder: (context) => PointerScrollableSheet(
         initialChildSize: 0.9,
         minChildSize: 0.5,
         maxChildSize: 0.95,

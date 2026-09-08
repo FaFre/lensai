@@ -23,6 +23,7 @@ import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:weblibre/features/geckoview/features/browser/presentation/widgets/tab_view/tab_preview.dart';
 import 'package:weblibre/features/geckoview/features/tabs/domain/providers.dart';
 import 'package:weblibre/features/geckoview/features/tabs/domain/repositories/tab.dart';
+import 'package:weblibre/presentation/widgets/pointer_scrollable_sheet.dart';
 
 /// Matches the fixed itemExtent used by the main tab list
 /// (`tab_list_view.dart`'s `_itemHeight`).
@@ -87,7 +88,7 @@ class _TabParentPickerSheet extends HookConsumerWidget {
     final movingTabAsync = ref.watch(watchTabDbDataProvider(tabId));
     final descendantsAsync = ref.watch(watchTabDescendantsProvider(tabId));
 
-    return DraggableScrollableSheet(
+    return PointerScrollableSheet(
       expand: false,
       initialChildSize: 0.6,
       minChildSize: 0.3,

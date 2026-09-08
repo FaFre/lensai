@@ -24,6 +24,8 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:weblibre/presentation/widgets/pointer_scrollable_sheet.dart';
+import 'package:weblibre/presentation/widgets/sheet_drag_handle.dart';
 
 const _viewType = 'eu.weblibre/addon_popup';
 
@@ -56,9 +58,7 @@ class _AddonPopupSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
-    return DraggableScrollableSheet(
+    return PointerScrollableSheet(
       initialChildSize: 0.65,
       minChildSize: 0.3,
       maxChildSize: 0.95,
@@ -66,15 +66,7 @@ class _AddonPopupSheet extends StatelessWidget {
       builder: (context, scrollController) {
         return Column(
           children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              height: 4,
-              width: 40,
-              decoration: BoxDecoration(
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+            const SheetDragHandle(),
             const Divider(height: 1),
             Expanded(child: _AddonPopupPlatformView(extensionId: extensionId)),
           ],

@@ -19,6 +19,8 @@
  */
 import 'package:flutter/material.dart';
 import 'package:weblibre/features/gestures/data/models/gesture_action.dart';
+import 'package:weblibre/presentation/widgets/pointer_scrollable_sheet.dart';
+import 'package:weblibre/presentation/widgets/sheet_drag_handle.dart';
 
 /// Shows a modal bottom sheet listing every [GestureAction] grouped by category,
 /// each with its icon, title and description, and returns the chosen action (or
@@ -56,7 +58,7 @@ class _GestureActionPicker extends StatelessWidget {
 
     // A draggable sheet (matching the main browser menu) so the whole surface —
     // not just a small handle — can be swiped down to dismiss.
-    return DraggableScrollableSheet(
+    return PointerScrollableSheet(
       initialChildSize: 0.7,
       minChildSize: 0.4,
       maxChildSize: 0.95,
@@ -65,15 +67,7 @@ class _GestureActionPicker extends StatelessWidget {
         return Column(
           children: [
             // Drag handle.
-            Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              height: 4,
-              width: 40,
-              decoration: BoxDecoration(
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+            const SheetDragHandle(),
             Padding(
               padding: const EdgeInsets.fromLTRB(24, 0, 24, 8),
               child: Align(

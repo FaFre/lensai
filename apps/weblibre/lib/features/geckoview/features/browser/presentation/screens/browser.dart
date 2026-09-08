@@ -77,6 +77,7 @@ import 'package:weblibre/features/sync/domain/repositories/sync.dart';
 import 'package:weblibre/features/user/data/models/general_settings.dart';
 import 'package:weblibre/features/user/domain/repositories/general_settings.dart';
 import 'package:weblibre/presentation/hooks/keyed_state.dart';
+import 'package:weblibre/presentation/widgets/pointer_scrollable_sheet.dart';
 import 'package:weblibre/utils/move_to_background.dart';
 import 'package:weblibre/utils/ui_helper.dart' as ui_helper;
 
@@ -2205,7 +2206,7 @@ class _SiteSettingsSheet extends HookConsumerWidget {
       }
     }
 
-    return DraggableScrollableSheet(
+    return PointerScrollableSheet(
       controller: draggableScrollableController,
       expand: false,
       initialChildSize: initialHeight,
@@ -2273,7 +2274,7 @@ class _ViewTabsSheet extends HookConsumerWidget {
       keys: [tabsReorderable],
     );
 
-    return DraggableScrollableSheet(
+    return PointerScrollableSheet(
       key: ValueKey(tabsReorderable),
       controller: draggableScrollableController,
       expand: false,

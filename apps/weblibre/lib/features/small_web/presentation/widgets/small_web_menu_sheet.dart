@@ -33,6 +33,8 @@ import 'package:weblibre/features/small_web/presentation/widgets/small_web_histo
 import 'package:weblibre/features/small_web/presentation/widgets/small_web_mode_chips.dart';
 import 'package:weblibre/features/small_web/presentation/widgets/wander_console_sheet.dart';
 import 'package:weblibre/presentation/widgets/failure_widget.dart';
+import 'package:weblibre/presentation/widgets/pointer_scrollable_sheet.dart';
+import 'package:weblibre/presentation/widgets/sheet_drag_handle.dart';
 
 /// Hand-off between the small-web menu and the wander-console sheet. Each
 /// sheet pops with one of these so [openSmallWebMenuFlow] can re-present the
@@ -74,7 +76,7 @@ class _SmallWebMenuSheet extends ConsumerWidget {
     final sessionAsync = ref.watch(smallWebSessionControllerProvider);
     final colorScheme = Theme.of(context).colorScheme;
 
-    return DraggableScrollableSheet(
+    return PointerScrollableSheet(
       initialChildSize: 0.6,
       minChildSize: 0.3,
       maxChildSize: 0.85,
@@ -82,15 +84,7 @@ class _SmallWebMenuSheet extends ConsumerWidget {
       builder: (context, scrollController) {
         return Column(
           children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              height: 4,
-              width: 40,
-              decoration: BoxDecoration(
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+            const SheetDragHandle(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(

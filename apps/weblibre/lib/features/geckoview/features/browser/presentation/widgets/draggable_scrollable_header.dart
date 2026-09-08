@@ -17,8 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
-import 'dart:math';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class DraggableScrollableHeader extends StatefulWidget {
@@ -75,11 +74,12 @@ class _DraggableScrollableHeaderState extends State<DraggableScrollableHeader> {
         final adjustedDelta = details.delta.dy * widget.dragSensitivity;
 
         widget.controller.jumpTo(
-          min(
-            1,
+          clampDouble(
             widget.controller.pixelsToSize(
               widget.controller.pixels - adjustedDelta,
             ),
+            0.0,
+            1.0,
           ),
         );
       },

@@ -32,6 +32,8 @@ import 'package:weblibre/features/geckoview/features/browser/features/menu/prese
 import 'package:weblibre/features/geckoview/features/browser/features/menu/presentation/widgets/sections/quick_links_section.dart';
 import 'package:weblibre/features/geckoview/features/browser/features/menu/presentation/widgets/sections/quick_toggles_section.dart';
 import 'package:weblibre/features/geckoview/features/browser/features/menu/presentation/widgets/sections/tab_actions_section.dart';
+import 'package:weblibre/presentation/widgets/pointer_scrollable_sheet.dart';
+import 'package:weblibre/presentation/widgets/sheet_drag_handle.dart';
 
 /// Shows the combined browser menu as a modal bottom sheet.
 Future<void> showBrowserMenuSheet(BuildContext context) {
@@ -87,7 +89,6 @@ class _BrowserMenuSheet extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final colorScheme = Theme.of(context).colorScheme;
     final selectedTabId = ref.watch(selectedTabProvider);
     final reorderMode = ref.watch(menuReorderModeProvider);
     final isReordering = reorderMode.active;
@@ -103,7 +104,7 @@ class _BrowserMenuSheet extends ConsumerWidget {
         if (didPop) return;
         ref.read(menuReorderModeProvider.notifier).stepBack();
       },
-      child: DraggableScrollableSheet(
+      child: PointerScrollableSheet(
         initialChildSize: 0.85,
         minChildSize: 0.4,
         maxChildSize: 0.95,
@@ -111,16 +112,7 @@ class _BrowserMenuSheet extends ConsumerWidget {
         builder: (context, scrollController) {
           return Column(
             children: [
-              // Drag handle
-              Container(
-                margin: const EdgeInsets.only(top: 12, bottom: 8),
-                height: 4,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
+              const SheetDragHandle(),
 
               // Pinned above the scrolling list: "Done" and the back arrow
               // are the only ways out of the arrangement UI, and a long

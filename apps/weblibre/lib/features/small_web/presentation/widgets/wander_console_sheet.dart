@@ -26,6 +26,8 @@ import 'package:weblibre/features/small_web/domain/providers.dart';
 import 'package:weblibre/features/small_web/presentation/controllers/small_web_session_controller.dart';
 import 'package:weblibre/features/small_web/presentation/widgets/small_web_menu_sheet.dart';
 import 'package:weblibre/presentation/widgets/failure_widget.dart';
+import 'package:weblibre/presentation/widgets/pointer_scrollable_sheet.dart';
+import 'package:weblibre/presentation/widgets/sheet_drag_handle.dart';
 import 'package:weblibre/presentation/widgets/sliding_pill_toggle.dart';
 import 'package:weblibre/presentation/widgets/url_icon.dart';
 import 'package:weblibre/utils/form_validators.dart';
@@ -48,7 +50,6 @@ class _WanderConsoleSheet extends HookConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final sessionAsync = ref.watch(smallWebSessionControllerProvider);
-    final colorScheme = Theme.of(context).colorScheme;
 
     final searchController = useTextEditingController();
     final searchQuery = useListenableSelector(
@@ -57,7 +58,7 @@ class _WanderConsoleSheet extends HookConsumerWidget {
     );
     final showAllConsoles = useState<bool?>(null);
 
-    return DraggableScrollableSheet(
+    return PointerScrollableSheet(
       initialChildSize: 0.6,
       minChildSize: 0.3,
       maxChildSize: 0.85,
@@ -65,15 +66,7 @@ class _WanderConsoleSheet extends HookConsumerWidget {
       builder: (context, scrollController) {
         return Column(
           children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12, bottom: 8),
-              height: 4,
-              width: 40,
-              decoration: BoxDecoration(
-                color: colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+            const SheetDragHandle(),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
