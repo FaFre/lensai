@@ -26,11 +26,11 @@ class IntentReceiver extends IntentEvents {
   final _controller = StreamController<Intent>.broadcast();
   int? _lastAdded;
 
-  /// Intent events, including the cold-start launch intent for each listener.
+  /// Intent events, including the ones that arrived before this side existed.
   ///
-  /// New-intent callbacks still arrive through the broadcast controller below.
-  /// The initial intent is replayed per listener so existing callers that only
-  /// listen to [events] continue to receive terminated-app launches.
+  /// Live callbacks arrive through the broadcast controller below. The backlog
+  /// the host held is replayed per listener, so a caller that only listens to
+  /// [events] still receives launches this isolate was not yet able to take.
   Stream<Intent> get events {
     return Stream.multi((controller) {
       final subscription = _controller.stream.listen(
@@ -40,9 +40,10 @@ class IntentReceiver extends IntentEvents {
       );
 
       unawaited(
-        initialIntent.then(
-          (intent) {
-            if (intent != null && !controller.isClosed) {
+        pendingIntents.then(
+          (intents) {
+            for (final intent in intents) {
+              if (controller.isClosed) return;
               controller.add(intent);
             }
           },
@@ -58,24 +59,20 @@ class IntentReceiver extends IntentEvents {
     }, isBroadcast: true);
   }
 
-  /// The launch intent recovered from the host, if any. Resolves to
-  /// `Future<null>` for instances not constructed via [IntentReceiver.setUp]
-  /// (e.g. test fakes / subclasses), so callers can always `await` without
-  /// guarding for `LateInitializationError`.
+  /// The launches the host held until this side could take them, oldest first.
   ///
-  /// On cold start the Android plugin sees the launch intent from
-  /// onAttachedToActivity before Dart has registered the Pigeon handler, so it
-  /// caches the value for Dart to recover. The [events] stream already replays
-  /// this value for compatibility; use this future directly only when the
-  /// launch intent needs one-shot handling outside the event stream.
+  /// Resolves to an empty list for instances not constructed via
+  /// [IntentReceiver.setUp] (e.g. test fakes / subclasses), so callers can
+  /// always `await` without guarding for `LateInitializationError`.
   ///
-  /// Note on rotation: the Android plugin's `pendingInitialIntent` cache
-  /// is intentionally overwritten on configuration change. If the user
-  /// triggers a new deep link via the activity launcher before Dart
-  /// drains the previous initial intent (rare — the future is read on
-  /// IntentReceiver construction, which happens during app bootstrap),
-  /// only the newest intent is delivered.
-  Future<Intent?> initialIntent = Future.value(null);
+  /// Not just a cold-start concern, and that is why it is a list rather than
+  /// the single "initial intent" it used to be. The host buffers a launch
+  /// whenever nothing here is listening yet — which is every launch between
+  /// process start and [IntentReceiver.setUp], not merely the one the activity
+  /// was created for. The [events] stream already replays these; use this
+  /// future directly only when they need one-shot handling outside the event
+  /// stream.
+  Future<List<Intent>> pendingIntents = Future.value(const []);
 
   @override
   void onIntentReceived(int sequence, Intent intent) {
@@ -99,7 +96,12 @@ class IntentReceiver extends IntentEvents {
       binaryMessenger: binaryMessenger,
       messageChannelSuffix: messageChannelSuffix,
     );
-    initialIntent = host.getInitialIntent();
+    // Strictly after [IntentEvents.setUp] above: this call is what tells the
+    // host it may start delivering live, and the handler it will deliver to has
+    // to be registered before that is true. The host flips and drains in one
+    // step, so nothing falls between the last buffered launch and the first
+    // live one.
+    pendingIntents = host.takePendingIntents();
   }
 
   Future<void> dispose() async {

@@ -276,12 +276,20 @@ private open class IntentPigeonCodec : StandardMessageCodec() {
 /** Generated interface from Pigeon that represents a handler of messages from Flutter. */
 interface IntentHost {
   /**
-   * Returns the launch intent that started the activity, if any.
-   * This allows Dart to retrieve an intent that arrived before
-   * IntentEvents.setUp() was called (cold-start deep links).
-   * Returns null if no launch intent is pending.
+   * Declares Dart ready for live delivery and returns every intent that
+   * arrived before it was, oldest first.
+   *
+   * The two halves are one call on purpose. Readiness is what the native side
+   * cannot observe for itself — an engine outlives the activity that hosted
+   * it, so "an activity just attached" says nothing about whether anything is
+   * listening — and a drain that did not flip it would leave a window between
+   * the last buffered intent and the first live one in which a launch reaches
+   * a handler that is not registered yet and is lost without a trace.
+   *
+   * Idempotent: a second call drains an empty buffer and leaves the side
+   * ready.
    */
-  fun getInitialIntent(): Intent?
+  fun takePendingIntents(): List<Intent>
 
   companion object {
     /** The codec used by IntentHost. */
@@ -293,11 +301,11 @@ interface IntentHost {
     fun setUp(binaryMessenger: BinaryMessenger, api: IntentHost?, messageChannelSuffix: String = "") {
       val separatedMessageChannelSuffix = if (messageChannelSuffix.isNotEmpty()) ".$messageChannelSuffix" else ""
       run {
-        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.simple_intent_receiver.IntentHost.getInitialIntent$separatedMessageChannelSuffix", codec)
+        val channel = BasicMessageChannel<Any?>(binaryMessenger, "dev.flutter.pigeon.simple_intent_receiver.IntentHost.takePendingIntents$separatedMessageChannelSuffix", codec)
         if (api != null) {
           channel.setMessageHandler { _, reply ->
             val wrapped: List<Any?> = try {
-              listOf(api.getInitialIntent())
+              listOf(api.takePendingIntents())
             } catch (exception: Throwable) {
               IntentPigeonUtils.wrapError(exception)
             }

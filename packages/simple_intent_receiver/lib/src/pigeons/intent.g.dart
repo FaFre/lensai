@@ -230,13 +230,21 @@ class IntentHost {
 
   final String pigeonVar_messageChannelSuffix;
 
-  /// Returns the launch intent that started the activity, if any.
-  /// This allows Dart to retrieve an intent that arrived before
-  /// IntentEvents.setUp() was called (cold-start deep links).
-  /// Returns null if no launch intent is pending.
-  Future<Intent?> getInitialIntent() async {
+  /// Declares Dart ready for live delivery and returns every intent that
+  /// arrived before it was, oldest first.
+  ///
+  /// The two halves are one call on purpose. Readiness is what the native side
+  /// cannot observe for itself — an engine outlives the activity that hosted
+  /// it, so "an activity just attached" says nothing about whether anything is
+  /// listening — and a drain that did not flip it would leave a window between
+  /// the last buffered intent and the first live one in which a launch reaches
+  /// a handler that is not registered yet and is lost without a trace.
+  ///
+  /// Idempotent: a second call drains an empty buffer and leaves the side
+  /// ready.
+  Future<List<Intent>> takePendingIntents() async {
     final pigeonVar_channelName =
-        'dev.flutter.pigeon.simple_intent_receiver.IntentHost.getInitialIntent$pigeonVar_messageChannelSuffix';
+        'dev.flutter.pigeon.simple_intent_receiver.IntentHost.takePendingIntents$pigeonVar_messageChannelSuffix';
     final pigeonVar_channel = BasicMessageChannel<Object?>(
       pigeonVar_channelName,
       pigeonChannelCodec,
@@ -248,9 +256,9 @@ class IntentHost {
     final Object? pigeonVar_replyValue = _extractReplyValueOrThrow(
       pigeonVar_replyList,
       pigeonVar_channelName,
-      isNullValid: true,
+      isNullValid: false,
     );
-    return pigeonVar_replyValue as Intent?;
+    return (pigeonVar_replyValue! as List<Object?>).cast<Intent>();
   }
 }
 

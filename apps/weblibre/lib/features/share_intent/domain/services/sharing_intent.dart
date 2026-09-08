@@ -253,6 +253,11 @@ Raw<IntentBus> intentBus(Ref ref) {
 /// and restart teardown nothing is, and those launches used to vanish without a
 /// trace. The native broker holds them instead, and they are replayed into this
 /// same stream, so a replayed launch meets exactly the handlers a live one does.
+///
+/// The broker is not the same thing as the plugin's own hold, and the two do not
+/// overlap. The broker takes launches `MainActivity` never passes on, because no
+/// profile is committed yet; the plugin holds the ones it *is* given while this
+/// isolate has not yet reached [intentReceiver]. Both end up here.
 @Riverpod(keepAlive: true)
 Raw<Stream<Intent>> allIntents(Ref ref) => ref.watch(intentBusProvider).stream;
 

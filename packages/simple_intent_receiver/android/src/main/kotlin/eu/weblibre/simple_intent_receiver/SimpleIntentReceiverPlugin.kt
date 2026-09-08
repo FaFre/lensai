@@ -38,30 +38,31 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
     private val EXTRA_NOTIFICATION_APPROVAL_TOKEN =
       IntentApprovals.EXTRA_NOTIFICATION_APPROVAL_TOKEN
     private val EXTRA_ALWAYS_ALLOW_PACKAGE = IntentApprovals.EXTRA_ALWAYS_ALLOW_PACKAGE
+
+    /**
+     * Marks an intent this plugin has already accounted for.
+     *
+     * Written on the activity's own `Intent` instance, which is what an
+     * in-process relaunch hands back, so the same launch cannot be delivered a
+     * second time when the activity is rebuilt around a surviving plugin. It
+     * says nothing about *which* link it was, which is the whole point: the
+     * per-URI guard this replaced also swallowed the user deliberately opening
+     * the same link twice, and that is a legitimate thing to do.
+     */
+    private const val EXTRA_DELIVERED = "eu.weblibre.simple_intent_receiver.DELIVERED"
   }
 
   private lateinit var context: Context
   private var intentReceiver: IntentReceiver? = null
-  private var lastHandledIntent: String? = null
   private var activity: Activity? = null
   private var binaryMessenger: io.flutter.plugin.common.BinaryMessenger? = null
 
   /**
-   * Caches the launch intent so Dart can retrieve it after setUp().
-   * On cold start, onAttachedToActivity fires before Dart registers its
-   * Pigeon handler, so the initial sendIntent message is lost. This field
-   * lets Dart call getInitialIntent() to recover it.
-   *
-   * On Android configuration change (rotation, theme switch) the activity
-   * is recreated and onAttachedToActivity fires again with the same
-   * launching intent. The `lastHandledIntent` guard below prevents
-   * re-caching that identical intent. If a NEW deep link arrives via the
-   * launcher between two Dart-side reads of getInitialIntent(),
-   * pendingInitialIntent is overwritten — only the latest intent is
-   * delivered. This is intentional: dropping the stale one keeps the
-   * "initial" intent meaning "what should the app open into right now".
+   * Whether Dart can be handed an intent, and where the ones that arrive before
+   * it can go. See [IntentDeliveryGate]; every launch this plugin sees goes
+   * through it.
    */
-  private var pendingInitialIntent: PigeonIntent? = null
+  private val gate = IntentDeliveryGate()
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     context = flutterPluginBinding.applicationContext
@@ -75,6 +76,9 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
   }
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    // The isolate that registered the handler is going away with the engine, so
+    // the gate's answer about it stops being true here.
+    gate.reset()
     intentReceiver = null
     binaryMessenger?.let {
       IntentHost.setUp(it, null)
@@ -83,26 +87,31 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
     binaryMessenger = null
   }
 
-  override fun getInitialIntent(): PigeonIntent? {
-    val intent = pendingInitialIntent
-    pendingInitialIntent = null
-    return intent
-  }
+  override fun takePendingIntents(): List<PigeonIntent> = gate.drain()
 
+  /**
+   * Picks up the intent that created this activity, if it has not been picked
+   * up already.
+   *
+   * `onNewIntent` never fires for the launch that built the activity, so this
+   * is the only place it can be seen — but "an activity attached" is not the
+   * same thing as "the app just started". The engine deliberately outlives
+   * `MainActivity` (`shouldDestroyEngineWithHost` is false there), so a link
+   * opened after the task was swiped from Recents can build a brand new
+   * activity on top of a Dart side that has been listening the whole time.
+   * Assuming otherwise and filing every launch away as a cold-start intent left
+   * exactly those links in a slot nothing would ever read again: the app came
+   * to the foreground and nothing happened, until a *second* link arrived
+   * through `onNewIntent` and was delivered live (#589).
+   *
+   * So this asks the gate rather than the lifecycle. Cold start buffers,
+   * because nothing is listening yet; everything else goes straight out.
+   */
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activity = binding.activity
     binding.addOnNewIntentListener(this)
 
-    binding.activity.intent?.let { intent ->
-      val uri = intent.toUri(0)
-      if (lastHandledIntent != uri) {
-        // Cache the launch intent for Dart to retrieve via getInitialIntent().
-        // Don't send via Pigeon here — the Dart handler isn't registered yet
-        // during cold start so the message would be lost.
-        pendingInitialIntent = prepareIntentForDelivery(intent)
-        lastHandledIntent = uri
-      }
-    }
+    binding.activity.intent?.let(::handleIntent)
   }
 
   override fun onDetachedFromActivityForConfigChanges() {
@@ -154,9 +163,29 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
     }
   }
 
+  /**
+   * Delivers [intent] to Dart, or holds it until Dart can take it.
+   *
+   * The `onNewIntent` half of the same question the gate answers for
+   * `onAttachedToActivity`: a profile is committed well before the app's intent
+   * consumers are built, so a link arriving in between used to be sent to a
+   * channel with no handler on the other end and vanish.
+   */
   private fun handleIntent(intent: Intent): Boolean {
+    if (intent.getBooleanExtra(EXTRA_DELIVERED, false)) {
+      return false
+    }
+
     val pigeonIntent = prepareIntentForDelivery(intent)
-    intentReceiver?.sendIntent(pigeonIntent)
+
+    // After the conversion, so the marker is not among the extras Dart sees, and
+    // before the send, so a delivery that somehow re-enters here finds it set.
+    intent.putExtra(EXTRA_DELIVERED, true)
+
+    if (gate.offer(pigeonIntent)) {
+      intentReceiver?.sendIntent(pigeonIntent)
+    }
+
     return true
   }
 
@@ -204,6 +233,9 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
             continue
           }
           if (key == EXTRA_ALWAYS_ALLOW_PACKAGE) {
+            continue
+          }
+          if (key == EXTRA_DELIVERED) {
             continue
           }
 

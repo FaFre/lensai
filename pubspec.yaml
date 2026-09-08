@@ -89,7 +89,7 @@ melos:
       description: Build combined Android gomobile runtime AAR for proxy plugins
       run: native/go_mobile_runtime/scripts/build-android.sh
     test-android:
-      description: Run the host-side Kotlin unit tests for the native plugin
+      description: Run the host-side Kotlin unit tests for the native plugins
       run: |
         set -e
         # No flutter/melos equivalent exists for Android unit tests, so this is
@@ -98,11 +98,12 @@ melos:
         # on a clean checkout.
         cd apps/weblibre/android
         # --continue: one applinks test fails permanently (see CLAUDE.md), and
-        # without it that failure would stop the second module from running at
-        # all. Read the XML reports, not the exit status.
+        # without it that failure would stop the modules after it from running
+        # at all. Read the XML reports, not the exit status.
         ./gradlew --continue \
           :flutter_mozilla_components:testDebugUnitTest \
-          :flutter_singbox_proxy:testDebugUnitTest
+          :flutter_singbox_proxy:testDebugUnitTest \
+          :simple_intent_receiver:testDebugUnitTest
 
     build-browser:
       description: Build stable release APKs split per ABI with the Skia renderer

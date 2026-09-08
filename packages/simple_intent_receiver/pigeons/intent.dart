@@ -51,11 +51,19 @@ class Intent {
 )
 @HostApi()
 abstract class IntentHost {
-  /// Returns the launch intent that started the activity, if any.
-  /// This allows Dart to retrieve an intent that arrived before
-  /// IntentEvents.setUp() was called (cold-start deep links).
-  /// Returns null if no launch intent is pending.
-  Intent? getInitialIntent();
+  /// Declares Dart ready for live delivery and returns every intent that
+  /// arrived before it was, oldest first.
+  ///
+  /// The two halves are one call on purpose. Readiness is what the native side
+  /// cannot observe for itself — an engine outlives the activity that hosted
+  /// it, so "an activity just attached" says nothing about whether anything is
+  /// listening — and a drain that did not flip it would leave a window between
+  /// the last buffered intent and the first live one in which a launch reaches
+  /// a handler that is not registered yet and is lost without a trace.
+  ///
+  /// Idempotent: a second call drains an empty buffer and leaves the side
+  /// ready.
+  List<Intent> takePendingIntents();
 }
 
 @FlutterApi()
