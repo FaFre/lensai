@@ -38,18 +38,6 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
     private val EXTRA_NOTIFICATION_APPROVAL_TOKEN =
       IntentApprovals.EXTRA_NOTIFICATION_APPROVAL_TOKEN
     private val EXTRA_ALWAYS_ALLOW_PACKAGE = IntentApprovals.EXTRA_ALWAYS_ALLOW_PACKAGE
-
-    /**
-     * Marks an intent this plugin has already accounted for.
-     *
-     * Written on the activity's own `Intent` instance, which is what an
-     * in-process relaunch hands back, so the same launch cannot be delivered a
-     * second time when the activity is rebuilt around a surviving plugin. It
-     * says nothing about *which* link it was, which is the whole point: the
-     * per-URI guard this replaced also swallowed the user deliberately opening
-     * the same link twice, and that is a legitimate thing to do.
-     */
-    private const val EXTRA_DELIVERED = "eu.weblibre.simple_intent_receiver.DELIVERED"
   }
 
   private lateinit var context: Context
@@ -77,8 +65,9 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
     // The isolate that registered the handler is going away with the engine, so
-    // the gate's answer about it stops being true here.
-    gate.reset()
+    // the gate's answer about it stops being true here. What it is holding is
+    // not that isolate's, and stays.
+    gate.release()
     intentReceiver = null
     binaryMessenger?.let {
       IntentHost.setUp(it, null)
@@ -88,6 +77,8 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
   }
 
   override fun takePendingIntents(): List<PigeonIntent> = gate.drain()
+
+  override fun releaseDelivery() = gate.release()
 
   /**
    * Picks up the intent that created this activity, if it has not been picked
@@ -106,6 +97,23 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
    *
    * So this asks the gate rather than the lifecycle. Cold start buffers,
    * because nothing is listening yet; everything else goes straight out.
+   *
+   * Nothing guards against taking the same launch twice, because each activity
+   * instance is attached once and is handed its own `Intent` by the system. The
+   * two guards that have stood here both cost more than they bought: a
+   * once-only flag lost the *next* link after one had been handled, and the URI
+   * comparison that replaced it swallowed the user opening one link twice —
+   * which is an ordinary thing to do and was half of #589.
+   *
+   * One case is left uncovered, knowingly. If the system destroys
+   * `MainActivity` while something else still holds the engine
+   * (`FlutterEngineCoordinator.retainForExternalTask`, e.g. a Custom Tab in a
+   * proxied container), the activity is later rebuilt from the launch intent
+   * the system kept, and this takes it again — one duplicate tab. It cannot be
+   * recognised from here: the system's copy of the intent is not the one this
+   * process annotated, so no marker written on an `Intent` survives to be read.
+   * `MainActivity.onCreate` *can* tell, from a non-null `savedInstanceState`,
+   * and that is where a fix would go.
    */
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activity = binding.activity
@@ -170,17 +178,15 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
    * `onAttachedToActivity`: a profile is committed well before the app's intent
    * consumers are built, so a link arriving in between used to be sent to a
    * channel with no handler on the other end and vanish.
+   *
+   * The conversion runs before the gate is asked, and that is the order that
+   * matters: it redeems the one-shot approval token and resolves the calling
+   * package, both of which have to be settled while the launch is still here.
+   * A launch that ends up held is therefore held complete, and comes back out
+   * of [takePendingIntents] carrying everything a live one would.
    */
   private fun handleIntent(intent: Intent): Boolean {
-    if (intent.getBooleanExtra(EXTRA_DELIVERED, false)) {
-      return false
-    }
-
     val pigeonIntent = prepareIntentForDelivery(intent)
-
-    // After the conversion, so the marker is not among the extras Dart sees, and
-    // before the send, so a delivery that somehow re-enters here finds it set.
-    intent.putExtra(EXTRA_DELIVERED, true)
 
     if (gate.offer(pigeonIntent)) {
       intentReceiver?.sendIntent(pigeonIntent)
@@ -233,9 +239,6 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
             continue
           }
           if (key == EXTRA_ALWAYS_ALLOW_PACKAGE) {
-            continue
-          }
-          if (key == EXTRA_DELIVERED) {
             continue
           }
 

@@ -260,6 +260,35 @@ class IntentHost {
     );
     return (pigeonVar_replyValue! as List<Object?>).cast<Intent>();
   }
+
+  /// Withdraws the readiness [takePendingIntents] declared, so the host goes
+  /// back to holding launches instead of sending them.
+  ///
+  /// For a Dart side being torn down. Its handler is about to be unregistered,
+  /// and a host still convinced someone is listening would keep sending into
+  /// nothing — a `BinaryMessenger` reports neither the missing handler nor a
+  /// closed sink, so the launch would be gone with no trace on either side.
+  ///
+  /// Deliberately not a discard: whatever the host is already holding stays
+  /// held. It was never delivered to the isolate that is leaving, so there is
+  /// nothing to replay — only something still waiting to be collected.
+  Future<void> releaseDelivery() async {
+    final pigeonVar_channelName =
+        'dev.flutter.pigeon.simple_intent_receiver.IntentHost.releaseDelivery$pigeonVar_messageChannelSuffix';
+    final pigeonVar_channel = BasicMessageChannel<Object?>(
+      pigeonVar_channelName,
+      pigeonChannelCodec,
+      binaryMessenger: pigeonVar_binaryMessenger,
+    );
+    final Future<Object?> pigeonVar_sendFuture = pigeonVar_channel.send(null);
+    final pigeonVar_replyList = await pigeonVar_sendFuture as List<Object?>?;
+
+    _extractReplyValueOrThrow(
+      pigeonVar_replyList,
+      pigeonVar_channelName,
+      isNullValid: true,
+    );
+  }
 }
 
 abstract class IntentEvents {

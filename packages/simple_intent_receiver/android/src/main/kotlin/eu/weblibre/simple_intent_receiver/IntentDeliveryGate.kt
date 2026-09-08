@@ -85,14 +85,19 @@ class IntentDeliveryGate(private val maxPending: Int = MAX_PENDING_INTENTS) {
     }
 
     /**
-     * Forgets that Dart was ever ready.
+     * Forgets that Dart was ready, and goes back to holding.
      *
-     * For engine detach: the isolate that registered the handler is gone, and
-     * whatever is buffered was addressed to it. Sending to its successor would
-     * replay a launch it never received into a session the user started since.
+     * For an isolate going away — an engine detaching, or a Dart side shutting
+     * down and unregistering its handler. Readiness is a claim about that
+     * isolate and stops being true with it; anything sent afterwards would go
+     * to a channel with no handler and be lost in the silence described above.
+     *
+     * The backlog deliberately survives. It was never handed to the isolate
+     * that is leaving, so it is not something to replay — it is a launch the
+     * user made that nobody has collected yet, and dropping it here is the
+     * failure this whole class exists to prevent.
      */
-    fun reset() {
+    fun release() {
         ready = false
-        pending.clear()
     }
 }

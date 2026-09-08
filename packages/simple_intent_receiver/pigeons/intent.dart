@@ -64,6 +64,19 @@ abstract class IntentHost {
   /// Idempotent: a second call drains an empty buffer and leaves the side
   /// ready.
   List<Intent> takePendingIntents();
+
+  /// Withdraws the readiness [takePendingIntents] declared, so the host goes
+  /// back to holding launches instead of sending them.
+  ///
+  /// For a Dart side being torn down. Its handler is about to be unregistered,
+  /// and a host still convinced someone is listening would keep sending into
+  /// nothing — a `BinaryMessenger` reports neither the missing handler nor a
+  /// closed sink, so the launch would be gone with no trace on either side.
+  ///
+  /// Deliberately not a discard: whatever the host is already holding stays
+  /// held. It was never delivered to the isolate that is leaving, so there is
+  /// nothing to replay — only something still waiting to be collected.
+  void releaseDelivery();
 }
 
 @FlutterApi()

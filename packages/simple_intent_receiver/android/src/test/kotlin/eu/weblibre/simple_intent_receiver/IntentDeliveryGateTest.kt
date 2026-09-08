@@ -142,21 +142,55 @@ class IntentDeliveryGateTest {
     }
 
     /**
-     * Engine detach. Whatever was buffered was addressed to an isolate that no
-     * longer exists, and its successor must not be told it is ready on its
-     * behalf.
+     * Engine detach, or a Dart side shutting down. Its successor must not be
+     * told it is ready on that isolate's behalf.
      */
     @Test
-    fun resetForgetsReadinessAndTheBacklog() {
+    fun releaseSendsLaterLaunchesBackToTheBacklog() {
         val gate = IntentDeliveryGate()
         gate.drain()
-        gate.offer(link("https://example.com/a"))
-        gate.reset()
+        assertTrue(gate.offer(link("https://example.com/live")))
+
+        gate.release()
 
         assertFalse(gate.isReady)
-        assertEquals(0, gate.pendingCount)
-
         // Back to holding, exactly as a fresh process would.
-        assertFalse(gate.offer(link("https://example.com/b")))
+        assertFalse(gate.offer(link("https://example.com/held")))
+        assertEquals(
+            listOf("https://example.com/held"),
+            gate.drain().map { it.data },
+        )
+    }
+
+    /**
+     * ...and it does not take the backlog with it. Those launches were never
+     * handed to the isolate that is leaving, so they are not a replay — they
+     * are a link the user opened that nobody has collected yet.
+     */
+    @Test
+    fun releaseKeepsWhatWasNeverCollected() {
+        val gate = IntentDeliveryGate()
+        gate.offer(link("https://example.com/a"))
+
+        gate.release()
+
+        assertEquals(1, gate.pendingCount)
+        assertEquals(listOf("https://example.com/a"), gate.drain().map { it.data })
+    }
+
+    /**
+     * The engine-replacement sequence end to end: held, the isolate goes away
+     * before it ever drained, and the next one gets it.
+     */
+    @Test
+    fun aLaunchHeldAcrossAnIsolateSurvivesToTheNextOne() {
+        val gate = IntentDeliveryGate()
+        gate.offer(link("https://example.com/a"))
+        gate.release()
+
+        // The replacement declares itself ready the same way the first would
+        // have, and collects what the first never did.
+        assertEquals(listOf("https://example.com/a"), gate.drain().map { it.data })
+        assertTrue(gate.isReady)
     }
 }
