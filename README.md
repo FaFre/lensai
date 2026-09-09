@@ -138,11 +138,11 @@ Bang providers and custom search engines let you send a query directly to a spec
 - **RSS/Atom feeds** and Small Web discovery help you follow and find independent sites.
 - **Firefox Sync** can synchronize tabs, bookmarks, and history with your other devices.
 
-**Learn more:** [On-Device AI](https://docs.weblibre.eu/weblibre/on-device-ai.html) | [Content tools](https://docs.weblibre.eu/weblibre/reader-mode.html) | [Full documentation](https://docs.weblibre.eu/)
+**Learn more:** [On-Device AI](https://docs.weblibre.eu/weblibre/on-device-ai.html) | [Content tools](https://docs.weblibre.eu/weblibre/reader-mode.html) | [Full documentation](https://docs.weblibre.eu/weblibre/index.html)
 
 ## Documentation and Community
 
-Full user documentation is available at **[docs.weblibre.eu](https://docs.weblibre.eu/)**.
+Full user documentation is available at **[docs.weblibre.eu](https://docs.weblibre.eu/weblibre/index.html)**.
 
 - **[Troubleshooting](https://docs.weblibre.eu/weblibre/troubleshooting.html)** - Fix common problems and learn what to include in a bug report.
 - **[Feedback Platform](https://feedback.weblibre.eu/)** - Suggest and vote on features.
