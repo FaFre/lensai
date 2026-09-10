@@ -6,9 +6,14 @@ package eu.weblibre.flutter_mozilla_components.components
 
 import kotlin.test.Test
 import kotlin.test.assertEquals
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import mozilla.components.browser.state.state.BrowserState
 import mozilla.components.browser.state.state.ContentState
@@ -28,6 +33,12 @@ private fun Flow<BrowserState>.contentChanges(): Flow<TabSessionState> = changed
         it.content.showToolbarAsExpanded,
     )
 }
+
+/**
+ * Long enough that the margins below are several times the window, so the
+ * timing assertions do not depend on how loaded the machine running them is.
+ */
+private const val WINDOW = 60L
 
 class EventsTabChangesTest {
     @Test
@@ -147,5 +158,85 @@ class EventsTabChangesTest {
 
         assertEquals(listOf("tab", "tab"), changes.toList().map { it.id })
         assertEquals(listOf("tab", "tab"), changes.toList().map { it.id })
+    }
+
+    @Test
+    fun `a burst is coalesced to the newest state of every tab that changed`() = runBlocking {
+        val a = TabSessionState(id = "a", content = ContentState("https://a.test"))
+        val b = TabSessionState(id = "b", content = ContentState("https://b.test"))
+        fun tick(tab: TabSessionState, progress: Int, loading: Boolean = true) =
+            tab.copy(content = tab.content.copy(progress = progress, loading = loading))
+
+        val changes = Channel<TabSessionState>(Channel.UNLIMITED)
+        val seen = mutableListOf<TabSessionState>()
+        val collector = launch { changes.consumeAsFlow().conflatedByTab(WINDOW).collect { seen += it } }
+
+        changes.send(tick(a, 10))
+        delay(WINDOW / 4)
+        assertEquals(listOf("a" to 10), seen.map { it.id to it.content.progress })
+
+        // Everything from here lands inside the open window.
+        changes.send(tick(a, 30))
+        changes.send(tick(b, 20))
+        changes.send(tick(a, 70))
+        changes.send(tick(a, 100, loading = false))
+        delay(WINDOW * 3)
+
+        // One event per tab, each carrying that tab's last word — the finished
+        // load included, which is the state a dropped update would strand.
+        assertEquals(
+            listOf("a" to 10, "a" to 100, "b" to 20),
+            seen.map { it.id to it.content.progress },
+        )
+        assertEquals(listOf(true, false, true), seen.map { it.content.loading })
+
+        changes.close()
+        collector.cancelAndJoin()
+    }
+
+    @Test
+    fun `a change after a quiet window is passed straight on`() = runBlocking {
+        val tab = TabSessionState(id = "tab", content = ContentState("https://tab.test"))
+
+        val changes = Channel<TabSessionState>(Channel.UNLIMITED)
+        val seen = mutableListOf<TabSessionState>()
+        val collector = launch { changes.consumeAsFlow().conflatedByTab(WINDOW).collect { seen += it } }
+
+        changes.send(tab.copy(content = tab.content.copy(title = "First")))
+        delay(WINDOW * 3)
+        changes.send(tab.copy(content = tab.content.copy(title = "Second")))
+        delay(WINDOW / 4)
+
+        assertEquals(listOf("First", "Second"), seen.map { it.content.title })
+
+        changes.close()
+        collector.cancelAndJoin()
+    }
+
+    @Test
+    fun `what is held is handed over when the upstream ends`() = runBlocking {
+        val a = TabSessionState(id = "a", content = ContentState("https://a.test"))
+        val b = TabSessionState(id = "b", content = ContentState("https://b.test"))
+
+        val seen = flowOf(
+            a,
+            a.copy(content = a.content.copy(title = "Newer")),
+            b,
+        ).conflatedByTab(WINDOW).toList()
+
+        assertEquals(listOf("a" to "", "a" to "Newer", "b" to ""), seen.map { it.id to it.content.title })
+    }
+
+    @Test
+    fun `a windowed selector still reports every tab of a burst`() = runBlocking {
+        val first = TabSessionState(id = "first", content = ContentState("about:blank"))
+        val second = first.copy(id = "second")
+
+        val events = flowOf(
+            BrowserState(tabs = listOf(first, second)),
+        ).changedTabsBy(windowMillis = WINDOW) { listOf(it.content.url, it.content.progress) }
+            .toList()
+
+        assertEquals(listOf("first", "second"), events.map { it.id })
     }
 }

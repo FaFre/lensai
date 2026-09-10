@@ -334,20 +334,38 @@ void main() {
   });
 
   test(
-    'a replacement attached before the drain does not receive old backlog',
+    'a consumer replaced before the drain still receives the backlog',
     () async {
       final first = receiver.events.listen((_) {});
       await host.sendLive(1, _link('https://example.com/queued'));
       await first.cancel();
 
+      // The consumer was swapped out while the host was still answering, which
+      // is what a rebuild of the bus looks like from here. The listener that
+      // left took nothing with it: the queue had not opened yet.
       final seen = <String?>[];
       receiver.events.listen((intent) => seen.add(intent.data));
       await host.sendLive(2, _link('https://example.com/current'));
       host.answerDrain([_link('https://example.com/held')]);
       await pumpEventQueue();
-      expect(seen, ['https://example.com/current']);
+      expect(seen, ['https://example.com/held', 'https://example.com/current']);
     },
   );
+
+  test('the backlog is dropped only when no consumer is left', () async {
+    final first = receiver.events.listen((_) {});
+    await first.cancel();
+    host.answerDrain([_link('https://example.com/held')]);
+    await pumpEventQueue();
+
+    // Answered into an empty room, so it is gone: a listener attaching now is
+    // starting after the handover, not waiting for it.
+    final seen = <String?>[];
+    receiver.events.listen((intent) => seen.add(intent.data));
+    await host.sendLive(1, _link('https://example.com/current'));
+    await pumpEventQueue();
+    expect(seen, ['https://example.com/current']);
+  });
 
   test(
     'a late drain after disposal does not deliver or reclaim the channel',

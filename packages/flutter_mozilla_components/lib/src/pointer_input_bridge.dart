@@ -49,7 +49,17 @@ class PointerInputBridge implements PointerInputFlutterApi {
   /// appear twice while a surface is being replaced.
   final _registrations = <Object, int>{};
 
-  var _revision = 0;
+  /// The revision stamped on the next answer.
+  ///
+  /// Shared by every bridge the isolate builds, so it never restarts while one
+  /// could still be running: the last registration going away tears the bridge
+  /// down, and coming back — leaving a settings route with the surface
+  /// unmounted, say — builds a new one. That bridge's [reset] and the replies
+  /// it gives travel on different channels, so a revision starting over could
+  /// reach the router as an answer *older* than the one it is already applying,
+  /// and be dropped along with the hand-off it was reporting.
+  static var _revision = 0;
+
   var _watchingFrames = false;
   var _live = true;
   Offset? _hoverPosition;

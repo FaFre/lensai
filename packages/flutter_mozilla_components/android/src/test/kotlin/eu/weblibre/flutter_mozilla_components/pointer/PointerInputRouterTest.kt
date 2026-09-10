@@ -662,4 +662,45 @@ class PointerInputRouterTest {
         assertFalse(root.isAccessibilityFocused)
         assertNotNull(root.createAccessibilityNodeInfo())
     }
+
+    @Test
+    fun surfaceThatIsNotYetAttachedKeepsPlainNativeDispatch() {
+        // Laid out by the platform view factory, not yet handed a Flutter view.
+        // Nothing is composited over it to protect, so swallowing the notch
+        // would only lose it.
+        val root = PointerInputFrameLayout(context, 9, router)
+        val child = Recorder()
+        flutterView.addView(root)
+        root.layout(0, 0, 400, 400)
+        root.addView(child)
+        child.layout(0, 0, 400, 400)
+
+        assertTrue(root.dispatchGenericMotionEvent(event()))
+        assertTrue(host.hitTests.isEmpty())
+        assertEquals(listOf(MotionEvent.ACTION_SCROLL), actions(child))
+        assertTrue(flutterEvents.isEmpty())
+    }
+
+    @Test
+    fun detachedSurfaceKeepsPlainNativeDispatch() {
+        val (root, child) = root(1)
+        root.detachPointerInput()
+
+        assertTrue(root.dispatchGenericMotionEvent(event()))
+        assertTrue(host.hitTests.isEmpty())
+        assertEquals(listOf(MotionEvent.ACTION_SCROLL), actions(child))
+    }
+
+    @Test
+    fun surfaceDisplacedByItsReplacementStillHasItsInputTakenOver() {
+        val (displaced, displacedChild) = root(1)
+        // The same id, registered by the surface replacing this one. The old
+        // root is still composited, so its input may not reach the page.
+        root(1)
+
+        assertTrue(displaced.dispatchGenericMotionEvent(event()))
+        assertTrue(host.hitTests.isEmpty())
+        assertTrue(displacedChild.events.isEmpty())
+        assertTrue(flutterEvents.isEmpty())
+    }
 }

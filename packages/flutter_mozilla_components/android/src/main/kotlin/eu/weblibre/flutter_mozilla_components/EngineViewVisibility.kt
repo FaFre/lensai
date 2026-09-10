@@ -11,9 +11,11 @@ import android.util.Log
 import android.view.SurfaceView
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import io.flutter.plugin.common.BinaryMessenger
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import java.lang.ref.WeakReference
 
 /**
  * Takes the engine's surface off the window when Flutter stops painting the
@@ -44,6 +46,14 @@ class EngineViewVisibility(
         setMethodCallHandler(::onMethodCall)
     }
 
+    /** The views this hid, so that showing again lifts those and nothing else. */
+    private val hidden = mutableListOf<WeakReference<View>>()
+
+    /** The container being kept hidden, and the observer watching it. */
+    private var watching: WeakReference<View>? = null
+    private var observer: ViewTreeObserver? = null
+    private val onGlobalLayout = ViewTreeObserver.OnGlobalLayoutListener { refreshWhileHidden() }
+
     private fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         when (call.method) {
             "setEngineViewVisible" -> {
@@ -72,9 +82,10 @@ class EngineViewVisibility(
      * false every single time the page was still on the window, so a guard on
      * it skips exactly the case this exists for.
      *
-     * Showing again only lifts what this hid: a surface view someone else took
-     * out of the hierarchy's view — Gecko releasing a session, say — is not
-     * this class's to put back.
+     * Showing again lifts what this hid, and only that. A surface someone else
+     * took out of the hierarchy's view — Gecko releasing a session, say — was
+     * not hidden here and is not this class's to put back, so the views that
+     * were actually changed are the ones remembered and restored.
      */
     private fun setVisible(visible: Boolean) {
         val container = activityProvider()?.findViewById<View>(containerId) ?: return
@@ -86,19 +97,34 @@ class EngineViewVisibility(
         )
 
         if (visible) {
-            container.restoreVisibility()
-            forEachSurfaceView(container) { it.restoreVisibility() }
+            stopWatching()
+            hidden.forEach { reference ->
+                val view = reference.get() ?: return@forEach
+                if (view.visibility == View.INVISIBLE) {
+                    view.visibility = View.VISIBLE
+                }
+            }
+            hidden.clear()
             return
         }
 
-        container.visibility = View.INVISIBLE
-        forEachSurfaceView(container) { it.visibility = View.INVISIBLE }
+        hideTree(container)
+        startWatching(container)
     }
 
-    private fun View.restoreVisibility() {
-        if (visibility == View.INVISIBLE) {
-            visibility = View.VISIBLE
+    /** Hides [container] and every surface under it, remembering each one. */
+    private fun hideTree(container: View) {
+        hide(container)
+        forEachSurfaceView(container) { hide(it) }
+    }
+
+    private fun hide(view: View) {
+        if (view.visibility != View.VISIBLE) {
+            return
         }
+
+        view.visibility = View.INVISIBLE
+        hidden += WeakReference(view)
     }
 
     private fun forEachSurfaceView(view: View, action: (SurfaceView) -> Unit) {
@@ -113,6 +139,49 @@ class EngineViewVisibility(
 
         for (i in 0 until view.childCount) {
             forEachSurfaceView(view.getChildAt(i), action)
+        }
+    }
+
+    /**
+     * Re-hides the subtree while it is meant to be hidden.
+     *
+     * A session swapped in behind a covering route brings its own surface view,
+     * attached visible, painting the page over Flutter again — the very
+     * symptom, arriving after the hide that was supposed to prevent it. A
+     * layout pass is what a new surface causes, so that is what this hangs off.
+     *
+     * Idempotent by construction: [hide] only touches views that are visible,
+     * so a pass that changes nothing requests no layout and cannot feed itself.
+     */
+    internal fun refreshWhileHidden() {
+        val container = watching?.get() ?: return
+        hideTree(container)
+    }
+
+    private fun startWatching(container: View) {
+        if (observer != null) {
+            return
+        }
+
+        val treeObserver = container.viewTreeObserver
+        if (!treeObserver.isAlive) {
+            return
+        }
+
+        treeObserver.addOnGlobalLayoutListener(onGlobalLayout)
+        observer = treeObserver
+        watching = WeakReference(container)
+    }
+
+    private fun stopWatching() {
+        val treeObserver = observer ?: return
+        observer = null
+        watching = null
+
+        // A dead observer has already dropped its listeners, and the live one
+        // the container holds now is not the one this registered on.
+        if (treeObserver.isAlive) {
+            treeObserver.removeOnGlobalLayoutListener(onGlobalLayout)
         }
     }
 
@@ -137,6 +206,8 @@ class EngineViewVisibility(
     }
 
     fun dispose() {
+        stopWatching()
+        hidden.clear()
         channel.setMethodCallHandler(null)
     }
 

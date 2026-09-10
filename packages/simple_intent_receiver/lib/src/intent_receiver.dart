@@ -36,11 +36,13 @@ import 'package:simple_intent_receiver/src/pigeons/intent.g.dart';
 ///   stream with no subscriber drops what is added to it, silently, which is
 ///   the same disappearance this class was written to stop.
 ///
-/// So [events] is single-consumer by contract: the first listener receives the
-/// newest 16 pending launches, and a replacement gets only what arrives from
-/// then on. Once the first listener has attached, launches received with no
-/// listener are dropped rather than replayed. In this app that listener is
-/// `IntentBus`, which buffers again on its own terms.
+/// So [events] is single-consumer by contract: the listener that is there when
+/// the backlog lands receives the newest 16 pending launches, and once anything
+/// has been handed over, a replacement gets only what arrives from then on.
+/// Launches received with no listener at all are dropped rather than replayed.
+/// In this app that listener is `IntentBus`, which buffers again on its own
+/// terms, and which is rebuilt from time to time — a consumer swapped out while
+/// the host is still answering must not cost the launches it never saw.
 class IntentReceiver extends IntentEvents {
   IntentReceiver.setUp({
     BinaryMessenger? binaryMessenger,
@@ -92,6 +94,10 @@ class IntentReceiver extends IntentEvents {
       StreamController<Intent>.broadcast(
         onListen: () {
           _hasListened = true;
+          // Whoever is here now is the consumer. A backlog still on its way
+          // belongs to them: it has been handed to nobody, and the listener
+          // that gave up waiting for it left with nothing.
+          _discardBacklog = false;
           _flush();
         },
         onCancel: () {
@@ -106,6 +112,13 @@ class IntentReceiver extends IntentEvents {
   /// Whether the host's backlog has been merged into [_queue].
   var _opened = false;
   var _hasListened = false;
+
+  /// Whether the startup backlog has outlived the consumer it was for.
+  ///
+  /// Set when a listener goes away, cleared when one arrives: the backlog is
+  /// kept for whoever is listening when it lands, and dropped only when the
+  /// consumer has gone for good. It cannot be delivered twice — [_openWith]
+  /// runs once, and it is what opens the queue at all.
   var _discardBacklog = false;
   var _disposed = false;
   (Object, StackTrace)? _pendingError;

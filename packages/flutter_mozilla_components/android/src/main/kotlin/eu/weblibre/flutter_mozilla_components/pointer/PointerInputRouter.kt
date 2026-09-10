@@ -226,13 +226,23 @@ class PointerInputRouter internal constructor(private val host: PointerInputHost
         // plain native dispatch is better than swallowing the input entirely.
         if (disposed) return false
 
+        val flutterView = root.pointerFlutterView
+        val registration = views[root.platformViewId]?.takeIf { it.view === root }
+
+        // A surface with neither a Flutter view nor a registration is not one
+        // this router speaks for: the platform view has been laid out but not
+        // yet attached, or it has been detached from the view it had. There is
+        // no Flutter tree composited over it to keep the input from, and
+        // swallowing it would be a wheel that quietly does nothing.
+        if (flutterView == null && registration == null) return false
+
         // From here the event is the router's, and stays the router's even when
         // the state needed to arbitrate it is missing: handing a
         // half-arbitrated event back to native dispatch is the leak this whole
-        // class exists to close.
-        val flutterView = root.pointerFlutterView ?: return true
-        val registration = views[root.platformViewId]
-        if (registration?.view !== root) return true
+        // class exists to close. A root that is composited but no longer the
+        // registered one for its id is exactly that case — its id has been
+        // taken over by the surface replacing it.
+        if (flutterView == null || registration == null) return true
 
         if (event.actionMasked == MotionEvent.ACTION_HOVER_EXIT) {
             if (hover.source === registration) {

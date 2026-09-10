@@ -29,12 +29,17 @@ import eu.weblibre.flutter_mozilla_components.pigeons.TranslationEngineStateData
 import eu.weblibre.flutter_mozilla_components.pigeons.TranslationLanguage
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancelAndJoin
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
 import mozilla.components.browser.state.action.BrowserAction
 import mozilla.components.browser.state.action.ContentAction
 import mozilla.components.browser.state.selector.selectedTab
@@ -75,18 +80,77 @@ import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifAnyChanged
  * store is forgotten, so one that comes back is reported afresh.
  */
 internal fun Flow<BrowserState>.changedTabsBy(
+    windowMillis: Long = 0L,
     selector: (TabSessionState) -> List<Any?>,
-): Flow<TabSessionState> = flow {
-    var previous = emptyMap<String, List<Any?>>()
-    collect { state ->
-        val current = state.tabs.associate { tab -> tab.id to selector(tab) }
-        state.tabs.forEach { tab ->
-            if (previous[tab.id] != current[tab.id]) {
-                emit(tab)
+): Flow<TabSessionState> {
+    val states = this
+    val changed = flow {
+        var previous = emptyMap<String, List<Any?>>()
+        states.collect { state ->
+            val current = state.tabs.associate { tab -> tab.id to selector(tab) }
+            state.tabs.forEach { tab ->
+                if (previous[tab.id] != current[tab.id]) {
+                    emit(tab)
+                }
+            }
+            previous = current
+        }
+    }
+
+    return if (windowMillis > 0L) changed.conflatedByTab(windowMillis) else changed
+}
+
+/**
+ * Emits at most one state per tab per [windowMillis], keeping the newest state
+ * of every tab that changed inside the window.
+ *
+ * The rate limit the debounce used to give, without the drops it came with.
+ * Each event carries a tab's whole state rather than a change to it, so a value
+ * that was overtaken inside the window never needed sending; what may not
+ * happen is a tab going unmentioned, which is what conflating *per tab id*
+ * rules out. A page load reports its progress a percent at a time, and every
+ * one of those crosses the channel and is awaited on the Flutter side, so a
+ * session restore is a burst of hundreds of them without this.
+ *
+ * The first change after a quiet period goes straight out, so a single event
+ * is never delayed; only a burst is batched, and the burst's last word arrives
+ * within one window of it being said.
+ *
+ * Confined to the single thread it is collected on — [Dispatchers.Main] here —
+ * which is what lets the window and the collector share `held` plainly.
+ */
+internal fun Flow<TabSessionState>.conflatedByTab(
+    windowMillis: Long,
+): Flow<TabSessionState> = channelFlow {
+    val held = LinkedHashMap<String, TabSessionState>()
+    var window: Job? = null
+
+    collect { tab ->
+        if (window?.isActive == true) {
+            held[tab.id] = tab
+            return@collect
+        }
+
+        send(tab)
+        window = launch {
+            while (true) {
+                delay(windowMillis)
+                if (held.isEmpty()) {
+                    // A window nobody wrote in closes the burst, and the next
+                    // change is a leading edge again.
+                    return@launch
+                }
+
+                val due = held.values.toList()
+                held.clear()
+                due.forEach { send(it) }
             }
         }
-        previous = current
     }
+
+    // Upstream is finished, so a later window is not coming to carry these.
+    window?.cancelAndJoin()
+    held.values.forEach { send(it) }
 }
 
 class Events(
@@ -146,7 +210,7 @@ class Events(
         }
 
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.changedTabsBy { listOf(it.content.icon) }
+            flow.changedTabsBy(windowMillis = 15) { listOf(it.content.icon) }
                 .collect { tab ->
                     val iconBytes = tab.content.icon?.toWebPBytes()
                     flutterEvents.onIconChange(
@@ -158,7 +222,7 @@ class Events(
         }
 
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.changedTabsBy { listOf(it.content.securityInfo) }
+            flow.changedTabsBy(windowMillis = 15) { listOf(it.content.securityInfo) }
                 .collect { tab ->
                     flutterEvents.onSecurityInfoStateChange(
                         EventSequence.next(),
@@ -173,7 +237,7 @@ class Events(
         }
 
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.changedTabsBy {
+            flow.changedTabsBy(windowMillis = 25) {
                 listOf(
                     it.readerState.readerable,
                     it.readerState.active,
@@ -228,7 +292,7 @@ class Events(
         }
 
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.changedTabsBy {
+            flow.changedTabsBy(windowMillis = 15) {
                 listOf(
                     it.content.history,
                     it.content.canGoBack,
@@ -255,7 +319,7 @@ class Events(
         }
 
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.changedTabsBy {
+            flow.changedTabsBy(windowMillis = 15) {
                 listOf(
                     it.parentId,
                     it.contextId,
@@ -325,7 +389,7 @@ class Events(
 
         // Per-tab translation state
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.changedTabsBy {
+            flow.changedTabsBy(windowMillis = 25) {
                 listOf(
                     it.translationsState.isTranslated,
                     it.translationsState.isTranslateProcessing,

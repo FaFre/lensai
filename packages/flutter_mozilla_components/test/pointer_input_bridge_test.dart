@@ -289,6 +289,25 @@ void main() {
     expect(second.revision, greaterThan(first.revision));
   });
 
+  testWidgets('revisions keep climbing across a rebuilt bridge', (
+    tester,
+  ) async {
+    await pump(tester, _surface(1));
+    final before = hitTest(tester, const Offset(100, 100));
+
+    // Every registration gone and back again: the surface is unmounted under a
+    // full-screen route and mounted when it closes. The router hears the new
+    // bridge's reset on one channel and its answers on another, so an answer
+    // that started over would be dropped as stale against the one the router
+    // has already applied.
+    await pump(tester, const SizedBox());
+    expect(PointerInputBridge.instance, isNull);
+    await pump(tester, _surface(1));
+
+    final after = hitTest(tester, const Offset(100, 100));
+    expect(after.revision, greaterThan(before.revision));
+  });
+
   testWidgets('a stationary hover follows overlays without scheduling frames', (
     tester,
   ) async {
