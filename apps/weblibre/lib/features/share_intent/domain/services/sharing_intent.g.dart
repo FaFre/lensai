@@ -8,14 +8,14 @@ part of 'sharing_intent.dart';
 
 // GENERATED CODE - DO NOT MODIFY BY HAND
 // ignore_for_file: type=lint, type=warning
-/// Shared intent receiver instance. Both the sharing intent stream
-/// and the account callback handler listen to its broadcast events.
+/// Native intent receiver, consumed only by [intentBus]. Sharing and account
+/// callback handlers subscribe to [allIntents], not directly to this receiver.
 
 @ProviderFor(intentReceiver)
 final intentReceiverProvider = IntentReceiverProvider._();
 
-/// Shared intent receiver instance. Both the sharing intent stream
-/// and the account callback handler listen to its broadcast events.
+/// Native intent receiver, consumed only by [intentBus]. Sharing and account
+/// callback handlers subscribe to [allIntents], not directly to this receiver.
 
 final class IntentReceiverProvider
     extends
@@ -25,8 +25,8 @@ final class IntentReceiverProvider
           Raw<IntentReceiver>
         >
     with $Provider<Raw<IntentReceiver>> {
-  /// Shared intent receiver instance. Both the sharing intent stream
-  /// and the account callback handler listen to its broadcast events.
+  /// Native intent receiver, consumed only by [intentBus]. Sharing and account
+  /// callback handlers subscribe to [allIntents], not directly to this receiver.
   IntentReceiverProvider._()
     : super(
         from: null,
@@ -112,6 +112,11 @@ String _$intentBusHash() => r'e54020cc2c4d5706191b1218e99b2d16a5149aa8';
 /// and restart teardown nothing is, and those launches used to vanish without a
 /// trace. The native broker holds them instead, and they are replayed into this
 /// same stream, so a replayed launch meets exactly the handlers a live one does.
+///
+/// The broker is not the same thing as the plugin's own hold, and the two do not
+/// overlap. The broker takes launches `MainActivity` never passes on, because no
+/// profile is committed yet; the plugin holds the ones it *is* given while this
+/// isolate has not yet reached [intentReceiver]. Both end up here.
 
 @ProviderFor(allIntents)
 final allIntentsProvider = AllIntentsProvider._();
@@ -124,6 +129,11 @@ final allIntentsProvider = AllIntentsProvider._();
 /// and restart teardown nothing is, and those launches used to vanish without a
 /// trace. The native broker holds them instead, and they are replayed into this
 /// same stream, so a replayed launch meets exactly the handlers a live one does.
+///
+/// The broker is not the same thing as the plugin's own hold, and the two do not
+/// overlap. The broker takes launches `MainActivity` never passes on, because no
+/// profile is committed yet; the plugin holds the ones it *is* given while this
+/// isolate has not yet reached [intentReceiver]. Both end up here.
 
 final class AllIntentsProvider
     extends
@@ -141,6 +151,11 @@ final class AllIntentsProvider
   /// and restart teardown nothing is, and those launches used to vanish without a
   /// trace. The native broker holds them instead, and they are replayed into this
   /// same stream, so a replayed launch meets exactly the handlers a live one does.
+  ///
+  /// The broker is not the same thing as the plugin's own hold, and the two do not
+  /// overlap. The broker takes launches `MainActivity` never passes on, because no
+  /// profile is committed yet; the plugin holds the ones it *is* given while this
+  /// isolate has not yet reached [intentReceiver]. Both end up here.
   AllIntentsProvider._()
     : super(
         from: null,

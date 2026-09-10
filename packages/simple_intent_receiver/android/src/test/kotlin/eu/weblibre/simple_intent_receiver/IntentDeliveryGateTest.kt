@@ -22,6 +22,7 @@ package eu.weblibre.simple_intent_receiver
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 import eu.weblibre.simple_intent_receiver.pigeons.Intent as PigeonIntent
 
@@ -34,6 +35,15 @@ import eu.weblibre.simple_intent_receiver.pigeons.Intent as PigeonIntent
  * makes when they arrive, and that decision lives here.
  */
 class IntentDeliveryGateTest {
+    @Test
+    fun nonPositiveCapacityIsRejectedAtConstruction() {
+        for (capacity in listOf(0, -1, Int.MIN_VALUE)) {
+            assertFailsWith<IllegalArgumentException> {
+                IntentDeliveryGate(maxPending = capacity)
+            }
+        }
+    }
+
     private fun link(url: String) = PigeonIntent(
         fromPackageName = null,
         action = "android.intent.action.VIEW",
@@ -184,13 +194,42 @@ class IntentDeliveryGateTest {
      */
     @Test
     fun aLaunchHeldAcrossAnIsolateSurvivesToTheNextOne() {
-        val gate = IntentDeliveryGate()
+        val pending = ArrayDeque<PigeonIntent>()
+        val gate = IntentDeliveryGate(pending = pending)
         gate.offer(link("https://example.com/a"))
         gate.release()
 
-        // The replacement declares itself ready the same way the first would
-        // have, and collects what the first never did.
-        assertEquals(listOf("https://example.com/a"), gate.drain().map { it.data })
-        assertTrue(gate.isReady)
+        val replacement = IntentDeliveryGate(pending = pending)
+        assertFalse(replacement.isReady)
+        replacement.offer(link("https://example.com/b"))
+        assertEquals(
+            listOf("https://example.com/a", "https://example.com/b"),
+            replacement.drain().map { it.data },
+        )
+        assertTrue(replacement.isReady)
+    }
+
+    @Test
+    fun replacementDoesNotInheritReadinessEvenBeforeOldGateIsReleased() {
+        val pending = ArrayDeque<PigeonIntent>()
+        val old = IntentDeliveryGate(pending = pending)
+        old.drain()
+
+        val replacement = IntentDeliveryGate(pending = pending)
+        assertFalse(replacement.offer(link("https://example.com/a")))
+        assertEquals(1, replacement.drain().size)
+
+        old.release()
+        assertTrue(replacement.isReady)
+    }
+
+    @Test
+    fun capacityOneKeepsOnlyTheLatestIncludingRepeatedUrls() {
+        val gate = IntentDeliveryGate(maxPending = 1)
+        gate.offer(link("https://example.com/old"))
+        gate.offer(link("https://example.com/latest"))
+        gate.offer(link("https://example.com/latest"))
+
+        assertEquals(listOf("https://example.com/latest"), gate.drain().map { it.data })
     }
 }

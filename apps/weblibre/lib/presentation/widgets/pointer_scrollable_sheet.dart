@@ -19,6 +19,7 @@
  */
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter/semantics.dart' show SemanticsAction;
 import 'package:flutter/widgets.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 
@@ -80,6 +81,8 @@ class PointerScrollableSheet extends HookWidget {
         return DraggableSheetPointerScroll(
           sheetController: sheetController,
           contentController: scrollController,
+          minChildSize: minChildSize,
+          maxChildSize: maxChildSize,
           child: builder(context, scrollController),
         );
       },
@@ -108,21 +111,26 @@ class PointerScrollableSheet extends HookWidget {
 /// this only ever acts on a notch nothing under the cursor wanted: signals are
 /// dispatched innermost-first and the resolver keeps the *first* registrant, and
 /// a scrollable registers only when the notch would actually scroll it. That is
-/// what keeps a list and the sheet from both travelling on one notch — nested
+/// what keeps a list and the sheet from consuming the same delta twice, nested
 /// scrollables this widget knows nothing about included.
 ///
 /// [contentController] is the sheet's own scrollable, i.e. the controller handed
-/// to [DraggableScrollableSheet.builder]. A notch the sheet cannot use, because
-/// it is already at that end of its range, is passed on to it rather than
-/// dropped — which is what lets the wheel scroll the list from over a pinned
-/// header.
-class DraggableSheetPointerScroll extends StatelessWidget {
+/// to [DraggableScrollableSheet.builder]. Any delta left after the sheet reaches
+/// the end of its range is passed on to it rather than dropped, letting the
+/// wheel scroll the list from over a pinned header. [minChildSize] and
+/// [maxChildSize] must match the sheet's bounds so a clamped, no-op resize does
+/// not cancel an ongoing content scroll.
+class DraggableSheetPointerScroll extends HookWidget {
   final DraggableScrollableController sheetController;
   final ScrollController? contentController;
+  final double minChildSize;
+  final double maxChildSize;
   final Widget child;
 
   const DraggableSheetPointerScroll({
     required this.sheetController,
+    required this.minChildSize,
+    required this.maxChildSize,
     required this.child,
     this.contentController,
     super.key,
@@ -154,69 +162,134 @@ class DraggableSheetPointerScroll extends StatelessWidget {
   /// does: a notch downwards grows the sheet, upwards shrinks it (and, at the
   /// minimum extent, dismisses it — the sheet's own notification carries that).
   ///
-  /// Returns false when the sheet is already at that end of its range, which is
-  /// read back from the controller rather than compared against the sheet's min
-  /// and max: [DraggableScrollableController.jumpTo] clamps to them internally
-  /// and they are not exposed.
-  bool _resizeSheet(double delta) {
+  /// Returns the pixels consumed by resizing, leaving the rest for the content.
+  double _resizeSheet(double delta) {
     final sizeBefore = sheetController.size;
+    final pixelsBefore = sheetController.pixels;
     final target = clampDouble(
-      sheetController.pixelsToSize(sheetController.pixels + delta),
-      0.0,
-      1.0,
+      sheetController.pixelsToSize(pixelsBefore + delta),
+      minChildSize,
+      maxChildSize,
     );
 
-    if (target == sizeBefore) {
-      return false;
+    // jumpTo cancels scrolling even when its internally clamped size is unchanged.
+    if ((target - sizeBefore).abs() <= precisionErrorTolerance) {
+      return 0.0;
     }
 
     sheetController.jumpTo(target);
 
-    return sheetController.size != sizeBefore;
+    return sheetController.pixels - pixelsBefore;
   }
 
-  void _handlePointerSignal(PointerSignalEvent event) {
+  void _handlePointerSignal(
+    PointerSignalEvent event,
+    ScrollContext scrollContext,
+  ) {
     if (event is! PointerScrollEvent ||
         event.scrollDelta.dy == 0.0 ||
-        !sheetController.isAttached) {
+        (!sheetController.isAttached && contentController == null)) {
       return;
     }
 
     GestureBinding.instance.pointerSignalResolver.register(
       event,
-      _applyPointerScroll,
+      (event) => _applyPointerScroll(event, scrollContext),
     );
   }
 
-  void _applyPointerScroll(PointerSignalEvent event) {
-    if (event is! PointerScrollEvent || !sheetController.isAttached) {
+  void _applyPointerScroll(
+    PointerSignalEvent event,
+    ScrollContext scrollContext,
+  ) {
+    if (event is! PointerScrollEvent) {
       return;
     }
 
-    final position = _contentPosition;
-    if (contentController != null && position == null) {
+    final contentController = this.contentController;
+    if ((contentController?.positions.length ?? 0) > 1) {
       // Ambiguous, mid-transition. Resizing is off the table too:
       // [DraggableScrollableController.jumpTo] reads the same `position` and
       // would throw, so the notch is dropped until the transition settles.
       return;
     }
 
-    final delta = event.scrollDelta.dy;
-
-    if (_resizeSheet(delta)) {
-      return;
+    final position = _contentPosition;
+    ScrollPosition? temporaryPosition;
+    if (contentController != null && !contentController.hasClients) {
+      // Native popup content does not attach a scrollable. Flutter still needs
+      // exactly one position for jumpTo, of the subtype made by this controller.
+      // Attach only for this signal so a later real scrollable stays unambiguous.
+      temporaryPosition = contentController.createScrollPosition(
+        const NeverScrollableScrollPhysics(),
+        scrollContext,
+        null,
+      );
+      contentController.attach(temporaryPosition);
     }
-
-    // The sheet has nowhere left to go, so hand the notch to its list rather
-    // than dropping it. Only reached from chrome: a list under the cursor would
-    // have claimed the notch itself.
-    if (position != null && _contentAbsorbs(position, delta)) {
-      position.pointerScroll(delta);
+    try {
+      if (!sheetController.isAttached) {
+        return;
+      }
+      final remaining =
+          event.scrollDelta.dy - _resizeSheet(event.scrollDelta.dy);
+      // An inner scrollable that wanted the notch already won the resolver.
+      if (remaining.abs() > precisionErrorTolerance &&
+          position != null &&
+          position.hasContentDimensions &&
+          _contentAbsorbs(position, remaining)) {
+        position.pointerScroll(remaining);
+      }
+    } finally {
+      if (temporaryPosition != null) {
+        contentController!.detach(temporaryPosition);
+        temporaryPosition.dispose();
+      }
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return Listener(onPointerSignal: _handlePointerSignal, child: child);
+    final scrollContext = _SheetWheelScrollContext(
+      context,
+      useSingleTickerProvider(),
+    );
+    return Listener(
+      behavior: HitTestBehavior.opaque,
+      onPointerSignal: (event) => _handlePointerSignal(event, scrollContext),
+      child: child,
+    );
   }
+}
+
+/// Context for a temporary, idle position with no Flutter scrolling viewport.
+class _SheetWheelScrollContext implements ScrollContext {
+  _SheetWheelScrollContext(this.notificationContext, this.vsync);
+
+  @override
+  final BuildContext notificationContext;
+
+  @override
+  BuildContext get storageContext => notificationContext;
+
+  @override
+  final TickerProvider vsync;
+
+  @override
+  AxisDirection get axisDirection => AxisDirection.down;
+
+  @override
+  double get devicePixelRatio => View.of(notificationContext).devicePixelRatio;
+
+  @override
+  void setIgnorePointer(bool value) {}
+
+  @override
+  void setCanDrag(bool value) {}
+
+  @override
+  void setSemanticsActions(Set<SemanticsAction> actions) {}
+
+  @override
+  void saveOffset(double offset) {}
 }

@@ -15,6 +15,8 @@ import eu.weblibre.flutter_mozilla_components.pigeons.GeckoBrowserApi
 import eu.weblibre.flutter_mozilla_components.pigeons.GeckoEngineSettingsApi
 import eu.weblibre.flutter_mozilla_components.pigeons.GeckoProfileApi
 import eu.weblibre.flutter_mozilla_components.pigeons.GeckoPushApi
+import eu.weblibre.flutter_mozilla_components.pigeons.PointerInputHostApi
+import eu.weblibre.flutter_mozilla_components.pointer.PointerInputRouter
 import eu.weblibre.flutter_mozilla_components.startup.DartStartupProgress
 
 import io.flutter.embedding.engine.FlutterEngine
@@ -26,6 +28,7 @@ import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding
 /** FlutterMozillaComponentsPlugin */
 class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
   private val browserApi = GeckoBrowserApiImpl()
+  private var pointerRouter: PointerInputRouter? = null
 
   /**
    * Held so the leases this engine took — profile access, and whatever the
@@ -61,6 +64,7 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
     // with "profile is in use".
     val lifecycle = object : FlutterEngine.EngineLifecycleListener {
       override fun onPreEngineRestart() {
+        pointerRouter?.reset()
         profileApi?.onEngineRestarting()
         // A new isolate starts its own cold start, exactly as it does on a fresh
         // engine; carrying the old one's progress into it would report a stage
@@ -93,7 +97,10 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
     }
     engineLifecycle = lifecycle
 
-    browserApi.attachBinding(flutterPluginBinding)
+    val router = PointerInputRouter(flutterPluginBinding.binaryMessenger)
+    pointerRouter = router
+    PointerInputHostApi.setUp(flutterPluginBinding.binaryMessenger, router)
+    browserApi.attachBinding(flutterPluginBinding, router)
     GeckoBrowserApi.setUp(flutterPluginBinding.binaryMessenger, browserApi)
     SandboxCaptureFeature.wireFlutterEvents(flutterPluginBinding.binaryMessenger)
 
@@ -113,6 +120,9 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
   }
 
   override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
+    PointerInputHostApi.setUp(binding.binaryMessenger, null)
+    pointerRouter?.dispose()
+    pointerRouter = null
     GeckoProfileApi.setUp(binding.binaryMessenger, null)
     // Before anything else: the profile-access lease and the arbiter's selection
     // and maintenance leases are all process-global and keyed on the isolate, so
@@ -128,6 +138,7 @@ class FlutterMozillaComponentsPlugin: FlutterPlugin, ActivityAware {
     GeckoPushApi.setUp(binding.binaryMessenger, null)
     browserApi.disposePushApi()
     browserApi.disposeContainerProxyApi()
+    browserApi.disposeEngineViewVisibility()
     GlobalComponents.historyEvents = null
     // The availability event is optimisation-only; once Flutter detaches, the surface
     // re-queries pending prompts on its next attach/resume, so dropping the sink is safe.

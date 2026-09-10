@@ -15,11 +15,13 @@ import eu.weblibre.flutter_mozilla_components.AddonSettingsViewFactory
 import eu.weblibre.flutter_mozilla_components.BrowserFragment
 import eu.weblibre.flutter_mozilla_components.GeckoViewFactory
 import eu.weblibre.flutter_mozilla_components.EngineProvider
+import eu.weblibre.flutter_mozilla_components.EngineViewVisibility
 import eu.weblibre.flutter_mozilla_components.GlobalComponents
 import eu.weblibre.flutter_mozilla_components.ProfileContext
 import eu.weblibre.flutter_mozilla_components.activities.ExternalAppBrowserActivity
 import eu.weblibre.flutter_mozilla_components.activities.NotificationActivity
 import eu.weblibre.flutter_mozilla_components.feature.DefaultSelectionActionDelegate
+import eu.weblibre.flutter_mozilla_components.pointer.PointerInputRouter
 import eu.weblibre.flutter_mozilla_components.pigeons.AddonCollection
 import eu.weblibre.flutter_mozilla_components.pigeons.BrowserExtensionEvents
 import eu.weblibre.flutter_mozilla_components.pigeons.ContentBlocking
@@ -143,11 +145,12 @@ class GeckoBrowserApiImpl : GeckoBrowserApi {
     private var isPlatformViewRegistered = false
     private var pushApi: GeckoPushApiImpl? = null
     private var containerProxyApi: GeckoContainerProxyApiImpl? = null
+    private var engineViewVisibility: EngineViewVisibility? = null
 
     private lateinit var _flutterPluginBinding: FlutterPlugin.FlutterPluginBinding
     private lateinit var _flutterEvents: GeckoStateEvents
 
-    fun attachBinding(flutterPluginBinding: FlutterPluginBinding) {
+    fun attachBinding(flutterPluginBinding: FlutterPluginBinding, pointerRouter: PointerInputRouter) {
         _flutterPluginBinding = flutterPluginBinding
         _flutterEvents = GeckoStateEvents(_flutterPluginBinding.binaryMessenger)
 
@@ -158,20 +161,35 @@ class GeckoBrowserApiImpl : GeckoBrowserApi {
             "eu.weblibre/gecko", GeckoViewFactory(
                 activityProvider = { this.activity },
                 FRAGMENT_CONTAINER_ID,
-                _flutterEvents
+                _flutterEvents,
+                pointerRouter,
             )
         )
         _flutterPluginBinding.platformViewRegistry.registerViewFactory(
             "eu.weblibre/addon_settings",
-            AddonSettingsViewFactory(activityProvider = { this.activity }),
+            AddonSettingsViewFactory(activityProvider = { this.activity }, pointerRouter),
         )
         _flutterPluginBinding.platformViewRegistry.registerViewFactory(
             "eu.weblibre/addon_popup",
-            AddonPopupViewFactory(activityProvider = { this.activity }),
+            AddonPopupViewFactory(activityProvider = { this.activity }, pointerRouter),
         )
         isPlatformViewRegistered = true
 
+        // Shares the container id with the factory above: what it hides is the
+        // very view the browser fragment is attached to.
+        engineViewVisibility?.dispose()
+        engineViewVisibility = EngineViewVisibility(
+            flutterPluginBinding.binaryMessenger,
+            activityProvider = { this.activity },
+            FRAGMENT_CONTAINER_ID,
+        )
+
         isGeckoInitialized = false
+    }
+
+    fun disposeEngineViewVisibility() {
+        engineViewVisibility?.dispose()
+        engineViewVisibility = null
     }
 
     fun attachActivity(activity: Activity) {

@@ -66,6 +66,10 @@ android {
 
     testOptions {
         unitTests.all {
+            // Robolectric instrumentation requires a supported host JDK.
+            javaLauncher = javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(17)
+            }
             useJUnitPlatform()
 
             testLogging {
@@ -161,6 +165,9 @@ dependencies {
     implementation 'androidx.startup:startup-runtime:1.2.0'
 
     testImplementation("org.jetbrains.kotlin:kotlin-test")
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.robolectric:robolectric:4.16.1")
+    testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.10.1")
     testImplementation("org.mockito:mockito-core:5.23.0")
     // android.jar's org.json is a stub that throws; unit tests that exercise
     // JSON-shaped APIs need the real implementation on the test classpath.

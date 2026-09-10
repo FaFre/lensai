@@ -34,12 +34,19 @@ const val MAX_PENDING_INTENTS = 16
  * silently. This is the one place that knows whether that has happened yet.
  *
  * Split out of [SimpleIntentReceiverPlugin] and free of `android.*` on purpose:
- * the ordering, the readiness flip and the bound are exactly the parts that have
- * to be right across an activity lifecycle no host-side test can reproduce, and
- * here they are provable without one.
+ * the ordering, readiness and bound can be tested without an Android runtime.
+ * [pending] may outlive a gate to carry the backlog across engine replacement;
+ * readiness always belongs to this gate's isolate. A shared queue requires a
+ * single engine consumer and platform-thread access, as in WebLibre's coordinator.
  */
-class IntentDeliveryGate(private val maxPending: Int = MAX_PENDING_INTENTS) {
-    private val pending = ArrayDeque<PigeonIntent>()
+class IntentDeliveryGate(
+    private val maxPending: Int = MAX_PENDING_INTENTS,
+    private val pending: ArrayDeque<PigeonIntent> = ArrayDeque(),
+) {
+    init {
+        require(maxPending > 0) { "maxPending must be positive" }
+    }
+
     private var ready = false
 
     /** Whether Dart has declared itself able to receive live events. */

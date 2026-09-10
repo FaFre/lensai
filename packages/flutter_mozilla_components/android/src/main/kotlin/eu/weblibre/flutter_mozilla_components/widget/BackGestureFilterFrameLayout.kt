@@ -10,8 +10,8 @@ import android.app.Activity
 import android.content.Context
 // import android.util.Log
 import android.view.MotionEvent
-import android.widget.FrameLayout
 import androidx.core.view.WindowInsetsCompat
+import eu.weblibre.flutter_mozilla_components.pointer.PointerInputRouter
 import eu.weblibre.flutter_mozilla_components.GlobalComponents
 import eu.weblibre.flutter_mozilla_components.ext.EventSequence
 import eu.weblibre.flutter_mozilla_components.feature.GestureRecognizer
@@ -47,7 +47,9 @@ import kotlin.math.abs
 class BackGestureFilterFrameLayout(
     context: Context,
     private val activity: Activity,
-) : FrameLayout(context) {
+    platformViewId: Int,
+    pointerRouter: PointerInputRouter,
+) : PointerInputFrameLayout(context, platformViewId, pointerRouter) {
     private var downX = 0f
     private var downY = 0f
     private var startedInEdgeZone = false

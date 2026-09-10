@@ -13,6 +13,8 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import androidx.fragment.app.FragmentActivity
 import eu.weblibre.flutter_mozilla_components.addons.FlutterAddonSettingsFragment
+import eu.weblibre.flutter_mozilla_components.pointer.PointerInputRouter
+import eu.weblibre.flutter_mozilla_components.widget.PointerInputFrameLayout
 import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
 import io.flutter.plugin.platform.PlatformViewFactory
@@ -21,6 +23,7 @@ private const val OPTIONS_PAGE_URL_KEY = "optionsPageUrl"
 
 class AddonSettingsViewFactory(
     private val activityProvider: () -> Activity?,
+    private val pointerRouter: PointerInputRouter,
 ) : PlatformViewFactory(StandardMessageCodec.INSTANCE) {
     override fun create(context: Context?, id: Int, args: Any?): PlatformView {
         val activity = activityProvider()
@@ -28,19 +31,22 @@ class AddonSettingsViewFactory(
         val optionsPageUrl = (args as? Map<*, *>)?.get(OPTIONS_PAGE_URL_KEY) as? String
             ?: throw IllegalArgumentException("Missing optionsPageUrl creation param")
 
-        return NativeAddonSettingsView(activity, optionsPageUrl)
+        return NativeAddonSettingsView(activity, optionsPageUrl, id, pointerRouter)
     }
 }
 
 private class NativeAddonSettingsView(
     activity: Activity,
     private val optionsPageUrl: String,
+    platformViewId: Int,
+    pointerRouter: PointerInputRouter,
 ) : PlatformView {
     private val fragmentActivity = activity as? FragmentActivity
         ?: throw IllegalStateException("Addon settings view requires a FragmentActivity host")
     private val containerId = View.generateViewId()
     private val fragmentTag = "addon_settings_$containerId"
-    private val container: FrameLayout = FrameLayout(activity).apply {
+    private var disposed = false
+    private val container = PointerInputFrameLayout(activity, platformViewId, pointerRouter).apply {
         id = containerId
         layoutParams = FrameLayout.LayoutParams(
             ViewGroup.LayoutParams.MATCH_PARENT,
@@ -58,6 +64,7 @@ private class NativeAddonSettingsView(
 
     override fun onFlutterViewAttached(flutterView: View) {
         super.onFlutterViewAttached(flutterView)
+        container.attachPointerInput(flutterView)
 
         if (container.isAttachedToWindow) {
             container.post { attachFragment() }
@@ -67,9 +74,16 @@ private class NativeAddonSettingsView(
         }
     }
 
+    override fun onFlutterViewDetached() {
+        container.detachPointerInput()
+    }
+
     override fun getView(): View = container
 
     override fun dispose() {
+        disposed = true
+        container.removeOnAttachStateChangeListener(attachStateListener)
+        container.detachPointerInput()
         val fm = fragmentActivity.supportFragmentManager
         if (!fragmentActivity.isFinishing && !fragmentActivity.isDestroyed && !fm.isStateSaved) {
             fm.findFragmentByTag(fragmentTag)?.let { fragment ->
@@ -79,7 +93,7 @@ private class NativeAddonSettingsView(
     }
 
     private fun attachFragment() {
-        if (fragmentActivity.isFinishing || fragmentActivity.isDestroyed) {
+        if (disposed || fragmentActivity.isFinishing || fragmentActivity.isDestroyed) {
             return
         }
 

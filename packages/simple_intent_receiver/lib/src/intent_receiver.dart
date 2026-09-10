@@ -24,9 +24,9 @@ import 'package:simple_intent_receiver/src/pigeons/intent.g.dart';
 
 /// The Dart end of the intent channel, and the single consumer of it.
 ///
-/// Every launch — the backlog the host held while this side did not exist, and
-/// every live one after — leaves through [events], in the order the host saw
-/// them. Two things have to be true for that, and neither is free:
+/// The bounded startup backlog and subsequent live launches leave through
+/// [events] in host order, provided the startup drain answers before its timeout.
+/// Two things have to be true for that:
 ///
 /// * **Nothing may be handed over before the backlog is.** The backlog arrives
 ///   as the reply to one call and live launches as calls on another channel, so
@@ -37,9 +37,10 @@ import 'package:simple_intent_receiver/src/pigeons/intent.g.dart';
 ///   the same disappearance this class was written to stop.
 ///
 /// So [events] is single-consumer by contract: the first listener receives the
-/// backlog, and a second one attaching later gets only what arrives from then
-/// on. In this app that listener is `IntentBus`, which buffers again on its own
-/// terms.
+/// newest 16 pending launches, and a replacement gets only what arrives from
+/// then on. Once the first listener has attached, launches received with no
+/// listener are dropped rather than replayed. In this app that listener is
+/// `IntentBus`, which buffers again on its own terms.
 class IntentReceiver extends IntentEvents {
   IntentReceiver.setUp({
     BinaryMessenger? binaryMessenger,
@@ -61,21 +62,21 @@ class IntentReceiver extends IntentEvents {
     // Strictly after [IntentEvents.setUp] above: this call is what tells the
     // host it may start delivering live, and the handler it will deliver to has
     // to be registered before that is true.
-    final pending = host.takePendingIntents();
+    final pending = host.takePendingIntents().timeout(_hostTimeout);
     pendingIntents = pending;
 
     unawaited(
       pending.then(
         _openWith,
         onError: (Object error, StackTrace stackTrace) {
+          if (_disposed) return;
+
           // Open anyway. There is no backlog to merge, but a queue that stayed
           // shut would hold every live launch from here on waiting for one that
           // is never coming.
+          // Retain the diagnostic too: startup usually has no listener yet.
+          _pendingError = (error, stackTrace);
           _openWith(const []);
-
-          if (!_controller.isClosed) {
-            _controller.addError(error, stackTrace);
-          }
         },
       ),
     );
@@ -84,19 +85,34 @@ class IntentReceiver extends IntentEvents {
   final BinaryMessenger? _binaryMessenger;
   final String _messageChannelSuffix;
   IntentHost? _host;
+  static const _hostTimeout = Duration(seconds: 5);
+  static const _maxPending = 16;
 
   late final StreamController<Intent> _controller =
-      StreamController<Intent>.broadcast(onListen: _flush);
+      StreamController<Intent>.broadcast(
+        onListen: () {
+          _hasListened = true;
+          _flush();
+        },
+        onCancel: () {
+          _queue.clear();
+          _discardBacklog = true;
+        },
+      );
 
   /// Received, not yet handed to a listener, oldest first.
   final _queue = <Intent>[];
 
   /// Whether the host's backlog has been merged into [_queue].
   var _opened = false;
+  var _hasListened = false;
+  var _discardBacklog = false;
+  var _disposed = false;
+  (Object, StackTrace)? _pendingError;
 
   int? _lastAdded;
 
-  /// Every launch this side is responsible for, in the order the host saw them.
+  /// Startup launches followed by live events for the current consumer.
   Stream<Intent> get events => _controller.stream;
 
   /// The launches the host held until this side could take them, oldest first.
@@ -111,6 +127,8 @@ class IntentReceiver extends IntentEvents {
   /// process start and [IntentReceiver.setUp], not merely the one the activity
   /// was created for. These reach [events] on their own; read this future only
   /// when they need one-shot handling outside the stream.
+  /// Fails after five seconds if the host does not answer; live events are then
+  /// released without the backlog, and a late host reply is ignored.
   Future<List<Intent>> pendingIntents = Future.value(const []);
 
   @override
@@ -129,31 +147,47 @@ class IntentReceiver extends IntentEvents {
   /// before it let this side have anything live, so it is older by
   /// construction, whichever of the two channels happened to arrive first.
   void _openWith(List<Intent> backlog) {
-    if (_opened) {
+    if (_opened || _disposed) {
       return;
     }
 
-    _queue.insertAll(0, backlog);
+    if (!_discardBacklog) {
+      _queue.insertAll(0, backlog);
+      _trimQueue();
+    }
     _opened = true;
     _flush();
   }
 
   void _emit(Intent intent) {
-    if (_controller.isClosed) {
+    if (_disposed || (_hasListened && !_controller.hasListener)) {
       return;
     }
 
     _queue.add(intent);
+    _trimQueue();
     _flush();
+  }
+
+  void _trimQueue() {
+    if (_queue.length > _maxPending) {
+      _queue.removeRange(0, _queue.length - _maxPending);
+    }
   }
 
   /// Hands over as much of the queue as there is somewhere to hand it to.
   ///
   /// Also the controller's `onListen`, which is what makes a late first
-  /// listener still receive everything from the beginning.
+  /// listener still receive the bounded startup backlog.
   void _flush() {
-    if (!_opened || !_controller.hasListener) {
+    if (_disposed || !_opened || !_controller.hasListener) {
       return;
+    }
+
+    final error = _pendingError;
+    if (error != null) {
+      _pendingError = null;
+      _controller.addError(error.$1, error.$2);
     }
 
     while (_queue.isNotEmpty && !_controller.isClosed) {
@@ -163,20 +197,19 @@ class IntentReceiver extends IntentEvents {
 
   /// Gives the channel back.
   ///
-  /// The host is told first and the handler unregistered second, so there is no
-  /// moment where it believes someone is listening and nobody is: it goes back
-  /// to holding launches, and whatever it is already holding it keeps for
-  /// whoever comes next.
+  /// Requests that the host resume buffering, then unregisters locally without
+  /// waiting for its reply. In-flight live events are not acknowledged here;
+  /// local teardown must still complete when the engine cannot answer.
   Future<void> dispose() async {
+    if (_disposed) return;
+    _disposed = true;
     final host = _host;
     _host = null;
 
-    if (host != null) {
-      // Teardown runs while the engine is being dismantled, so this channel can
-      // already be gone. Failing here would only replace a tidy hand-back with
-      // an unhandled error on the way out.
-      await host.releaseDelivery().catchError((Object _) {});
-    }
+    final released = host
+        ?.releaseDelivery()
+        .timeout(_hostTimeout)
+        .catchError((Object _) {});
 
     IntentEvents.setUp(
       null,
@@ -185,6 +218,10 @@ class IntentReceiver extends IntentEvents {
     );
 
     _queue.clear();
-    await _controller.close();
+    _pendingError = null;
+    await Future.wait<void>([
+      _controller.close(),
+      if (released != null) released,
+    ]);
   }
 }

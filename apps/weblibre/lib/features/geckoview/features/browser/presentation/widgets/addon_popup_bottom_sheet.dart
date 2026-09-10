@@ -22,8 +22,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:weblibre/presentation/widgets/pointer_scrollable_sheet.dart';
 import 'package:weblibre/presentation/widgets/sheet_drag_handle.dart';
 
@@ -85,15 +85,12 @@ class _AddonPopupPlatformView extends StatelessWidget {
   Widget build(BuildContext context) {
     return PlatformViewLink(
       viewType: _viewType,
-      surfaceFactory: (context, controller) {
-        return AndroidViewSurface(
-          controller: controller as AndroidViewController,
-          gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{
-            Factory<EagerGestureRecognizer>(EagerGestureRecognizer.new),
-          },
-          hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-        );
-      },
+      surfaceFactory: (context, controller) => PointerInputSurface(
+        controller: controller,
+        gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{
+          Factory<EagerGestureRecognizer>(EagerGestureRecognizer.new),
+        },
+      ),
       onCreatePlatformView: (params) {
         final controller = PlatformViewsService.initExpensiveAndroidView(
           id: params.id,

@@ -12,6 +12,7 @@
 build/
 CLAUDE.md
 AGENTS.md
+opencode.json
 plans/
 .env
 .temp/

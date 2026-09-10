@@ -30,23 +30,31 @@ import eu.weblibre.flutter_mozilla_components.startup.StartupIntentBroker
 import eu.weblibre.flutter_mozilla_components.startup.StartupPaths
 import eu.weblibre.simple_intent_receiver.IntentApprovals
 import eu.weblibre.simple_intent_receiver.IntentCallerResolver
+import eu.weblibre.simple_intent_receiver.IntentReceiverHost
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.embedding.engine.FlutterEngineCache
 import io.flutter.plugin.common.MethodChannel
+import java.util.UUID
 
-class MainActivity : FlutterFragmentActivity() {
+class MainActivity : FlutterFragmentActivity(), IntentReceiverHost {
     companion object {
         private const val TAG = "MainActivity"
 
         /** Marks the intent [checkAndExitPiP] sends to itself. */
         private const val EXTRA_EXIT_PIP = "eu.weblibre.gecko.EXIT_PIP"
+
+        private const val STATE_INTENT_PROCESS = "eu.weblibre.gecko.INTENT_PROCESS"
+        private val intentProcessId = UUID.randomUUID().toString()
     }
 
     private val TRIM_MEMORY_CHANNEL = "eu.weblibre.flutter_mozilla_components/trim_memory"
     private val ACTIVITY_CHANNEL = "eu.weblibre.gecko/activity"
     private val ENGINE_ID = FlutterEngineCoordinator.ENGINE_ID
     private var trimMemoryChannel: MethodChannel? = null
+
+    override var isRestoredLaunch: Boolean = false
+        private set
 
     private fun engineTag(engine: FlutterEngine?): String {
         return engine?.let { "0x${System.identityHashCode(it).toString(16)}" } ?: "null"
@@ -56,10 +64,20 @@ class MainActivity : FlutterFragmentActivity() {
         Log.d(TAG, "onCreate: savedInstanceState=${savedInstanceState != null}, " +
             "cachedEngine=${engineTag(FlutterEngineCache.getInstance().get(ENGINE_ID))}")
 
+        // Flutter attaches plugins inside super.onCreate. Suppress only a launch
+        // already seen in this process, including when its engine was replaced:
+        // the plugin's undelivered backlog survives that replacement. After
+        // process death there is no backlog, so Android's launch must be taken.
+        isRestoredLaunch = savedInstanceState?.getString(STATE_INTENT_PROCESS) == intentProcessId
         super.onCreate(null)
 
         // Restored straight into a pinned task (e.g. the process was killed while in PiP).
         checkAndExitPiP()
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putString(STATE_INTENT_PROCESS, intentProcessId)
     }
 
     override fun onNewIntent(intent: Intent) {

@@ -370,9 +370,9 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
             )
 
             // Apply pull-to-refresh setting
-            binding.swipeToRefresh.isEnabled = GlobalComponents.pullToRefreshEnabled
-            GlobalComponents.onPullToRefreshEnabledChanged = { enabled ->
-                _binding?.swipeToRefresh?.isEnabled = enabled
+            updatePullToRefreshEnabled()
+            GlobalComponents.onPullToRefreshEnabledChanged = {
+                updatePullToRefreshEnabled()
             }
             GlobalComponents.onSecureWindowSettingsChanged = {
                 updateSecureWindowState()
@@ -704,6 +704,36 @@ abstract class BaseBrowserFragment : Fragment(), UserInteractionHandler, Activit
         } else {
             activity?.exitImmersiveMode()
         }
+
+        updatePullToRefreshEnabled(enabled)
+    }
+
+    /**
+     * Whether a pull-down on the content should reload, mirroring Fenix's
+     * `shouldPullToRefreshBeEnabled`: the user setting has to be on, and the
+     * tab must not be in fullscreen.
+     *
+     * Fullscreen content (a video player, a canvas game) reports itself as
+     * scrolled to the top, so without this guard every downward drag over it
+     * arms the throbber and reloads the page on release.
+     */
+    private fun shouldPullToRefreshBeEnabled(inFullScreen: Boolean): Boolean =
+        GlobalComponents.pullToRefreshEnabled && !inFullScreen
+
+    /**
+     * Re-applies [shouldPullToRefreshBeEnabled] to the layout. Called from both
+     * inputs that can change the answer: the setting, and fullscreen entry/exit.
+     *
+     * [inFullScreen] defaults to the tab's own state, so a view recreated while
+     * a tab is already fullscreen does not come back with pull-to-refresh on.
+     * Read from the store rather than from [fullScreenFeature], because the
+     * initial call runs before that feature is bound.
+     */
+    private fun updatePullToRefreshEnabled(
+        inFullScreen: Boolean = components.core.store.state
+            .findTabOrCustomTabOrSelectedTab(sessionId)?.content?.fullScreen == true,
+    ) {
+        _binding?.swipeToRefresh?.isEnabled = shouldPullToRefreshBeEnabled(inFullScreen)
     }
 
     private fun viewportFitChanged(viewportFit: Int) {

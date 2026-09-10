@@ -84,7 +84,9 @@ const List<SettingsSectionDefinition> advancedSettingsSections = [
     entries: [
       SettingsEntryDefinition(
         title: 'Unmount Engine Off-Screen',
-        subtitle: 'Free the web engine when an overlay is on top',
+        subtitle:
+            'Rebuild the web engine after an overlay, instead of '
+            'keeping it warm',
         keywords: ['geckoview', 'memory', 'performance', 'suspend'],
         child: _UnmountGeckoViewOffRouteTile(),
       ),
@@ -273,10 +275,11 @@ class _UnmountGeckoViewOffRouteTile extends HookConsumerWidget {
     return SwitchListTile.adaptive(
       title: const Text('Unmount Engine Off-Screen'),
       subtitle: const Text(
-        'Unmount the web engine while a full-screen overlay (settings, tabs, '
-        'search) is on top, freeing its resources. On Android 12 and lower '
-        'this is always done; enabling it applies the same behavior on '
-        'Android 13+, which may cause the page to reload when returning.',
+        'Tear the web engine down while a full-screen overlay (settings, tabs, '
+        'search) is on top, and build it again on the way back, freeing its '
+        'resources in between. Returning to the page costs a reattach and can '
+        'flicker or reload, so this is a memory trade rather than a fix for '
+        'anything. On Android 12 and lower it is always done.',
       ),
       secondary: const Icon(Icons.memory),
       value: unmountGeckoViewOffRoute,

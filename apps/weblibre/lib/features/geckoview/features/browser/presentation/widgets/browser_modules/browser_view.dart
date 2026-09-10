@@ -21,6 +21,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -258,11 +259,47 @@ class _BrowserViewState extends ConsumerState<BrowserView>
       ),
     );
 
+    final isOnBrowserRoute =
+        topRoute is GoRoute && topRoute.name == BrowserRoute.name;
+
+    // Whether the route on top of the browser has finished covering it.
+    //
+    // A pushed route's overlay entry only turns opaque when its transition
+    // *completes* ([TransitionRoute._handleStatusChanged]), and that is the
+    // moment the navigator stops painting everything below it — the engine
+    // surface included. This route's secondary animation is that same
+    // animation, so its status is the signal.
+    //
+    // Paired with the go-router check because status alone would also report a
+    // dialog or a modal sheet, and those are not opaque: the browser keeps
+    // being painted underneath them, and telling the engine otherwise would
+    // blank the page behind an open dialog.
+    final secondaryAnimation = ModalRoute.of(context)?.secondaryAnimation;
+    // Seeded rather than read once in the effect, which flutter_hooks runs
+    // *during* the build that created it: a browser rebuilt from nothing under
+    // a route that is already covering it — a UI reset, for one — gets no
+    // status change to learn that from, and assigning it there would be a
+    // build-time markNeedsBuild.
+    final coveringRouteSettled = useState(
+      secondaryAnimation?.isCompleted ?? false,
+    );
+
+    useEffect(() {
+      if (secondaryAnimation == null) {
+        return null;
+      }
+
+      void onStatus(AnimationStatus status) {
+        coveringRouteSettled.value = status == AnimationStatus.completed;
+      }
+
+      secondaryAnimation.addStatusListener(onStatus);
+
+      return () => secondaryAnimation.removeStatusListener(onStatus);
+    }, [secondaryAnimation]);
+
     final isGeckoViewVisible = androidInfoAsync.when(
       data: (androidInfo) {
-        final isOnBrowserRoute =
-            topRoute is GoRoute && topRoute.name == BrowserRoute.name;
-
         if (androidInfo == null) {
           // Not Android, always show GeckoView based on route
           return isOnBrowserRoute;
@@ -271,6 +308,11 @@ class _BrowserViewState extends ConsumerState<BrowserView>
         // around the native visibility bug. On Android 13+ the engine normally
         // stays mounted to avoid reload/flicker, unless the developer setting
         // opts into the same off-route unmounting.
+        //
+        // Neither is what keeps a stale engine surface off the route above it
+        // any more; [GeckoView.isPainted] is, on every version and for the home
+        // surface too. What this decides is only whether the engine is worth
+        // keeping warm while it cannot be seen.
         if (androidInfo.sdkInt <= 31 || unmountGeckoViewOffRoute) {
           return isOnBrowserRoute;
         }
@@ -280,6 +322,12 @@ class _BrowserViewState extends ConsumerState<BrowserView>
       loading: () => true, // Show by default while loading
       error: (_, _) => true, // Show by default on error
     );
+
+    // The two ways this subtree stops being painted while the platform view
+    // stays mounted: the home surface going up over it, and an opaque route
+    // finishing its transition on top of the whole browser.
+    final isEnginePainted =
+        !showHome && (isOnBrowserRoute || !coveringRouteSettled.value);
 
     return Listener(
       behavior: HitTestBehavior.translucent,
@@ -336,6 +384,11 @@ class _BrowserViewState extends ConsumerState<BrowserView>
           // [Visibility] — the off-route unmount, which deliberately *does*
           // destroy the platform view (see [isGeckoViewVisible] above), so it
           // keeps the default maintainState: false.
+          //
+          // Not painting a hybrid-composition view is not the same as taking it
+          // off the screen, so both of these have to be reported to
+          // [GeckoView.isPainted] as well: the engine's surface layer stays on
+          // the window until something hides the surface view itself.
           Offstage(
             offstage: showHome,
             child: Visibility(
@@ -350,6 +403,7 @@ class _BrowserViewState extends ConsumerState<BrowserView>
                 viewReadyEvents: ref
                     .read(eventServiceProvider)
                     .viewReadyStateEvents,
+                isPainted: isEnginePainted,
                 postInitializationStep: () async {
                   await widget.postInitializationStep?.call();
 

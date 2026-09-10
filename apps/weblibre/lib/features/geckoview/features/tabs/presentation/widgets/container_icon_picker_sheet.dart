@@ -22,6 +22,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:weblibre/features/geckoview/features/tabs/utils/container_colors.dart';
 import 'package:weblibre/features/geckoview/features/tabs/utils/container_icons.dart';
+import 'package:weblibre/presentation/widgets/sheet_drag_handle.dart';
 
 final List<ContainerIconOption> _mdiContainerIconOptions = List.unmodifiable([
   for (final iconData in MdiIcons.values)
@@ -82,17 +83,7 @@ class ContainerIconPickerSheet extends HookWidget {
           ),
           child: Column(
             children: [
-              const SizedBox(height: 12),
-              Container(
-                width: 32,
-                height: 4,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.onSurfaceVariant.withValues(
-                    alpha: 0.4,
-                  ),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-              ),
+              const SheetDragHandle(),
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
                 child: Row(

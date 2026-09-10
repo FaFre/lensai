@@ -17,6 +17,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  */
+import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -40,6 +41,9 @@ class _Harness extends StatelessWidget {
   /// Mounts a second list on the sheet's controller, the way an
   /// [AnimatedSwitcher] does while it cross-fades two panels of one sheet.
   final bool duplicateContent;
+  final bool omitContent;
+  final double minChildSize;
+  final double maxChildSize;
 
   const _Harness({
     required this.sheetController,
@@ -47,6 +51,9 @@ class _Harness extends StatelessWidget {
     required this.onExtent,
     this.nestedController,
     this.duplicateContent = false,
+    this.omitContent = false,
+    this.minChildSize = 0.1,
+    this.maxChildSize = 1.0,
   });
 
   @override
@@ -66,49 +73,48 @@ class _Harness extends StatelessWidget {
               controller: sheetController,
               expand: false,
               initialChildSize: 0.5,
-              minChildSize: 0.1,
+              minChildSize: minChildSize,
+              maxChildSize: maxChildSize,
               builder: (context, scrollController) {
                 onContentController(scrollController);
 
-                return Material(
-                  child: Column(
-                    children: [
-                      Container(
-                        height: _chromeHeight,
-                        color: const Color(0xFF000000),
-                      ),
+                return Column(
+                  children: [
+                    const SizedBox(height: _chromeHeight),
+                    Expanded(
+                      child: omitContent
+                          ? const SizedBox.expand()
+                          : ListView.builder(
+                              controller: scrollController,
+                              itemCount: 20,
+                              itemBuilder: (context, index) => SizedBox(
+                                height: 100,
+                                child: index == 0 && nestedController != null
+                                    ? ListView.builder(
+                                        controller: nestedController,
+                                        itemCount: 5,
+                                        itemBuilder: (context, index) =>
+                                            SizedBox(
+                                              height: 100,
+                                              child: Text('nested $index'),
+                                            ),
+                                      )
+                                    : Text('item $index'),
+                              ),
+                            ),
+                    ),
+                    if (duplicateContent)
                       Expanded(
                         child: ListView.builder(
                           controller: scrollController,
                           itemCount: 20,
                           itemBuilder: (context, index) => SizedBox(
                             height: 100,
-                            child: index == 0 && nestedController != null
-                                ? ListView.builder(
-                                    controller: nestedController,
-                                    itemCount: 5,
-                                    itemBuilder: (context, index) => SizedBox(
-                                      height: 100,
-                                      child: Text('nested $index'),
-                                    ),
-                                  )
-                                : Text('item $index'),
+                            child: Text('other $index'),
                           ),
                         ),
                       ),
-                      if (duplicateContent)
-                        Expanded(
-                          child: ListView.builder(
-                            controller: scrollController,
-                            itemCount: 20,
-                            itemBuilder: (context, index) => SizedBox(
-                              height: 100,
-                              child: Text('other $index'),
-                            ),
-                          ),
-                        ),
-                    ],
-                  ),
+                  ],
                 );
               },
             ),
@@ -139,6 +145,9 @@ void main() {
     ScrollController? nestedController,
     bool withController = true,
     bool duplicateContent = false,
+    bool omitContent = false,
+    double minChildSize = 0.1,
+    double maxChildSize = 1.0,
   }) async {
     extent = 0.5;
     sheetController = DraggableScrollableController();
@@ -151,6 +160,9 @@ void main() {
         onExtent: (value) => extent = value,
         nestedController: nestedController,
         duplicateContent: duplicateContent,
+        omitContent: omitContent,
+        minChildSize: minChildSize,
+        maxChildSize: maxChildSize,
       ),
     );
   }
@@ -218,18 +230,19 @@ void main() {
     expect(sheetController.size, closeTo(0.5, 0.001));
   });
 
-  testWidgets('a notch over the chrome resizes the sheet in both directions', (
-    tester,
-  ) async {
-    await pumpSheet(tester);
+  testWidgets(
+    'a notch over blank chrome resizes the sheet in both directions',
+    (tester) async {
+      await pumpSheet(tester);
 
-    await tester.wheel(chromeCenter(), 120);
-    expect(sheetController.size, closeTo(0.7, 0.001));
+      await tester.wheel(chromeCenter(), 120);
+      expect(sheetController.size, closeTo(0.7, 0.001));
 
-    await tester.wheel(chromeCenter(), -240);
-    expect(sheetController.size, closeTo(0.3, 0.001));
-    expect(contentController.position.pixels, 0.0);
-  });
+      await tester.wheel(chromeCenter(), -240);
+      expect(sheetController.size, closeTo(0.3, 0.001));
+      expect(contentController.position.pixels, 0.0);
+    },
+  );
 
   testWidgets('a notch over the chrome reaches the list once the sheet is '
       'fully expanded', (tester) async {
@@ -250,6 +263,134 @@ void main() {
     await tester.wheel(chromeCenter(), -600);
 
     expect(sheetController.size, closeTo(0.1, 0.001));
+  });
+
+  testWidgets('blank space outside the sheet does not resize it', (
+    tester,
+  ) async {
+    await pumpSheet(tester);
+
+    await tester.wheel(100, 120);
+
+    expect(sheetController.size, 0.5);
+    expect(contentController.offset, 0);
+  });
+
+  testWidgets('the remainder at the maximum extent scrolls content', (
+    tester,
+  ) async {
+    await pumpSheet(tester, maxChildSize: 0.8);
+
+    await tester.wheel(chromeCenter(), 240);
+
+    expect(sheetController.size, 0.8);
+    expect(contentController.offset, closeTo(60, 0.001));
+  });
+
+  testWidgets('the remainder at the minimum extent scrolls content', (
+    tester,
+  ) async {
+    await pumpSheet(tester, minChildSize: 0.2);
+    contentController.jumpTo(120);
+    await tester.pump();
+
+    await tester.wheel(chromeCenter(), -240);
+
+    expect(sheetController.size, 0.2);
+    expect(contentController.offset, closeTo(60, 0.001));
+  });
+
+  for (final gap in [0.0, precisionErrorTolerance / 2]) {
+    testWidgets(
+      'a clamped notch does not cancel content animation (gap $gap)',
+      (tester) async {
+        await pumpSheet(tester, maxChildSize: 0.8);
+        sheetController.jumpTo(0.8 - gap);
+        await tester.pump();
+        final position = contentController.position;
+        position.jumpTo(position.maxScrollExtent);
+        await tester.pump();
+        final offsetBefore = position.pixels;
+        final animation = contentController.animateTo(
+          0,
+          duration: const Duration(seconds: 1),
+          curve: Curves.linear,
+        );
+
+        await tester.wheel(chromeCenter(), 120);
+
+        expect(position.isScrollingNotifier.value, isTrue);
+        expect(sheetController.size, 0.8 - gap);
+        await tester.pump(const Duration(milliseconds: 100));
+        expect(position.pixels, lessThan(offsetBefore));
+        await tester.pumpAndSettle();
+        await animation;
+      },
+    );
+  }
+
+  for (final withController in [true, false]) {
+    testWidgets('popup content with zero attachments resizes '
+        '(external controller $withController)', (tester) async {
+      await pumpSheet(
+        tester,
+        omitContent: true,
+        withController: withController,
+        minChildSize: 0.2,
+        maxChildSize: 0.8,
+      );
+      expect(contentController.hasClients, isFalse);
+
+      for (final (delta, expected) in [
+        (120.0, 0.7),
+        (-240.0, 0.3),
+        (600.0, 0.8),
+        (-600.0, 0.2),
+      ]) {
+        await tester.wheel(chromeCenter(), delta);
+
+        expect(tester.takeException(), isNull);
+        expect(extent, closeTo(expected, 0.001));
+        expect(
+          tester.getSize(find.byType(DraggableSheetPointerScroll)).height,
+          closeTo(expected * _viewportHeight, 0.001),
+        );
+        expect(contentController.hasClients, isFalse);
+      }
+    });
+  }
+
+  testWidgets('temporary popup position does not interfere with later lists', (
+    tester,
+  ) async {
+    await pumpSheet(tester, omitContent: true);
+    await tester.wheel(chromeCenter(), 120);
+
+    for (final (omitContent, duplicateContent) in [
+      (false, false),
+      (true, false),
+      (false, true),
+      (false, false),
+    ]) {
+      await tester.pumpWidget(
+        _Harness(
+          sheetController: sheetController,
+          onContentController: (controller) => contentController = controller,
+          onExtent: (value) => extent = value,
+          omitContent: omitContent,
+          duplicateContent: duplicateContent,
+        ),
+      );
+      final before = extent;
+      await tester.wheel(chromeCenter(), -30);
+
+      expect(tester.takeException(), isNull);
+      expect(extent, closeTo(before - (duplicateContent ? 0 : 0.05), 0.001));
+      expect(
+        contentController.positions.length,
+        omitContent ? 0 : (duplicateContent ? 2 : 1),
+      );
+    }
   });
 
   testWidgets('a notch is dropped while two lists share the controller', (

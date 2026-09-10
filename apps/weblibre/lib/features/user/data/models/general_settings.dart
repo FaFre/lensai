@@ -423,6 +423,12 @@ class GeneralSettings with FastEquatable {
   /// visibility bug; on Android 13+ the engine normally stays mounted to
   /// avoid reload/flicker, and this flag opts into the off-route unmounting
   /// there too. Defaults to false.
+  ///
+  /// It is not the answer to a stale engine surface left on top of an overlay:
+  /// unmounting only hid that by destroying the platform view, and never
+  /// covered the home surface, which does not unmount at all. `GeckoView`
+  /// handles that wherever it happens now — see `GeckoView.isPainted` — so what
+  /// is left here is the memory trade this describes.
   final bool unmountGeckoViewOffRoute;
 
   GeneralSettings({

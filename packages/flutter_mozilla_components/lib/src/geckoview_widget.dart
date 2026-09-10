@@ -7,13 +7,11 @@
 import 'dart:async';
 import 'dart:developer' as developer;
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mozilla_components/src/domain/services/gecko_browser.dart';
+import 'package:flutter_mozilla_components/src/pointer_input_surface.dart';
 
 class GeckoView extends StatefulWidget {
   /// Whether the native container backing this platform view is attached to the
@@ -29,11 +27,29 @@ class GeckoView extends StatefulWidget {
   /// See https://github.com/FaFre/WebLibre/issues/557.
   final Stream<bool> viewReadyEvents;
 
+  /// Whether an ancestor is currently painting this view.
+  ///
+  /// Not painting a hybrid-composition view is not the same as taking it off
+  /// the screen. The engine renders into a `SurfaceView`, which owns a
+  /// compositor layer of its own, and that layer is not retired by hiding
+  /// anything above it: measured on Android 13, the `FlutterMutatorView`
+  /// wrapper is `GONE` and the container reports `isShown == false` while the
+  /// last page rendered is still on the window, over everything Flutter has
+  /// drawn since. Only setting visibility on the surface view itself reconciles
+  /// the layer, and nothing in the embedder does that.
+  ///
+  /// So the host has to say when it stopped painting, and `EngineViewVisibility`
+  /// on the Kotlin side walks down and does it. `true` is the safe value — it
+  /// is what a caller that never goes offstage would report — so a host that
+  /// keeps the view painted at all times can leave this alone.
+  final bool isPainted;
+
   final Future<void> Function()? postInitializationStep;
 
   const GeckoView({
     super.key,
     required this.viewReadyEvents,
+    this.isPainted = true,
     this.postInitializationStep,
   });
 
@@ -44,6 +60,10 @@ class GeckoView extends StatefulWidget {
 class _GeckoViewState extends State<GeckoView> {
   static const platform = MethodChannel(
     'eu.weblibre.flutter_mozilla_components/trim_memory',
+  );
+
+  static const _visibility = MethodChannel(
+    'eu.weblibre.flutter_mozilla_components/engine_view',
   );
 
   final browserService = GeckoBrowserService();
@@ -65,12 +85,20 @@ class _GeckoViewState extends State<GeckoView> {
       onResume: () {
         //Make sure fragment visible after resuming the app in case native resources have been disposed
         unawaited(_enqueueShowNativeFragment());
+        unawaited(_applyContainerVisibility());
       },
     );
 
     _viewReadySubscription = widget.viewReadyEvents
         .where((ready) => ready)
-        .listen((_) => unawaited(_enqueueShowNativeFragment()));
+        .listen((_) async {
+          await _enqueueShowNativeFragment();
+          // The container that just attached is a new view, at its default
+          // visibility, and it can attach long after the view stopped being
+          // painted — an engine kept alive but unpainted for the whole of
+          // startup reaches this with nothing else left to hide it.
+          await _applyContainerVisibility();
+        });
   }
 
   /// Queues an attach attempt behind any that is still running.
@@ -148,6 +176,43 @@ class _GeckoViewState extends State<GeckoView> {
   }
 
   @override
+  void didUpdateWidget(covariant GeckoView oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.isPainted != widget.isPainted) {
+      unawaited(_applyContainerVisibility());
+    }
+  }
+
+  /// Puts the native container in the state [GeckoView.isPainted] describes.
+  ///
+  /// Sent on the edge itself rather than after a grace period. The embedder
+  /// hides its own wrapper promptly and correctly — measured, it is already
+  /// `GONE` by the time anything asks — and that is precisely what does *not*
+  /// retire the engine's surface layer, so waiting to see whether it will only
+  /// buys a window in which the stale page is on screen.
+  ///
+  /// Also re-sent whenever the container may be a different one, or may have
+  /// come back on its own: it can attach after the view has already stopped
+  /// being painted, and nothing else would then hide it.
+  Future<void> _applyContainerVisibility() async {
+    try {
+      await _visibility.invokeMethod<void>(
+        'setEngineViewVisible',
+        widget.isPainted,
+      );
+    } catch (error, stackTrace) {
+      developer.log(
+        'Failed to set engine view visibility',
+        name: 'GeckoView',
+        level: 900,
+        error: error,
+        stackTrace: stackTrace,
+      );
+    }
+  }
+
+  @override
   void dispose() {
     platform.setMethodCallHandler(null);
     unawaited(_viewReadySubscription?.cancel());
@@ -160,13 +225,8 @@ class _GeckoViewState extends State<GeckoView> {
   Widget build(BuildContext context) {
     return PlatformViewLink(
       viewType: 'eu.weblibre/gecko',
-      surfaceFactory: (context, controller) {
-        return AndroidViewSurface(
-          controller: controller as AndroidViewController,
-          gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-          hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-        );
-      },
+      surfaceFactory: (context, controller) =>
+          PointerInputSurface(controller: controller),
       onCreatePlatformView: (PlatformViewCreationParams params) {
         return PlatformViewsService.initExpensiveAndroidView(
             id: params.id,

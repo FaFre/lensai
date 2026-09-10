@@ -20,10 +20,7 @@
 
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_mozilla_components/flutter_mozilla_components.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
@@ -135,13 +132,8 @@ class _AddonSettingsPlatformView extends StatelessWidget {
   Widget build(BuildContext context) {
     return PlatformViewLink(
       viewType: 'eu.weblibre/addon_settings',
-      surfaceFactory: (context, controller) {
-        return AndroidViewSurface(
-          controller: controller as AndroidViewController,
-          gestureRecognizers: const <Factory<OneSequenceGestureRecognizer>>{},
-          hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-        );
-      },
+      surfaceFactory: (context, controller) =>
+          PointerInputSurface(controller: controller),
       onCreatePlatformView: (params) {
         final controller = PlatformViewsService.initExpensiveAndroidView(
           id: params.id,

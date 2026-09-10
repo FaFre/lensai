@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.FrameLayout
 import eu.weblibre.flutter_mozilla_components.ext.EventSequence
 import eu.weblibre.flutter_mozilla_components.pigeons.GeckoStateEvents
+import eu.weblibre.flutter_mozilla_components.pointer.PointerInputRouter
 import eu.weblibre.flutter_mozilla_components.widget.BackGestureFilterFrameLayout
 import io.flutter.plugin.common.StandardMessageCodec
 import io.flutter.plugin.platform.PlatformView
@@ -21,22 +22,25 @@ import io.flutter.plugin.platform.PlatformViewFactory
 class GeckoViewFactory(
     private val activityProvider: () -> Activity?,
     private val containerId: Int,
-    private val flutterEvents: GeckoStateEvents
+    private val flutterEvents: GeckoStateEvents,
+    private val pointerRouter: PointerInputRouter,
     ) : PlatformViewFactory(
     StandardMessageCodec.INSTANCE) {
     override fun create(context: Context?, id: Int, args: Any?): PlatformView {
         val activity = activityProvider()
             ?: throw IllegalStateException("No activity available when creating GeckoView platform view")
-        return NativeFragmentView(activity, this.containerId, this.flutterEvents)
+        return NativeFragmentView(activity, this.containerId, this.flutterEvents, id, pointerRouter)
     }
 }
 
 private class NativeFragmentView(
     activity: Activity?,
     containerId: Int,
-    private val flutterEvents: GeckoStateEvents
+    private val flutterEvents: GeckoStateEvents,
+    platformViewId: Int,
+    pointerRouter: PointerInputRouter,
 ) : PlatformView {
-    private val container: View
+    private val container: BackGestureFilterFrameLayout
 
     /**
      * Reports whether the container is reachable through [Activity.findViewById], which is what
@@ -75,7 +79,7 @@ private class NativeFragmentView(
             throw IllegalStateException("Activity cannot be null when creating NativeFragmentView")
         }
 
-        container = BackGestureFilterFrameLayout(activity, activity)
+        container = BackGestureFilterFrameLayout(activity, activity, platformViewId, pointerRouter)
         container.layoutParams = vParams
         container.id = containerId
         container.addOnAttachStateChangeListener(attachStateListener)
@@ -83,6 +87,7 @@ private class NativeFragmentView(
 
     override fun onFlutterViewAttached(flutterView: View) {
         super.onFlutterViewAttached(flutterView)
+        container.attachPointerInput(flutterView)
 
         // A Dart half that restarted has lost the ready state it was told when
         // components came up, and nothing else would tell it again: the engine
@@ -98,11 +103,16 @@ private class NativeFragmentView(
         flutterEvents.onEngineReadyStateChange(EventSequence.next(), true) { _ -> }
     }
 
+    override fun onFlutterViewDetached() {
+        container.detachPointerInput()
+    }
+
     override fun getView(): View {
         return container
     }
 
     override fun dispose() {
+        container.detachPointerInput()
         container.removeOnAttachStateChangeListener(attachStateListener)
 
         // Removing the listener suppresses the detach callback that tearing the view down would

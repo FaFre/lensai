@@ -178,8 +178,8 @@ _buildSharingIntentTransformer(
   },
 );
 
-/// Shared intent receiver instance. Both the sharing intent stream
-/// and the account callback handler listen to its broadcast events.
+/// Native intent receiver, consumed only by [intentBus]. Sharing and account
+/// callback handlers subscribe to [allIntents], not directly to this receiver.
 @Riverpod(keepAlive: true)
 Raw<IntentReceiver> intentReceiver(Ref ref) {
   final receiver = IntentReceiver.setUp();

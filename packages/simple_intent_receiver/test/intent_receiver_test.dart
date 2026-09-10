@@ -51,7 +51,7 @@ class _FakeHost {
     );
     _mock(_releaseChannel, (_) {
       releaseCount++;
-      return Future<Object?>.value(<Object?>[null]);
+      return releaseReply?.future ?? Future<Object?>.value(<Object?>[null]);
     });
   }
 
@@ -59,6 +59,7 @@ class _FakeHost {
   final _backlog = Completer<List<Intent>>();
 
   int releaseCount = 0;
+  Completer<Object?>? releaseReply;
 
   void _mock(String name, Future<Object?> Function(Object?) handler) {
     messenger.setMockDecodedMessageHandler<Object?>(
@@ -112,7 +113,10 @@ void main() {
     receiver = IntentReceiver.setUp(binaryMessenger: messenger);
   });
 
-  tearDown(() => host.tearDown());
+  tearDown(() async {
+    await receiver.dispose();
+    host.tearDown();
+  });
 
   test(
     'the backlog reaches a listener that attaches after it arrived',
@@ -201,4 +205,162 @@ void main() {
     // cannot land in a closed sink and disappear.
     expect(await host.sendLive(2, _link('https://example.com/b')), isFalse);
   });
+
+  test(
+    'a stalled drain times out, opens live delivery and ignores a late reply',
+    () async {
+      final seen = <String?>[];
+      final errors = <Object>[];
+      receiver.events.listen(
+        (intent) => seen.add(intent.data),
+        onError: errors.add,
+      );
+      await host.sendLive(1, _link('https://example.com/queued'));
+
+      await expectLater(
+        receiver.pendingIntents,
+        throwsA(isA<TimeoutException>()),
+      );
+      await host.sendLive(2, _link('https://example.com/live'));
+      await pumpEventQueue();
+
+      expect(seen, ['https://example.com/queued', 'https://example.com/live']);
+      expect(errors.single, isA<TimeoutException>());
+
+      host.answerDrain([_link('https://example.com/late')]);
+      await pumpEventQueue();
+      expect(seen, ['https://example.com/queued', 'https://example.com/live']);
+    },
+  );
+
+  test(
+    'a startup error is retained until the first listener attaches',
+    () async {
+      host._backlog.completeError(PlatformException(code: 'gone'));
+      await pumpEventQueue();
+
+      final errors = <Object>[];
+      final seen = <String?>[];
+      receiver.events.listen(
+        (intent) => seen.add(intent.data),
+        onError: errors.add,
+      );
+      await host.sendLive(1, _link('https://example.com/live'));
+      await pumpEventQueue();
+
+      expect(errors.single, isA<PlatformException>());
+      expect(seen, ['https://example.com/live']);
+    },
+  );
+
+  test(
+    'only the newest 16 startup launches survive without a listener',
+    () async {
+      host.answerDrain();
+      for (var i = 0; i < 20; i++) {
+        await host.sendLive(i, _link('https://example.com/$i'));
+      }
+
+      final seen = <String?>[];
+      receiver.events.listen((intent) => seen.add(intent.data));
+      await pumpEventQueue();
+      expect(seen, [for (var i = 4; i < 20; i++) 'https://example.com/$i']);
+    },
+  );
+
+  test(
+    'the merged backlog is bounded with newer live launches retained',
+    () async {
+      for (var i = 16; i < 20; i++) {
+        await host.sendLive(i, _link('https://example.com/$i'));
+      }
+      host.answerDrain([
+        for (var i = 0; i < 16; i++) _link('https://example.com/$i'),
+      ]);
+      await pumpEventQueue();
+
+      final seen = <String?>[];
+      receiver.events.listen((intent) => seen.add(intent.data));
+      await pumpEventQueue();
+      expect(seen, [for (var i = 4; i < 20; i++) 'https://example.com/$i']);
+    },
+  );
+
+  test(
+    'a replacement listener does not replay launches from its absence',
+    () async {
+      host.answerDrain();
+      final first = receiver.events.listen((_) {});
+      await first.cancel();
+      await host.sendLive(1, _link('https://example.com/absent'));
+
+      final seen = <String?>[];
+      receiver.events.listen((intent) => seen.add(intent.data));
+      await host.sendLive(2, _link('https://example.com/current'));
+      await pumpEventQueue();
+      expect(seen, ['https://example.com/current']);
+    },
+  );
+
+  test(
+    'cancelling during startup clears queued launches and skips late backlog',
+    () async {
+      final first = receiver.events.listen((_) {});
+      await host.sendLive(1, _link('https://example.com/queued'));
+      await first.cancel();
+      host.answerDrain([_link('https://example.com/held')]);
+      await pumpEventQueue();
+
+      final seen = <String?>[];
+      receiver.events.listen((intent) => seen.add(intent.data));
+      await host.sendLive(2, _link('https://example.com/current'));
+      await pumpEventQueue();
+      expect(seen, ['https://example.com/current']);
+    },
+  );
+
+  test('a stalled release cannot retain the event handler or stream', () async {
+    host.answerDrain();
+    host.releaseReply = Completer<Object?>();
+    var closed = false;
+    receiver.events.listen((_) {}, onDone: () => closed = true);
+    final disposed = receiver.dispose();
+    await pumpEventQueue();
+
+    expect(host.releaseCount, 1);
+    expect(await host.sendLive(1, _link('https://example.com/late')), isFalse);
+    expect(closed, isTrue);
+    await disposed.timeout(const Duration(seconds: 6));
+  });
+
+  test(
+    'a replacement attached before the drain does not receive old backlog',
+    () async {
+      final first = receiver.events.listen((_) {});
+      await host.sendLive(1, _link('https://example.com/queued'));
+      await first.cancel();
+
+      final seen = <String?>[];
+      receiver.events.listen((intent) => seen.add(intent.data));
+      await host.sendLive(2, _link('https://example.com/current'));
+      host.answerDrain([_link('https://example.com/held')]);
+      await pumpEventQueue();
+      expect(seen, ['https://example.com/current']);
+    },
+  );
+
+  test(
+    'a late drain after disposal does not deliver or reclaim the channel',
+    () async {
+      await receiver.dispose();
+      host.answerDrain([_link('https://example.com/late')]);
+      await pumpEventQueue();
+      expect(
+        await host.sendLive(1, _link('https://example.com/live')),
+        isFalse,
+      );
+      await receiver.dispose();
+      expect(host.releaseCount, 1);
+    },
+  );
 }

@@ -88,6 +88,11 @@ melos:
     build-go-runtime:
       description: Build combined Android gomobile runtime AAR for proxy plugins
       run: native/go_mobile_runtime/scripts/build-android.sh
+    test-intents:
+      description: Run the Dart intent delivery queue tests
+      packageFilters:
+        scope: simple_intent_receiver
+      exec: flutter test
     test-android:
       description: Run the host-side Kotlin unit tests for the native plugins
       run: |

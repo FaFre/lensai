@@ -33,11 +33,21 @@ import eu.weblibre.simple_intent_receiver.pigeons.IntentHost
 import eu.weblibre.simple_intent_receiver.pigeons.Intent as PigeonIntent
 import eu.weblibre.simple_intent_receiver.pigeons.IntentGatekeeperHostApi
 
+/** Supplied by the activity from saved state, never from caller-controlled intent extras. */
+interface IntentReceiverHost {
+  val isRestoredLaunch: Boolean
+}
+
 class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.NewIntentListener, IntentHost {
   companion object {
     private val EXTRA_NOTIFICATION_APPROVAL_TOKEN =
       IntentApprovals.EXTRA_NOTIFICATION_APPROVAL_TOKEN
     private val EXTRA_ALWAYS_ALLOW_PACKAGE = IntentApprovals.EXTRA_ALWAYS_ALLOW_PACKAGE
+
+    // FlutterEngineCoordinator replaces the process's single engine. Keep only
+    // undelivered payloads across that replacement, not an isolate's readiness or
+    // any Activity/messenger. All access is on Flutter's Android platform thread.
+    private val pendingIntents = ArrayDeque<PigeonIntent>()
   }
 
   private lateinit var context: Context
@@ -50,7 +60,7 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
    * it can go. See [IntentDeliveryGate]; every launch this plugin sees goes
    * through it.
    */
-  private val gate = IntentDeliveryGate()
+  private val gate = IntentDeliveryGate(pending = pendingIntents)
 
   override fun onAttachedToEngine(flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
     context = flutterPluginBinding.applicationContext
@@ -98,28 +108,19 @@ class SimpleIntentReceiverPlugin: FlutterPlugin, ActivityAware, PluginRegistry.N
    * So this asks the gate rather than the lifecycle. Cold start buffers,
    * because nothing is listening yet; everything else goes straight out.
    *
-   * Nothing guards against taking the same launch twice, because each activity
-   * instance is attached once and is handed its own `Intent` by the system. The
-   * two guards that have stood here both cost more than they bought: a
-   * once-only flag lost the *next* link after one had been handled, and the URI
-   * comparison that replaced it swallowed the user opening one link twice —
-   * which is an ordinary thing to do and was half of #589.
-   *
-   * One case is left uncovered, knowingly. If the system destroys
-   * `MainActivity` while something else still holds the engine
-   * (`FlutterEngineCoordinator.retainForExternalTask`, e.g. a Custom Tab in a
-   * proxied container), the activity is later rebuilt from the launch intent
-   * the system kept, and this takes it again — one duplicate tab. It cannot be
-   * recognised from here: the system's copy of the intent is not the one this
-   * process annotated, so no marker written on an `Intent` survives to be read.
-   * `MainActivity.onCreate` *can* tell, from a non-null `savedInstanceState`,
-   * and that is where a fix would go.
+   * A restored activity in the same process has already offered its launch.
+   * The host identifies that from saved state before Flutter attaches, rather
+   * than an Intent marker (Android retains a different copy) or URL equality
+   * (opening the same link twice is a deliberate new delivery). Check before
+   * conversion, which also consumes one-shot approval tokens.
    */
   override fun onAttachedToActivity(binding: ActivityPluginBinding) {
     activity = binding.activity
     binding.addOnNewIntentListener(this)
 
-    binding.activity.intent?.let(::handleIntent)
+    if ((binding.activity as? IntentReceiverHost)?.isRestoredLaunch != true) {
+      binding.activity.intent?.let(::handleIntent)
+    }
   }
 
   override fun onDetachedFromActivityForConfigChanges() {

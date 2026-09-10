@@ -168,3 +168,4 @@ export 'src/pigeons/startup.g.dart'
         ProfileStartupOwnerType,
         ProfileStartupPromptMode,
         StartupIntentRecord;
+export 'src/pointer_input_surface.dart';

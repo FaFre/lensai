@@ -42,11 +42,17 @@ android {
 
     dependencies {
         testImplementation("org.jetbrains.kotlin:kotlin-test")
-        testImplementation("org.mockito:mockito-core:5.23.0")
+        testImplementation("junit:junit:4.13.2")
+        testImplementation("org.robolectric:robolectric:4.16.1")
+        testRuntimeOnly("org.junit.vintage:junit-vintage-engine:5.10.1")
     }
 
     testOptions {
         unitTests.all {
+            // Robolectric's bytecode instrumentation does not support newer host JDKs yet.
+            javaLauncher = javaToolchains.launcherFor {
+                languageVersion = JavaLanguageVersion.of(17)
+            }
             useJUnitPlatform()
 
             testLogging {
