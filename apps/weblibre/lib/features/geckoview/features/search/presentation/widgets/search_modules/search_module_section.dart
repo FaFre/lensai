@@ -21,6 +21,7 @@ import 'package:flutter/material.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:sliver_tools/sliver_tools.dart';
 import 'package:weblibre/core/design/app_colors.dart';
+import 'package:weblibre/core/design/wallpaper_surface.dart';
 import 'package:weblibre/features/geckoview/features/search/domain/providers/search_module_order.dart';
 import 'package:weblibre/features/geckoview/features/search/domain/providers/search_modules_view.dart';
 import 'package:weblibre/features/geckoview/features/search/presentation/widgets/module_surface_scope.dart';
@@ -190,8 +191,9 @@ class SearchModuleSection extends ConsumerWidget {
         sliver: DecoratedSliver(
           decoration: BoxDecoration(
             // Not fully opaque: the home surface's aura gradient and any
-            // wallpaper behind it should still read through the card.
-            color: colorScheme.surfaceContainer.withValues(alpha: 0.9),
+            // wallpaper behind it should still read through the card. Broad and
+            // sparsely typeset, so it takes the lighter of the two levels.
+            color: colorScheme.surfaceContainer.wallpaperBroad,
             borderRadius: BorderRadius.circular(28),
             border: Border.all(
               color: Color.alphaBlend(

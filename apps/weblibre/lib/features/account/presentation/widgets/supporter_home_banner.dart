@@ -24,6 +24,7 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:weblibre/core/design/app_colors.dart';
+import 'package:weblibre/core/design/wallpaper_surface.dart';
 import 'package:weblibre/core/providers/persisted_bool.dart';
 import 'package:weblibre/core/routing/routes.dart';
 import 'package:weblibre/features/account/domain/repositories/account_auth.dart';
@@ -112,9 +113,9 @@ class SupporterHomeBanner extends HookConsumerWidget {
             colors: [
               Color.alphaBlend(
                 AppColors.brandPurple.withValues(alpha: 0.16),
-                colorScheme.surfaceContainerHigh,
+                colorScheme.surfaceContainerHigh.wallpaperBroad,
               ),
-              colorScheme.surfaceContainer.withValues(alpha: 0.9),
+              colorScheme.surfaceContainer.wallpaperBroad,
             ],
           ),
           borderRadius: BorderRadius.circular(28),

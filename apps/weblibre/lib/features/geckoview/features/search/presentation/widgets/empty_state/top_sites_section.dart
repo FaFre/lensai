@@ -25,6 +25,7 @@ import 'package:flutter_material_design_icons/flutter_material_design_icons.dart
 import 'package:flutter_reorderable_grid_view/widgets/custom_draggable.dart';
 import 'package:flutter_reorderable_grid_view/widgets/reorderable_builder.dart';
 import 'package:hooks_riverpod/hooks_riverpod.dart';
+import 'package:weblibre/core/design/wallpaper_surface.dart';
 import 'package:weblibre/features/geckoview/features/search/domain/providers/search_modules_view.dart';
 import 'package:weblibre/features/geckoview/features/search/presentation/dialogs/edit_top_site_dialog.dart';
 import 'package:weblibre/features/geckoview/features/search/presentation/widgets/module_surface_scope.dart';
@@ -248,6 +249,55 @@ class _TopSitesGrid extends ConsumerWidget {
   }
 }
 
+/// Shell shared by every cell of the shortcuts grid, the trailing "+" included.
+/// Fill, radius, outline and ink live here so the cells cannot drift apart —
+/// they did once, when the "+" was the only translucent one among solid tiles.
+///
+/// The fill is deliberately not opaque: this grid paints straight onto the home
+/// surface, so a wallpaper and the aura gradient behind it read through the
+/// cells the way they read through a module card. It takes the denser of the
+/// two wallpaper-surface levels, because a tile label is the smallest type on
+/// the surface and sits directly over the image.
+class _TopSiteTileSurface extends StatelessWidget {
+  final VoidCallback? onTap;
+  final VoidCallback? onLongPress;
+  final Widget child;
+
+  const _TopSiteTileSurface({
+    required this.child,
+    this.onTap,
+    this.onLongPress,
+  });
+
+  static const borderRadius = BorderRadius.all(Radius.circular(12.0));
+
+  @override
+  Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        color: colorScheme.surfaceContainerHigh.wallpaperDense,
+        borderRadius: borderRadius,
+        border: Border.all(color: colorScheme.wallpaperOutline),
+      ),
+      // Transparent so the ink splash rides on the decoration above rather
+      // than painting a second, opaque layer over it.
+      child: Material(
+        type: MaterialType.transparency,
+        borderRadius: borderRadius,
+        clipBehavior: Clip.antiAlias,
+        child: InkWell(
+          borderRadius: borderRadius,
+          onTap: onTap,
+          onLongPress: onLongPress,
+          child: child,
+        ),
+      ),
+    );
+  }
+}
+
 /// Trailing "+" cell. Creating a shortcut previously required visiting the site
 /// and pinning it from the browser menu; there was no way to just type one in.
 class _AddShortcutTile extends StatelessWidget {
@@ -259,16 +309,11 @@ class _AddShortcutTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Material(
-      color: colorScheme.surfaceContainerHighest.withValues(alpha: 0.4),
-      borderRadius: _TopSiteGridTile._borderRadius,
-      clipBehavior: Clip.antiAlias,
-      child: InkWell(
-        onTap: onPressed,
-        child: Tooltip(
-          message: 'Add shortcut',
-          child: Icon(Icons.add, color: colorScheme.onSurfaceVariant),
-        ),
+    return _TopSiteTileSurface(
+      onTap: onPressed,
+      child: Tooltip(
+        message: 'Add shortcut',
+        child: Icon(Icons.add, color: colorScheme.onSurfaceVariant),
       ),
     );
   }
@@ -500,7 +545,6 @@ class _TopSiteGridTile extends StatefulWidget {
   });
 
   static const _iconSize = 40.0;
-  static const _borderRadius = BorderRadius.all(Radius.circular(12.0));
 
   @override
   State<_TopSiteGridTile> createState() => _TopSiteGridTileState();
@@ -544,144 +588,129 @@ class _TopSiteGridTileState extends State<_TopSiteGridTile> {
             ),
           ),
       ],
-      child: Material(
-        color: colorScheme.surfaceContainerHigh,
-        borderRadius: _TopSiteGridTile._borderRadius,
-        clipBehavior: Clip.antiAlias,
-        child: InkWell(
-          borderRadius: _TopSiteGridTile._borderRadius,
-          onTap: widget.onTap,
-          onLongPress: _hasMenu
-              ? () {
-                  if (_menuController.isOpen) {
-                    _menuController.close();
-                  } else {
-                    _menuController.open();
-                  }
+      child: _TopSiteTileSurface(
+        onTap: widget.onTap,
+        onLongPress: _hasMenu
+            ? () {
+                if (_menuController.isOpen) {
+                  _menuController.close();
+                } else {
+                  _menuController.open();
                 }
-              : null,
-          child: Stack(
-            fit: StackFit.expand,
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 8.0,
-                  vertical: 10.0,
-                ),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    final titleStyle = textTheme.bodySmall?.copyWith(
-                      color: colorScheme.onSurface,
-                    );
-                    final lineHeight =
-                        (titleStyle?.fontSize ?? 12.0) *
-                        (titleStyle?.height ?? 1.2);
-                    const textLines = 2;
-                    const gap = 6.0;
-                    const minIconSize = 18.0;
-                    const textHeightPadding = 16.0;
-                    final minTextHeight = lineHeight + textHeightPadding;
-                    final maxTextHeight =
-                        lineHeight * textLines + textHeightPadding;
-                    final iconSize =
-                        (constraints.maxHeight - minTextHeight - gap).clamp(
-                          minIconSize,
-                          _TopSiteGridTile._iconSize,
-                        );
+              }
+            : null,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 8.0,
+                vertical: 10.0,
+              ),
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final titleStyle = textTheme.bodySmall?.copyWith(
+                    color: colorScheme.onSurface,
+                  );
+                  final lineHeight =
+                      (titleStyle?.fontSize ?? 12.0) *
+                      (titleStyle?.height ?? 1.2);
+                  const textLines = 2;
+                  const gap = 6.0;
+                  const minIconSize = 18.0;
+                  const textHeightPadding = 16.0;
+                  final minTextHeight = lineHeight + textHeightPadding;
+                  final maxTextHeight =
+                      lineHeight * textLines + textHeightPadding;
+                  final iconSize = (constraints.maxHeight - minTextHeight - gap)
+                      .clamp(minIconSize, _TopSiteGridTile._iconSize);
 
-                    return Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        Align(
-                          child: SizedBox.square(
-                            dimension: iconSize,
-                            child: RepaintBoundary(
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.all(
-                                  Radius.circular(8.0),
-                                ),
-                                child: UrlIcon([
-                                  widget.item.url,
-                                ], iconSize: iconSize),
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      Align(
+                        child: SizedBox.square(
+                          dimension: iconSize,
+                          child: RepaintBoundary(
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.all(
+                                Radius.circular(8.0),
                               ),
+                              child: UrlIcon([
+                                widget.item.url,
+                              ], iconSize: iconSize),
                             ),
                           ),
                         ),
-                        const SizedBox(height: gap),
-                        Flexible(
-                          child: ConstrainedBox(
-                            constraints: BoxConstraints(
-                              maxHeight: maxTextHeight,
-                            ),
-                            child: Text(
-                              widget.item.title,
-                              maxLines: textLines,
-                              overflow: TextOverflow.ellipsis,
-                              textAlign: TextAlign.center,
-                              style: titleStyle,
-                            ),
+                      ),
+                      const SizedBox(height: gap),
+                      Flexible(
+                        child: ConstrainedBox(
+                          constraints: BoxConstraints(maxHeight: maxTextHeight),
+                          child: Text(
+                            widget.item.title,
+                            maxLines: textLines,
+                            overflow: TextOverflow.ellipsis,
+                            textAlign: TextAlign.center,
+                            style: titleStyle,
                           ),
                         ),
-                      ],
-                    );
-                  },
+                      ),
+                    ],
+                  );
+                },
+              ),
+            ),
+            if (widget.item.source == TopSiteSource.pinned)
+              Positioned(
+                top: 4,
+                right: 4,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(3.0),
+                    child: Icon(
+                      Icons.push_pin,
+                      size: 12,
+                      color: colorScheme.onPrimaryContainer,
+                    ),
+                  ),
                 ),
               ),
-              if (widget.item.source == TopSiteSource.pinned)
-                Positioned(
-                  top: 4,
-                  right: 4,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(10.0),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: Icon(
-                        Icons.push_pin,
-                        size: 12,
-                        color: colorScheme.onPrimaryContainer,
-                      ),
+            if (widget.item.source == TopSiteSource.defaultSite)
+              Positioned(
+                top: 4,
+                right: 4,
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer,
+                    borderRadius: const BorderRadius.all(Radius.circular(10.0)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(3.0),
+                    child: Icon(
+                      MdiIcons.crown,
+                      size: 12,
+                      color: colorScheme.onPrimaryContainer,
                     ),
                   ),
                 ),
-              if (widget.item.source == TopSiteSource.defaultSite)
-                Positioned(
-                  top: 4,
-                  right: 4,
-                  child: DecoratedBox(
-                    decoration: BoxDecoration(
-                      color: colorScheme.primaryContainer,
-                      borderRadius: const BorderRadius.all(
-                        Radius.circular(10.0),
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(3.0),
-                      child: Icon(
-                        MdiIcons.crown,
-                        size: 12,
-                        color: colorScheme.onPrimaryContainer,
-                      ),
-                    ),
-                  ),
+              ),
+            if (widget.showDragHandle)
+              Positioned(
+                top: 2,
+                left: 2,
+                child: Icon(
+                  Icons.drag_indicator,
+                  size: 16,
+                  color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                 ),
-              if (widget.showDragHandle)
-                Positioned(
-                  top: 2,
-                  left: 2,
-                  child: Icon(
-                    Icons.drag_indicator,
-                    size: 16,
-                    color: colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
-                  ),
-                ),
-            ],
-          ),
+              ),
+          ],
         ),
       ),
     );
