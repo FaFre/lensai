@@ -32,18 +32,62 @@ import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import mozilla.components.browser.state.action.BrowserAction
 import mozilla.components.browser.state.action.ContentAction
 import mozilla.components.browser.state.selector.selectedTab
 import mozilla.components.browser.state.state.BrowserState
+import mozilla.components.browser.state.state.TabSessionState
 import mozilla.components.feature.addons.logger
 import mozilla.components.lib.state.Store
 import mozilla.components.lib.state.ext.flowScoped
 import kotlinx.coroutines.flow.distinctUntilChangedBy
 import mozilla.components.support.ktx.kotlinx.coroutines.flow.filterChanged
 import mozilla.components.support.ktx.kotlinx.coroutines.flow.ifAnyChanged
+
+/**
+ * Emits every tab whose [selector] values differ from the values last emitted
+ * for *that* tab.
+ *
+ * This replaces `filterChanged { … }.ifAnyChanged { … }.debounce(n)`, which
+ * flattens the tab list into a single stream of tabs and then filters that
+ * stream as though consecutive emissions belonged to the same tab. Both stages
+ * therefore drop other tabs' updates:
+ *
+ *  - `ifAnyChanged` holds one previous tuple for the whole stream, so a tab
+ *    whose values happen to equal those of the tab emitted just before it is
+ *    discarded outright. Two freshly created `about:blank` tabs in one snapshot
+ *    are enough, which is why this reproduces for some users and never for
+ *    others.
+ *  - `debounce` keeps only the last tab of each window and drops every other
+ *    tab that changed in the same burst — a whole session restore collapses to
+ *    a single tab.
+ *
+ * Either drop is permanent: the store reports changes, not state, so a tab
+ * whose only update was swallowed is never mentioned to Flutter again. Diffing
+ * per tab id makes both impossible, and it is stricter than `filterChanged` as
+ * well, which reads a change to any *other* field of the session (its last
+ * access time, say) as a change to the values being watched.
+ *
+ * A tab is always emitted the first time it is seen, and a tab that leaves the
+ * store is forgotten, so one that comes back is reported afresh.
+ */
+internal fun Flow<BrowserState>.changedTabsBy(
+    selector: (TabSessionState) -> List<Any?>,
+): Flow<TabSessionState> = flow {
+    var previous = emptyMap<String, List<Any?>>()
+    collect { state ->
+        val current = state.tabs.associate { tab -> tab.id to selector(tab) }
+        state.tabs.forEach { tab ->
+            if (previous[tab.id] != current[tab.id]) {
+                emit(tab)
+            }
+        }
+        previous = current
+    }
+}
 
 class Events(
     private val flutterEvents: GeckoStateEvents,
@@ -102,12 +146,7 @@ class Events(
         }
 
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.mapNotNull { state -> state.tabs }
-                .filterChanged {
-                    it.content
-                }
-                .ifAnyChanged { arrayOf(it.content.icon) }
-                .debounce(15)
+            flow.changedTabsBy { listOf(it.content.icon) }
                 .collect { tab ->
                     val iconBytes = tab.content.icon?.toWebPBytes()
                     flutterEvents.onIconChange(
@@ -119,11 +158,7 @@ class Events(
         }
 
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.mapNotNull { state -> state.tabs }
-                .filterChanged {
-                    it.content.securityInfo
-                }
-                .debounce(15)
+            flow.changedTabsBy { listOf(it.content.securityInfo) }
                 .collect { tab ->
                     flutterEvents.onSecurityInfoStateChange(
                         EventSequence.next(),
@@ -138,17 +173,12 @@ class Events(
         }
 
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.mapNotNull { state -> state.tabs }
-                .filterChanged {
-                    it.readerState
-                }
-                .ifAnyChanged {
-                    arrayOf(
-                        it.readerState.readerable,
-                        it.readerState.active,
-                    )
-                }
-                .debounce(25)
+            flow.changedTabsBy {
+                listOf(
+                    it.readerState.readerable,
+                    it.readerState.active,
+                )
+            }
                 .collect { tab ->
                     flutterEvents.onReaderableStateChange(
                         EventSequence.next(),
@@ -198,18 +228,13 @@ class Events(
         }
 
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.mapNotNull { state -> state.tabs }
-                .filterChanged {
-                    it.content
-                }
-                .ifAnyChanged {
-                    arrayOf(
-                        it.content.history,
-                        it.content.canGoBack,
-                        it.content.canGoForward,
-                    )
-                }
-                .debounce(15)
+            flow.changedTabsBy {
+                listOf(
+                    it.content.history,
+                    it.content.canGoBack,
+                    it.content.canGoForward,
+                )
+            }
                 .collect { tab ->
                     flutterEvents.onHistoryStateChange(
                         EventSequence.next(),
@@ -230,22 +255,19 @@ class Events(
         }
 
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.mapNotNull { state -> state.tabs }
-                .filterChanged {
-                    it.content
-                }
-                .ifAnyChanged {
-                    arrayOf(
-                        it.content.url,
-                        it.content.title,
-                        it.content.private,
-                        it.content.fullScreen,
-                        it.content.progress,
-                        it.content.loading,
-                        it.content.showToolbarAsExpanded,
-                    )
-                }
-                .debounce(15)
+            flow.changedTabsBy {
+                listOf(
+                    it.parentId,
+                    it.contextId,
+                    it.content.url,
+                    it.content.title,
+                    it.content.private,
+                    it.content.fullScreen,
+                    it.content.progress,
+                    it.content.loading,
+                    it.content.showToolbarAsExpanded,
+                )
+            }
                 .collect { tab ->
                     flutterEvents.onTabContentStateChange(
                         EventSequence.next(),
@@ -303,21 +325,16 @@ class Events(
 
         // Per-tab translation state
         stateFlow.flowScoped(dispatcher = Dispatchers.Main) { flow ->
-            flow.mapNotNull { state -> state.tabs }
-                .filterChanged {
-                    it.translationsState
-                }
-                .ifAnyChanged {
-                    arrayOf(
-                        it.translationsState.isTranslated,
-                        it.translationsState.isTranslateProcessing,
-                        it.translationsState.isOfferTranslate,
-                        it.translationsState.isExpectedTranslate,
-                        it.translationsState.translationEngineState,
-                        it.translationsState.translationError,
-                    )
-                }
-                .debounce(25)
+            flow.changedTabsBy {
+                listOf(
+                    it.translationsState.isTranslated,
+                    it.translationsState.isTranslateProcessing,
+                    it.translationsState.isOfferTranslate,
+                    it.translationsState.isExpectedTranslate,
+                    it.translationsState.translationEngineState,
+                    it.translationsState.translationError,
+                )
+            }
                 .collect { tab ->
                     val ts = tab.translationsState
                     flutterEvents.onTabTranslationStateChange(

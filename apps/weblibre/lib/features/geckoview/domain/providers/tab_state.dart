@@ -58,6 +58,9 @@ const thumbnailDecodeWidth = 720;
 
 @Riverpod(keepAlive: true)
 class TabStates extends _$TabStates {
+  /// Callers parked in [awaitContentState], per tab.
+  final _contentStateWaiters = <String, List<Completer<TabState?>>>{};
+
   /// Replaces the entry for [tabId] — but only when [next] actually differs.
   ///
   /// Every write here allocates a new map, and `Map` compares by identity, so
@@ -73,6 +76,15 @@ class TabStates extends _$TabStates {
     }
 
     state = {...state}..[tabId] = next;
+
+    if (next.hasContentState) {
+      final waiters = _contentStateWaiters.remove(tabId);
+      if (waiters != null) {
+        for (final waiter in waiters) {
+          waiter.complete(next);
+        }
+      }
+    }
   }
 
   Future<void> _onTabContentStateChange(TabContentState contentState) async {
@@ -105,6 +117,7 @@ class TabStates extends _$TabStates {
     final engineParentChanged = contentState.parentId != current.parentId;
 
     final newState = current.copyWith(
+      hasContentState: true,
       parentId: contentState.parentId,
       contextId: contentState.contextId,
       url: url,
@@ -142,6 +155,48 @@ class TabStates extends _$TabStates {
       ref
           .read(geckoInferenceRepositoryProvider.notifier)
           .markInitialLoadComplete();
+    }
+  }
+
+  /// Waits until [tabId] carries the engine's content state, and returns it.
+  ///
+  /// A tab reaches this map only once native has reported its content, and that
+  /// report is not immediate: it crosses a per-tab diff natively and the
+  /// database read in [patchedState] here. Anything acting on a *different*
+  /// native event — a container site assignment, say — can therefore arrive
+  /// first and find nothing, or find the partial entry an icon left behind.
+  /// Both look like a tab that does not exist, and treating them that way is
+  /// how a cancelled navigation ends up in a tab that never loads anything.
+  ///
+  /// Returns `null` if [timeout] passes first — long enough that only a tab
+  /// native never reports at all runs it out — or if this provider is disposed
+  /// while waiting.
+  Future<TabState?> awaitContentState(
+    String tabId, {
+    Duration timeout = const Duration(seconds: 10),
+  }) async {
+    final current = state[tabId];
+    if (current != null && current.hasContentState) {
+      return current;
+    }
+
+    final completer = Completer<TabState?>();
+    _contentStateWaiters.putIfAbsent(tabId, () => []).add(completer);
+
+    try {
+      return await completer.future.timeout(timeout);
+    } on TimeoutException {
+      return null;
+    } finally {
+      // Read the map again rather than holding on to the list: [_put] detaches
+      // it wholesale, and any waiter that arrived since is in a new one.
+      final waiters = _contentStateWaiters[tabId];
+      if (waiters != null) {
+        waiters.remove(completer);
+        if (waiters.isEmpty) {
+          _contentStateWaiters.remove(tabId);
+        }
+      }
     }
   }
 
@@ -416,6 +471,13 @@ class TabStates extends _$TabStates {
     );
 
     ref.onDispose(() async {
+      for (final waiters in _contentStateWaiters.values.toList()) {
+        for (final waiter in waiters) {
+          waiter.complete(null);
+        }
+      }
+      _contentStateWaiters.clear();
+
       for (final sub in subscriptions) {
         await sub.cancel();
       }

@@ -19,6 +19,8 @@ abstract class _$TabStateCWProxy {
 
   TabState tabMode(TabMode tabMode);
 
+  TabState hasContentState(bool hasContentState);
+
   TabState isFullScreen(bool isFullScreen);
 
   TabState isLoading(bool isLoading);
@@ -43,6 +45,7 @@ abstract class _$TabStateCWProxy {
     String? title,
     EquatableImage? icon,
     TabMode tabMode,
+    bool hasContentState,
     bool isFullScreen,
     bool isLoading,
     bool showToolbarAsExpanded,
@@ -77,6 +80,10 @@ class _$TabStateCWProxyImpl implements _$TabStateCWProxy {
   TabState tabMode(TabMode tabMode) => call(tabMode: tabMode);
 
   @override
+  TabState hasContentState(bool hasContentState) =>
+      call(hasContentState: hasContentState);
+
+  @override
   TabState isFullScreen(bool isFullScreen) => call(isFullScreen: isFullScreen);
 
   @override
@@ -109,6 +116,7 @@ class _$TabStateCWProxyImpl implements _$TabStateCWProxy {
     Object? title = const $CopyWithPlaceholder(),
     Object? icon = const $CopyWithPlaceholder(),
     Object? tabMode = const $CopyWithPlaceholder(),
+    Object? hasContentState = const $CopyWithPlaceholder(),
     Object? isFullScreen = const $CopyWithPlaceholder(),
     Object? isLoading = const $CopyWithPlaceholder(),
     Object? showToolbarAsExpanded = const $CopyWithPlaceholder(),
@@ -141,6 +149,12 @@ class _$TabStateCWProxyImpl implements _$TabStateCWProxy {
           ? _value.tabMode
           // ignore: cast_nullable_to_non_nullable
           : tabMode as TabMode,
+      hasContentState:
+          hasContentState == const $CopyWithPlaceholder() ||
+              hasContentState == null
+          ? _value.hasContentState
+          // ignore: cast_nullable_to_non_nullable
+          : hasContentState as bool,
       isFullScreen:
           isFullScreen == const $CopyWithPlaceholder() || isFullScreen == null
           ? _value.isFullScreen

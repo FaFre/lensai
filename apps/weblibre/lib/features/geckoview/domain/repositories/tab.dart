@@ -139,6 +139,15 @@ class TabRepository extends _$TabRepository {
   final _closeLock = Lock();
   final _pendingIsolationCleanup = <String>{};
 
+  /// The site-assignment request currently being handled for each tab.
+  ///
+  /// Handling one means waiting for the tab's content state and then reading
+  /// containers out of the database, and the engine can start another
+  /// navigation in that tab in the meantime. The earlier request is obsolete
+  /// once that happens: reopening its URL would pull the tab back to a page the
+  /// engine has already left.
+  final _latestAssignmentRequests = <String, String>{};
+
   TabBackPromptBehavior? backPromptBehaviorFor(String? tabId) {
     if (tabId == null) {
       return null;
@@ -1135,6 +1144,169 @@ class TabRepository extends _$TabRepository {
   //   }
   // }
 
+  /// Reopens a navigation the container extension cancelled, in the container
+  /// the site is assigned to.
+  ///
+  /// The extension cancels the request natively and reports it here. Nothing
+  /// else retries it, so a report this drops leaves the tab sitting on a
+  /// navigation that will never happen.
+  Future<void> _handleSiteAssignment(ContainerSiteAssignment event) async {
+    // Strict-mode blocks have no destination container to re-open into; the
+    // navigation was already cancelled natively and the user is notified via
+    // a snackbar (see the strict-block listener in the app shell). Nothing
+    // to reconcile here.
+    if (event.strict) {
+      return;
+    }
+
+    final tabId = event.tabId;
+    if (tabId == null) {
+      logger.w(
+        'Site assignment for ${event.url} names no tab; nothing to reopen',
+      );
+      return;
+    }
+
+    _latestAssignmentRequests[tabId] = event.requestId;
+    bool isCurrentRequest() =>
+        ref.mounted && _latestAssignmentRequests[tabId] == event.requestId;
+
+    try {
+      // Not `ref.read(tabStatesProvider)[tabId]`: this event reaches Dart the
+      // moment the extension answers, which for a tab opened by the very
+      // navigation being cancelled is before the tab itself does.
+      final tabState = await ref
+          .read(tabStatesProvider.notifier)
+          .awaitContentState(tabId);
+
+      if (!isCurrentRequest()) {
+        return;
+      }
+
+      if (tabState == null) {
+        logger.w(
+          'Gave up waiting for tab $tabId to reopen ${event.url} in its '
+          'assigned container',
+        );
+        return;
+      }
+
+      final uri = Uri.parse(event.url);
+      final originUri = event.originUrl.mapNotNull(Uri.parse);
+
+      final targetContainerId = await ref
+          .read(containerRepositoryProvider.notifier)
+          .siteAssignedContainerId(Uri.parse(uri.origin));
+
+      if (!isCurrentRequest()) {
+        return;
+      }
+
+      final containerData = await targetContainerId.mapNotNull(
+        (id) =>
+            ref.read(containerRepositoryProvider.notifier).getContainerData(id),
+      );
+
+      if (!isCurrentRequest() || containerData == null) {
+        return;
+      }
+
+      final currentTabState = ref.read(tabStatesProvider)[tabId];
+      if (currentTabState == null) {
+        logger.w(
+          'Tab $tabId disappeared before ${event.url} could be reopened',
+        );
+        return;
+      }
+
+      // The tab is already in the target container, so there is nothing
+      // to reconcile. This notably fires when reassigning a tab into a
+      // container that shares the default Gecko context: assignContainer
+      // recreates the tab in the target container, and that new tab's
+      // load re-triggers this event. Without this guard the transiently
+      // empty new tab would be treated as an empty tab and churn yet
+      // another tab (re-prompting app-links).
+      final currentTabContainerId = await ref
+          .read(tabDataRepositoryProvider.notifier)
+          .getTabContainerId(currentTabState.id);
+      if (!isCurrentRequest() || currentTabContainerId == targetContainerId) {
+        return;
+      }
+
+      final historyIsEmpty =
+          ref
+              .read(tabHistoryStatesProvider)[currentTabState.id]
+              ?.items
+              .isEmpty ??
+          true;
+
+      final tabIsEmpty =
+          currentTabState.url == TabState.defaultUrl && historyIsEmpty;
+
+      if (event.blocked || tabIsEmpty) {
+        final newTabId = await addTab(
+          url: uri,
+          tabMode: currentTabState.tabMode,
+          containerSelection: TabContainerSelection.specific(containerData),
+          parentId: currentTabState.id,
+          selectTab: true,
+        );
+
+        // Past the point of no return. The replacement tab exists, so the swap
+        // is finished even if a newer navigation has claimed this tab since —
+        // abandoning it here would leave the new tab created but unselected.
+        if (historyIsEmpty && ref.mounted) {
+          await closeTab(currentTabState.id);
+          if (ref.mounted) {
+            await selectTab(newTabId);
+          }
+        }
+      } else {
+        final latestTabState = ref.read(tabStatesProvider)[tabId];
+        if (latestTabState == null) {
+          logger.w(
+            'Tab $tabId disappeared before ${event.url} could be reassigned',
+          );
+          return;
+        }
+
+        if (originUri == null) {
+          await ref
+              .read(tabDataRepositoryProvider.notifier)
+              .assignContainer(
+                latestTabState.id,
+                containerData,
+                replacementUrl: uri,
+              );
+        } else if (latestTabState.url == originUri) {
+          await ref
+              .read(tabDataRepositoryProvider.notifier)
+              .assignContainer(
+                latestTabState.id,
+                containerData,
+                closeOldTab: false,
+                replacementUrl: uri,
+              );
+        } else {
+          logger.w(
+            'Could not match origin url for assignment ${latestTabState.url} to request ${event.originUrl}',
+          );
+        }
+      }
+    } catch (error, stackTrace) {
+      // The stream's `onError` never sees what an async listener throws.
+      logger.e(
+        'Failed to reopen ${event.url} in its assigned container',
+        error: error,
+        stackTrace: stackTrace,
+      );
+    } finally {
+      if (_latestAssignmentRequests[tabId] == event.requestId) {
+        _latestAssignmentRequests.remove(tabId);
+      }
+    }
+  }
+
   @override
   void build() {
     // Hold an active listener on the rendered navigation order: swipes and
@@ -1173,141 +1345,19 @@ class TabRepository extends _$TabRepository {
       },
     );
 
-    final containerSiteAssignementSub = eventSerivce.siteAssignementEvent.listen(
-      (event) async {
-        // Strict-mode blocks have no destination container to re-open into; the
-        // navigation was already cancelled natively and the user is notified via
-        // a snackbar (see the strict-block listener in the app shell). Nothing
-        // to reconcile here.
-        if (event.strict) {
-          return;
-        }
-
-        final tabId = event.tabId;
-        if (tabId != null) {
-          final tabState = ref.read(tabStatesProvider)[tabId];
-          if (tabState != null) {
-            final uri = Uri.parse(event.url);
-            final originUri = event.originUrl.mapNotNull(Uri.parse);
-
-            final targetContainerId = await ref
-                .read(containerRepositoryProvider.notifier)
-                .siteAssignedContainerId(Uri.parse(uri.origin));
-
-            if (!ref.mounted) {
-              return;
-            }
-
-            final containerData = await targetContainerId.mapNotNull(
-              (id) => ref
-                  .read(containerRepositoryProvider.notifier)
-                  .getContainerData(id),
+    final containerSiteAssignementSub = eventSerivce.siteAssignementEvent
+        .listen(
+          (event) async {
+            await _handleSiteAssignment(event);
+          },
+          onError: (Object error, StackTrace stackTrace) {
+            logger.e(
+              'Error in container site assignment stream',
+              error: error,
+              stackTrace: stackTrace,
             );
-
-            if (!ref.mounted) {
-              return;
-            }
-
-            if (containerData != null) {
-              final currentTabState = ref.read(tabStatesProvider)[tabId];
-              if (currentTabState == null) {
-                logger.w('Could not get tab for assignement ${event.url}');
-                return;
-              }
-
-              // The tab is already in the target container, so there is nothing
-              // to reconcile. This notably fires when reassigning a tab into a
-              // container that shares the default Gecko context: assignContainer
-              // recreates the tab in the target container, and that new tab's
-              // load re-triggers this event. Without this guard the transiently
-              // empty new tab would be treated as an empty tab and churn yet
-              // another tab (re-prompting app-links).
-              final currentTabContainerId = await ref
-                  .read(tabDataRepositoryProvider.notifier)
-                  .getTabContainerId(currentTabState.id);
-              if (!ref.mounted) {
-                return;
-              }
-              if (currentTabContainerId == targetContainerId) {
-                return;
-              }
-
-              final historyIsEmpty =
-                  ref
-                      .read(tabHistoryStatesProvider)[currentTabState.id]
-                      ?.items
-                      .isEmpty ??
-                  true;
-
-              final tabIsEmpty =
-                  currentTabState.url == TabState.defaultUrl && historyIsEmpty;
-
-              if (event.blocked || tabIsEmpty) {
-                final newTabId = await addTab(
-                  url: uri,
-                  tabMode: currentTabState.tabMode,
-                  containerSelection: TabContainerSelection.specific(
-                    containerData,
-                  ),
-                  parentId: currentTabState.id,
-                  selectTab: true,
-                );
-
-                if (!ref.mounted) {
-                  return;
-                }
-
-                if (historyIsEmpty) {
-                  await closeTab(currentTabState.id);
-                  if (!ref.mounted) {
-                    return;
-                  }
-                  await selectTab(newTabId);
-                }
-              } else {
-                final latestTabState = ref.read(tabStatesProvider)[tabId];
-                if (latestTabState == null) {
-                  logger.w('Could not get tab for assignement ${event.url}');
-                  return;
-                }
-
-                if (originUri == null) {
-                  await ref
-                      .read(tabDataRepositoryProvider.notifier)
-                      .assignContainer(
-                        latestTabState.id,
-                        containerData,
-                        replacementUrl: uri,
-                      );
-                } else if (latestTabState.url == originUri) {
-                  await ref
-                      .read(tabDataRepositoryProvider.notifier)
-                      .assignContainer(
-                        latestTabState.id,
-                        containerData,
-                        closeOldTab: false,
-                        replacementUrl: uri,
-                      );
-                } else {
-                  logger.w(
-                    'Could not match origin url for assignment ${latestTabState.url} to request ${event.originUrl}',
-                  );
-                }
-              }
-            }
-          } else {
-            logger.w('Could not get tab for assignement ${tabState?.url}');
-          }
-        }
-      },
-      onError: (Object error, StackTrace stackTrace) {
-        logger.e(
-          'Error in container site assignment stream',
-          error: error,
-          stackTrace: stackTrace,
+          },
         );
-      },
-    );
 
     final tabContentSub = tabContentService.tabContentStream.listen(
       (content) async {

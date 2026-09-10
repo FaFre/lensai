@@ -67,6 +67,19 @@ class TabState extends WebPageInfo {
   final TabMode tabMode;
   String? get isolationContextId => tabMode.isolationContextId;
 
+  /// Whether the engine has reported this tab's content state.
+  ///
+  /// Icons, security info and readerable state all seed an entry from
+  /// [TabState.$default], which claims a regular, non-isolated tab sitting at
+  /// [defaultUrl]. Those defaults are fine to render, but a caller that acts on
+  /// the tab's identity — reopening it in another container, say — would carry
+  /// a private or isolated tab over as a regular one. It has to wait for the
+  /// content event instead; see `TabStates.awaitContentState`.
+  ///
+  /// Unlike the other fields here this one only ever flips once per tab, so it
+  /// costs the tab list a single extra rebuild.
+  final bool hasContentState;
+
   final bool isFullScreen;
   final bool isLoading;
   final bool showToolbarAsExpanded;
@@ -82,6 +95,7 @@ class TabState extends WebPageInfo {
     required String title,
     required this.icon,
     this.tabMode = TabMode.regular,
+    this.hasContentState = false,
     required this.isFullScreen,
     required this.isLoading,
     required this.showToolbarAsExpanded,
@@ -97,6 +111,7 @@ class TabState extends WebPageInfo {
     required super.title,
     required this.icon,
     required this.tabMode,
+    required this.hasContentState,
     required this.isFullScreen,
     required this.isLoading,
     required this.showToolbarAsExpanded,
@@ -126,6 +141,7 @@ class TabState extends WebPageInfo {
     contextId,
     icon,
     tabMode,
+    hasContentState,
     isFullScreen,
     isLoading,
     showToolbarAsExpanded,

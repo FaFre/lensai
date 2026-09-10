@@ -68,6 +68,7 @@ export 'src/pigeons/gecko.g.dart'
         BounceTrackingProtectionMode,
         ClearDataType,
         ColorScheme,
+        ContainerSiteAssignment,
         ContentBlocking,
         CookieBannerHandlingMode,
         CookieSameSiteStatus,
