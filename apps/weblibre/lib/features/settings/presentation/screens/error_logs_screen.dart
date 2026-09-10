@@ -177,15 +177,17 @@ class ErrorLogsScreen extends HookConsumerWidget {
     Level minLogLevel,
     Level level,
   ) {
-    final isSelected = level.value == minLogLevel.value;
     final levelColor = _levelColor(level);
 
-    return CheckboxMenuButton(
+    // The minimum level is a single choice, so these are radios rather than
+    // checkboxes: tapping one always selects it and deselects the others.
+    return RadioMenuButton<Level>(
       trailingIcon: Icon(_levelIcon(level), color: levelColor),
-      value: isSelected,
+      value: level,
+      groupValue: minLogLevel,
       onChanged: (value) {
-        if (value == true) {
-          ref.read(logFilterProvider.notifier).setFilter(level);
+        if (value != null) {
+          ref.read(logFilterProvider.notifier).setFilter(value);
         }
       },
       child: Text(level.name.toUpperCase()),

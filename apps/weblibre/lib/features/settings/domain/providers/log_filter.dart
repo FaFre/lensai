@@ -26,7 +26,7 @@ part 'log_filter.g.dart';
 class LogFilter extends _$LogFilter {
   @override
   Level build() {
-    return Level.all;
+    return Level.warning;
   }
 
   // ignore: use_setters_to_change_properties
