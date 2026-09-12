@@ -33,11 +33,18 @@ import 'package:weblibre/features/user/domain/providers.dart';
 import 'package:weblibre/utils/exit_app.dart';
 import 'package:weblibre/utils/ui_helper.dart' as ui_helper;
 
+/// Tears the app down. Injectable so a test can confirm a quit without the real
+/// implementation ending the process.
+typedef ExitAppCallback = Future<void> Function(ProviderContainer container);
+
 /// Profile switch, sync, settings and quit.
 class ProfileSection extends HookConsumerWidget {
   final List<MenuItemType> items;
 
-  const ProfileSection({super.key, required this.items});
+  /// What a confirmed quit runs. Defaults to the real teardown.
+  final ExitAppCallback onExit;
+
+  const ProfileSection({super.key, required this.items, this.onExit = exitApp});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -92,16 +99,25 @@ class ProfileSection extends HookConsumerWidget {
               style: TextStyle(color: theme.colorScheme.error),
             ),
             onTap: () async {
+              // Read the container before popping: dismissing the sheet
+              // disposes this widget while the dialog is still up, and a `ref`
+              // access after that resolves through a dead element
+              // ("No ProviderScope found"). Deliberately no post-dialog
+              // `context.mounted` guard — the widget is *expected* to be gone
+              // by then, and bailing out would make a confirmed quit do
+              // nothing.
+              final container = ref.container;
               Navigator.pop(context);
               final result = await showQuitBrowserDialog(context);
 
               if (result == true) {
-                await exitApp(ref.container);
+                await onExit(container);
               }
             },
             onLongPress: () async {
+              final container = ref.container;
               Navigator.pop(context);
-              await exitApp(ref.container);
+              await onExit(container);
             },
           );
 
