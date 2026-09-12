@@ -1,0 +1,196 @@
+GeckoView 155.0
+
+This release brings together eleven updates since the last stable version. It gives you more control over when links open in other apps, adds website notifications without needing Google, makes bookmarks and the home screen far more customizable, and improves how WebLibre connects through Tor and proxies.
+
+## Highlights
+
+- **App Links** — decide when links open in other apps, with rules per site and per container
+- **Website Notifications** — get notified by websites via UnifiedPush, without Google's involvement
+- **Bookmarks Rewritten** — large bookmark collections load fast, and imports run smoothly in the background
+- **Redesigned Home Page** — customize your sections, add a wallpaper, and choose where the search bar sits
+- **Clearer Connections** — see at a glance how each tab is connecting, with more reliable Tor/proxy startup
+- **Bangs Overhaul** — pin your favorite search shortcuts and use them right from the address bar
+- **Customizable Browser Menu** — reorder or hide the menu items you don't use
+- **Settings Export & Import** — copy your settings to another device in a few taps
+- **Engine Upgrade** — GeckoView 155.0 for better compatibility and security
+
+## App Links (New)
+
+The web is full of links that could open in another app — a YouTube link opening the YouTube app, for example. WebLibre now lets you decide what happens when a page tries to do that.
+
+- **Three modes** under Settings > Browsing > Open Links in Apps: **Ask before opening** (default), **Always**, and **Never**.
+- **Remember your choice for a site** — tap "Remember for this site" in a prompt, and revisit or undo any saved choices later from a "Remembered site rules" list.
+- **Per-site override** in a site's settings: always open in app, always keep in browser, or follow your default.
+- **Advanced: per-container rules** — containers with their own cookies can have their own App Links setting and remembered sites, separate from the rest of the app. Handy if you want a Shopping container to always stay in-browser while a Media container opens YouTube freely.
+- **Less disruptive prompts** — a small banner asks about ordinary links so you can keep reading while you decide; links with nothing to show get a simple pop-up instead. Only one shows at a time, and they no longer get stuck on screen or vanish on their own before you've had a chance to answer.
+- **Closing a prompt without choosing now genuinely does nothing** — it won't be treated as "No", and it won't be remembered as a permanent choice, like it sometimes was before.
+- **New setting: Wait for your answer** — turn this on if you'd rather the page not start loading until after you've answered the prompt (normally it keeps loading behind the scenes while you decide).
+- **"Sign in with" flows now work properly** — many sites let you sign in by bouncing you to another app and back (like "Sign in with Google"). This now works correctly even if you've set links to Never open other apps. A new **Allow login app callbacks** setting (on by default) lets you turn this back off.
+- **Extra care for your privacy** — while browsing privately, through Tor or a proxy, or in a strict container, WebLibre never opens another app on its own — you're always asked, and it won't offer to remember your answer, so an anonymous session can't be linked back to you through another app. A few sensitive link types (like ones for payment apps, or links embedded in a page's own code) always require an explicit tap from you and can never open an app silently, and a remembered choice will never open a different app than the one you originally picked.
+- This is different from the existing **Intent Gatekeeper** setting, which controls whether *other* apps are allowed to send links *into* WebLibre.
+- Fixed some pages endlessly reloading themselves when they tried (and failed) to open an app you don't have installed.
+
+## Website Notifications (New)
+
+Websites can now send you notifications — even when WebLibre isn't open — without going through Google.
+
+- Moved out of Experimental into its own **Notifications** settings screen.
+- Built on **UnifiedPush**, an open, Google-independent alternative to Firebase Cloud Messaging. Instead of routing through Google, you choose a delivery app you trust (such as ntfy, which you can even self-host) the first time you turn this on.
+- The Notifications screen shows whether everything is set up correctly, and lists which sites currently have notifications turned on.
+- Nothing is on by default: a site has to ask you for permission, and you need to have chosen a delivery app and granted Android's notification permission.
+- Notifications are delivered reliably, even if your connection drops for a moment, and can still arrive while the app is fully closed.
+- Your choice of delivery app and your subscriptions are kept separate for each profile.
+- To stop notifications from a specific site, turn off notifications for that site (from its site info panel) rather than looking for an "unsubscribe" button in the Notifications screen.
+
+## Bookmarks
+
+- **Folders open instantly**, even with a huge bookmark collection — WebLibre no longer tries to load your entire bookmark tree at once.
+- **Importing a large bookmarks file no longer freezes the app** — you'll see a progress screen while it works in the background, and it finishes much faster than before.
+- **Safer imports** — an empty or broken bookmarks file can no longer accidentally wipe out your existing bookmarks. Re-importing a Firefox export also rebuilds your Toolbar, Menu, and Unfiled folders more faithfully.
+- **More ways to organize your list** — sort by title, web address, or date; show folders only; hide empty built-in folders; collapse everything with one tap. Your choices are remembered.
+- **New setting: what happens when you tap a bookmark** — always ask (default, unchanged), open in a regular tab, a private tab, a Custom Tab, or an isolated tab.
+- **Better folder tools** — add bookmarks straight into the folder you're viewing, move folders safely, merge a folder into its parent, and see how many bookmarks are inside before you delete a folder.
+
+## Redesigned Home Page
+
+- Closing your last tab (or opening the app) now shows a proper home screen: a search bar at the top with voice and QR-scan buttons, and a scrollable list of sections below it — Quick Actions, Shortcuts, Recent Tabs, a daily Quote, and more.
+- **Customize your home screen** — reorder sections, show or hide the ones you don't use, and reset to the defaults if you change your mind. The home page and the new-tab page can look different from each other.
+- **New setting: what to show when there's no tab open** — the home page (default), your last tab, or a specific address you choose, with an option to apply this per container too.
+- **Better shortcuts** — add one by hand by typing a title and address, hide every shortcut from one website at once, and removed shortcuts now actually stay removed instead of quietly coming back.
+- **Choose where the search bar sits** — follow your tab bar (default), pin it to the top of the home page, or use the tab bar's own address field instead.
+- **Home screen wallpapers** — pick a photo, with controls for blur and dimming so your text stays readable, and set a different wallpaper per container if you like.
+- The home screen now centers itself nicely when you only have a few sections turned on, and the daily quote has a cleaner look with an easy refresh button.
+
+## Clearer Connections (Proxy & Tor)
+
+WebLibre's proxy support is built on **sing-box**, the same open-source proxy engine it has used since the last release, supporting protocols like Shadowsocks, VMess, VLESS, Trojan, and WireGuard.
+
+- **Redesigned Connections screen** — each tab now shows exactly how it's connecting ("This tab: Tor", "This tab: Direct connection", or "Blocked — start your connection first", with a one-tap button to start it). One screen lets you choose the connection for regular tabs, private tabs, an isolated tab, or a whole container.
+- Each saved connection now shows what's using it, and ones nothing is using are hidden to keep the list tidy.
+- **Start Automatically** — flag any proxy or Tor connection to start as soon as you open WebLibre, so it's ready before you need it.
+- Isolated tabs can now use their own connection, separate from their container.
+- **Stronger privacy by default** — WebLibre never sends your traffic over an unprotected connection by mistake. If a tab is supposed to use a proxy that isn't running, its traffic (and related background activity like search suggestions or site icons) is blocked rather than silently sent unprotected.
+- Fixed proxies occasionally failing to start with a "connection already in use" type error.
+- **More reliable when opening links from other apps** — a proxied link opened via a Custom Tab, a home-screen shortcut, or an installed web app now works correctly the first time, even if WebLibre wasn't already running; before, this could sometimes load nothing at all.
+- These same proxied launches now show a clear "Connecting privately…" message while your connection starts, with options to try again, open normally, or cancel — instead of failing silently or opening unprotected.
+- Websites you visit are now kept more strongly separated from each other for better privacy, and WebLibre uses a little less memory while sitting idle.
+- **New Proxy Logs screen** for troubleshooting — filter by severity, copy or share what you're viewing, and adjust how much detail is logged.
+- Importing WireGuard connections is easier and comes tuned with mobile-friendly defaults.
+
+## DNS over HTTPS
+
+- Custom DNS-over-HTTPS providers you add are now saved in a list next to the built-in ones (up to 16), so switching between them is a single tap instead of retyping the address every time. Deleting the one you're using safely falls back to the default so lookups never stop working.
+
+## History & Link Cleaning
+
+- **"Exclude from History" now works for every container**, not just ones with their own separate cookies.
+- Turning on "Exclude from History" also removes that container's pages from your on-device search results.
+- Excluding a container's history is now more reliable, including for pop-ups and tabs opened from links — and if WebLibre is ever unsure, it plays it safe and doesn't record a visit.
+- **You can now restore a removed tracking parameter** from a cleaned-up link, if there's one you actually want to keep (like a referral code).
+- The tracking indicator now clearly shows whether a link is fully cleaned, partially cleaned, or untouched, and no longer gets stuck showing the wrong status.
+
+## Tabs, Gestures & Navigation
+
+- Swiping between tabs (or using a next/previous tab gesture) now follows the order you actually see on screen — including any sorting or grouping you've set up — and can move across containers instead of stopping at the edge of one.
+- **New actions** you can assign to a gesture or the toolbar: open the home screen, hide/show the tab bar, switch to the next or previous container, and open the container list.
+- **New two-finger gestures in the tab overview**: swipe with two fingers to switch containers, or pinch to switch between tab layouts.
+- **New setting: what happens when a tab opens in the background** — stay where you are with a "Switch" button (default), or jump to the new tab right away.
+- **New setting: swiping past your last tab** — move into the next container (default), or loop back to your first tab.
+- **New setting: show the tab close button** on the active tab only, on every tab, or not at all.
+- Closing a tab now more reliably takes you back to the tab that opened it, even across containers.
+- Fixed reordering tabs sometimes sending a tab flying to the top or bottom of the list by accident.
+- Fixed long-pressing a tab sometimes starting a drag instead of opening its menu (or the other way around).
+- Long-pressing a tab group now opens a proper menu — new tab, pin, close, bookmark, clear data, edit, delete — instead of jumping straight into the group editor.
+- Fixed tabs occasionally getting stuck showing an outdated title, icon, or address, most noticeable after restoring several tabs at once.
+- **Mouse and trackpad support** — scrolling now correctly affects whatever menu or panel is open, instead of the page underneath it, and you can resize or dismiss panels with the scroll wheel too.
+- Pull-to-refresh no longer triggers by accident after zooming in or out, or while watching a fullscreen video or playing a fullscreen game. Three-finger taps (like the screenshot gesture on some phones) no longer scroll the page or close tabs by accident.
+
+## Search & Bangs
+
+Bangs are shortcuts like `!g` that jump straight to a specific search engine.
+
+- **Type a bang directly in the address bar** — like `!g cats` or `cats !g` — and watch the search icon update as you type.
+- **Pin your favorite bangs** to keep them close at hand, and long-press one to pin, unpin, edit, or turn it into your own custom shortcut.
+- **New setting: Popular Site Suggestions** — turn off suggested well-known websites when nothing in your own history matches what you're typing.
+
+## Browser Menu & Toolbar
+
+- **Customize the browser menu** — reorder or hide the sections and buttons you don't use, with an option to reset to the default layout. Find it via "Customize menu" at the bottom of the menu, or in Settings.
+- The QR-code scanner and voice search can now be added to your toolbar, so they're available while browsing a page, not just from the home screen.
+
+## Settings Export & Import (New)
+
+- Export your settings to a file (or the clipboard) and import them on another device — handy when setting up a new phone.
+- Choose to transfer just your app settings, advanced browser preferences, or both.
+- This isn't a full backup: it doesn't include your tabs, history, bookmarks, saved logins, or account sign-in. Sensitive details like passwords are scrubbed where possible, but it's worth reviewing an exported file before sharing it.
+
+## Backup, Restore & Profiles
+
+- Backing up or restoring a profile now closes and reopens the app to do it safely, with clear messages explaining what's happening at each step.
+- **New: a one-tap "Back up this profile" shortcut**, right in Settings.
+- Backing up is simpler — temporary files are always skipped automatically, and you no longer have to re-enter your password to confirm.
+- Before backing up, restoring, or deleting a profile, WebLibre now clearly explains that the app needs to restart, and what that means for any open private tabs.
+- Fixed restoring an older backup sometimes permanently signing you out of your Firefox Sync account if your session had expired — WebLibre now keeps your account and sync setup intact and simply asks you to sign back in.
+
+## Firefox Account Sync
+
+Bookmark, history, and tab sync uses a **Firefox Account** (the same account system Firefox itself uses).
+
+- Fixed the sync screen sometimes briefly showing "Not signed in" right after opening it, even though you were signed in.
+- Fixed the "syncing…" indicator getting stuck or flickering.
+- Renaming a device now updates everywhere immediately, without needing to restart the app.
+
+## WebLibre Account
+
+Separate from Firefox Sync, your **WebLibre Account** covers things like Supporter status and app-level sign-in.
+
+- Fixed a rare case where a successful sign-in could be lost after restarting the app.
+- Revoked or expired sessions are now handled differently from manually signing out, so you don't lose recovery access unexpectedly.
+- Older "unclaimed" sign-ins are explained more clearly and can be fixed from the Account screen.
+- Old or corrupted account data no longer breaks the Account screen.
+
+## Reliability
+
+- Tabs are less likely to reload from scratch after you've been away from the app for a while.
+- If a web page itself crashes, its tab now reloads automatically instead of getting stuck on a blank white screen.
+- Links and shares from other apps now reliably open in WebLibre — previously, tapping a link right as WebLibre was starting up could silently do nothing.
+- Fixed the previous page briefly flashing on screen when leaving the browser for another screen, like Settings.
+- Fixed a rare crash when closing an add-on's settings while it was still loading.
+
+## Privacy & Safety
+
+- **New: allow screenshots in private tabs** — they're still blocked by default, and the separate Screenshot Protection setting, if enabled, still blocks screenshots everywhere in the app regardless.
+
+## Zoom & Web Content
+
+- **New: Zoom on All Websites** — lets you pinch-to-zoom even on pages that try to prevent it. Off by default.
+- Pressing Enter in the address bar now completes the suggestion shown, instead of ignoring it — unless you'd already chosen otherwise.
+- Quitting the browser now immediately clears any containers you've set to clear their data on exit.
+
+## Extensions & Interface Polish
+
+- Installing add-ons is more reliable, especially right after opening a new tab, and leaving an add-on's page mid-install no longer leaves it stuck.
+- Search and filter buttons in History, Downloads, and Bookmarks now work the same way across all three screens.
+- The home screen search widget now matches your device's light or dark theme, and can pick up your device's own colors on newer Android versions (Android 12+'s "Material You" theming).
+- Fixed some permission pop-ups (for example, from add-ons) not matching the rest of the app's look.
+
+## Performance
+
+- Smoother scrolling, snappier tab lists, and less lag when switching tabs or opening menus — especially if you have lots of tabs, containers, or feed articles.
+- Faster startup, and the app avoids redoing work that hasn't changed since last time, like refreshing site icons or rebuilding built-in databases.
+
+## Engine Update
+
+- Updated browser engine (GeckoView 155) with the latest website compatibility, stability, and security fixes.
+- The default rendering engine is back to the classic "Skia" one, after a brief experiment with Google's newer **Impeller** engine turned up issues — most people won't notice any visual difference. A separate Impeller build is still available if you want to help test it.
+- GitHub release downloads now include a version for emulators and x86-based tablets or Chromebooks.
+
+## Upgrade Notes
+
+- App Links starts in "Ask" mode with no sites remembered yet — nothing changes automatically.
+- Website Notifications stay off until you choose a UnifiedPush delivery app for them.
+- Your bookmarks, folders, and existing settings all carry over as they were.
+- Screenshots in private tabs stay blocked unless you turn on the new setting.
+- If you were trying the experimental Impeller rendering engine, it keeps working as its own separate install.
+- This engine update removes Mozilla's built-in automatic cookie-banner handling (upstream discontinued it) — if you relied on it, a content-blocking extension like uBlock Origin can take over that job.
+- Settings Export & Import is not a replacement for a full profile backup.
